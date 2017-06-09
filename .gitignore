@@ -1,0 +1,15 @@
+*.class
+build
+.DS_Store
+.gradle
+.idea
+*.iml
+*.ipr
+*.iws
+out/**
+logs/**
+Gemfile.lock
+artefacts/
+data/**
+/.mongo/*
+!/.mongo/.gitkeep
