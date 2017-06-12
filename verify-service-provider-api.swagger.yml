@@ -55,6 +55,10 @@ paths:
           description: an error due to a problem with translating the Response
           schema:
             $ref: '#/definitions/ErrorBody'
+        '401':
+          description: Response identifies failures when authenticating the user
+          schema:
+            $ref: '#/definitions/ErrorBody'
         '500':
           description: an error due to an internal server error
           schema:
@@ -140,10 +144,10 @@ definitions:
   ErrorBody:
     type: object
     required:
-      - errorType
+      - reason
       - message
     properties:
-      errorType:
+      reason:
         type: string
       message:
         type: string
