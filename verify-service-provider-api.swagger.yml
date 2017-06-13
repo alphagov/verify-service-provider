@@ -1,0 +1,163 @@
+swagger: '2.0'
+info:
+  description: This a proposed API for the Verify Serivce Provider
+  version: 1.0.0
+  title: Verify Service Provider
+paths:
+  /generate-request:
+    post:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: requestGenerationBody
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/RequestGenerationBody'
+      responses:
+        '200':
+          description: An object containing a SAML request.
+          schema:
+            $ref: '#/definitions/RequestResponseBody'
+        '400':
+          description: >-
+            An error due to a problem with creating the SAML request. Can be
+            because of given parameters are not recognized.
+          schema:
+            $ref: '#/definitions/ErrorBody'
+        '500':
+          description: An error due to an internal server error.
+          schema:
+            $ref: '#/definitions/ErrorBody'
+  /translate-response:
+    post:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: responseBody
+          description: An object containing a details of a SAML Authn response.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TranslateResponseRequestBody'
+      responses:
+        '200':
+          description: >-
+            Response contains an object with details of a translated SAML
+            response.
+          schema:
+            $ref: '#/definitions/TranslatedResponseBody'
+        '400':
+          description: an error due to a problem with translating the Response
+          schema:
+            $ref: '#/definitions/ErrorBody'
+        '401':
+          description: Response identifies failures when authenticating the user
+          schema:
+            $ref: '#/definitions/ErrorBody'
+        '500':
+          description: an error due to an internal server error
+          schema:
+            $ref: '#/definitions/ErrorBody'
+definitions:
+  ExpectedLevelOfAssurance:
+    description: Level of assurance requested by the Service
+    type: string
+    default: DEFINED IN SERVICE PROVIDER CONFIG
+    enum:
+      - LEVEL_1
+      - LEVEL_2
+      - LEVEL_3
+  ReceivedLevelOfAssurance:
+    description: Level of assurance the user authenticated with.
+    type: string
+    enum:
+      - LEVEL_1
+      - LEVEL_2
+      - LEVEL_3
+  RequestGenerationBody:
+    type: object
+    properties:
+      levelOfAssurance:
+        $ref: '#/definitions/ExpectedLevelOfAssurance'
+  RequestResponseBody:
+    type: object
+    required:
+      - samlRequest
+      - secureToken
+      - location
+    properties:
+      samlRequest:
+        description: SAML authn request string as a base64 string
+        type: string
+        format: byte
+      secureToken:
+        description: >-
+          A token that identifies the authn request. This can be used to later
+          verify that the request and response have passed through the same
+          browser.
+        type: string
+        format: byte
+      location:
+        description: The url for Verify HUB SSO. The entrypoint for saml authn flow.
+        type: string
+        format: url
+  TranslateResponseRequestBody:
+    type: object
+    required:
+      - samlResponse
+      - secureToken
+    properties:
+      samlResponse:
+        description: A SAML Authn response as a base64 string.
+        type: string
+        format: byte
+      secureToken:
+        description: >-
+          A token that was generated for the original SAML Authn request. The
+          token is used to verify that the request and response are from the
+          same browser.
+        type: string
+        format: byte
+  TranslatedResponseBody:
+    type: object
+    required:
+      - pid
+    properties:
+      pid:
+        description: >-
+          A unique identifier that can identify a user against an internal
+          record.
+        type: string
+        format: byte
+      levelOfAssurance:
+        $ref: '#/definitions/ReceivedLevelOfAssurance'
+      attributes:
+        description: An optional array of user attributes if no match was possible
+        type: array
+        items:
+          $ref: '#/definitions/Attribute'
+  ErrorBody:
+    type: object
+    required:
+      - reason
+      - message
+    properties:
+      reason:
+        type: string
+      message:
+        type: string
+  Attribute:
+    description: >-
+      An attribute describing a user WIP: some attributes do not fit the
+      string:string model
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string
