@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 repositories {
-    mavenCentral()
+    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
 }
 
 dependencies {
@@ -15,6 +15,25 @@ dependencies {
         'org.mockito:mockito-core:2.7.22'
     )
 
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            srcDir 'src/integration-test/java'
+        }
+        resources {
+            srcDir 'src/integration-test/resources'
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+        compileClasspath += sourceSets.test.runtimeClasspath
+        compileClasspath += sourceSets.test.output
+    }
+}
+
+task testIntegration(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath += sourceSets.integrationTest.runtimeClasspath
 }
 
 run {

@@ -1,15 +1,21 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
+import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfiguration;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 @Path("/hello-world")
 public class HelloWorldResource {
 
+    VerifyServiceProviderConfiguration configuration;
+
+    public HelloWorldResource(VerifyServiceProviderConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
     @GET
     public String getHelloWorld() {
-        return "Hello World";
+        return "Hello " + configuration.getHelloWorldValue();
     }
 }
