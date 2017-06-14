@@ -5,15 +5,16 @@ import io.dropwizard.Configuration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
     @Valid
-    protected String helloWorldValue;
+    protected URI hubLocation;
 
-    public String getHelloWorldValue() {
-        return helloWorldValue;
+    public URI getHubLocation() {
+        return hubLocation;
     }
 }
