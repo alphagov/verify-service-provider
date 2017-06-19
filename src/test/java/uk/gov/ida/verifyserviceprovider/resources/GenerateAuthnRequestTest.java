@@ -12,13 +12,11 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.net.URI;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GenerateAuthnRequestTest {
 
-    private static final URI HUB_LOCATION = URI.create("http://example.com");
+    private static final String HUB_LOCATION = "http://example.com";
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -45,6 +43,6 @@ public class GenerateAuthnRequestTest {
         RequestResponseBody requestResponseBody = response.readEntity(RequestResponseBody.class);
         assertThat(requestResponseBody.samlRequest).isNotEmpty();
         assertThat(requestResponseBody.secureToken).isNotEmpty();
-        assertThat(requestResponseBody.location).isEqualTo(HUB_LOCATION);
+        assertThat(requestResponseBody.location.toString()).isEqualTo(HUB_LOCATION);
     }
   }
