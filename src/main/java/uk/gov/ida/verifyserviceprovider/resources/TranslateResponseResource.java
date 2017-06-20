@@ -19,7 +19,7 @@ public class TranslateResponseResource {
 
     @POST
     public Response translateResponse(TranslateResponseRequestBody request) {
-        // LevelOfAssurance levelOfAssurance = request.authnResponse.contains("LEVEL_1") ? LevelOfAssurance.LEVEL_1 : LevelOfAssurance.LEVEL_2;
-        return Response.ok(new TranslatedResponseBody("pid", LevelOfAssurance.LEVEL_1, Collections.EMPTY_LIST)).build();
+         LevelOfAssurance levelOfAssurance = request.response.contains("LEVEL_1") ? LevelOfAssurance.LEVEL_1 : LevelOfAssurance.LEVEL_2;
+        return Response.ok(new TranslatedResponseBody("pid", levelOfAssurance, Collections.EMPTY_LIST)).build();
     }
 }

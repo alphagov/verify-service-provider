@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TranslateResponseRequestBody {
-    public final String authnResponse;
+    public final String response;
     public final String secureToken;
 
     @JsonCreator
-    public TranslateResponseRequestBody(@JsonProperty("authnResponse") String authnResponse,
+    public TranslateResponseRequestBody(@JsonProperty("response") String response,
                                         @JsonProperty("secureToken") String secureToken) {
-        this.authnResponse = authnResponse;
+        this.response = response;
         this.secureToken = secureToken;
     }
 }
