@@ -16,4 +16,4 @@ logging:
       currentLogFilename: logs/verify-service-provider.log
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
-hubLocation: ${HUB_LOCATION}
+hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}

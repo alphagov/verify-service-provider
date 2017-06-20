@@ -5,7 +5,6 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,17 +17,16 @@ import java.net.URI;
 @Consumes(MediaType.APPLICATION_JSON)
 public class GenerateAuthnRequestResource {
 
-    VerifyServiceProviderConfiguration configuration;
+    private final URI location;
 
     public GenerateAuthnRequestResource(VerifyServiceProviderConfiguration configuration) {
-        this.configuration = configuration;
+        this.location = URI.create(configuration.getHubSsoLocation());
     }
 
     @POST
     public Response generateAuthnRequest(RequestGenerationBody requestGenerationBody) {
         String samlRequest = "some-saml";
         String secureToken = "some-secure-token";
-        URI location = URI.create("http://example.com");
         return Response.ok(new RequestResponseBody(samlRequest, secureToken, location)).build();
     }
 }

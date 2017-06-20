@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GenerateAuthnRequestTest {
 
-    private static final String HUB_LOCATION = "http://example.com";
+    private static final String HUB_SSO_LOCATION = "http://example.com/SAML2/SSO";
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -25,8 +25,9 @@ public class GenerateAuthnRequestTest {
 
     private static VerifyServiceProviderConfiguration getConfiguration() {
         class TestVerifyServiceProviderConfiguration extends VerifyServiceProviderConfiguration {
-            public TestVerifyServiceProviderConfiguration() {
-                this.hubLocation = HUB_LOCATION;
+            @Override
+            public String getHubSsoLocation() {
+                return HUB_SSO_LOCATION;
             }
         }
 
@@ -43,6 +44,6 @@ public class GenerateAuthnRequestTest {
         RequestResponseBody requestResponseBody = response.readEntity(RequestResponseBody.class);
         assertThat(requestResponseBody.samlRequest).isNotEmpty();
         assertThat(requestResponseBody.secureToken).isNotEmpty();
-        assertThat(requestResponseBody.location.toString()).isEqualTo(HUB_LOCATION);
+        assertThat(requestResponseBody.location.toString()).isEqualTo(HUB_SSO_LOCATION);
     }
   }

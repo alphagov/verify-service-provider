@@ -11,9 +11,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
-    protected String hubLocation;
+    private String hubSsoLocation;
 
-    public String getHubLocation() {
-        return hubLocation;
+    public String getHubSsoLocation() {
+        return hubSsoLocation;
     }
 }
