@@ -6,7 +6,7 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
     public static void main(String[] args) throws Exception {
@@ -31,6 +31,6 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(new GenerateAuthnRequestResource(configuration));
-        environment.jersey().register(new TranslateResponseResource());
+        environment.jersey().register(new TranslateSamlResponseResource());
     }
 }
