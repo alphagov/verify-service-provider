@@ -26,6 +26,9 @@ If the form post is successful then a browser redirect will be issued to a page 
 journey.  Continuing from this page will take the user to a page containing a series of possible response scenarios that
 can be selected.
 
+Any information that needs to be stored from the original request or between pages will be stored in a session
+cookie. The session cookie does not need to be signed or encrypted initially.
+
 Some scenarios will require additional user input such as a providing a pid value or user account creation attributes.
 These will be provided on subsequent pages. In every case the user will need to provide the URL that the stub-hub should
 send its responses to.
