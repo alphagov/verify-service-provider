@@ -1,5 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
+import com.google.common.collect.ImmutableMap;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.json.JSONObject;
 import org.junit.ClassRule;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.Base64;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,7 +70,12 @@ public class TranslateSamlResponseResourceTest {
     }
 
     private String getSamlResponseForLOA(String levelOfAssurance) {
-        String samlRequestJson = new JSONObject().put("levelOfAssurance", levelOfAssurance).toString();
+        Map<String, String> samlResponseData = ImmutableMap.of(
+            "levelOfAssurance", levelOfAssurance,
+            "pid", "some-pid-value"
+        );
+
+        String samlRequestJson = new JSONObject(samlResponseData).toString();
         return new String(Base64.getEncoder().encode(samlRequestJson.getBytes()));
     }
 }
