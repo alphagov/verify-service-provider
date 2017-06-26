@@ -29,11 +29,9 @@ public class TranslateSamlResponseResource {
         String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.response));
 
         try {
-            Map<String, String> samlResponseData = convertToMap(decodedSamlResponse);
-
-            Optional<String> loa = Optional.ofNullable(samlResponseData.get("levelOfAssurance"));
+            Optional<String> loa = Optional.ofNullable(convertToMap(decodedSamlResponse).get("levelOfAssurance"));
             return Response.ok(new TranslatedResponseBody(
-                samlResponseData.get("pid"),
+                "pid",
                 LevelOfAssurance.valueOf(loa.get()),
                 Collections.EMPTY_LIST)
             ).build();
