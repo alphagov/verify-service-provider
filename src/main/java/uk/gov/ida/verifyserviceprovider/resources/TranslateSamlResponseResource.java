@@ -2,6 +2,8 @@ package uk.gov.ida.verifyserviceprovider.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
@@ -24,24 +26,29 @@ import java.util.Optional;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TranslateSamlResponseResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
+
     @POST
     public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) {
         String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.response));
 
         try {
-            Optional<String> loa = Optional.ofNullable(convertToMap(decodedSamlResponse).get("levelOfAssurance"));
+            Map<String, Object> samlResponseBody = convertToMap(decodedSamlResponse);
+            Optional<String> loa = Optional.ofNullable(samlResponseBody.get("levelOfAssurance"));
+
             return Response.ok(new TranslatedResponseBody(
-                "pid",
+                samlResponseBody.get("pid"),
                 LevelOfAssurance.valueOf(loa.get()),
                 Collections.EMPTY_LIST)
             ).build();
         } catch (IllegalArgumentException | NoSuchElementException | IOException e) {
+            LOGGER.error("Error during SAML response translation.", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 
-    private Map<String, String> convertToMap(String decodedSamlResponse) throws IOException {
-        return new ObjectMapper().readValue(decodedSamlResponse, new TypeReference<Map<String, String>>() {
+    private Map<String, Object> convertToMap(String decodedSamlResponse) throws IOException {
+        return new ObjectMapper().readValue(decodedSamlResponse, new TypeReference<Map<String, Object>>() {
         });
     }
 }
