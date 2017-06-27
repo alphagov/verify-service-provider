@@ -2,9 +2,10 @@ package uk.gov.ida.verifyserviceprovider.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
@@ -16,10 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
@@ -33,22 +31,20 @@ public class TranslateSamlResponseResource {
         String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.response));
 
         try {
-            Map<String, Object> samlResponseBody = convertToMap(decodedSamlResponse);
-            Optional<String> loa = Optional.ofNullable(samlResponseBody.get("levelOfAssurance"));
-
-            return Response.ok(new TranslatedResponseBody(
-                samlResponseBody.get("pid"),
-                LevelOfAssurance.valueOf(loa.get()),
-                Collections.EMPTY_LIST)
-            ).build();
+            return Response.ok(convertTranslatedResponseBody(decodedSamlResponse)).build();
         } catch (IllegalArgumentException | NoSuchElementException | IOException e) {
             LOGGER.error("Error during SAML response translation.", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 
-    private Map<String, Object> convertToMap(String decodedSamlResponse) throws IOException {
-        return new ObjectMapper().readValue(decodedSamlResponse, new TypeReference<Map<String, Object>>() {
+    private TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper() {{
+            registerModule(new Jdk8Module());
+            registerModule(new JavaTimeModule());
+        }};
+
+        return objectMapper.readValue(decodedSamlResponse, new TypeReference<TranslatedResponseBody>() {
         });
     }
 }
