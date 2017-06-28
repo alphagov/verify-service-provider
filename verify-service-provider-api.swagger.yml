@@ -137,10 +137,8 @@ definitions:
       levelOfAssurance:
         $ref: '#/definitions/ReceivedLevelOfAssurance'
       attributes:
-        description: An optional array of user attributes if no match was possible
-        type: array
-        items:
-          $ref: '#/definitions/Attribute'
+        description: An optional attributes-object if no match was possible
+        $ref: '#/definitions/Attributes'
   ErrorBody:
     type: object
     required:
@@ -151,13 +149,49 @@ definitions:
         type: string
       message:
         type: string
-  Attribute:
+  Attributes:
     description: >-
-      An attribute describing a user WIP: some attributes do not fit the
-      string:string model
+      An object containing user attributes
     type: object
     properties:
-      name:
+      firstName:
         type: string
-      value:
+      firstNameVerified:
+        type: boolean
+      middleName:
+        type: string
+      middleNameVerified:
+        type: boolean
+      surname:
+        type: string
+      surnameVerified:
+        type: boolean
+      dateOfBirth:
+        type: string
+      dateOfBirthVerified:
+        type: boolean
+      address:
+        $ref: '#/definitions/Address'
+      cycle3:
+        type: string
+  Address:
+    description: >-
+      An object describing the address fields of a user
+    type: object
+    properties:
+      verified:
+        type: boolean
+      lines:
+        type: array
+        items:
+          type: string
+      postCode:
+        type: string
+      internationalPostCode:
+        type: string
+      uprn:
+        type: string
+      fromDate:
+        type: string
+      toDate:
         type: string
