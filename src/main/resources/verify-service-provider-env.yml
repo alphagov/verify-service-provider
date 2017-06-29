@@ -1,0 +1,16 @@
+server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${PORT:- 50400}
+
+logging:
+  level: INFO
+  loggers:
+    "uk.gov": DEBUG
+  appenders:
+    - type: console
+
+hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}
