@@ -36,7 +36,7 @@ public class TranslateSamlResponseResourceTest {
     @Test
     public void translateAuthnResponseWithSuccessfulLOA1Match() {
         Map<String, Object> data = ImmutableMap.of(
-            "responseType", "some-response-type",
+            "scenario", "some-response-type",
             "levelOfAssurance", "LEVEL_1",
             "pid", "some-pid"
         );
@@ -63,7 +63,7 @@ public class TranslateSamlResponseResourceTest {
     @Test
     public void translateAuthnResponseWithSuccessfulLOA2Match() {
         Map<String, Object> data = ImmutableMap.of(
-            "responseType", "some-response-type",
+            "scenario", "some-response-type",
             "levelOfAssurance", "LEVEL_2",
             "pid", "some-pid"
         );
@@ -111,7 +111,7 @@ public class TranslateSamlResponseResourceTest {
             .put("cycle3", "some-cycle3");
 
         JSONObject data = new JSONObject()
-            .put("responseType", "some-response-type")
+            .put("scenario", "some-response-type")
             .put("pid", "some-pid")
             .put("levelOfAssurance", "LEVEL_1")
             .put("attributes", attributes);
