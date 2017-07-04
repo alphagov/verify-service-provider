@@ -253,6 +253,31 @@ public class TranslateSamlResponseResourceTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @Test
+    public void translateAuthenticationResponseShouldRetur400WhenRequestError() {
+        Map<String, Object> data = ImmutableMap.of(
+            "scenario", "REQUEST_ERROR"
+        );
+
+        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
+            getSamlResponseFor(data),
+            "secure-token"
+        );
+
+        Response response = resources.target("/translate-response")
+            .request()
+            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
+        ErrorBody result = response.readEntity(ErrorBody.class);
+
+        ErrorBody expected = new ErrorBody(
+            "REQUEST_ERROR",
+            "Request error."
+        );
+
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
+        assertThat(result).isEqualTo(expected);
+    }
+
     private String getSamlResponseFor(Map<String, Object> data) {
         String samlRequestJson = new JSONObject(data).toString();
         return encode(samlRequestJson);

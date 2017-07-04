@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Base64;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Path("/translate-response")
@@ -32,6 +33,7 @@ public class TranslateSamlResponseResource {
     private static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     private static final String NO_MATCH = "NO_MATCH";
     private static final String CANCELLATION = "CANCELLATION";
+    private static final String REQUEST_ERROR = "REQUEST_ERROR";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
 
@@ -54,6 +56,9 @@ public class TranslateSamlResponseResource {
                 break;
             case CANCELLATION:
                 response = createErrorResponse(UNAUTHORIZED, new ErrorBody(CANCELLATION, "Operation was cancelled."));
+                break;
+            case REQUEST_ERROR:
+                response = createErrorResponse(BAD_REQUEST, new ErrorBody(REQUEST_ERROR, "Request error."));
                 break;
             default:
                 throw new RuntimeException("Unknown scenario");
