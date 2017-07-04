@@ -203,6 +203,31 @@ public class TranslateSamlResponseResourceTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @Test
+    public void translateAuthenticationResponseShouldRetur401WhenNoMatch() {
+        Map<String, Object> data = ImmutableMap.of(
+            "scenario", "NO_MATCH"
+        );
+
+        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
+            getSamlResponseFor(data),
+            "secure-token"
+        );
+
+        Response response = resources.target("/translate-response")
+            .request()
+            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
+        ErrorBody result = response.readEntity(ErrorBody.class);
+
+        ErrorBody expected = new ErrorBody(
+            "NO_MATCH",
+            "No match was found."
+        );
+
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
+        assertThat(result).isEqualTo(expected);
+    }
+
     private String getSamlResponseFor(Map<String, Object> data) {
         String samlRequestJson = new JSONObject(data).toString();
         return encode(samlRequestJson);

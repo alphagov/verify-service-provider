@@ -28,25 +28,36 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 public class TranslateSamlResponseResource {
 
     private static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+    private static final String NO_MATCH = "NO_MATCH";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
 
     @POST
     public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) {
         String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.response));
+        String scenario = new JSONObject(decodedSamlResponse).get("scenario").toString();
 
         Response response;
-        switch (new JSONObject(decodedSamlResponse).get("scenario").toString()) {
+        switch (scenario) {
             case AUTHENTICATION_FAILED:
-                response = Response.status(UNAUTHORIZED)
-                    .entity(new ErrorBody(AUTHENTICATION_FAILED, "Authentication has failed."))
-                    .build();
+                response = createErrorResponse(UNAUTHORIZED, new ErrorBody(AUTHENTICATION_FAILED, "Authentication has failed."));
+                break;
+            case NO_MATCH:
+                response = createErrorResponse(UNAUTHORIZED, new ErrorBody(NO_MATCH, "No match was found."));
                 break;
             default:
                 response = createDefaultResponse(decodedSamlResponse);
                 break;
         }
 
+        return response;
+    }
+
+    private Response createErrorResponse(Response.Status status, ErrorBody errorBody) {
+        Response response;
+        response = Response.status(UNAUTHORIZED)
+            .entity(errorBody)
+            .build();
         return response;
     }
 
