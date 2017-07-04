@@ -27,8 +27,11 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TranslateSamlResponseResource {
 
+    private static final String SUCCESS_MATCH = "SUCCESS_MATCH";
+    private static final String ACCOUNT_CREATION = "ACCOUNT_CREATION";
     private static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     private static final String NO_MATCH = "NO_MATCH";
+    private static final String CANCELLATION = "CANCELLATION";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
 
@@ -39,15 +42,21 @@ public class TranslateSamlResponseResource {
 
         Response response;
         switch (scenario) {
+            case SUCCESS_MATCH:
+            case ACCOUNT_CREATION:
+                response = createDefaultResponse(decodedSamlResponse);
+                break;
             case AUTHENTICATION_FAILED:
                 response = createErrorResponse(UNAUTHORIZED, new ErrorBody(AUTHENTICATION_FAILED, "Authentication has failed."));
                 break;
             case NO_MATCH:
                 response = createErrorResponse(UNAUTHORIZED, new ErrorBody(NO_MATCH, "No match was found."));
                 break;
-            default:
-                response = createDefaultResponse(decodedSamlResponse);
+            case CANCELLATION:
+                response = createErrorResponse(UNAUTHORIZED, new ErrorBody(CANCELLATION, "Operation was cancelled."));
                 break;
+            default:
+                throw new RuntimeException("Unknown scenario");
         }
 
         return response;
