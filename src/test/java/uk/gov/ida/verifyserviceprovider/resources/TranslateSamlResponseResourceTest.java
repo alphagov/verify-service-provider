@@ -22,6 +22,7 @@ import java.util.Optional;
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -274,7 +275,32 @@ public class TranslateSamlResponseResourceTest {
             "Request error."
         );
 
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void translateAuthenticationResponseShouldReturn500WhenInternalServerError() {
+        Map<String, Object> data = ImmutableMap.of(
+                "scenario", "INTERNAL_SERVER_ERROR"
+        );
+
+        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
+                getSamlResponseFor(data),
+                "secure-token"
+        );
+
+        Response response = resources.target("/translate-response")
+                .request()
+                .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
+        ErrorBody result = response.readEntity(ErrorBody.class);
+
+        ErrorBody expected = new ErrorBody(
+                "INTERNAL_SERVER_ERROR",
+                "Request error."
+        );
+
+        assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(result).isEqualTo(expected);
     }
 

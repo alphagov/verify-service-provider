@@ -34,6 +34,7 @@ public class TranslateSamlResponseResource {
     private static final String NO_MATCH = "NO_MATCH";
     private static final String CANCELLATION = "CANCELLATION";
     private static final String REQUEST_ERROR = "REQUEST_ERROR";
+    private static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
 
@@ -60,6 +61,9 @@ public class TranslateSamlResponseResource {
             case REQUEST_ERROR:
                 response = createErrorResponse(BAD_REQUEST, new ErrorBody(REQUEST_ERROR, "Request error."));
                 break;
+            case INTERNAL_SERVER_ERROR:
+                response = createErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, new ErrorBody(INTERNAL_SERVER_ERROR, "Request error."));
+                break;
             default:
                 throw new RuntimeException("Unknown scenario");
         }
@@ -69,7 +73,7 @@ public class TranslateSamlResponseResource {
 
     private Response createErrorResponse(Response.Status status, ErrorBody errorBody) {
         Response response;
-        response = Response.status(UNAUTHORIZED)
+        response = Response.status(status)
             .entity(errorBody)
             .build();
         return response;
