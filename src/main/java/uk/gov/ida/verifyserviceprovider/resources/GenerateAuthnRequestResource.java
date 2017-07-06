@@ -1,6 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
-import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 

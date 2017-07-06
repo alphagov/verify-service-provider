@@ -3,7 +3,7 @@ package uk.gov.ida.verifyserviceprovider.resources;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -20,8 +20,8 @@ public class GenerateAuthnRequestTest {
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
-            .addResource(new GenerateAuthnRequestResource(getConfiguration()))
-            .build();
+        .addResource(new GenerateAuthnRequestResource(getConfiguration()))
+        .build();
 
     private static VerifyServiceProviderConfiguration getConfiguration() {
         class TestVerifyServiceProviderConfiguration extends VerifyServiceProviderConfiguration {
@@ -46,4 +46,4 @@ public class GenerateAuthnRequestTest {
         assertThat(requestResponseBody.secureToken).isNotEmpty();
         assertThat(requestResponseBody.location.toString()).isEqualTo(HUB_SSO_LOCATION);
     }
-  }
+}

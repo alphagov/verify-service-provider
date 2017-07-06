@@ -7,6 +7,7 @@ import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 
@@ -24,7 +25,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     }
 
     public static void main(String[] args) throws Exception {
-        if(Arrays.asList(args).isEmpty()) {
+        if (Arrays.asList(args).isEmpty()) {
             new VerifyServiceProviderApplication(false).run("server", "verify-service-provider-env.yml");
         } else {
             new VerifyServiceProviderApplication().run(args);
@@ -53,7 +54,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     }
 
     public ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
-        if(fileSystemConfig) {
+        if (fileSystemConfig) {
             return bootstrap.getConfigurationSourceProvider();
         } else {
             return new ResourceConfigurationSourceProvider();
