@@ -40,7 +40,7 @@ public class TranslateSamlResponseResource {
 
     @POST
     public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) {
-        String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.response));
+        String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.samlResponse));
         String scenario = new JSONObject(decodedSamlResponse).get("scenario").toString();
 
         Response response;
@@ -83,7 +83,7 @@ public class TranslateSamlResponseResource {
         try {
             return Response.ok(convertTranslatedResponseBody(decodedSamlResponse)).build();
         } catch (IOException e) {
-            LOGGER.error("Error during SAML response translation.", e);
+            LOGGER.error("Error during SAML samlResponse translation.", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
