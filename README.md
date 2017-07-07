@@ -64,6 +64,77 @@ provided by Dropwizard: http://www.dropwizard.io/1.1.0/docs/manual/configuration
 
 Configurations can be provided by the yml file and/or environment variables. see above for an example.
 
+The following Environment confs are supported:
+```
+HUB_ENTITY_ID
+# An entity id for Verify Hub
+
+MSA_ENTITY_ID
+# An entity id that identifies the matching service adapter of the relying party
+
+HUB_METADATA_URL
+# A Url that is used to get Metadata from Verify Hub.
+# The metadata is needed for ?
+
+MSA_METADATA_URL 
+# A Url that is used to get Metadata from Matching service adapter.
+# The metadata is needed for ?
+
+MSA_TRUSTSTORE_PATH 
+# A path to a truststore file for the Matching Service Adapter of the relying party.
+# The truststore is needed for ?
+
+MSA_TRUSTSTORE_PASSWORD  
+# A password for the msa truststore.
+
+HUB_TRUSTSTORE_PATH 
+# A path to a truststore file for the Verify Hub.
+# The truststore is needed for ?
+
+HUB_TRUSTSTORE_PASSWORD 
+# A password for the hub truststore
+
+RELYING_PARTY_TRUSTSTORE_PATH  
+# A path to the truststore of the Relying Party.
+# The truststore is needed for ?
+
+RELYING_PARTY_TRUSTSTORE_PASSWORD  
+# Password to the relying party truststore
+
+SIGNINGKEYS_KEY  
+# A base64 encoded private key that is used for signing the Authn request. With a correct
+# signature, Verify Hub is able to trust that the request actually originates from the relying party.
+
+SIGNINGKEYS_CERT  
+# A base64 encoded public cert for signing? The cert is used for?
+
+ENCRYPTIONKEYS_KEY  
+# A base64 encoded private key that the relying party's Matching Service Adapter is using to encrypt
+# the assertions with. The key is used to decrypt the assertions.
+
+ENCRYPTIONKEYS_CERT  
+# A base64 encoded public cert that the relying party's Matching Service Adapter is using to encrypt
+# the assertions with. The cert is used to decrypt the assertions.
+
+dw.server.applicationConnectors[0].type
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+dw.server.applicationConnectors[0].port
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+dw.server.adminConnectors[0].type
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+dw.server.adminConnectors[0].port
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+dw.logging.level
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
+
+dw.logging.appenders[0].type
+# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
+```
+
 Usage
 -----
 
