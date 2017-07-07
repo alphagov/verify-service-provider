@@ -75,7 +75,7 @@ Verify Service Provider will provide the content and support for parsing the SAM
 to the Relying party to render the form for the user. See Passport-Verify for support on doing this
 with node.js. https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/stub-rp/passport-verify
 
-When The authentication flow begins, Verify Service Provider is used to create a SAML AuthnRequest.
+__When The authentication flow begins__, Verify Service Provider is used to create a SAML AuthnRequest.
 
 ![Request flow diagram](https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/diagrams/request_flow.png)
 
@@ -107,7 +107,7 @@ curl -XPOST \
 }
 ```
 
-When The authentication flow ends, Verify Service Provider is used to transform the SAML Response message into json. 
+__When The authentication flow ends__, Verify Service Provider is used to transform the SAML Response message into json. 
 
 ![Response flow diagram](https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/diagrams/response_flow.png)
 
@@ -146,12 +146,6 @@ API
 ---
 
 A detailed API documentation can be found in a swagger file at https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/verify-service-provider-api.swagger.yml
-
-prototype-0 version of Verify Service Provider has a slightly modified api from the final version.
-It is made to work hand in hand with stub-verify-hub. While the API is similar to the final
-design, the content of base64 encoded `samlResponse` is expected to be json instead of saml.
-
-See Stub Verify Hub for further description of the possible scenarios and samlResponses: https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/stub-verify-hub
 
 __POST /generate-request__
 
@@ -195,6 +189,13 @@ __POST /translate-response__
 Translates a base64 encoded `samlResponse` into json that describes the desired scenario. A different
 Response is provided depending on the scenario provided in the `samlResponse` parameter. See Stub Verify Hub
 for further details on the scenarios https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/stub-verify-hub.
+
+prototype-0 version of Verify Service Provider has a slightly modified api from the final version.
+It is made to work hand in hand with stub-verify-hub. While the API is similar to the final
+design, the content of base64 encoded `samlResponse` is expected to be json instead of saml.
+
+See Stub Verify Hub for further description of the possible scenarios and samlResponses: https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/stub-verify-hub
+
 ```
 Content-Type: application/json
 POST /translate-response
