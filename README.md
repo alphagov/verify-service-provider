@@ -22,12 +22,12 @@ the Verify Support Team.
 typical yaml-configuration file. See the provided `verify-service-provider.yml` for an example
 and detailed documentation.
    ```shell-script
-   vim verify-service-provide/verify-service-provider.yml
+   vim verify-service-provide/configuration/verify-service-provider.yml
    ```
 
 3. __Spin up the application.__
    ```shell-script
-   verify-service-provider/bin/verify-service-provider server ./verify-service-provide/rconfiguration/verify-service-provider.yml
+   verify-service-provider/bin/verify-service-provider server ./verify-service-provide/configuration/verify-service-provider.yml
    ```
    Or with only environment variables
    ```shell-script
@@ -65,75 +65,81 @@ provided by Dropwizard: http://www.dropwizard.io/1.1.0/docs/manual/configuration
 Configurations can be provided by the yml file and/or environment variables. see above for an example.
 
 The following Environment confs are supported:
-```
-HUB_ENTITY_ID
-# An entity id for Verify Hub
 
-MSA_ENTITY_ID
-# An entity id that identifies the matching service adapter of the relying party
+* `HUB_ENTITY_ID`
 
-HUB_METADATA_URL
-# A Url that is used to get Metadata from Verify Hub.
-# The metadata is needed for ?
+  An entity id for Verify Hub
 
-MSA_METADATA_URL 
-# A Url that is used to get Metadata from Matching service adapter.
-# The metadata is needed for ?
+* `MSA_ENTITY_ID`
 
-MSA_TRUSTSTORE_PATH 
-# A path to a truststore file for the Matching Service Adapter of the relying party.
-# The truststore is needed for ?
+  An entity id that identifies the matching service adapter of the relying party
 
-MSA_TRUSTSTORE_PASSWORD  
-# A password for the msa truststore.
+* `HUB_METADATA_URL`
 
-HUB_TRUSTSTORE_PATH 
-# A path to a truststore file for the Verify Hub.
-# The truststore is needed for ?
+  A Url that is used to get Metadata from Verify Hub.
+  _The metadata is needed for ?_
 
-HUB_TRUSTSTORE_PASSWORD 
-# A password for the hub truststore
+* `MSA_METADATA_URL`
 
-RELYING_PARTY_TRUSTSTORE_PATH  
-# A path to the truststore of the Relying Party.
-# The truststore is needed for ?
+  A Url that is used to get Metadata from Matching service adapter.
+  _The metadata is needed for ?_
 
-RELYING_PARTY_TRUSTSTORE_PASSWORD  
-# Password to the relying party truststore
+* `MSA_TRUSTSTORE_PATH`
+  A path to a truststore file for the Matching Service Adapter of the relying party.
+  The truststore is needed for ?
 
-SIGNINGKEYS_KEY  
-# A base64 encoded private key that is used for signing the Authn request. With a correct
-# signature, Verify Hub is able to trust that the request actually originates from the relying party.
+* `MSA_TRUSTSTORE_PASSWORD`
+  A password for the msa truststore.
 
-SIGNINGKEYS_CERT  
-# A base64 encoded public cert for signing? The cert is used for?
+* `HUB_TRUSTSTORE_PATH` 
+  A path to a truststore file for the Verify Hub.
+  _The truststore is needed for ?_
 
-ENCRYPTIONKEYS_KEY  
-# A base64 encoded private key that the relying party's Matching Service Adapter is using to encrypt
-# the assertions with. The key is used to decrypt the assertions.
+* `HUB_TRUSTSTORE_PASSWORD`
+  A password for the hub truststore
 
-ENCRYPTIONKEYS_CERT  
-# A base64 encoded public cert that the relying party's Matching Service Adapter is using to encrypt
-# the assertions with. The cert is used to decrypt the assertions.
+* `RELYING_PARTY_TRUSTSTORE_PATH`
+  A path to the truststore of the Relying Party.
+  _The truststore is needed for ?_
 
-dw.server.applicationConnectors[0].type
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+* `RELYING_PARTY_TRUSTSTORE_PASSWORD`
+  Password to the relying party truststore
 
-dw.server.applicationConnectors[0].port
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+* `SIGNINGKEYS_KEY`
+  A base64 encoded private key that is used for signing the Authn request. With a correct
+  signature, Verify Hub is able to trust that the request actually originates from the relying party.
 
-dw.server.adminConnectors[0].type
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+* `SIGNINGKEYS_CERT`
+  A base64 encoded public cert for signing?
+  _The cert is used for?_
 
-dw.server.adminConnectors[0].port
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+* `ENCRYPTIONKEYS_KEY`
+  A base64 encoded private key that the relying party's Matching Service Adapter is using to encrypt
+  the assertions with.
+  _The key is used to decrypt the assertions._
 
-dw.logging.level
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
+* `ENCRYPTIONKEYS_CERT`
+  A base64 encoded public cert that the relying party's Matching Service Adapter is using to encrypt
+  the assertions with.
+  _The cert is used to decrypt the assertions._
 
-dw.logging.appenders[0].type
-# see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
-```
+* `dw.server.applicationConnectors[0].type`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+* `dw.server.applicationConnectors[0].port`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+* `dw.server.adminConnectors[0].type`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+* `dw.server.adminConnectors[0].port`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#man-configuration-connectors
+
+* `dw.logging.level`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
+
+* `dw.logging.appenders[0].type`
+  see http://www.dropwizard.io/1.1.0/docs/manual/configuration.html#logging
 
 Usage
 -----
@@ -172,7 +178,7 @@ curl -XPOST \
 <
 * Connection #0 to host localhost left intact
 {
-  "samlRequest": "some-saml",
+  "samlRequest": "some-base64-encoded-saml",
   "secureToken": "some-secure-token",
   "location": "http://localhost:50410/SAML2/SSO"
 }
