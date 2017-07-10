@@ -157,7 +157,7 @@ __When The authentication flow begins__, Verify Service Provider is used to crea
 ![Request flow diagram](https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/diagrams/request_flow.png)
 
 ```shell-script
-curl -XPOST \
+curl \
   -H "Content-Type: application/json" \
   -d '{"levelOfAssurance":"LEVEL_2"}' \
   --verbose \
@@ -189,10 +189,11 @@ __When The authentication flow ends__, Verify Service Provider is used to transf
 ![Response flow diagram](https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/diagrams/response_flow.png)
 
 ```shell-script
-SUCCESS_SCENARIO=`echo '{"scenario":"SUCCESS_MATCH","levelOfAssurance":"LEVEL_2","pid":"some-pid"}' | base64`
-curl -XPOST \
+SUCCESS_SCENARIO=$(base64 <<< '{"scenario":"SUCCESS_MATCH","levelOfAssurance":"LEVEL_2","pid":"some-pid"}')
+curl \
   -H "Content-Type: application/json" \
   -d "{\"samlResponse\":\"$SUCCESS_SCENARIO\", \"secureToken\":\"some-secure-token\"}" \
+  --verbose
   localhost:50400/translate-response
 
 *   Trying ::1...
