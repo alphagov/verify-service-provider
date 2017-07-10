@@ -45,15 +45,16 @@ Using these responses it will be possible able to test different scenarios in th
 
 The Stub Verify Hub will provide the following responses:
 
-| Response Scenario     | Message                                                                                                                  |
-| --                    | --                                                                                                                       |
-| Successful Match      | scenario: SUCCESS_MATCH, levelOfAssurance: ${specified loa}, pid: ${specified PID}                                       |
+| Response Scenario     | Message                                                                                                                   |
+| --                    | --                                                                                                                         |
+| Successful Match      | scenario: SUCCESS_MATCH, levelOfAssurance: ${specified loa}, pid: ${specified PID}                                         |
 | Account Creation      | scenario: ACCOUNT_CREATION, levelOfAssurance: ${specified loa}, pid: ${specified PID}, attributes: [${user attributes}]  |
-| No Match              | scenario: NO_MATCH                                                                                                       |
-| Cancellation          | scenario: CANCEL                                                                                                         |
-| Authentication failed | scenario: AUTH_FAILURE                                                                                                   |
-| Requestor Error       | scenario: REQUESTOR_ERROR                                                                                                |
-
+| No Match              | scenario: NO_MATCH                                                                                                         |
+| Cancellation          | scenario: CANCELLATION                                                                                                     |
+| Authentication failed | scenario: AUTHENTICATION_FAILED                                                                                           |
+| Requestor Error       | scenario: REQUESTOR_ERROR                                                                                                 |
+| Internal Server Error | scenario: INTERNAL_SERVER_ERROR
+                      |
 Initially, the Stub Verify Hub will be deployed to Government PaaS.
 
 A diagram of a potential stub architecture is available at: `prototypes/prototype-0/docs/diagrams/stub_service_architecture.png`
