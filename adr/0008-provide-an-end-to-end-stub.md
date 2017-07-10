@@ -52,9 +52,9 @@ The Stub Verify Hub will provide the following responses:
 | No Match              | scenario: NO_MATCH                                                                                                         |
 | Cancellation          | scenario: CANCELLATION                                                                                                     |
 | Authentication failed | scenario: AUTHENTICATION_FAILED                                                                                           |
-| Requestor Error       | scenario: REQUESTOR_ERROR                                                                                                 |
+| Requestor Error       | scenario: REQUEST_ERROR                                                                                                 |
 | Internal Server Error | scenario: INTERNAL_SERVER_ERROR
-                      |
+                      
 Initially, the Stub Verify Hub will be deployed to Government PaaS.
 
 A diagram of a potential stub architecture is available at: `prototypes/prototype-0/docs/diagrams/stub_service_architecture.png`
