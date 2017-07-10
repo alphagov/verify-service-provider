@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
+import java.util.List;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -44,7 +45,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private String secret;
+    private String secureTokenSeed;
 
     @JsonProperty
     @NotNull
@@ -63,8 +64,15 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
+    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private SigningKeysConfiguration signingKeys;
+    private String signingPrivateKey;
+
+    @NotNull
+    @Valid
+    @Size(min = 1, max = 2)
+    @JsonProperty
+    private List<String> encryptionCertificates;
 
     public String getHubSsoLocation() {
         return hubSsoLocation;
@@ -78,12 +86,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return msaMetadataUrl;
     }
 
-    public URI getHubMetadataUrl() {
-        return hubMetadataUrl;
-    }
-
-    public String getSecret() {
-        return secret;
+    public String getSecureTokenSeed() {
+        return secureTokenSeed;
     }
 
     public TrustStoreConfiguration getMsaTrustStore() {
@@ -100,5 +104,17 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public String getMsaEntityId() {
         return msaEntityId;
+    }
+
+    public URI getHubMetadataUrl() {
+        return hubMetadataUrl;
+    }
+
+    public String getSigningPrivateKey() {
+        return signingPrivateKey;
+    }
+
+    public List<String> getEncryptionCertificates() {
+        return encryptionCertificates;
     }
 }

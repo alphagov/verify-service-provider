@@ -3,7 +3,6 @@ package uk.gov.ida.verifyserviceprovider;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -15,6 +14,7 @@ import java.io.InputStream;
 
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
+import static org.hamcrest.core.StringContains.containsString;
 
 public class VerifyServiceProviderConfigurationTest {
 
@@ -28,12 +28,29 @@ public class VerifyServiceProviderConfigurationTest {
     );
 
     @Test
-    @Ignore
     public void shouldNotComplainWhenConfiguredCorrectly() throws Exception {
         factory.build(
             new FileConfigurationSourceProvider(),
             VerifyServiceProviderConfigurationTest.class.getResource("/verify-service-provider.yml").getPath()
         );
+    }
+
+    @Test
+    public void shouldNotAllowNullValues() throws Exception {
+        expectedException.expectMessage(containsString("server may not be null"));
+        expectedException.expectMessage(containsString("hubSsoLocation may not be null"));
+        expectedException.expectMessage(containsString("hubEntityId may not be null"));
+        expectedException.expectMessage(containsString("msaEntityId may not be null"));
+        expectedException.expectMessage(containsString("hubMetadataUrl may not be null"));
+        expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
+        expectedException.expectMessage(containsString("secureTokenSeed may not be null"));
+        expectedException.expectMessage(containsString("msaTrustStore may not be null"));
+        expectedException.expectMessage(containsString("hubTrustStore may not be null"));
+        expectedException.expectMessage(containsString("relyingPartyTrustStore may not be null"));
+        expectedException.expectMessage(containsString("signingPrivateKey may not be null"));
+        expectedException.expectMessage(containsString("encryptionCertificates may not be null"));
+
+        factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
 
     @Test
@@ -55,9 +72,9 @@ public class VerifyServiceProviderConfigurationTest {
     }
 
     @Test
-    public void shouldNotAllowEmptySecret() throws Exception {
-        expectedException.expectMessage("secret may not be empty");
-        factory.build(new StringConfigurationSourceProvider("secret: \"\""), "");
+    public void shouldNotAllowEmptySecureTokenSeed() throws Exception {
+        expectedException.expectMessage("secureTokenSeed may not be empty");
+        factory.build(new StringConfigurationSourceProvider("secureTokenSeed: \"\""), "");
     }
 
     @Test
@@ -79,10 +96,15 @@ public class VerifyServiceProviderConfigurationTest {
     }
 
     @Test
-    @Ignore
-    public void shouldNotAllowEmptySigningKeys() throws Exception {
-        expectedException.expectMessage("signingKeys.primary may not be empty");
-        factory.build(new StringConfigurationSourceProvider("signingKeys:\n  primary:\n    publicKey:\"\"\n    privateKey:\"\""), "");
+    public void shouldNotAllowEmptySigningPrivate() throws Exception {
+        expectedException.expectMessage("signingPrivateKey may not be empty");
+        factory.build(new StringConfigurationSourceProvider("signingPrivateKey: \"\""), "");
+    }
+
+    @Test
+    public void shouldNotAllowEmptyEngryptionCertificates() throws Exception {
+        expectedException.expectMessage("encryptionCertificates size must be between 1 and 2");
+        factory.build(new StringConfigurationSourceProvider("encryptionCertificates: []\n"), "");
     }
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {

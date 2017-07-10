@@ -17,3 +17,29 @@ logging:
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
 hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}
+
+hubEntityId: ${HUB_ENTITY_ID:-default-hub-entity-id}
+
+msaEntityId: ${MSA_ENTITY_ID:-default-msa-entity-id}
+
+hubMetadataUrl: ${HUB_METADATA_URL:-default-hub-metadata-url}
+
+msaMetadataUrl: ${MSA_METADATA_URL:-default-msa-metadata-url}
+
+secureTokenSeed: ${SECURE_TOKEN_SEED:-default-secure-token-seed}
+
+msaTrustStore:
+  path: ${MSA_TRUST_STORE_PATH:-default-msa-trust-store-path}
+  password: ${MSA_TRUST_STORE_PASSWORD:-default-msa-trust-store-password}
+
+hubTrustStore:
+  path: ${HUB_TRUST_STORE_PATH:-default-hub-trust-store-path}
+  password: ${HUB_TRUST_STORE_PASSWORD:-default-hub-trust-store-password}
+
+relyingPartyTrustStore:
+  path: ${RELYING_PARTY_TRUST_STORE_PATH:-default-relying-party-trust-store-path}
+  password: ${RELYING_PARTY_TRUST_STORE_PASSWORD:-default-relying-party-trust-store-password}
+
+signingPrivateKey: ${SIGNING_PRIVATE_KEY:-default-signing-private-key}
+
+encryptionCertificates: [${ENCRYPTION_CERTIFICATES:-default-encryption-certificate-1,default-encryption-certificate-2}]

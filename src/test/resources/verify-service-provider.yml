@@ -14,26 +14,32 @@ logging:
     - type: console
 
 
-hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}
+hubSsoLocation: default-hub-sso-location
 
-hubEntityId: some-hub-entity-id
+hubEntityId: default-hub-entity-id
 
-msaEntityId: some-msa-entity-id
+msaEntityId: default-msa-entity-id
 
-hubMetadataUrl: some-hub-metadata-url
+hubMetadataUrl: default-hub-metadata-url
 
-msaMetadataUrl: some-msa-metadata-url
+msaMetadataUrl: default-msa-metadata-url
 
-secret: jelly-fish-cat
+secureTokenSeed: default-secure-token-seed
 
 msaTrustStore:
-  path: some-path
-  password: some-password
+  path: default-msa-trust-store-path
+  password: default-msa-trust-store-password
 
 hubTrustStore:
-  path: some-path
-  password: some-password
+  path: default-hub-trust-store-path
+  password: default-hub-trust-store-password
 
 relyingPartyTrustStore:
-  path: some-path
-  password: some-password
+  path: default-relying-party-trust-store-path
+  password: default-relying-party-trust-store-password
+
+signingPrivateKey: defoult-signing-private-key
+
+encryptionCertificates:
+ - default-encryption-certificate-1
+ - default-encryption-certificate-2

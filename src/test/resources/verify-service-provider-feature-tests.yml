@@ -4,7 +4,6 @@ server:
   adminContextPath: /admin
   connector:
     type: http
-    port: ${PORT:- 50400}
 
 logging:
   level: INFO
@@ -12,6 +11,7 @@ logging:
     "uk.gov": DEBUG
   appenders:
     - type: console
+
 
 hubSsoLocation: ${HUB_SSO_LOCATION:-}
 
