@@ -26,20 +26,8 @@ msaMetadataUrl: default-msa-metadata-url
 
 secureTokenSeed: default-secure-token-seed
 
-msaTrustStore:
-  path: default-msa-trust-store-path
-  password: default-msa-trust-store-password
-
-hubTrustStore:
-  path: default-hub-trust-store-path
-  password: default-hub-trust-store-password
-
-relyingPartyTrustStore:
-  path: default-relying-party-trust-store-path
-  password: default-relying-party-trust-store-password
-
 signingPrivateKey: defoult-signing-private-key
 
-encryptionCertificates:
- - default-encryption-certificate-1
- - default-encryption-certificate-2
+decryptionPrivateKeys:
+ - default-decryption-private-key-1
+ - default-decryption-private-key-2

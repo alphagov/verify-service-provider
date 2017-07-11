@@ -49,21 +49,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
-    @Valid
-    private TrustStoreConfiguration msaTrustStore;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    private TrustStoreConfiguration hubTrustStore;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    private TrustStoreConfiguration relyingPartyTrustStore;
-
-    @JsonProperty
-    @NotNull
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
     private String signingPrivateKey;
@@ -72,7 +57,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @Valid
     @Size(min = 1, max = 2)
     @JsonProperty
-    private List<String> encryptionCertificates;
+    private List<String> decryptionPrivateKeys;
 
     public String getHubSsoLocation() {
         return hubSsoLocation;
@@ -90,18 +75,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return secureTokenSeed;
     }
 
-    public TrustStoreConfiguration getMsaTrustStore() {
-        return msaTrustStore;
-    }
-
-    public TrustStoreConfiguration getHubTrustStore() {
-        return hubTrustStore;
-    }
-
-    public TrustStoreConfiguration getRelyingPartyTrustStore() {
-        return relyingPartyTrustStore;
-    }
-
     public String getMsaEntityId() {
         return msaEntityId;
     }
@@ -114,7 +87,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return signingPrivateKey;
     }
 
-    public List<String> getEncryptionCertificates() {
-        return encryptionCertificates;
+    public List<String> getDecryptionPrivateKeys() {
+        return decryptionPrivateKeys;
     }
 }

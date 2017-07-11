@@ -25,18 +25,6 @@ msaMetadataUrl: ${MSA_METADATA_URL:-}
 
 secureTokenSeed: ${SECURE_TOKEN_SEED:-}
 
-msaTrustStore:
-  path: ${MSA_TRUST_STORE_PATH:-}
-  password: ${MSA_TRUST_STORE_PASSWORD:-}
-
-hubTrustStore:
-  path: ${HUB_TRUST_STORE_PATH:-}
-  password: ${HUB_TRUST_STORE_PASSWORD:-}
-
-relyingPartyTrustStore:
-  path: ${RELYING_PARTY_TRUST_STORE_PATH:-}
-  password: ${RELYING_PARTY_TRUST_STORE_PASSWORD:-}
-
 signingPrivateKey: ${SIGNING_PRIVATE_KEY:-}
 
-encryptionCertificates: [${ENCRYPTION_CERTIFICATES:-}]
+decryptionPrivateKeys: [${DECRYPTION_PRIVATE_KEYS:-}]

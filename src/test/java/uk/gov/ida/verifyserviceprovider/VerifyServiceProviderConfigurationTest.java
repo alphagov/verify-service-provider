@@ -44,11 +44,8 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("hubMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("secureTokenSeed may not be null"));
-        expectedException.expectMessage(containsString("msaTrustStore may not be null"));
-        expectedException.expectMessage(containsString("hubTrustStore may not be null"));
-        expectedException.expectMessage(containsString("relyingPartyTrustStore may not be null"));
         expectedException.expectMessage(containsString("signingPrivateKey may not be null"));
-        expectedException.expectMessage(containsString("encryptionCertificates may not be null"));
+        expectedException.expectMessage(containsString("decryptionPrivateKeys may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
@@ -78,33 +75,15 @@ public class VerifyServiceProviderConfigurationTest {
     }
 
     @Test
-    public void shouldNotAllowEmptyMsaTrustStore() throws Exception {
-        expectedException.expectMessage("msaTrustStore.path may not be empty");
-        factory.build(new StringConfigurationSourceProvider("msaTrustStore: \n  path: \"\"\n  password: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyHubTrustStore() throws Exception {
-        expectedException.expectMessage("hubTrustStore.path may not be empty");
-        factory.build(new StringConfigurationSourceProvider("hubTrustStore: \n  path: \"\"\n  password: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyRelyingPartyTrustStore() throws Exception {
-        expectedException.expectMessage("relyingPartyTrustStore.path may not be empty");
-        factory.build(new StringConfigurationSourceProvider("relyingPartyTrustStore: \n  path: \"\"\n  password: \"\""), "");
-    }
-
-    @Test
     public void shouldNotAllowEmptySigningPrivate() throws Exception {
         expectedException.expectMessage("signingPrivateKey may not be empty");
         factory.build(new StringConfigurationSourceProvider("signingPrivateKey: \"\""), "");
     }
 
     @Test
-    public void shouldNotAllowEmptyEngryptionCertificates() throws Exception {
-        expectedException.expectMessage("encryptionCertificates size must be between 1 and 2");
-        factory.build(new StringConfigurationSourceProvider("encryptionCertificates: []\n"), "");
+    public void shouldNotAllowEmptyDecryptionPrivateKeys() throws Exception {
+        expectedException.expectMessage("decryptionPrivateKeys size must be between 1 and 2");
+        factory.build(new StringConfigurationSourceProvider("decryptionPrivateKeys: []\n"), "");
     }
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {
