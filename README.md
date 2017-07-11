@@ -19,66 +19,22 @@ The application accepts environment variables or a Dropwizard-style yaml configu
 
 It is recommended that you choose one mechanism or the other.
 
+__NOTE__: These options may change during development
+
 ##### Environment variables
 
-The following Environment Variables are defined:
+The following Environment Variables can be defined:
 
-* `HUB_ENTITY_ID`
-
-  An entity id for Verify Hub
-
-* `MSA_ENTITY_ID`
-
-  An entity id that identifies the matching service adapter of the relying party
-
-* `HUB_METADATA_URL`
-
-  A Url that is used to get Metadata from Verify Hub.
-  _The metadata is needed for ?_
-
-* `MSA_METADATA_URL`
-
-  A Url that is used to get Metadata from Matching service adapter.
-  _The metadata is needed for ?_
-
-* `MSA_TRUSTSTORE_PATH`
-  A path to a truststore file for the Matching Service Adapter of the relying party.
-  The truststore is needed for ?
-
-* `MSA_TRUSTSTORE_PASSWORD`
-  A password for the msa truststore.
-
-* `HUB_TRUSTSTORE_PATH` 
-  A path to a truststore file for the Verify Hub.
-  _The truststore is needed for ?_
-
-* `HUB_TRUSTSTORE_PASSWORD`
-  A password for the hub truststore
-
-* `RELYING_PARTY_TRUSTSTORE_PATH`
-  A path to the truststore of the Relying Party.
-  _The truststore is needed for ?_
-
-* `RELYING_PARTY_TRUSTSTORE_PASSWORD`
-  Password to the relying party truststore
-
-* `SIGNINGKEYS_KEY`
-  A base64 encoded private key that is used for signing the Authn request. With a correct
-  signature, Verify Hub is able to trust that the request actually originates from the relying party.
-
-* `SIGNINGKEYS_CERT`
-  A base64 encoded public cert for signing?
-  _The cert is used for?_
-
-* `ENCRYPTIONKEYS_KEY`
-  A base64 encoded private key that the relying party's Matching Service Adapter is using to encrypt
-  the assertions with.
-  _The key is used to decrypt the assertions._
-
-* `ENCRYPTIONKEYS_CERT`
-  A base64 encoded public cert that the relying party's Matching Service Adapter is using to encrypt
-  the assertions with.
-  _The cert is used to decrypt the assertions._
+* `MSA_ENTITY_ID` - The SAML Entity Id that identifies the Relying Partie's Matching Service Adapter
+* `MSA_METADATA_URL` - The URL to the Matching Service Adapter's SAML metadata.
+* `HUB_ENTITY_ID` - The SAML Entity Id that identifies the Verify Hub (default: https://signin.service.gov.uk)
+* `HUB_METADATA_URL` - The URL to the Verify Hub's SAML metadata. (default: https://www.signin.service.gov.uk/SAML2/metadata/federation
+* `SAML_SIGNING_KEY` - A base64 encoded RSA private key that is used for signing the request to Verify
+* `SAML_SIGNING_CERTIFICATE` - A base64 encoded x509 certificate that corresponds to the above key
+* `SAML_PRIMARY_ENCRYPTION_KEY` - A primary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions
+* `SAML_PRIMARY_ENCRYPTION_CERTIFICATE` - A base64 encoded x509 certificate key that corresponds to the above key
+* `SAML_SECONDARY_ENCRYPTION_KEY` - (Optional) A secondary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions that will be used during certificate rotation events
+* `SAML_SECONDARY_ENCRYPTION_CERTIFICATE` - (Optional) A base64 encoded x509 certificate key that corresponds to the above key
 
 #### Yaml based configuration
 
