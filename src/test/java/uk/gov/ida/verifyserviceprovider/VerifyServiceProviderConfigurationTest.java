@@ -76,7 +76,7 @@ public class VerifyServiceProviderConfigurationTest {
 
     @Test
     public void shouldNotAllowEmptySigningPrivate() throws Exception {
-        expectedException.expectMessage("signingPrivateKey may not be empty");
+        expectedException.expectMessage("Failed to parse configuration at: signingPrivateKey");
         factory.build(new StringConfigurationSourceProvider("signingPrivateKey: \"\""), "");
     }
 

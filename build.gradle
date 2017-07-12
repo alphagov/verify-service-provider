@@ -18,6 +18,12 @@ dependencies {
 
 }
 
+compileTestJava {
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+    options.compilerArgs << "-XDignore.symbol.file"
+}
+
 sourceSets {
     integrationTest {
         java {

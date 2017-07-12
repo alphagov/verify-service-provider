@@ -1,12 +1,14 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
+import java.security.PrivateKey;
 import java.util.List;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
@@ -49,9 +51,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private String signingPrivateKey;
+    @JsonDeserialize(using = PrivateKeyDeserializer.class)
+    private PrivateKey signingPrivateKey;
 
     @NotNull
     @Valid
@@ -83,7 +85,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return hubMetadataUrl;
     }
 
-    public String getSigningPrivateKey() {
+    public PrivateKey getSigningPrivateKey() {
         return signingPrivateKey;
     }
 
