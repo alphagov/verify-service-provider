@@ -32,6 +32,16 @@ sourceSets {
     }
 }
 
+distributions {
+    main {
+        contents {
+            from {
+							['README.md', 'RELEASE_NOTES.md', 'configuration/verify-service-provider.yml']
+						}
+        }
+    }
+}
+
 task testIntegration(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath += sourceSets.integrationTest.runtimeClasspath
@@ -41,4 +51,5 @@ run {
     args = ["server", "configuration/verify-service-provider.yml"]
 }
 
+version = 'prototype-0'
 mainClassName = 'uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication'
