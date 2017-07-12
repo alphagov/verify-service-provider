@@ -36,8 +36,8 @@ distributions {
     main {
         contents {
             from {
-							['README.md', 'RELEASE_NOTES.md', 'configuration/verify-service-provider.yml']
-						}
+                ['README.md', 'RELEASE_NOTES.md', 'configuration/verify-service-provider.yml']
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 Release notes
 =============
 
-* prototype-0
+__2017-07-12__ prototype-0
 
-  Initial release
+Initial release
+
