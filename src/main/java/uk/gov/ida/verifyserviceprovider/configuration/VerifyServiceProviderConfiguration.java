@@ -10,7 +10,6 @@ import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.util.List;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -69,15 +68,20 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private PrivateKey samlPrimaryEncryptionKey;
 
     @JsonProperty
+    @NotNull
+    @Valid
+    @JsonDeserialize(using = CertificateDeserializer.class)
+    private Certificate samlPrimaryEncryptionCertificate;
+
+    @JsonProperty
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSecondaryEncryptionKey;
 
-    @NotNull
-    @Valid
-    @Size(min = 1, max = 2)
     @JsonProperty
-    private List<String> decryptionPrivateKeys;
+    @Valid
+    @JsonDeserialize(using = CertificateDeserializer.class)
+    private Certificate samlSecondaryEncryptionCertificate;
 
     public String getHubSsoLocation() {
         return hubSsoLocation;
@@ -115,11 +119,15 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlPrimaryEncryptionKey;
     }
 
+    public Certificate getSamlPrimaryEncryptionCertificate() {
+        return samlPrimaryEncryptionCertificate;
+    }
+
     public PrivateKey getSamlSecondaryEncryptionKey() {
         return samlSecondaryEncryptionKey;
     }
 
-    public List<String> getDecryptionPrivateKeys() {
-        return decryptionPrivateKeys;
+    public Certificate getSamlSecondaryEncryptionCertificate() {
+        return samlSecondaryEncryptionCertificate;
     }
 }

@@ -47,7 +47,7 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlSigningCertificate may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
-        expectedException.expectMessage(containsString("decryptionPrivateKeys may not be null"));
+        expectedException.expectMessage(containsString("samlPrimaryEncryptionCertificate may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
@@ -92,12 +92,6 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowEmptySamlPrimaryEncryptionKey() throws Exception {
         expectedException.expectMessage("Failed to parse configuration at: samlPrimaryEncryptionKey");
         factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyDecryptionPrivateKeys() throws Exception {
-        expectedException.expectMessage("decryptionPrivateKeys size must be between 1 and 2");
-        factory.build(new StringConfigurationSourceProvider("decryptionPrivateKeys: []\n"), "");
     }
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {

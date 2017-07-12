@@ -34,7 +34,9 @@ samlSigningCertificate: ${SAML_SIGNING_CERTIFICATE:-}
 
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 
+samlPrimaryEncryptionCertificate: ${SAML_PRIMARY_ENCRYPTION_CERTIFICATE:-}
+
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 
-decryptionPrivateKeys: [${DECRYPTION_PRIVATE_KEYS:-}]
+samlSecondaryEncryptionCertificate: ${SAML_SECONDARY_ENCRYPTION_CERTIFICATE:-}
 
