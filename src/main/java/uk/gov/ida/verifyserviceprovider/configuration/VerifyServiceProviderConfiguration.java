@@ -55,6 +55,12 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSigningKey;
 
+    @JsonProperty
+    @NotNull
+    @Valid
+    @JsonDeserialize(using = PrivateKeyDeserializer.class)
+    private PrivateKey samlPrimaryEncryptionKey;
+
     @NotNull
     @Valid
     @Size(min = 1, max = 2)
@@ -87,6 +93,10 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public PrivateKey getSamlSigningKey() {
         return samlSigningKey;
+    }
+
+    public PrivateKey getSamlPrimaryEncryptionKey() {
+        return samlPrimaryEncryptionKey;
     }
 
     public List<String> getDecryptionPrivateKeys() {

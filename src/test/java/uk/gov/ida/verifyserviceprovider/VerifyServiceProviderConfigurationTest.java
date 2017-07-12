@@ -45,6 +45,7 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("secureTokenSeed may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
+        expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
         expectedException.expectMessage(containsString("decryptionPrivateKeys may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
@@ -78,6 +79,12 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowEmptySamlSigningKey() throws Exception {
         expectedException.expectMessage("Failed to parse configuration at: samlSigningKey");
         factory.build(new StringConfigurationSourceProvider("samlSigningKey: \"\""), "");
+    }
+
+    @Test
+    public void shouldNotAllowEmptySamlPrimaryEncryptionKey() throws Exception {
+        expectedException.expectMessage("Failed to parse configuration at: samlPrimaryEncryptionKey");
+        factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
     }
 
     @Test

@@ -1,5 +1,6 @@
 package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
+import common.uk.gov.ida.verifyserviceprovider.utils.CertAndKeys;
 import common.uk.gov.ida.verifyserviceprovider.utils.SystemUtils;
 import io.dropwizard.logging.DefaultLoggingFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -10,6 +11,7 @@ import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfigurationTest;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Base64;
 import java.util.HashMap;
 
@@ -30,7 +32,9 @@ public class ApplicationConfigurationFeatureTests {
 
     @Test
     public void applicationShouldStartUp() throws Exception {
-        PrivateKey privateKey = generate().privateKey;
+        CertAndKeys samlSigningCertAndKeys = generate();
+        CertAndKeys samlPrimaryEncryptionCertAndKeys = generate();
+
         SystemUtils.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
@@ -40,7 +44,8 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", "some-hub-metadata-url");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("SECURE_TOKEN_SEED", "some-secret");
-            put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(privateKey.getEncoded())));
+            put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.privateKey.getEncoded())));
+            put("SAML_PRIMARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded())));
             put("DECRYPTION_PRIVATE_KEYS", "some-decryption-private-keys-1, some-decryption-private-keys-2");
         }});
 
@@ -56,7 +61,8 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getHubMetadataUrl().toString()).isEqualTo("some-hub-metadata-url");
         assertThat(configuration.getMsaMetadataUrl().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getSecureTokenSeed()).isEqualTo("some-secret");
-        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(privateKey.getEncoded());
+        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(samlSigningCertAndKeys.privateKey.getEncoded());
+        assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded());
         assertThat(configuration.getDecryptionPrivateKeys()).contains("some-decryption-private-keys-1", "some-decryption-private-keys-2");
     }
 }
