@@ -45,7 +45,7 @@ The following Environment Variables can be defined:
 
 Yaml based configuration provides more fine grained controls over the application. For example, you are able to configure HTTPS endpoints.
 
-See the reference configuration file available at [configuration/verify-service-provider.yml](
+See the reference configuration file available at [verify-service-provider.yml](
 https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/verify-service-provider/configuration/verify-service-provider.yml
 )
 
@@ -66,7 +66,7 @@ For Environment Variables:
 Or with a Yaml file:
 
 ```
-./bin/verify-service-provider server config.yml
+./bin/verify-service-provider server verify-service-provider.yml
 ```
 
 ## Integrate
@@ -89,3 +89,9 @@ __Startup__
 
 Remember to run acceptance tests after changes https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/acceptance-tests
 
+__Build a distribution__
+```
+./gradlew distZip
+```
+
+The result can be found at `build/distributions`

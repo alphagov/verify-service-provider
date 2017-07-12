@@ -1,3 +1,5 @@
+# Dropwizard server connector configuration
+# see: http://www.dropwizard.io/1.1.2/docs/manual/configuration.html#servers
 server:
   applicationConnectors:
     - type: http
@@ -6,6 +8,8 @@ server:
     - type: http
       port: 50401
 
+# Logging configuration
+# see: http://www.dropwizard.io/1.1.2/docs/manual/configuration.html#logging
 logging:
   level: INFO
   loggers:
@@ -16,18 +20,34 @@ logging:
       currentLogFilename: logs/verify-service-provider.log
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
+# Location where Verify Hub authentication flow begins
 hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}
 
+# Entity ID that uniquely identifies the hub
 hubEntityId: ${HUB_ENTITY_ID:-default-hub-entity-id}
 
+# Entity that identifies the relying party's Matching Service Adapater
 msaEntityId: ${MSA_ENTITY_ID:-default-msa-entity-id}
 
+# Location of hub metadata
+# Verify Service Provider consumes the metadata and 
+# Hub Public certificates from the metadata to identify the hub
 hubMetadataUrl: ${HUB_METADATA_URL:-default-hub-metadata-url}
 
+# Location of Matching Service Metadata
+# Verify Service Provider consumes the metadata and uses
+# public certificates from it to identify the msa
 msaMetadataUrl: ${MSA_METADATA_URL:-default-msa-metadata-url}
 
+# A random string that is used to seed to generate tokens.
+# Secure tokens are used to ensure that AuthnRequest and SAML response
+# are coming from the same browser.
 secureTokenSeed: ${SECURE_TOKEN_SEED:-default-secure-token-seed}
 
+# Private key that is used to sign an AuthnRequest
 signingPrivateKey: ${SIGNING_PRIVATE_KEY:-default-signing-private-key}
 
+# Private Keys that are used to decrypt any assertions that
+# come from the msa. if a key rotation needs to happen,
+# the new keys can be added to the list.
 decryptionPrivateKeys: [${DECRYPTION_PRIVATE_KEYS:-default-decryption-private-key-1,default-decryption-private-key-2}]
