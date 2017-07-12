@@ -30,6 +30,8 @@ secureTokenSeed: ${SECURE_TOKEN_SEED:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
+samlSigningCertificate: ${SAML_SIGNING_CERTIFICATE:-}
+
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}

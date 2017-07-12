@@ -10,8 +10,6 @@ import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfigurationTest;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
-import java.security.PrivateKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.Base64;
 import java.util.HashMap;
 
@@ -46,6 +44,7 @@ public class ApplicationConfigurationFeatureTests {
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("SECURE_TOKEN_SEED", "some-secret");
             put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.privateKey.getEncoded())));
+            put("SAML_SIGNING_CERTIFICATE", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.certificate.getEncoded())));
             put("SAML_PRIMARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded())));
             put("SAML_SECONDARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded())));
             put("DECRYPTION_PRIVATE_KEYS", "some-decryption-private-keys-1, some-decryption-private-keys-2");
@@ -64,6 +63,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getMsaMetadataUrl().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getSecureTokenSeed()).isEqualTo("some-secret");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(samlSigningCertAndKeys.privateKey.getEncoded());
+        assertThat(configuration.getSamlSigningCertificate().getEncoded()).isEqualTo(samlSigningCertAndKeys.certificate.getEncoded());
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded());
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded());
         assertThat(configuration.getDecryptionPrivateKeys()).contains("some-decryption-private-keys-1", "some-decryption-private-keys-2");

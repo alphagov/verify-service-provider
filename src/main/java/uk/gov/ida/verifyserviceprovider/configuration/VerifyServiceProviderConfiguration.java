@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.util.List;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
@@ -58,6 +59,12 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
+    @JsonDeserialize(using = CertificateDeserializer.class)
+    private Certificate samlSigningCertificate;
+
+    @JsonProperty
+    @NotNull
+    @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlPrimaryEncryptionKey;
 
@@ -98,6 +105,10 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public PrivateKey getSamlSigningKey() {
         return samlSigningKey;
+    }
+
+    public Certificate getSamlSigningCertificate() {
+        return samlSigningCertificate;
     }
 
     public PrivateKey getSamlPrimaryEncryptionKey() {
