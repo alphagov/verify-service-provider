@@ -28,7 +28,7 @@ msaMetadataUrl: ${MSA_METADATA_URL:-}
 
 secureTokenSeed: ${SECURE_TOKEN_SEED:-}
 
-signingPrivateKey: ${SIGNING_PRIVATE_KEY:-}
+samlSigningKey: ${SAML_SIGNING_KEY:-}
 
 decryptionPrivateKeys: [${DECRYPTION_PRIVATE_KEYS:-}]
 

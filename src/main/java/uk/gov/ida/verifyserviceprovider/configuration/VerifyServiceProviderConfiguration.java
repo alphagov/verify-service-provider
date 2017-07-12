@@ -53,7 +53,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
-    private PrivateKey signingPrivateKey;
+    private PrivateKey samlSigningKey;
 
     @NotNull
     @Valid
@@ -85,8 +85,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return hubMetadataUrl;
     }
 
-    public PrivateKey getSigningPrivateKey() {
-        return signingPrivateKey;
+    public PrivateKey getSamlSigningKey() {
+        return samlSigningKey;
     }
 
     public List<String> getDecryptionPrivateKeys() {

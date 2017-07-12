@@ -40,7 +40,7 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", "some-hub-metadata-url");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("SECURE_TOKEN_SEED", "some-secret");
-            put("SIGNING_PRIVATE_KEY", new String(Base64.getEncoder().encode(privateKey.getEncoded())));
+            put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(privateKey.getEncoded())));
             put("DECRYPTION_PRIVATE_KEYS", "some-decryption-private-keys-1, some-decryption-private-keys-2");
         }});
 
@@ -56,7 +56,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getHubMetadataUrl().toString()).isEqualTo("some-hub-metadata-url");
         assertThat(configuration.getMsaMetadataUrl().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getSecureTokenSeed()).isEqualTo("some-secret");
-        assertThat(configuration.getSigningPrivateKey().getEncoded()).isEqualTo(privateKey.getEncoded());
+        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(privateKey.getEncoded());
         assertThat(configuration.getDecryptionPrivateKeys()).contains("some-decryption-private-keys-1", "some-decryption-private-keys-2");
     }
 }
