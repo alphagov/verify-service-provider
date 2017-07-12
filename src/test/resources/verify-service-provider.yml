@@ -12,7 +12,9 @@ logging:
     "uk.gov": DEBUG
   appenders:
     - type: console
-
+    - type: file
+      currentLogFilename: logs/verify-service-provider.log
+      archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
 hubSsoLocation: default-hub-sso-location
 

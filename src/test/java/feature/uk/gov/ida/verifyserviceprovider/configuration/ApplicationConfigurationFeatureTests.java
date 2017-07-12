@@ -1,6 +1,7 @@
 package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
 import common.uk.gov.ida.verifyserviceprovider.utils.SystemUtils;
+import io.dropwizard.logging.DefaultLoggingFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,7 @@ public class ApplicationConfigurationFeatureTests {
         PrivateKey privateKey = generate().privateKey;
         SystemUtils.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
+            put("LOG_LEVEL", "ERROR");
             put("HUB_SSO_LOCATION", "some-hub-sso-location");
             put("HUB_ENTITY_ID", "some-hub-entity-id");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
@@ -47,6 +49,7 @@ public class ApplicationConfigurationFeatureTests {
         VerifyServiceProviderConfiguration configuration = application.getConfiguration();
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
+        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
         assertThat(configuration.getHubSsoLocation()).isEqualTo("some-hub-sso-location");
         assertThat(configuration.getHubEntityId()).isEqualTo("some-hub-entity-id");
         assertThat(configuration.getMsaEntityId()).isEqualTo("some-msa-entity-id");

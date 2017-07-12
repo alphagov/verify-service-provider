@@ -11,7 +11,7 @@ server:
 # Logging configuration
 # see: http://www.dropwizard.io/1.1.2/docs/manual/configuration.html#logging
 logging:
-  level: INFO
+  level: ${LOG_LEVEL:-INFO}
   loggers:
     "uk.gov": DEBUG
   appenders:
