@@ -6,6 +6,9 @@ between Verify Hub and a Relying Party.
 
 Please refer to the [techinical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) to understand how services can technically integrate with Verify.
 
+__NOTE__: The Verify Service Provider is currently in a prototyping phase of development
+
+
 Setup
 -----
 
@@ -25,6 +28,8 @@ __NOTE__: These options may change during development
 
 The following Environment Variables can be defined:
 
+* `PORT` - The TCP port where the application will listen for HTTP traffic
+* `LOG_LEVEL` - The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR) (default: INFO)
 * `MSA_ENTITY_ID` - The SAML Entity Id that identifies the Relying Partie's Matching Service Adapter
 * `MSA_METADATA_URL` - The URL to the Matching Service Adapter's SAML metadata.
 * `HUB_ENTITY_ID` - The SAML Entity Id that identifies the Verify Hub (default: https://signin.service.gov.uk)
