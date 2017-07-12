@@ -24,7 +24,7 @@ logging:
 hubSsoLocation: ${HUB_SSO_LOCATION:-http://localhost:50410/SAML2/SSO}
 
 # Entity ID that uniquely identifies the hub
-hubEntityId: ${HUB_ENTITY_ID:-default-hub-entity-id}
+hubEntityId: ${HUB_ENTITY_ID:-https://signin.service.gov.uk}
 
 # Entity that identifies the relying party's Matching Service Adapater
 msaEntityId: ${MSA_ENTITY_ID:-default-msa-entity-id}
@@ -32,7 +32,7 @@ msaEntityId: ${MSA_ENTITY_ID:-default-msa-entity-id}
 # Location of hub metadata
 # Verify Service Provider consumes the metadata and
 # Hub Public certificates from the metadata to identify the hub
-hubMetadataUrl: ${HUB_METADATA_URL:-default-hub-metadata-url}
+hubMetadataUrl: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
 # Location of Matching Service Metadata
 # Verify Service Provider consumes the metadata and uses
