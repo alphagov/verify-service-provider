@@ -3,7 +3,7 @@
 server:
   applicationConnectors:
     - type: http
-      port: 50400
+      port: ${PORT:-50400}
   adminConnectors:
     - type: http
       port: 50401

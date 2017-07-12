@@ -31,6 +31,7 @@ public class ApplicationConfigurationFeatureTests {
     public void applicationShouldStartUp() throws Exception {
         PrivateKey privateKey = generate().privateKey;
         SystemUtils.setEnv(new HashMap<String, String>() {{
+            put("PORT", "50555");
             put("HUB_SSO_LOCATION", "some-hub-sso-location");
             put("HUB_ENTITY_ID", "some-hub-entity-id");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
@@ -45,6 +46,7 @@ public class ApplicationConfigurationFeatureTests {
 
         VerifyServiceProviderConfiguration configuration = application.getConfiguration();
 
+        assertThat(application.getLocalPort()).isEqualTo(50555);
         assertThat(configuration.getHubSsoLocation()).isEqualTo("some-hub-sso-location");
         assertThat(configuration.getHubEntityId()).isEqualTo("some-hub-entity-id");
         assertThat(configuration.getMsaEntityId()).isEqualTo("some-msa-entity-id");
