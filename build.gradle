@@ -18,6 +18,7 @@ dependencies {
 
 }
 
+// Allows us to use the private sun API for generating self signed certs in tests
 compileTestJava {
     options.fork = true
     options.forkOptions.executable = 'javac'
