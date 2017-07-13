@@ -20,6 +20,4 @@ public class SystemUtils {
         field.setAccessible(true);
         return (Map<String, String>) field.get(env);
     }
-
-
 }

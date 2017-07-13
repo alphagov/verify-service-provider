@@ -1,9 +1,10 @@
 package uk.gov.ida.verifyserviceprovider;
 
 import io.dropwizard.configuration.ConfigurationSourceProvider;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
-import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,7 +33,10 @@ public class VerifyServiceProviderConfigurationTest {
     @Test
     public void shouldNotComplainWhenConfiguredCorrectly() throws Exception {
         factory.build(
-            new FileConfigurationSourceProvider(),
+            new SubstitutingSourceProvider(
+                new FileConfigurationSourceProvider(),
+                new EnvironmentVariableSubstitutor(false)
+            ),
             resourceFilePath("verify-service-provider.yml")
         );
     }

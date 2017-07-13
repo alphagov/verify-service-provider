@@ -24,7 +24,7 @@ public class ApplicationConfigurationFeatureTests {
     public void setUp() {
         application = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider-feature-tests.yml")
+            resourceFilePath("verify-service-provider.yml")
         );
     }
 
