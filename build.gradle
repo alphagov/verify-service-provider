@@ -58,5 +58,4 @@ run {
     args = ["server", "configuration/verify-service-provider.yml"]
 }
 
-version = 'prototype-0'
 mainClassName = 'uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication'
