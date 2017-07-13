@@ -67,7 +67,6 @@ definitions:
   ExpectedLevelOfAssurance:
     description: Level of assurance requested by the Service
     type: string
-    default: DEFINED IN SERVICE PROVIDER CONFIG
     enum:
       - LEVEL_1
       - LEVEL_2
