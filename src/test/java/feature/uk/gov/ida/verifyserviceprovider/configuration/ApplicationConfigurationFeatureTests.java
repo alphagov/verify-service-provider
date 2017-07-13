@@ -7,13 +7,13 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfigurationTest;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import java.util.Base64;
 import java.util.HashMap;
 
 import static common.uk.gov.ida.verifyserviceprovider.utils.CertAndKeys.generate;
+import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApplicationConfigurationFeatureTests {
@@ -24,7 +24,7 @@ public class ApplicationConfigurationFeatureTests {
     public void setUp() {
         application = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
-            VerifyServiceProviderConfigurationTest.class.getResource("/verify-service-provider-feature-tests.yml").getPath()
+            resourceFilePath("verify-service-provider-feature-tests.yml")
         );
     }
 

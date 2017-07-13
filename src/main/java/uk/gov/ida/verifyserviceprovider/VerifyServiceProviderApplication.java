@@ -53,7 +53,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new TranslateSamlResponseResource());
     }
 
-    public ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
+    private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
         if (fileSystemConfig) {
             return bootstrap.getConfigurationSourceProvider();
         } else {

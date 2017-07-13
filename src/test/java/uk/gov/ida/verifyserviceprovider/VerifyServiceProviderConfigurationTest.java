@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
+import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,13 +15,14 @@ import java.io.InputStream;
 
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
+import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static org.hamcrest.core.StringContains.containsString;
 
 public class VerifyServiceProviderConfigurationTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-    private final YamlConfigurationFactory factory = new YamlConfigurationFactory(
+    private final YamlConfigurationFactory factory = new YamlConfigurationFactory<>(
         VerifyServiceProviderConfiguration.class,
         newValidator(),
         newObjectMapper(),
@@ -31,7 +33,7 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotComplainWhenConfiguredCorrectly() throws Exception {
         factory.build(
             new FileConfigurationSourceProvider(),
-            VerifyServiceProviderConfigurationTest.class.getResource("/verify-service-provider.yml").getPath()
+            resourceFilePath("verify-service-provider.yml")
         );
     }
 

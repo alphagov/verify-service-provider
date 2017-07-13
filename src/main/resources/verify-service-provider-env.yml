@@ -1,5 +1,6 @@
-# This configuration will be used when no custom yaml file is specified.
-# For example, when the application is being configured with environment variables.
+# This configuration will be used when no YAML file is specified.
+# For example when the application is being configured with environment variables.
+
 server:
   type: simple
   applicationContextPath: /
@@ -22,16 +23,16 @@ hubSsoLocation: ${HUB_SSO_LOCATION:-https://stub-verify-hub-proto-demo.cloudapps
 
 hubEntityId: ${HUB_ENTITY_ID:-https://signin.service.gov.uk}
 
-msaEntityId: ${MSA_ENTITY_ID:-}
+msaEntityId: ${MSA_ENTITY_ID}
 
 hubMetadataUrl: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
-msaMetadataUrl: ${MSA_METADATA_URL:-}
+msaMetadataUrl: ${MSA_METADATA_URL}
 
-secureTokenKey: ${SECURE_TOKEN_KEY:-}
+secureTokenKey: ${SECURE_TOKEN_KEY}
 
-samlSigningKey: ${SAML_SIGNING_KEY:-}
+samlSigningKey: ${SAML_SIGNING_KEY}
 
-samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
+samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY}
 
-samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
+samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY}
