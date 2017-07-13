@@ -70,7 +70,7 @@ Or with a Yaml file:
 ## Integrate
 
 Verify Service Provider provides a HTTP API that supports the communication between the Relying party
-and Verify. Please see our [swagger documentation](https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/docs/verify-service-provider-api.swagger.yml) for details of this.
+and Verify. Please see our [swagger documentation](https://alphagov.github.io/verify-service-provider) for details of this.
 
 Development
 -----------
