@@ -26,16 +26,10 @@ hubMetadataUrl: ${HUB_METADATA_URL:-}
 
 msaMetadataUrl: ${MSA_METADATA_URL:-}
 
-secureTokenSeed: ${SECURE_TOKEN_SEED:-}
+secureTokenKey: ${SECURE_TOKEN_KEY:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
-samlSigningCertificate: ${SAML_SIGNING_CERTIFICATE:-}
-
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 
-samlPrimaryEncryptionCertificate: ${SAML_PRIMARY_ENCRYPTION_CERTIFICATE:-}
-
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
-
-samlSecondaryEncryptionCertificate: ${SAML_SECONDARY_ENCRYPTION_CERTIFICATE:-}

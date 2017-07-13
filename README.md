@@ -30,16 +30,14 @@ The following Environment Variables can be defined:
 
 * `PORT` - The TCP port where the application will listen for HTTP traffic
 * `LOG_LEVEL` - The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR) (default: INFO)
-* `MSA_ENTITY_ID` - The SAML Entity Id that identifies the Relying Partie's Matching Service Adapter
+* `MSA_ENTITY_ID` - The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
 * `MSA_METADATA_URL` - The URL to the Matching Service Adapter's SAML metadata.
 * `HUB_ENTITY_ID` - The SAML Entity Id that identifies the Verify Hub (default: https://signin.service.gov.uk)
 * `HUB_METADATA_URL` - The URL to the Verify Hub's SAML metadata. (default: https://www.signin.service.gov.uk/SAML2/metadata/federation
+* `SECURE_TOKEN_KEY` - A random string value used as a key to generate tokens
 * `SAML_SIGNING_KEY` - A base64 encoded RSA private key that is used for signing the request to Verify
-* `SAML_SIGNING_CERTIFICATE` - A base64 encoded x509 certificate that corresponds to the above key
 * `SAML_PRIMARY_ENCRYPTION_KEY` - A primary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions
-* `SAML_PRIMARY_ENCRYPTION_CERTIFICATE` - A base64 encoded x509 certificate key that corresponds to the above key
 * `SAML_SECONDARY_ENCRYPTION_KEY` - (Optional) A secondary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions that will be used during certificate rotation events
-* `SAML_SECONDARY_ENCRYPTION_CERTIFICATE` - (Optional) A base64 encoded x509 certificate key that corresponds to the above key
 
 #### Yaml based configuration
 

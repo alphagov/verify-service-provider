@@ -43,11 +43,9 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("msaEntityId may not be null"));
         expectedException.expectMessage(containsString("hubMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
-        expectedException.expectMessage(containsString("secureTokenSeed may not be null"));
+        expectedException.expectMessage(containsString("secureTokenKey may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
-        expectedException.expectMessage(containsString("samlSigningCertificate may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
-        expectedException.expectMessage(containsString("samlPrimaryEncryptionCertificate may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
@@ -71,21 +69,15 @@ public class VerifyServiceProviderConfigurationTest {
     }
 
     @Test
-    public void shouldNotAllowEmptySecureTokenSeed() throws Exception {
-        expectedException.expectMessage("secureTokenSeed may not be empty");
-        factory.build(new StringConfigurationSourceProvider("secureTokenSeed: \"\""), "");
+    public void shouldNotAllowEmptySecureTokenKey() throws Exception {
+        expectedException.expectMessage("secureTokenKey may not be empty");
+        factory.build(new StringConfigurationSourceProvider("secureTokenKey: \"\""), "");
     }
 
     @Test
     public void shouldNotAllowEmptySamlSigningKey() throws Exception {
         expectedException.expectMessage("Failed to parse configuration at: samlSigningKey");
         factory.build(new StringConfigurationSourceProvider("samlSigningKey: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptySamlSigningCertificate() throws Exception {
-        expectedException.expectMessage("Failed to parse configuration at: samlSigningCertificate");
-        factory.build(new StringConfigurationSourceProvider("samlSigningCertificate: \"\""), "");
     }
 
     @Test

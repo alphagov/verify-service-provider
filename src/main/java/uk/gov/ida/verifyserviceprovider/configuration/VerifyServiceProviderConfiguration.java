@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -47,7 +46,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private String secureTokenSeed;
+    private String secureTokenKey;
 
     @JsonProperty
     @NotNull
@@ -58,30 +57,13 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
-    @JsonDeserialize(using = CertificateDeserializer.class)
-    private Certificate samlSigningCertificate;
-
-    @JsonProperty
-    @NotNull
-    @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlPrimaryEncryptionKey;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    @JsonDeserialize(using = CertificateDeserializer.class)
-    private Certificate samlPrimaryEncryptionCertificate;
 
     @JsonProperty
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSecondaryEncryptionKey;
-
-    @JsonProperty
-    @Valid
-    @JsonDeserialize(using = CertificateDeserializer.class)
-    private Certificate samlSecondaryEncryptionCertificate;
 
     public String getHubSsoLocation() {
         return hubSsoLocation;
@@ -95,8 +77,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return msaMetadataUrl;
     }
 
-    public String getSecureTokenSeed() {
-        return secureTokenSeed;
+    public String getSecureTokenKey() {
+        return secureTokenKey;
     }
 
     public String getMsaEntityId() {
@@ -111,23 +93,10 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlSigningKey;
     }
 
-    public Certificate getSamlSigningCertificate() {
-        return samlSigningCertificate;
-    }
-
     public PrivateKey getSamlPrimaryEncryptionKey() {
         return samlPrimaryEncryptionKey;
     }
-
-    public Certificate getSamlPrimaryEncryptionCertificate() {
-        return samlPrimaryEncryptionCertificate;
-    }
-
     public PrivateKey getSamlSecondaryEncryptionKey() {
         return samlSecondaryEncryptionKey;
-    }
-
-    public Certificate getSamlSecondaryEncryptionCertificate() {
-        return samlSecondaryEncryptionCertificate;
     }
 }

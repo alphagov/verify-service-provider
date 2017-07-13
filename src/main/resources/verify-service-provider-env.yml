@@ -1,13 +1,15 @@
+# This configuration will be used when no custom yaml file is specified.
+# For example, when the application is being configured with environment variables.
 server:
-  applicationConnectors:
-    - type: http
-      port: ${PORT:-50400}
-  adminConnectors:
-    - type: http
-      port: 50401
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${PORT:-50400}
 
 logging:
-  level: ${LOG_LEVEL:-}
+  level: ${LOG_LEVEL:-INFO}
   loggers:
     "uk.gov": DEBUG
   appenders:
@@ -16,27 +18,20 @@ logging:
       currentLogFilename: logs/verify-service-provider.log
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
-hubSsoLocation: ${HUB_SSO_LOCATION:-}
+hubSsoLocation: ${HUB_SSO_LOCATION:-https://stub-verify-hub-proto-demo.cloudapps.digital/SAML2/SSO}
 
-hubEntityId: ${HUB_ENTITY_ID:-}
+hubEntityId: ${HUB_ENTITY_ID:-https://signin.service.gov.uk}
 
 msaEntityId: ${MSA_ENTITY_ID:-}
 
-hubMetadataUrl: ${HUB_METADATA_URL:-}
+hubMetadataUrl: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
 msaMetadataUrl: ${MSA_METADATA_URL:-}
 
-secureTokenSeed: ${SECURE_TOKEN_SEED:-}
+secureTokenKey: ${SECURE_TOKEN_KEY:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
-samlSigningCertificate: ${SAML_SIGNING_CERTIFICATE:-}
-
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 
-samlPrimaryEncryptionCertificate: ${SAML_PRIMARY_ENCRYPTION_CERTIFICATE:-}
-
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
-
-samlSecondaryEncryptionCertificate: ${SAML_SECONDARY_ENCRYPTION_CERTIFICATE:-}
-
