@@ -1,7 +1,7 @@
 Release notes
 =============
 
-__2017-07-12__ prototype-0
+__2017-07-17__ 0.1.0-prototype-0
 
-Initial release
+Pre-release of verify service provider prototype-0.
 
