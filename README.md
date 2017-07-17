@@ -35,11 +35,27 @@ export HUB_ENTITY_ID=... # The SAML Entity Id that identifies the Verify Hub (de
 export HUB_METADATA_URL=... # The URL to the Verify Hub's SAML metadata. (default: https://www.signin.service.gov.uk/SAML2/metadata/federation
 export SECURE_TOKEN_KEY=... # A random string value used as a key to generate tokens
 export SAML_SIGNING_KEY=... # A base64 encoded RSA private key that is used for signing the request to Verify
-export SAML_PRIMARY_ENCRYPTION_KEY=... # A primary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions
-export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded RSA private key that is used to decrypt encrypted SAML Assertions that will be used during certificate rotation events
+export SAML_PRIMARY_ENCRYPTION_KEY=... # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
+export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that will be used during certificate rotation events (see "Generating keys for testing")
 
 # Run the application with the above variables set
 ./bin/verify-service-provider
+```
+
+#### Generating keys for testing
+
+If you have openssl installed you can generate a private key in the correct format with:
+
+```
+openssl genrsa -des3 -passout pass:x -out "key-name.pass.key" 2048
+openssl rsa -passin pass:x -in "key-name.pass.key" -out "key-name.key"
+openssl pkcs8 -topk8 -inform PEM -outform DER -in "key-name.key" -out "key-name.pk8" -nocrypt
+
+# This command will print a base64 encoded PKCS8 RSA private key to standard out
+openssl base64 -in key-name.pk8 -out key-name.pk8.base64
+
+# Strip the newlines from the base64 encoded file and print to standard out
+tr -d '\n' < key-name.pk8.base64
 ```
 
 ### Run
