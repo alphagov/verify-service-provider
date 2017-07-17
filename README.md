@@ -51,6 +51,12 @@ export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded
 
 The application will write logs to STDOUT.
 
+You can check that the application is running by calling the healthcheck path:
+```
+curl localhost:{$PORT}/admin/healthcheck
+```
+
+
 ## Usage
 
 There are prebuilt clients for the following languages and frameworks:

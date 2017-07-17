@@ -4,6 +4,7 @@ import common.uk.gov.ida.verifyserviceprovider.utils.CertAndKeys;
 import common.uk.gov.ida.verifyserviceprovider.utils.SystemUtils;
 import io.dropwizard.logging.DefaultLoggingFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
@@ -26,6 +27,11 @@ public class ApplicationConfigurationFeatureTests {
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml")
         );
+    }
+
+    @After
+    public void cleanup() {
+        application.getTestSupport().after();
     }
 
     @Test

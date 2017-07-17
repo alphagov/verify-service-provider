@@ -10,6 +10,7 @@ import io.dropwizard.setup.Environment;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.utils.ApplicationHealthCheck;
 
 import java.util.Arrays;
 
@@ -51,6 +52,9 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(new GenerateAuthnRequestResource(configuration));
         environment.jersey().register(new TranslateSamlResponseResource());
+
+        ApplicationHealthCheck healthCheck = new ApplicationHealthCheck();
+        environment.healthChecks().register(healthCheck.getName(), healthCheck);
     }
 
     private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
