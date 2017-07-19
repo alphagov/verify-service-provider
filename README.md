@@ -89,7 +89,7 @@ See the [swagger documentation](https://alphagov.github.io/verify-service-provid
 Yaml based configuration provides more fine grained controls over the application. For example, you are able to configure HTTPS endpoints.
 
 See the reference configuration file available at [verify-service-provider.yml](
-https://github.com/alphagov/verify-service-provider/blob/master/prototypes/prototype-0/verify-service-provider/configuration/verify-service-provider.yml
+https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml
 )
 
 Verify Service Provider is a Dropwizard application and thus supports all configuration options
@@ -109,8 +109,6 @@ __Startup__
 ```
 ./startup.sh
 ```
-
-Remember to run acceptance tests after changes https://github.com/alphagov/verify-service-provider/tree/master/prototypes/prototype-0/acceptance-tests
 
 __Build a distribution__
 ```
