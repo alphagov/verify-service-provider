@@ -4,7 +4,7 @@ server:
   adminContextPath: /admin
   connector:
     type: http
-    port: ${PORT:-50400}
+    port: ${PORT:-0}
 
 logging:
   level: ${LOG_LEVEL:-INFO}
