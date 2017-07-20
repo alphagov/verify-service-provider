@@ -1,6 +1,6 @@
 memory: 256M
 applications:
-  - name: verify-service-provider-test
+  - name: verify-service-provider-dev
     path: build/distributions/verify-service-provider.zip
     env:
       HUB_SSO_LOCATION: http://example.com

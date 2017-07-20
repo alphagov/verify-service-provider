@@ -35,5 +35,5 @@ cfLogin() {
 
 cfLogin
 
-cf push -f test-manifest.yml
+cf push -f dev-manifest.yml
 
