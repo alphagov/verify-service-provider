@@ -21,13 +21,12 @@ logging:
 
 hubSsoLocation: ${HUB_SSO_LOCATION:-https://stub-verify-hub-proto-demo.cloudapps.digital/SAML2/SSO}
 
-hubEntityId: ${HUB_ENTITY_ID:-https://signin.service.gov.uk}
+verifyHubMetadata:
+  uri: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
-msaEntityId: ${MSA_ENTITY_ID:-}
-
-hubMetadataUrl: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
-
-msaMetadataUrl: ${MSA_METADATA_URL:-}
+msaMetadata:
+  uri: ${MSA_METADATA_URL:-default-msa-metadata-url}
+  expectedEntityId: ${MSA_ENTITY_ID:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 

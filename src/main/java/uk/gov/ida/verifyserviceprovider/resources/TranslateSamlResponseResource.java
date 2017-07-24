@@ -22,6 +22,7 @@ import java.util.Base64;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
@@ -89,12 +90,7 @@ public class TranslateSamlResponseResource {
     }
 
     private TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper() {{
-            registerModule(new Jdk8Module());
-            registerModule(new JavaTimeModule());
-        }};
-
-        return objectMapper.readValue(decodedSamlResponse, new TypeReference<TranslatedResponseBody>() {
+        return OBJECT_MAPPER.readValue(decodedSamlResponse, new TypeReference<TranslatedResponseBody>() {
         });
     }
 }

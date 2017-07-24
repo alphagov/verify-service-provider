@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.resources;
+package unit.uk.gov.ida.verifyserviceprovider.resources;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -7,11 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.Address;
 import uk.gov.ida.verifyserviceprovider.dto.Attributes;
+import uk.gov.ida.verifyserviceprovider.dto.Address;
 import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;

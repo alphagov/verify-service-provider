@@ -6,17 +6,25 @@ repositories {
     maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
 }
 
+project.ext {
+    openSamlVersion = '3.3.0'
+}
+
 dependencies {
     compile(
-        'io.dropwizard:dropwizard-core:1.1.0',
-        'org.json:json:20170516'
+        'io.dropwizard:dropwizard-core:1.1.2',
+        'org.json:json:20170516',
+        "org.opensaml:opensaml-core:$openSamlVersion",
+        "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-41",
     )
     testCompile(
         'junit:junit:4.12',
         'io.dropwizard:dropwizard-testing:1.1.0',
-        'org.mockito:mockito-core:2.7.22'
+        'org.mockito:mockito-core:2.7.22',
+        "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-41",
+        "uk.gov.ida:common-test-utils:2.0.0-31",
     )
-
+    testCompile('com.github.tomakehurst:wiremock:2.5.1'){ transitive = false }
 }
 
 // Allows us to use the private sun API for generating self signed certs in tests

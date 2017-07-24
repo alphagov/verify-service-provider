@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.resources;
+package unit.uk.gov.ida.verifyserviceprovider.resources;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.ClassRule;
@@ -7,6 +7,7 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
+import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;

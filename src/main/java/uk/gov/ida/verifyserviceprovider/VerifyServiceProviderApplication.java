@@ -8,9 +8,10 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
+import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
-import uk.gov.ida.verifyserviceprovider.utils.ApplicationHealthCheck;
 
 import java.util.Arrays;
 
@@ -53,8 +54,10 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new GenerateAuthnRequestResource(configuration));
         environment.jersey().register(new TranslateSamlResponseResource());
 
-        ApplicationHealthCheck healthCheck = new ApplicationHealthCheck();
-        environment.healthChecks().register(healthCheck.getName(), healthCheck);
+        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
+
+        environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
+        environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
     }
 
     private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {

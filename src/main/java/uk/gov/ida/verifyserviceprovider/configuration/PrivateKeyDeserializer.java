@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -15,11 +14,13 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
+import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
+
 public class PrivateKeyDeserializer extends JsonDeserializer<PrivateKey> {
 
     @Override
     public PrivateKey deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
-        jsonParser.setCodec(new ObjectMapper());
+        jsonParser.setCodec(OBJECT_MAPPER);
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
         try {

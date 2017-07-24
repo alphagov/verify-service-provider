@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider;
+package unit.uk.gov.ida.verifyserviceprovider;
 
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -45,12 +45,10 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage(containsString("server may not be null"));
         expectedException.expectMessage(containsString("hubSsoLocation may not be null"));
-        expectedException.expectMessage(containsString("hubEntityId may not be null"));
-        expectedException.expectMessage(containsString("msaEntityId may not be null"));
-        expectedException.expectMessage(containsString("hubMetadataUrl may not be null"));
-        expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
+        expectedException.expectMessage(containsString("verifyHubMetadata may not be null"));
+        expectedException.expectMessage(containsString("msaMetadata may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
@@ -59,18 +57,6 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowEmptyHubSSOLocation() throws Exception {
         expectedException.expectMessage("hubSsoLocation may not be empty");
         factory.build(new StringConfigurationSourceProvider("hubSsoLocation: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyHubEntityId() throws Exception {
-        expectedException.expectMessage("hubEntityId may not be empty");
-        factory.build(new StringConfigurationSourceProvider("hubEntityId: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyMsaEntityId() throws Exception {
-        expectedException.expectMessage("msaEntityId may not be empty");
-        factory.build(new StringConfigurationSourceProvider("msaEntityId: \"\""), "");
     }
 
     @Test
@@ -83,6 +69,12 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowEmptySamlPrimaryEncryptionKey() throws Exception {
         expectedException.expectMessage("Failed to parse configuration at: samlPrimaryEncryptionKey");
         factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
+    }
+
+    @Test
+    public void shouldNotAllowEmptyMsaMetadataExpectedEntityId() throws Exception {
+        expectedException.expectMessage("msaMetadata.expectedEntityId may not be null");
+        factory.build(new StringConfigurationSourceProvider("msaMetadata: \n uri: https://some-url.com"), "");
     }
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {

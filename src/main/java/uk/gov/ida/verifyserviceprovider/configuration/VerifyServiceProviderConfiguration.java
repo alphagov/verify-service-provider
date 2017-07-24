@@ -7,7 +7,6 @@ import io.dropwizard.Configuration;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.net.URI;
 import java.security.PrivateKey;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
@@ -19,28 +18,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
     private String hubSsoLocation;
-
-    @JsonProperty
-    @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
-    @Valid
-    private String hubEntityId;
-
-    @JsonProperty
-    @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
-    @Valid
-    private String msaEntityId;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    private URI msaMetadataUrl;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    private URI hubMetadataUrl;
 
     @JsonProperty
     @NotNull
@@ -59,24 +36,18 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSecondaryEncryptionKey;
 
+    @JsonProperty
+    @NotNull
+    @Valid
+    private MetadataConfigurationWithHubDefaults verifyHubMetadata;
+
+    @JsonProperty
+    @NotNull
+    @Valid
+    private MetadataConfigurationWithMsaDefaults msaMetadata;
+
     public String getHubSsoLocation() {
         return hubSsoLocation;
-    }
-
-    public String getHubEntityId() {
-        return hubEntityId;
-    }
-
-    public URI getMsaMetadataUrl() {
-        return msaMetadataUrl;
-    }
-
-    public String getMsaEntityId() {
-        return msaEntityId;
-    }
-
-    public URI getHubMetadataUrl() {
-        return hubMetadataUrl;
     }
 
     public PrivateKey getSamlSigningKey() {
@@ -86,8 +57,17 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     public PrivateKey getSamlPrimaryEncryptionKey() {
         return samlPrimaryEncryptionKey;
     }
-    
+
+
     public PrivateKey getSamlSecondaryEncryptionKey() {
         return samlSecondaryEncryptionKey;
+    }
+
+    public MetadataConfigurationWithMsaDefaults getMsaMetadata() {
+        return msaMetadata;
+    }
+
+    public MetadataConfigurationWithHubDefaults getVerifyHubMetadata() {
+        return verifyHubMetadata;
     }
 }
