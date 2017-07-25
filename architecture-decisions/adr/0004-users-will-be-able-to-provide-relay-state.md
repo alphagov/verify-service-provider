@@ -1,6 +1,6 @@
 # 4. Users will be able to provide relay state
 
-Date: 01/06/2017
+Date: 2017-06-01
 
 ## Status
 

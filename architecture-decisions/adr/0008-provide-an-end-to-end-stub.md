@@ -1,6 +1,6 @@
 # 8. Provide an End To End Stub
 
-Date: 12/06/2017
+Date: 2017-06-12
 
 ## Status
 

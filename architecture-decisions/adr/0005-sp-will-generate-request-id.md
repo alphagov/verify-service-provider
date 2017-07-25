@@ -1,6 +1,6 @@
 # 5. SP will generate request ID
 
-Date: 01/06/2017
+Date: 2017-06-01
 
 ## Status
 
