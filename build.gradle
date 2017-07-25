@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'idea'
 
 repositories {
     maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
@@ -26,12 +27,12 @@ compileTestJava {
 }
 
 sourceSets {
-    integrationTest {
+    acceptanceTest {
         java {
-            srcDir 'src/integration-test/java'
+            srcDir 'src/acceptance-test/java'
         }
         resources {
-            srcDir 'src/integration-test/resources'
+            srcDir 'src/acceptance-test/resources'
         }
         compileClasspath += sourceSets.main.runtimeClasspath
         compileClasspath += sourceSets.test.runtimeClasspath
@@ -49,9 +50,9 @@ distributions {
     }
 }
 
-task testIntegration(type: Test) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath += sourceSets.integrationTest.runtimeClasspath
+task testAcceptance(type: Test) {
+    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    classpath += sourceSets.acceptanceTest.runtimeClasspath
 }
 
 run {
