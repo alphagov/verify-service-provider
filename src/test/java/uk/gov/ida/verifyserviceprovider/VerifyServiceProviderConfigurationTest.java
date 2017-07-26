@@ -49,7 +49,6 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("msaEntityId may not be null"));
         expectedException.expectMessage(containsString("hubMetadataUrl may not be null"));
         expectedException.expectMessage(containsString("msaMetadataUrl may not be null"));
-        expectedException.expectMessage(containsString("secureTokenKey may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
 
@@ -72,12 +71,6 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowEmptyMsaEntityId() throws Exception {
         expectedException.expectMessage("msaEntityId may not be empty");
         factory.build(new StringConfigurationSourceProvider("msaEntityId: \"\""), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptySecureTokenKey() throws Exception {
-        expectedException.expectMessage("secureTokenKey may not be empty");
-        factory.build(new StringConfigurationSourceProvider("secureTokenKey: \"\""), "");
     }
 
     @Test

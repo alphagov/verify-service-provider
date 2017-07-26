@@ -4,13 +4,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TranslateSamlResponseBody {
-    public final String samlResponse;
-    public final String secureToken;
+    private final String samlResponse;
+    private final String requestId;
 
     @JsonCreator
     public TranslateSamlResponseBody(@JsonProperty("samlResponse") String samlResponse,
-                                     @JsonProperty("secureToken") String secureToken) {
+                                     @JsonProperty("requestId") String requestId) {
         this.samlResponse = samlResponse;
-        this.secureToken = secureToken;
+        this.requestId = requestId;
+    }
+
+    public String getSamlResponse() {
+        return samlResponse;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 }

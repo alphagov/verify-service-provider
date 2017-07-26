@@ -48,7 +48,6 @@ public class ApplicationConfigurationFeatureTests {
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("HUB_METADATA_URL", "some-hub-metadata-url");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
-            put("SECURE_TOKEN_KEY", "some-secure-token-key");
             put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.privateKey.getEncoded())));
             put("SAML_PRIMARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded())));
             put("SAML_SECONDARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded())));
@@ -65,7 +64,6 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getMsaEntityId()).isEqualTo("some-msa-entity-id");
         assertThat(configuration.getHubMetadataUrl().toString()).isEqualTo("some-hub-metadata-url");
         assertThat(configuration.getMsaMetadataUrl().toString()).isEqualTo("some-msa-metadata-url");
-        assertThat(configuration.getSecureTokenKey()).isEqualTo("some-secure-token-key");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(samlSigningCertAndKeys.privateKey.getEncoded());
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded());
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded());

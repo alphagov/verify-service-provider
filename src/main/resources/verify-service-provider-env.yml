@@ -29,8 +29,6 @@ hubMetadataUrl: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/meta
 
 msaMetadataUrl: ${MSA_METADATA_URL:-}
 
-secureTokenKey: ${SECURE_TOKEN_KEY:-}
-
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}

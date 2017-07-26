@@ -42,8 +42,8 @@ public class GenerateAuthnRequestTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
         RequestResponseBody requestResponseBody = response.readEntity(RequestResponseBody.class);
-        assertThat(requestResponseBody.samlRequest).isNotEmpty();
-        assertThat(requestResponseBody.secureToken).isNotEmpty();
-        assertThat(requestResponseBody.location.toString()).isEqualTo(HUB_SSO_LOCATION);
+        assertThat(requestResponseBody.getSamlRequest()).isNotEmpty();
+        assertThat(requestResponseBody.getRequestId()).isNotEmpty();
+        assertThat(requestResponseBody.getLocation().toString()).isEqualTo(HUB_SSO_LOCATION);
     }
 }

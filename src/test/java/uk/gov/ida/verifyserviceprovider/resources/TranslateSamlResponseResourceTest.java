@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
@@ -31,6 +32,8 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class TranslateSamlResponseResourceTest {
 
+    private static final String REQUEST_ID = UUID.randomUUID().toString(); 
+    
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
         .addResource(new TranslateSamlResponseResource())
@@ -46,7 +49,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
@@ -73,7 +76,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
@@ -121,7 +124,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             encode(data.toString()),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
@@ -169,7 +172,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")
@@ -187,7 +190,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")
@@ -212,7 +215,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")
@@ -237,7 +240,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")
@@ -262,7 +265,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
             getSamlResponseFor(data),
-            "secure-token"
+            REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")
@@ -287,7 +290,7 @@ public class TranslateSamlResponseResourceTest {
 
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
                 getSamlResponseFor(data),
-                "secure-token"
+                REQUEST_ID
         );
 
         Response response = resources.target("/translate-response")

@@ -87,14 +87,14 @@ definitions:
     type: object
     required:
       - samlRequest
-      - secureToken
+      - requestId
       - location
     properties:
       samlRequest:
         description: SAML authn request string as a base64 string
         type: string
         format: byte
-      secureToken:
+      requestId:
         description: >-
           A token that identifies the authn request. This can be used to later
           verify that the request and response have passed through the same
@@ -109,13 +109,13 @@ definitions:
     type: object
     required:
       - samlResponse
-      - secureToken
+      - requestId
     properties:
       samlResponse:
         description: A SAML Authn response as a base64 string.
         type: string
         format: byte
-      secureToken:
+      requestId:
         description: >-
           A token that was generated for the original SAML Authn request. The
           token is used to verify that the request and response are from the

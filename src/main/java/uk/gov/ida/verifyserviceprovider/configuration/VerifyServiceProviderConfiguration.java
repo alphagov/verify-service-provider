@@ -44,12 +44,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
-    @Valid
-    private String secureTokenKey;
-
-    @JsonProperty
-    @NotNull
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSigningKey;
@@ -77,10 +71,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return msaMetadataUrl;
     }
 
-    public String getSecureTokenKey() {
-        return secureTokenKey;
-    }
-
     public String getMsaEntityId() {
         return msaEntityId;
     }
@@ -96,6 +86,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     public PrivateKey getSamlPrimaryEncryptionKey() {
         return samlPrimaryEncryptionKey;
     }
+    
     public PrivateKey getSamlSecondaryEncryptionKey() {
         return samlSecondaryEncryptionKey;
     }

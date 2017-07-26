@@ -40,7 +40,7 @@ public class TranslateSamlResponseResource {
 
     @POST
     public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) {
-        String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.samlResponse));
+        String decodedSamlResponse = new String(Base64.getDecoder().decode(translateSamlResponseBody.getSamlResponse()));
         String scenario = new JSONObject(decodedSamlResponse).get("scenario").toString();
 
         Response response;

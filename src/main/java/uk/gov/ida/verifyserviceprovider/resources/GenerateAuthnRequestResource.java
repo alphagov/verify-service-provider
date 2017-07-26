@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.UUID;
 
 @Path("/generate-request")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,7 +27,7 @@ public class GenerateAuthnRequestResource {
     @POST
     public Response generateAuthnRequest(RequestGenerationBody requestGenerationBody) {
         String samlRequest = "some-saml";
-        String secureToken = "some-secure-token";
-        return Response.ok(new RequestResponseBody(samlRequest, secureToken, location)).build();
+        String requestId = UUID.randomUUID().toString();
+        return Response.ok(new RequestResponseBody(samlRequest, requestId, location)).build();
     }
 }
