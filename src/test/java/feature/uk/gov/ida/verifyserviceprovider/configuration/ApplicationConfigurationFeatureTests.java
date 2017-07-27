@@ -35,7 +35,7 @@ public class ApplicationConfigurationFeatureTests {
         keyStoreResource.create();
         application = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider.yml"),
+            resourceFilePath("verify-service-provider-test.yml"),
             ConfigOverride.config("verifyHubMetadata.trustStorePath", keyStoreResource.getAbsolutePath()),
             ConfigOverride.config("verifyHubMetadata.trustStorePassword", keyStoreResource.getPassword())
         );
@@ -71,7 +71,7 @@ public class ApplicationConfigurationFeatureTests {
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
         assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
-        assertThat(configuration.getHubSsoLocation()).isEqualTo("some-hub-sso-location");
+        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo("some-hub-sso-location");
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(PRODUCTION_METADATA_URI);
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
