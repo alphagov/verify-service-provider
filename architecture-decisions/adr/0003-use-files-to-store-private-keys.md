@@ -4,7 +4,7 @@ Date: 2017-06-01
 
 ## Status
 
-Pending
+Superseded
 
 ## Context
 

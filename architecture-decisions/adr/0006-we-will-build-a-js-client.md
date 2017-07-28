@@ -4,7 +4,7 @@ Date: 2017-06-01
 
 ## Status
 
-Pending
+Accepted
 
 ## Context
 
@@ -28,3 +28,4 @@ We will have to learn how passport works.
 
 ## Consequences
 
+JS client lives here https://github.com/alphagov/passport-verify

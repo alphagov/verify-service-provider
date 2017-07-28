@@ -4,7 +4,7 @@ Date: 2017-06-01
 
 ## Status
 
-Pending
+Accepted
 
 ## Context
 
@@ -19,3 +19,4 @@ We will use swagger to document the API between the client and the service-provi
 
 ## Consequences
 
+We will need to do some work to auto-generate the API documentation.
