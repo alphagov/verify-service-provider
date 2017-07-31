@@ -22,6 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
@@ -36,7 +37,7 @@ public class HubMetadataFeatureTest {
 
     private final String HEALTHCHECK_URL = "http://localhost:%d/admin/healthcheck";
 
-    private static WireMockServer wireMockServer = new WireMockServer();
+    private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
