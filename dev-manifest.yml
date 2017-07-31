@@ -3,10 +3,9 @@ applications:
   - name: verify-service-provider-dev
     path: build/distributions/verify-service-provider.zip
     env:
-      HUB_SSO_LOCATION: http://example.com
-      HUB_ENTITY_ID: http://example.com
+      HUB_SSO_LOCATION: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
       MSA_ENTITY_ID: http://example.com
-      HUB_METADATA_URL: https://example.com
+      HUB_METADATA_URL: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation
       MSA_METADATA_URL: https://example.com
       # Test Keys expire on 2117-06-13, CN=My Application,O=My Organisation,L=My City,C=DE
       SAML_SIGNING_KEY: MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCajzdC5dQ014K9Pp7z3y7P9hrVMcyVHZz1jE3XC9zWhz6JR+xdZzX24oGZgR+kl1a5OSDPVVwWrOLyO/L8B5amSGrLCQS1WjlIUlF82yQ0Vb4v0mdIIEoRjIZRmFORqlOPnzGTOWO2KuXBOTnOy+AYdlDdslcyH4R1+6yKtOVtFX4eT1OJwngTUHAtN9+7h/BwiPtEUe6doWwyTulQljORmqpSccQkgKS8RCH4F7PyrXDVQpHN3B1YLLeVrjL2mvOT88LNttpN7v57db3Wka0t17+bwm+xwwT0RlbQv9/4Uhuvo25VJhUcZzimAJqLcB6/jZCMRo/5S7QAUCcxSae9AgMBAAECggEAaCxXRtO5b9RB3mOypxSqbKin9UIXbfoDrMzgOi1Yr4+Aau77NQk3qiuIxnntZfZLEZSbtKMH6pCkdjhJ0e0bcQAmWqq9ba5eJYy2N71MbanNAlaCHm8E/UcF0UEmMmvm3kqiE2T+++115gI4IFXxuQsl/gcSFkp/8TWsWeELMbXaU263q+QMI4p520YXf+Hr0l3pYllaM/LC0CQPhA8IMv/oVSUuedmhuXSnDEovn2fj2mnG2+uwygFmLtpBJ1ECmIuIXj71Zy6LVwQ9mRRf6xOlmF3mpqZK70JsGsrX7styv4QcmC2wpMDG7SHypfHiQYpaYjXFmdt3+7EbtANN0QKBgQDQu9nS+DIPFmWwReuty6Xob9o5m92PrLfKSuzsCz1XhPeFSjl0GZfswUopMY7bweL7oLqBDo//9c8090bpJNPzFqC2eg5WSVi3TDAi94RMpKAIcPjFzfFAKgh5GBMUFPwWESv9dGxzaFpyn6YWrGyxYlxtmbEVYuzI7jGe0Snk4wKBgQC9juqNylyk8HP6xqJkq9XQ5apacySfCDR+oIWHjSx23vHaDhl1oF0Mh+L+0hJ0OFnd2+uIT4t3pUGTH3qZWSAIhlR0+9M+CrsHv9aDQ6ayoISnK+FWl+ps39zaSIyal+eweiWVksv8s72ECZgQnD7vO8hyUeJ3vPZ44W42jzCC3wKBgDWzrsXtXwusqnrgclMjasrTRCTAKg+V0y8zeaL8/UowBnJ/dyqcjw61Z/wTKPr29gvg/TrI4VlsB2RMHi1LcVBASRbJbjja4/08l8HXRm1liVrCne5eHqxwY/+rpvTqtTSENHof4usKNQL6egOpVsmIUdlMyleDPQIw7gk7LPkbAoGAQYkhqrfl49iGIJOAHZITME/W38KjTKBHleflgoHad5aIwzzQrIwu32AzqKn0W14II94exlfJ/imSTE0707yuiIP4uyE9XVvUYc9/WI6RGXzJoApZs9h94fpbntQqWGBgZ/EzAU1pXQq/YOD4Q/XhBFEE8hFBXOhlxlEaC57hxL0CgYBHZJ6lVu3cxuSAGIHfU/WBQK/VrY24xaKuC0XQn6LKs8Y1sRNi7t2ILsukKDa11rkKuiGBnNgcbc/2G6rtFKp3Y2SFqnpqA6LGYwpt1zd8HIQNl4OsAHeLStI4pbaK5mFObeMZG0Yk9AC0pxyjkSFzEEuQwKW/oNCC0Z78tyv4Vw==
