@@ -1,11 +1,11 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.io.Resources;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.client.ssl.TlsConfiguration;
-import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -21,7 +21,14 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 
-public class MetadataConfigurationWithHubDefaults implements MetadataResolverConfiguration {
+public class MetadataConfigurationWithHubDefaults implements VerifyServiceProviderMetadataConfiguration {
+    /**
+     * Note: our trust stores do not contain private keys,
+     * so this password does not need to be managed securely.
+     *
+     * This password MUST NOT be used for anything sensitive, since it is open source.
+     */
+    private String DEFAULT_TRUST_STORE_PASSWORD = "bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh";
 
     private final String trustStorePath;
     private final String trustStorePassword;
@@ -31,6 +38,7 @@ public class MetadataConfigurationWithHubDefaults implements MetadataResolverCon
     private final String expectedEntityId;
     private final JerseyClientConfiguration jerseyClientConfiguration;
     private final String jerseyClientName;
+    private final boolean shouldLoadTrustStoreFromResources;
 
     @JsonCreator
     public MetadataConfigurationWithHubDefaults(
@@ -43,14 +51,15 @@ public class MetadataConfigurationWithHubDefaults implements MetadataResolverCon
         @JsonProperty("jerseyClientConfiguration") JerseyClientConfiguration jerseyClientConfiguration,
         @JsonProperty("jerseyClientName") String jerseyClientName
     ) {
-        this.trustStorePath = generateTrustStorePath(uri, trustStorePath);
-        this.trustStorePassword = ofNullable(trustStorePassword).orElse("");
+        this.trustStorePath = ofNullable(trustStorePath).orElseGet(() -> generateTrustStorePath(uri));
+        this.trustStorePassword = ofNullable(trustStorePassword).orElse(DEFAULT_TRUST_STORE_PASSWORD);
         this.uri = uri;
         this.minRefreshDelay = ofNullable(minRefreshDelay).orElse(60000L);
         this.maxRefreshDelay = ofNullable(maxRefreshDelay).orElse(600000L);
         this.expectedEntityId = generateExpectedEntityId(uri, expectedEntityId);
         this.jerseyClientConfiguration = ofNullable(jerseyClientConfiguration).orElse(createClient());
         this.jerseyClientName = ofNullable(jerseyClientName).orElse(HUB_JERSEY_CLIENT_NAME);
+        this.shouldLoadTrustStoreFromResources = (trustStorePath == null);
     }
 
     @NotNull
@@ -109,6 +118,12 @@ public class MetadataConfigurationWithHubDefaults implements MetadataResolverCon
         return jerseyClientName;
     }
 
+    @JsonIgnore
+    @Override
+    public boolean shouldLoadTrustStoreFromResources() {
+        return shouldLoadTrustStoreFromResources;
+    }
+
     private static JerseyClientConfiguration createClient() {
         JerseyClientConfiguration jerseyClientConfiguration = new JerseyClientConfiguration() {{
             setTimeout(seconds(2));
@@ -129,11 +144,7 @@ public class MetadataConfigurationWithHubDefaults implements MetadataResolverCon
         return jerseyClientConfiguration;
     }
 
-    private static String generateTrustStorePath(URI uri, String providedTrustStorePath) {
-        if (providedTrustStorePath != null) {
-            return providedTrustStorePath;
-        }
-
+    private static String generateTrustStorePath(URI uri) {
         String trustStoreName;
         switch (uri.toString()) {
             case PRODUCTION_METADATA_URI:
@@ -147,7 +158,7 @@ public class MetadataConfigurationWithHubDefaults implements MetadataResolverCon
                 throw new RuntimeException("Unknown metadata uri");
         }
 
-        return Resources.getResource(trustStoreName).getPath();
+        return trustStoreName;
     }
 
     private static String generateExpectedEntityId(URI uri, String providedExpectedEntityId) {

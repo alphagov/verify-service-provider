@@ -2,7 +2,6 @@ package uk.gov.ida.verifyserviceprovider.factories;
 
 import io.dropwizard.setup.Environment;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
-import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 

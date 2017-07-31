@@ -80,7 +80,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
-        assertThat(actualConfiguration.getTrustStorePassword()).isEqualTo("");
+        assertThat(actualConfiguration.getTrustStorePassword()).startsWith("bj76");
         assertThat(actualConfiguration.getMinRefreshDelay()).isEqualTo(60000);
         assertThat(actualConfiguration.getMaxRefreshDelay()).isEqualTo(600000);
         assertThat(actualConfiguration.getJerseyClientConfiguration()).isNotNull();

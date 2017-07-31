@@ -19,13 +19,13 @@ logging:
       currentLogFilename: logs/verify-service-provider.log
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
-hubSsoLocation: ${HUB_SSO_LOCATION:-https://stub-verify-hub-proto-demo.cloudapps.digital/SAML2/SSO}
+hubSsoLocation: ${HUB_SSO_LOCATION:-}
 
 verifyHubMetadata:
   uri: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
 msaMetadata:
-  uri: ${MSA_METADATA_URL:-default-msa-metadata-url}
+  uri: ${MSA_METADATA_URL:-}
   expectedEntityId: ${MSA_ENTITY_ID:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}

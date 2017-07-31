@@ -16,7 +16,7 @@ import static io.dropwizard.util.Duration.seconds;
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
 
-public class MetadataConfigurationWithMsaDefaults implements MetadataResolverConfiguration {
+public class MetadataConfigurationWithMsaDefaults implements VerifyServiceProviderMetadataConfiguration {
 
     private final URI uri;
     private final Long minRefreshDelay;
@@ -92,6 +92,11 @@ public class MetadataConfigurationWithMsaDefaults implements MetadataResolverCon
     @Override
     public String getJerseyClientName() {
         return jerseyClientName;
+    }
+
+    @Override
+    public boolean shouldLoadTrustStoreFromResources() {
+        return false;
     }
 
     private static JerseyClientConfiguration createClient() {
