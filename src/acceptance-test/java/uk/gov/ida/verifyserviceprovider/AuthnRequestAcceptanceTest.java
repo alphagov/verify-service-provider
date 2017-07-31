@@ -72,9 +72,9 @@ public class AuthnRequestAcceptanceTest {
         RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
 
         Response complianceToolResponse = client
-                .target(authnSaml.location)
+                .target(authnSaml.getLocation())
                 .request()
-                .buildPost(Entity.form(new MultivaluedHashMap<>(ImmutableMap.of("SAMLRequest", authnSaml.samlRequest))))
+                .buildPost(Entity.form(new MultivaluedHashMap<>(ImmutableMap.of("SAMLRequest", authnSaml.getSamlRequest()))))
                 .invoke();
 
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
