@@ -28,7 +28,7 @@ public class MetadataHealthCheck extends HealthCheck {
         if (entityDescriptor != null) {
             return healthy();
         }
-        return unhealthy("Could not load the hub entity from the metadata provider");
+        return unhealthy("Could not load entity " + expectedEntityId +" from the metadata provider");
     }
 }
 
