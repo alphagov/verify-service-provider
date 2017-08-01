@@ -32,6 +32,9 @@ public class EnvironmentHelper {
         Class<?> cl = env.getClass();
         Field field = cl.getDeclaredField("m");
         field.setAccessible(true);
-        return (Map<String, String>) field.get(env);
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) field.get(env);
+        return result;
     }
 }

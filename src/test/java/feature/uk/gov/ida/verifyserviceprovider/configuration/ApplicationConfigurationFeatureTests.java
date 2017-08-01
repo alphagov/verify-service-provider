@@ -1,6 +1,5 @@
 package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
-import common.uk.gov.ida.verifyserviceprovider.utils.CertAndKeys;
 import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.logging.DefaultLoggingFactory;
 import io.dropwizard.testing.ConfigOverride;
@@ -13,13 +12,14 @@ import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.MetadataUri;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
-import java.util.Base64;
 import java.util.HashMap;
 
-import static common.uk.gov.ida.verifyserviceprovider.utils.CertAndKeys.generate;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
+import static org.apache.xml.security.utils.Base64.decode;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
 public class ApplicationConfigurationFeatureTests {
@@ -49,10 +49,6 @@ public class ApplicationConfigurationFeatureTests {
 
     @Test
     public void applicationShouldStartUp() throws Exception {
-        CertAndKeys samlSigningCertAndKeys = generate();
-        CertAndKeys samlPrimaryEncryptionCertAndKeys = generate();
-        CertAndKeys samlSecondaryEncryptionCertAndKeys = generate();
-
         environmentHelper.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
@@ -60,9 +56,9 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
-            put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.privateKey.getEncoded())));
-            put("SAML_PRIMARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded())));
-            put("SAML_SECONDARY_ENCRYPTION_KEY", new String(Base64.getEncoder().encode(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded())));
+            put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
+            put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
+            put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
         }});
 
         application.getTestSupport().before();
@@ -75,9 +71,10 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
+
         assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
-        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(samlSigningCertAndKeys.privateKey.getEncoded());
-        assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(samlPrimaryEncryptionCertAndKeys.privateKey.getEncoded());
-        assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(samlSecondaryEncryptionCertAndKeys.privateKey.getEncoded());
+        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
+        assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
+        assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
     }
 }

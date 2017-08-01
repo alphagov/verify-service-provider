@@ -30,13 +30,6 @@ dependencies {
     testCompile('com.github.tomakehurst:wiremock:2.5.1'){ transitive = false }
 }
 
-// Allows us to use the private sun API for generating self signed certs in tests
-compileTestJava {
-    options.fork = true
-    options.forkOptions.executable = 'javac'
-    options.compilerArgs << "-XDignore.symbol.file"
-}
-
 sourceSets {
     acceptanceTest {
         java {
