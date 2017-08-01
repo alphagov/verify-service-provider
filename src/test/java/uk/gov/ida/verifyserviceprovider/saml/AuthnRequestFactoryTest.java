@@ -11,7 +11,6 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 
 public class AuthnRequestFactoryTest {
 

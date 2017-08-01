@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.client.ssl.TlsConfiguration;
 import org.apache.commons.lang3.NotImplementedException;
-import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

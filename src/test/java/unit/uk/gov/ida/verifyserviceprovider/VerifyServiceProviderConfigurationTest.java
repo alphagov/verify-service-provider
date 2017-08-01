@@ -1,6 +1,10 @@
 package unit.uk.gov.ida.verifyserviceprovider;
 
-import io.dropwizard.configuration.*;
+import io.dropwizard.configuration.ConfigurationSourceProvider;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.FileConfigurationSourceProvider;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.configuration.YamlConfigurationFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

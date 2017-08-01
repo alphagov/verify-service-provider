@@ -10,7 +10,6 @@ import io.dropwizard.setup.Environment;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
-import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.saml.AuthnRequestFactory;
