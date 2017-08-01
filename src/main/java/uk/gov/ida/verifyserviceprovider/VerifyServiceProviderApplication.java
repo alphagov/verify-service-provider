@@ -7,11 +7,13 @@ import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.saml.AuthnRequestFactory;
 
 import java.util.Arrays;
 
@@ -42,6 +44,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
                 new EnvironmentVariableSubstitutor(false)
             )
         );
+        IdaSamlBootstrap.bootstrap();
     }
 
     @Override
@@ -51,7 +54,12 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
-        environment.jersey().register(new GenerateAuthnRequestResource(configuration));
+        AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
+                //TODO merge with metadata
+                configuration.getHubSsoLocation(),
+                configuration.getServiceEntityId(),
+                configuration.getSamlSigningKey());
+        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
         environment.jersey().register(new TranslateSamlResponseResource());
 
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);

@@ -16,6 +16,9 @@ dependencies {
         'org.json:json:20170516',
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-42",
+        "org.opensaml:opensaml-saml-impl:$openSamlVersion",
+        "uk.gov.ida:saml-serializers:$openSamlVersion-14",
+        "uk.gov.ida:saml-security:$openSamlVersion-33"
     )
     testCompile(
         'junit:junit:4.12',

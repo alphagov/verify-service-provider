@@ -6,18 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 
 public class RequestResponseBody {
-
     private final String samlRequest;
     private final String requestId;
-    private final URI location;
+    private final URI ssoLocation;
 
     @JsonCreator
     public RequestResponseBody(@JsonProperty("samlRequest") String samlRequest,
                                @JsonProperty("requestId") String requestId,
-                               @JsonProperty("location") URI location) {
+                               @JsonProperty("ssoLocation") URI ssoLocation) {
         this.samlRequest = samlRequest;
         this.requestId = requestId;
-        this.location = location;
+        this.ssoLocation = ssoLocation;
     }
 
     public String getSamlRequest() {
@@ -28,7 +27,7 @@ public class RequestResponseBody {
         return requestId;
     }
 
-    public URI getLocation() {
-        return location;
+    public URI getSsoLocation() {
+        return ssoLocation;
     }
 }

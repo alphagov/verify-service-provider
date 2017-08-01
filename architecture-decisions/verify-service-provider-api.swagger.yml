@@ -88,7 +88,7 @@ definitions:
     required:
       - samlRequest
       - requestId
-      - location
+      - ssoLocation
     properties:
       samlRequest:
         description: SAML authn request string as a base64 string
@@ -101,7 +101,7 @@ definitions:
           browser.
         type: string
         format: byte
-      location:
+      ssoLocation:
         description: The url for Verify HUB SSO. The entrypoint for saml authn flow.
         type: string
         format: url

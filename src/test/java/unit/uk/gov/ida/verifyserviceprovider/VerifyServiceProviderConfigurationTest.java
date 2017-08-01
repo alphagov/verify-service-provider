@@ -1,10 +1,6 @@
 package unit.uk.gov.ida.verifyserviceprovider;
 
-import io.dropwizard.configuration.ConfigurationSourceProvider;
-import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
-import io.dropwizard.configuration.FileConfigurationSourceProvider;
-import io.dropwizard.configuration.SubstitutingSourceProvider;
-import io.dropwizard.configuration.YamlConfigurationFactory;
+import io.dropwizard.configuration.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,13 +33,14 @@ public class VerifyServiceProviderConfigurationTest {
                 new FileConfigurationSourceProvider(),
                 new EnvironmentVariableSubstitutor(false)
             ),
-            resourceFilePath("verify-service-provider.yml")
+            resourceFilePath("verify-service-provider-test.yml")
         );
     }
 
     @Test
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage(containsString("server may not be null"));
+        expectedException.expectMessage(containsString("serviceEntityId may not be null"));
         expectedException.expectMessage(containsString("hubSsoLocation may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
@@ -51,12 +48,6 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage(containsString("msaMetadata may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
-    }
-
-    @Test
-    public void shouldNotAllowEmptyHubSSOLocation() throws Exception {
-        expectedException.expectMessage("hubSsoLocation may not be empty");
-        factory.build(new StringConfigurationSourceProvider("hubSsoLocation: \"\""), "");
     }
 
     @Test

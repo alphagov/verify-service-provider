@@ -23,6 +23,9 @@ logging:
       currentLogFilename: logs/verify-service-provider.log
       archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
 
+# Entity ID that uniquely identifies your service
+serviceEntityId: ${SERVICE_ENTITY_ID:-http://verify-service-provider}
+
 # Location where Verify Hub authentication flow begins
 hubSsoLocation: ${HUB_SSO_LOCATION:-https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO}
 

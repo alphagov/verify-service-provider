@@ -7,6 +7,7 @@ import io.dropwizard.Configuration;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.net.URI;
 import java.security.PrivateKey;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
@@ -17,7 +18,12 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private String hubSsoLocation;
+    private String serviceEntityId;
+
+    @JsonProperty
+    @NotNull
+    @Valid
+    private URI hubSsoLocation;
 
     @JsonProperty
     @NotNull
@@ -46,7 +52,11 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @Valid
     private MetadataConfigurationWithMsaDefaults msaMetadata;
 
-    public String getHubSsoLocation() {
+    public String getServiceEntityId() {
+        return serviceEntityId;
+    }
+
+    public URI getHubSsoLocation() {
         return hubSsoLocation;
     }
 

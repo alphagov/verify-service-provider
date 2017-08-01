@@ -26,14 +26,19 @@ public class CertAndKeys {
         this.certificate = certificate;
     }
 
-    public static CertAndKeys generate() throws Exception {
-        CertAndKeyGen certGen = new CertAndKeyGen(KEY_TYPE, SIGNATURE_ALGORITHM);
-        certGen.generate(KEY_SIZE);
+    public static CertAndKeys generate() {
+        try {
+            CertAndKeyGen certGen = new CertAndKeyGen(KEY_TYPE, SIGNATURE_ALGORITHM);
+            certGen.generate(KEY_SIZE);
 
-        X509Certificate certificate = certGen.getSelfCertificate(new X500Name(DISTINGUISHED_NAME), ONE_YEAR_CERT_EXPIRY);
-        RSAPrivateKey privateKey = (RSAPrivateKey) certGen.getPrivateKey();
-        RSAPublicKey publicKey = (RSAPublicKey) certGen.getPublicKey();
+            X509Certificate certificate = certGen.getSelfCertificate(new X500Name(DISTINGUISHED_NAME), ONE_YEAR_CERT_EXPIRY);
+            RSAPrivateKey privateKey = (RSAPrivateKey) certGen.getPrivateKey();
+            RSAPublicKey publicKey = (RSAPublicKey) certGen.getPublicKey();
 
-        return new CertAndKeys(publicKey, privateKey, certificate);
+            return new CertAndKeys(publicKey, privateKey, certificate);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
 }
