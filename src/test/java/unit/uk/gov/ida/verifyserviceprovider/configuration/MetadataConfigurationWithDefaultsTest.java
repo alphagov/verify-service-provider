@@ -3,13 +3,11 @@ package unit.uk.gov.ida.verifyserviceprovider.configuration;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.MetadataConfigurationWithHubDefaults;
 import uk.gov.ida.verifyserviceprovider.configuration.MetadataConfigurationWithMsaDefaults;
+import uk.gov.ida.verifyserviceprovider.configuration.MetadataUri;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_TOOL_METADATA_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_METADATA_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_METADATA_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
@@ -19,7 +17,7 @@ public class MetadataConfigurationWithDefaultsTest {
     @Test
     public void shouldSetHubMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String configurationAsString = "{" +
-            "\"uri\": \"" + PRODUCTION_METADATA_URI + "\"," +
+            "\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"," +
             "\"trustStorePath\":\"some-truststore-path\"" +
             "}";
 
@@ -30,7 +28,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetHubMetadataTrustStorePathToProductionWhenUsingProductionMetadata() throws Exception {
-        String configurationAsString = "{\"uri\": \"" + PRODUCTION_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"}";
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -39,7 +37,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetHubMetadataTrustStorePathToTestWhenUsingIntegrationMetadata() throws Exception {
-        String configurationAsString = "{\"uri\": \"" + INTEGRATION_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.INTEGRATION.getUri().toString() + "\"}";
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -48,7 +46,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetHubMetadataTrustStorePathToTestWhenUsingComplianceToolMetadata() throws Exception {
-        String configurationAsString = "{\"uri\": \"" + COMPLIANCE_TOOL_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.COMPLIANCE_TOOL.getUri().toString() + "\"}";
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -58,7 +56,7 @@ public class MetadataConfigurationWithDefaultsTest {
     @Test
     public void shouldSetHubMetadataExpectedEntityIdToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String configurationAsString = "{" +
-            "\"uri\": \"" + PRODUCTION_METADATA_URI + "\"," +
+            "\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"," +
             "\"expectedEntityId\":\"some-expected-entity-id\"}";
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -67,7 +65,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetHubMetadataExpectedEntityIdToProductionWhenUsingProductionMetadata() throws Exception {
-        String configurationAsString = "{\"uri\": \"" + PRODUCTION_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"}";
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -76,7 +74,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetHubMetadataDefaultConfigValuesWhenNotProvided() throws Exception{
-        String configurationAsString = "{\"uri\": \"" + PRODUCTION_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"}";
 
         MetadataConfigurationWithHubDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithHubDefaults.class);
 
@@ -89,7 +87,7 @@ public class MetadataConfigurationWithDefaultsTest {
 
     @Test
     public void shouldSetMsaMetadataDefaultConfigValuesWhenNotProvided() throws Exception {
-        String configurationAsString = "{\"uri\": \"" + PRODUCTION_METADATA_URI + "\"}";
+        String configurationAsString = "{\"uri\": \"" + MetadataUri.PRODUCTION.getUri().toString() + "\"}";
 
         MetadataConfigurationWithMsaDefaults actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MetadataConfigurationWithMsaDefaults.class);
 

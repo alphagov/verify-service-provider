@@ -100,7 +100,7 @@ public class MetadataConfigurationWithMsaDefaults implements VerifyServiceProvid
     }
 
     private static JerseyClientConfiguration createClient() {
-        JerseyClientConfiguration jerseyClientConfiguration = new JerseyClientConfiguration() {{
+        return new JerseyClientConfiguration() {{
             setTimeout(seconds(2));
             setTimeToLive(minutes(10));
             setCookiesEnabled(false);
@@ -116,6 +116,5 @@ public class MetadataConfigurationWithMsaDefaults implements VerifyServiceProvid
             }};
             setTlsConfiguration(tlsConfiguration);
         }};
-        return jerseyClientConfiguration;
     }
 }

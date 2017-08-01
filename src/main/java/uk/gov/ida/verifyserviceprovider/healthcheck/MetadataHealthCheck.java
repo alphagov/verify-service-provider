@@ -23,12 +23,20 @@ public class MetadataHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        CriteriaSet criteria = new CriteriaSet(new EntityIdCriterion(expectedEntityId));
-        EntityDescriptor entityDescriptor = metadataResolver.resolveSingle(criteria);
-        if (entityDescriptor != null) {
-            return healthy();
+        try {
+            CriteriaSet criteria = new CriteriaSet(new EntityIdCriterion(expectedEntityId));
+            EntityDescriptor entityDescriptor = metadataResolver.resolveSingle(criteria);
+            if (entityDescriptor != null) {
+                return healthy();
+            }
+            return unhealthy(getMessage("No exception was thrown"));
+        } catch (Exception e) {
+            return unhealthy(getMessage(e.getMessage()));
         }
-        return unhealthy("Could not load entity " + expectedEntityId +" from the metadata provider");
+    }
+
+    private String getMessage(String message) {
+        return "Could not load entity " + this.expectedEntityId + " from the metadata provider. " + message + ". See the logs for more details.";
     }
 }
 

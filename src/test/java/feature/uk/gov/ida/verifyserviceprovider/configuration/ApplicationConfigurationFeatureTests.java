@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
+import uk.gov.ida.verifyserviceprovider.configuration.MetadataUri;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import java.util.Base64;
@@ -20,7 +21,6 @@ import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_METADATA_URI;
 
 public class ApplicationConfigurationFeatureTests {
 
@@ -57,7 +57,7 @@ public class ApplicationConfigurationFeatureTests {
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("HUB_SSO_LOCATION", "some-hub-sso-location");
-            put("HUB_METADATA_URL", PRODUCTION_METADATA_URI);
+            put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SAML_SIGNING_KEY", new String(Base64.getEncoder().encode(samlSigningCertAndKeys.privateKey.getEncoded())));
@@ -72,7 +72,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(application.getLocalPort()).isEqualTo(50555);
         assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
         assertThat(configuration.getHubSsoLocation().toString()).isEqualTo("some-hub-sso-location");
-        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(PRODUCTION_METADATA_URI);
+        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
         assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");

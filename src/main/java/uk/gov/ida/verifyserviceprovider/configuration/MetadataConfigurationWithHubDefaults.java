@@ -3,7 +3,6 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.io.Resources;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.client.ssl.TlsConfiguration;
 
@@ -14,10 +13,7 @@ import java.net.URI;
 import static io.dropwizard.util.Duration.minutes;
 import static io.dropwizard.util.Duration.seconds;
 import static java.util.Optional.ofNullable;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_TOOL_METADATA_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_METADATA_URI;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_METADATA_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 
@@ -125,7 +121,7 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
     }
 
     private static JerseyClientConfiguration createClient() {
-        JerseyClientConfiguration jerseyClientConfiguration = new JerseyClientConfiguration() {{
+        return new JerseyClientConfiguration() {{
             setTimeout(seconds(2));
             setTimeToLive(minutes(10));
             setCookiesEnabled(false);
@@ -141,21 +137,20 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
             }};
             setTlsConfiguration(tlsConfiguration);
         }};
-        return jerseyClientConfiguration;
     }
 
     private static String generateTrustStorePath(URI uri) {
         String trustStoreName;
-        switch (uri.toString()) {
-            case PRODUCTION_METADATA_URI:
+        switch (MetadataUri.fromUri(uri)) {
+            case PRODUCTION:
                 trustStoreName = PRODUCTION_VERIFY_TRUSTSTORE_NAME;
                 break;
-            case INTEGRATION_METADATA_URI:
-            case COMPLIANCE_TOOL_METADATA_URI:
+            case INTEGRATION:
+            case COMPLIANCE_TOOL:
                 trustStoreName = TEST_VERIFY_TRUSTSTORE_NAME;
                 break;
             default:
-                throw new RuntimeException("Unknown metadata uri");
+                throw new RuntimeException("No trust store configured for Metadata URI " + uri);
         }
 
         return trustStoreName;
@@ -167,14 +162,14 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
         }
 
         String expectedEntityId;
-        switch (uri.toString()) {
-            case PRODUCTION_METADATA_URI:
-            case INTEGRATION_METADATA_URI:
-            case COMPLIANCE_TOOL_METADATA_URI:
+        switch (MetadataUri.fromUri(uri)) {
+            case PRODUCTION:
+            case INTEGRATION:
+            case COMPLIANCE_TOOL:
                 expectedEntityId = "https://signin.service.gov.uk";
                 break;
             default:
-                throw new RuntimeException("Unknown metadata uri");
+                throw new RuntimeException("No entity ID configured for Metadata URI " + uri);
         }
 
         return expectedEntityId;
