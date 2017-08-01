@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Destination="http://rp-endpoint.com" ID="_bf2d2428-ac2b-48d8-9eeb-e99e1cb4d39b" InResponseTo="request-id-386f467d-85c1-4c71-b3fc-cdc3739682b1" IssueInstant="2017-08-01T15:21:20.104Z" Version="2.0" xsi:type="saml2p:ResponseType">
+  <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://signin.service.gov.uk</saml2:Issuer>
+  <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <ds:Reference URI="#_bf2d2428-ac2b-48d8-9eeb-e99e1cb4d39b">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <ds:DigestValue>R9TtvbCD7m3sA+6NywjC3M1hMc9uN0hQXE7cvsWKJ1Y=</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>
+oVLeZTG/ZKOacQdECSo6o/uWuWkK0/I8RcCZIk7PZZFzhQiZi3pQDjIrmJDJWwHK1adPekvg/XNa
+RWMR1az837laaRalz2mx7BhsSYSn0HyEGG42IpZcQr1P8/QHT0MAky9rfEGojsH07Np14qpvGEzW
+boxgYHwRSMhl3s9/sihWoYR7kyZZV1BD+nobIK3wxLcNKN8ZgtxKX8owjlPygHPDxYVhEf2enf8g
+8DReLoOFMJQXyrCfeIM+xg7ka72WvWgdSVvezgCnJn3YSVYsxcZObotN6wADhYFjji/9LW8CGAah
+2ylQ57sAFz3Z+lEGbKEyVnFtYRS8kvIh/bKF6Q==
+</ds:SignatureValue>
+  </ds:Signature>
+  <saml2p:Status xsi:type="saml2p:StatusType">
+    <saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" xsi:type="saml2p:StatusCodeType"/>
+  </saml2p:Status>
+  <saml2:EncryptedAssertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">
+    <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="_33f6b56b61cbdaa389481823f8184dc2" Type="http://www.w3.org/2001/04/xmlenc#Element">
+      <xenc:EncryptionMethod xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:RetrievalMethod Type="http://www.w3.org/2001/04/xmlenc#EncryptedKey" URI="#_84a9017eba3fe5370ebd366577d3594b"/>
+      </ds:KeyInfo>
+      <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+        <xenc:CipherValue>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
+NdSMy15yk4Bju4/x</xenc:CipherValue>
+      </xenc:CipherData>
+    </xenc:EncryptedData>
+    <xenc:EncryptedKey xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="_84a9017eba3fe5370ebd366577d3594b">
+      <xenc:EncryptionMethod xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p">
+        <ds:DigestMethod xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+      </xenc:EncryptionMethod>
+      <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+        <xenc:CipherValue>N0U/dF44UTZvTs3XFsngmZhaB4ryC6/UsMeLo7+BEcp3c2SGRJZ1/h3Aideb7tc64BD3EUZDyiUh
+YHiltrBg2n7UksNmRbvbM6yCRfHMi4ZqU8xVwm6fxH+V+SrHws7CRQiAbtT+4MKiq0qhVvIB2fV7
+RIaU/eP8/m7x+ei5pve/CMcb+uRJTZpukRo1RYRLNrIsRJloS01MM1inf/iwT8yf8SmvRdspD74Q
++MhagVcxlEJgaCYP8MlENiFJ1iVIC6ooV85B83IBtdE2Fz9AmADrdsB2h1ZwjsWcbPzYXvDrXscI
+DXisCuuD9jk4+Mi2atiGP8n+yAZhFgAusDuiGQ==</xenc:CipherValue>
+      </xenc:CipherData>
+      <xenc:ReferenceList>
+        <xenc:DataReference URI="#_33f6b56b61cbdaa389481823f8184dc2"/>
+      </xenc:ReferenceList>
+    </xenc:EncryptedKey>
+  </saml2:EncryptedAssertion>
+</saml2p:Response>

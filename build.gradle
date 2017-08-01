@@ -26,6 +26,7 @@ dependencies {
         'org.mockito:mockito-core:2.7.22',
         "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-42",
         "uk.gov.ida:common-test-utils:2.0.0-31",
+        "org.jsoup:jsoup:1.10.3",
     )
     testCompile('com.github.tomakehurst:wiremock:2.5.1'){ transitive = false }
 }
