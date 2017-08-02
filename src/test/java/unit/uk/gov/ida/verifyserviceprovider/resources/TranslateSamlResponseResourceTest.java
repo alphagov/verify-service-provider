@@ -2,318 +2,74 @@ package unit.uk.gov.ida.verifyserviceprovider.resources;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.sun.jdi.connect.Connector;
 import io.dropwizard.testing.junit.ResourceTestRule;
-import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.Address;
+import org.mockito.ArgumentMatchers;
+import uk.gov.ida.common.shared.security.PrivateKeyFactory;
+import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.Attributes;
-import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
 import javax.ws.rs.core.Response;
-import java.time.LocalDate;
+import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
-import static javax.ws.rs.client.Entity.entity;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static java.util.Collections.*;
+import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PRIVATE_KEY;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
+import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
+import static uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory.createStringToResponseTransformer;
 
 public class TranslateSamlResponseResourceTest {
 
-    private static final String REQUEST_ID = UUID.randomUUID().toString(); 
-    
+    private static final ResponseService responseService = mock(ResponseService.class);
+
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
-        .addResource(new TranslateSamlResponseResource())
+        .addResource(new TranslateSamlResponseResource(responseService))
         .build();
 
     @Test
-    public void translateAuthnResponseWithSuccessfulLOA1Match() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "SUCCESS_MATCH",
-            "levelOfAssurance", "LEVEL_1",
-            "pid", "some-pid"
-        );
+    public void shouldUseResponseServiceToTranslateSaml() throws Exception {
+        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response");
 
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
+        Response response = resources.client()
+            .target("/translate-response")
+            .request()
+            .post(json(translateResponseRequest.toString()));
 
-        Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        TranslatedResponseBody result = response.readEntity(TranslatedResponseBody.class);
-
-        TranslatedResponseBody expected = new TranslatedResponseBody(
-            "SUCCESS_MATCH",
-            "some-pid",
-            LEVEL_1,
-            Optional.empty()
-        );
-
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    public void translateAuthnResponseWithSuccessfulLOA2Match() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "SUCCESS_MATCH",
-            "levelOfAssurance", "LEVEL_2",
-            "pid", "some-pid"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        TranslatedResponseBody result = response.readEntity(TranslatedResponseBody.class);
-
-        TranslatedResponseBody exptected = new TranslatedResponseBody(
-            "SUCCESS_MATCH",
-            "some-pid",
-            LEVEL_2,
-            Optional.empty()
-        );
-
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(result).isEqualTo(exptected);
-    }
-
-    @Test
-    public void translateAuthnResponseWithNoMatch() {
-        JSONObject address = new JSONObject()
-            .put("verified", true)
-            .put("lines", new JSONArray().put("address-line-1").put("address-line-2"))
-            .put("postCode", "some-post-code")
-            .put("internationalPostCode", "some-international-post-code")
-            .put("uprn", "some-uprn")
-            .put("fromDate", "2010-01-31")
-            .put("toDate", "2017-01-31");
-
-        JSONObject attributes = new JSONObject()
-            .put("firstName", "some-first-name")
-            .put("firstNameVerified", true)
-            .put("middleName", "some-middle-name")
-            .put("middleNameVerified", false)
-            .put("surname", "some-surname")
-            .put("surnameVerified", true)
-            .put("dateOfBirth", "2000-01-31")
-            .put("dateOfBirthVerified", true)
-            .put("address", address)
-            .put("cycle3", "some-cycle3");
-
-        JSONObject data = new JSONObject()
-            .put("scenario", "SUCCESS_MATCH")
-            .put("pid", "some-pid")
-            .put("levelOfAssurance", "LEVEL_1")
-            .put("attributes", attributes);
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            encode(data.toString()),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response").request().post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        TranslatedResponseBody result = response.readEntity(TranslatedResponseBody.class);
-
-        Address expectedAddress = new Address(
-            true,
-            ImmutableList.of("address-line-1", "address-line-2"),
-            "some-post-code",
-            "some-international-post-code",
-            "some-uprn",
-            LocalDate.of(2010, 1, 31),
-            LocalDate.of(2017, 1, 31)
-        );
-        Attributes expectedAttributes = new Attributes(
-            "some-first-name",
-            true,
-            "some-middle-name",
-            false,
-            "some-surname",
-            true,
-            LocalDate.of(2000, 1, 31),
-            true,
-            expectedAddress,
-            "some-cycle3"
-        );
-        TranslatedResponseBody expected = new TranslatedResponseBody(
-            "SUCCESS_MATCH",
-            "some-pid",
-            LEVEL_1,
-            Optional.of(expectedAttributes)
-        );
-
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(result).isEqualTo(expected);
+        verify(responseService, times(1)).convertTranslatedResponseBody(translateResponseRequest.getString("samlResponse"));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
     public void translateAuthnResponseShouldReturn400WhenUnknownLevel() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "SUCCESS_MATCH",
-            "levelOfAssurance", "some-unknown-level",
-            "pid", "some-pid-id"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-            .request()
-            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-
-        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
-    public void translateAuthenticationResponseShouldRetur401WhenAuthenticationFailed() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "AUTHENTICATION_FAILED"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-            .request()
-            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        ErrorBody result = response.readEntity(ErrorBody.class);
-
-        ErrorBody expected = new ErrorBody(
-            "AUTHENTICATION_FAILED",
-            "Authentication has failed."
-        );
-
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    public void translateAuthenticationResponseShouldRetur401WhenNoMatch() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "NO_MATCH"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-            .request()
-            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        ErrorBody result = response.readEntity(ErrorBody.class);
-
-        ErrorBody expected = new ErrorBody(
-            "NO_MATCH",
-            "No match was found."
-        );
-
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    public void translateAuthenticationResponseShouldRetur401WhenCancellation() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "CANCELLATION"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-            .request()
-            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        ErrorBody result = response.readEntity(ErrorBody.class);
-
-        ErrorBody expected = new ErrorBody(
-            "CANCELLATION",
-            "Operation was cancelled."
-        );
-
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED.getStatusCode());
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    public void translateAuthenticationResponseShouldRetur400WhenRequestError() {
-        Map<String, Object> data = ImmutableMap.of(
-            "scenario", "REQUEST_ERROR"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-            getSamlResponseFor(data),
-            REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-            .request()
-            .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        ErrorBody result = response.readEntity(ErrorBody.class);
-
-        ErrorBody expected = new ErrorBody(
-            "REQUEST_ERROR",
-            "Request error."
-        );
-
-        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-        assertThat(result).isEqualTo(expected);
     }
 
     @Test
     public void translateAuthenticationResponseShouldReturn500WhenInternalServerError() {
-        Map<String, Object> data = ImmutableMap.of(
-                "scenario", "INTERNAL_SERVER_ERROR"
-        );
-
-        TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(
-                getSamlResponseFor(data),
-                REQUEST_ID
-        );
-
-        Response response = resources.target("/translate-response")
-                .request()
-                .post(entity(translateSamlResponseBody, APPLICATION_JSON_TYPE));
-        ErrorBody result = response.readEntity(ErrorBody.class);
-
-        ErrorBody expected = new ErrorBody(
-                "INTERNAL_SERVER_ERROR",
-                "Request error."
-        );
-
-        assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.getStatusCode());
-        assertThat(result).isEqualTo(expected);
     }
 
-    private String getSamlResponseFor(Map<String, Object> data) {
-        String samlRequestJson = new JSONObject(data).toString();
-        return encode(samlRequestJson);
-    }
-
-    private String encode(String content) {
-        return new String(Base64.getEncoder().encode(content.getBytes()));
-    }
 }

@@ -11,8 +11,7 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
-import uk.gov.ida.verifyserviceprovider.saml.AuthnRequestFactory;
+import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
 import java.util.Arrays;
 
@@ -57,10 +56,11 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
                 configuration.getHubSsoLocation(),
                 configuration.getServiceEntityId(),
                 configuration.getSamlSigningKey());
-        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
-        environment.jersey().register(new TranslateSamlResponseResource());
-
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
+
+        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
+        environment.jersey().register(factory.getTranslateSamlResponseResource());
+
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());

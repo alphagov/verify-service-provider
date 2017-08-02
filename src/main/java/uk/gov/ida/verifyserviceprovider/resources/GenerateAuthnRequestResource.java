@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.saml.AuthnRequestFactory;
+import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -14,7 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.logging.Logger;
 
 @Path("/generate-request")
 @Produces(MediaType.APPLICATION_JSON)

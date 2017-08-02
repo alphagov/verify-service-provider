@@ -1,16 +1,25 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 public class NotImplementedPublicKey implements PublicKey {
+    private final String algorithm;
+    private final String format;
+
+    public NotImplementedPublicKey(PrivateKey privateKey) {
+        this.algorithm = privateKey.getAlgorithm();
+        this.format = privateKey.getFormat();
+    }
+
     @Override
     public String getAlgorithm() {
-        throw new RuntimeException("Not implemented");
+        return this.algorithm;
     }
 
     @Override
     public String getFormat() {
-        throw new RuntimeException("Not implemented");
+        return this.format;
     }
 
     @Override

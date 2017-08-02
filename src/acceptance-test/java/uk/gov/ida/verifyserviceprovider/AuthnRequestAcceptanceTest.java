@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
@@ -26,6 +27,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
 
 public class AuthnRequestAcceptanceTest {
 
@@ -43,15 +45,12 @@ public class AuthnRequestAcceptanceTest {
 
     @Before
     public void setupComplianceTool() throws Exception {
-        URL testDataURL = AuthnRequestAcceptanceTest.class.getResource("/compliance-tool-service-test-data.json");
-
-        JSONObject serviceTestData = new JSONObject(new String(Files.readAllBytes(Paths.get(testDataURL.toURI()))));
-        serviceTestData.put("signingCertificate", TEST_RP_PUBLIC_SIGNING_CERT);
+        Entity initializationRequest = aComplianceToolInitialisationRequest().build();
 
         Response complianceToolResponse = client
             .target(URI.create(String.format("%s/%s", COMPLIANCE_TOOL_HOST, "service-test-data")))
             .request()
-            .buildPost(Entity.json(serviceTestData.toString()))
+            .buildPost(initializationRequest)
             .invoke();
 
         assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());

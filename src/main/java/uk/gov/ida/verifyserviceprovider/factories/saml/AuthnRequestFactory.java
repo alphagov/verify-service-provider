@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.saml;
+package uk.gov.ida.verifyserviceprovider.factories.saml;
 
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -61,7 +61,7 @@ public class AuthnRequestFactory {
     }
 
     private Signature createSignature() {
-        KeyPair signingKeyPair = new KeyPair(new NotImplementedPublicKey(), signingKey);
+        KeyPair signingKeyPair = new KeyPair(new NotImplementedPublicKey(signingKey), signingKey);
         IdaKeyStore keyStore = new IdaKeyStore(signingKeyPair, Collections.emptyList());
         IdaKeyStoreCredentialRetriever keyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
         SignatureRSASHA256 signatureAlgorithm = new SignatureRSASHA256();

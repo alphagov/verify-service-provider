@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.saml;
+package unit.uk.gov.ida.verifyserviceprovider.factories.saml;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
 import java.net.URI;
 
