@@ -27,6 +27,7 @@ The following Environment Variables can be defined:
 ```
 #!/usr/bin/env sh
 
+export SERVICE_ENTITY_ID=... # The entity id of the service using Verify Service Provider
 export PORT=... # The TCP port where the application will listen for HTTP traffic
 export LOG_LEVEL=... # The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR) (default: INFO)
 export MSA_ENTITY_ID=... # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
