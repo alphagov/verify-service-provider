@@ -12,13 +12,13 @@ import org.eclipse.jetty.server.ServerConnector;
  */
 public class ServerDetailFinder {
 
-    private static final String DROPWIZARD_CONNECTOR_APPLICATION = "application";
+    static final String DROPWIZARD_CONNECTOR_APPLICATION = "application";
 
-    private static final String DROPWIZARD_CONNECTOR_ADMIN = "admin";
+    static final String DROPWIZARD_CONNECTOR_ADMIN = "admin";
 
-    private static final String DROPWIZARD_PROTOCOL_SSL = "SSL";
+    static final String DROPWIZARD_PROTOCOL_SSL = "SSL";
 
-    private static final String DROPWIZARD_PROTOCOL_HTTP = "HTTP";
+    static final String DROPWIZARD_PROTOCOL_HTTP = "HTTP";
 
     public static ServerDetail fetchServerDetails(Server server, Configuration config, Environment environment) {
 
@@ -34,7 +34,7 @@ public class ServerDetailFinder {
         return serverDetail;
     }
 
-    private static void fetchStandardServerDetails(ServerDetail serverDetail, Server server) {
+    static void fetchStandardServerDetails(ServerDetail serverDetail, Server server) {
 
         for (Connector connector : server.getConnectors()) {
             if (connector instanceof ServerConnector) {
@@ -61,7 +61,7 @@ public class ServerDetailFinder {
         }
     }
 
-    private static void fetchSimpleServerDetail(ServerDetail serverDetail, Server server) {
+    static void fetchSimpleServerDetail(ServerDetail serverDetail, Server server) {
         for (Connector connector : server.getConnectors()) {
             if (connector instanceof ServerConnector) {
                 ServerConnector serverConnector = (ServerConnector) connector;
@@ -84,13 +84,13 @@ public class ServerDetailFinder {
 
         private final String adminPath;
 
-        private Integer serverHttpPort;
+        Integer serverHttpPort;
 
-        private Integer serverHttpsPort;
+        Integer serverHttpsPort;
 
-        private Integer adminHttpPort;
+        Integer adminHttpPort;
 
-        private Integer adminHttpsPort;
+        Integer adminHttpsPort;
 
         ServerDetail(String applicationName, String adminPath) {
             this.applicationName = applicationName;
@@ -104,22 +104,50 @@ public class ServerDetailFinder {
             sb.append("| ").append(applicationName).append(" started successfully with the following useful URLs: \n");
             sb.append("| ------------------------------------------------------------------------------------ \n");
 
-            appendLogConditionally(sb, "| Server HTTP base URL  ", HTTP_LOCAL_HOST_BASE_URL, serverHttpPort, "");
-            appendLogConditionally(sb, "| Server HTTPS base URL ", HTTPS_LOCAL_HOST_BASE_URL, serverHttpsPort, "");
-            appendLogConditionally(sb, "| Admin HTTP Url        ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "?pretty=true");
-            appendLogConditionally(sb, "| Admin HTTPS Url       ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "?pretty=true");
-            appendLogConditionally(sb, "| Healthcheck HTTP URL  ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "/healthcheck?pretty=true");
-            appendLogConditionally(sb, "| Healthcheck HTTPS URL ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "/healthcheck?pretty=true");
+            if (serverHttpPort != null) {
+                appendUrlLog(sb, "| Server HTTP base URL  ", HTTP_LOCAL_HOST_BASE_URL, serverHttpPort, "");
+            }
+
+            if (serverHttpsPort != null) {
+                appendUrlLog(sb, "| Server HTTPS base URL ", HTTPS_LOCAL_HOST_BASE_URL, serverHttpsPort, "");
+            }
+
+            if (adminHttpPort != null) {
+                appendUrlLog(sb, "| Admin HTTP Url        ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "?pretty=true");
+                appendUrlLog(sb, "| Healthcheck HTTP URL  ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "/healthcheck?pretty=true");
+            }
+
+            if (adminHttpsPort != null) {
+                appendUrlLog(sb, "| Admin HTTPS Url       ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "?pretty=true");
+                appendUrlLog(sb, "| Healthcheck HTTPS URL ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "/healthcheck?pretty=true");
+            }
 
             sb.append("======================================================================================\n");
             return sb.toString();
         }
 
-        private void appendLogConditionally(StringBuilder sb, String description, String baseUrl, Integer port, String subPath) {
-            if (port != null) {
-                sb.append(description).append(" - ")
-                        .append(baseUrl).append(":").append(port).append(subPath).append("\n");
-            }
+        String generateApplicationBaseUrl(boolean isSsl) {
+            String baseUrl = isSsl ? HTTPS_LOCAL_HOST_BASE_URL : HTTP_LOCAL_HOST_BASE_URL;
+            int port = isSsl ? serverHttpsPort : serverHttpPort;
+            return baseUrl + ":" + port;
+        }
+
+        String generateAdminBaseUrl(boolean isSsl) {
+            String baseUrl = isSsl ? HTTPS_LOCAL_HOST_BASE_URL : HTTP_LOCAL_HOST_BASE_URL;
+            int port = isSsl ? adminHttpsPort : adminHttpPort;
+            return baseUrl + ":" + port;
+        }
+
+        String generateAdminUrl(boolean isSsl) {
+            return generateAdminBaseUrl(isSsl) + "/" + adminPath + "?pretty=true";
+        }
+
+        String generateHealthcheckUrl(boolean isSsl) {
+            return generateAdminBaseUrl(isSsl) + "/" + adminPath + "/healthcheck?pretty=true";
+        }
+
+        private void appendUrlLog(StringBuilder sb, String description, String baseUrl, Integer port, String subPath) {
+            sb.append(description).append(" - ").append(baseUrl).append(":").append(port).append(subPath).append("\n");
         }
     }
 }
