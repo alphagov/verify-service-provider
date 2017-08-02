@@ -54,7 +54,6 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
-                //TODO merge with metadata
                 configuration.getHubSsoLocation(),
                 configuration.getServiceEntityId(),
                 configuration.getSamlSigningKey());

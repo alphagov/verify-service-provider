@@ -6,6 +6,7 @@ build
 *.iml
 *.ipr
 *.iws
+*.swp
 out/**
 classes/
 logs/**
