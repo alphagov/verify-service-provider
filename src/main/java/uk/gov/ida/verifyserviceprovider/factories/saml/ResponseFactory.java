@@ -11,16 +11,15 @@ import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
-import uk.gov.ida.verifyserviceprovider.dto.NotImplementedPublicKey;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivateKey;
 
 public class ResponseFactory {
 
@@ -50,12 +49,12 @@ public class ResponseFactory {
     }
 
     private IdaKeyStore createKeyStore() {
-        KeyPair primaryEncryptionKeyPair = new KeyPair(new NotImplementedPublicKey(samlPrimaryEncryptionKey), samlPrimaryEncryptionKey);
+        KeyPair primaryEncryptionKeyPair = new KeyPair(publicKeyFromPrivateKey(samlPrimaryEncryptionKey), samlPrimaryEncryptionKey);
         List<KeyPair> encryptionKeyPairs;
         if (samlSecondaryEncryptionKey == null) {
             encryptionKeyPairs = singletonList(primaryEncryptionKeyPair);
         } else {
-            encryptionKeyPairs = asList(primaryEncryptionKeyPair, new KeyPair(new NotImplementedPublicKey(samlSecondaryEncryptionKey), samlSecondaryEncryptionKey));
+            encryptionKeyPairs = asList(primaryEncryptionKeyPair, new KeyPair(publicKeyFromPrivateKey(samlSecondaryEncryptionKey), samlSecondaryEncryptionKey));
         }
         return new IdaKeyStore(null, encryptionKeyPairs);
     }
