@@ -7,6 +7,10 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Utility that looks up various server details so that useful URLs can be logged to the log file.
  */
@@ -22,54 +26,55 @@ public class ServerDetailFinder {
 
     public static ServerDetail fetchServerDetails(Server server, Configuration config, Environment environment) {
 
-        ServerDetail serverDetail = new ServerDetail(environment.getName(), environment.getAdminContext().getContextPath());
-
         if (config.getServerFactory() instanceof SimpleServerFactory) {
-            fetchSimpleServerDetail(serverDetail, server);
+            return fetchSimpleServerDetail(environment, server);
         }
         else {
-            fetchStandardServerDetails(serverDetail, server);
-        }
-
-        return serverDetail;
-    }
-
-    static void fetchStandardServerDetails(ServerDetail serverDetail, Server server) {
-
-        for (Connector connector : server.getConnectors()) {
-            if (connector instanceof ServerConnector) {
-                ServerConnector serverConnector = (ServerConnector) connector;
-
-                if (serverConnector.getName().equals(DROPWIZARD_CONNECTOR_APPLICATION)) {
-                    if (serverConnector.getDefaultProtocol().equals(DROPWIZARD_PROTOCOL_SSL)) {
-                        serverDetail.serverHttpsPort = serverConnector.getLocalPort();
-                    }
-                    else if (serverConnector.getDefaultProtocol().startsWith(DROPWIZARD_PROTOCOL_HTTP)) {
-                        serverDetail.serverHttpPort = serverConnector.getLocalPort();
-                    }
-                }
-
-                if (serverConnector.getName().equals(DROPWIZARD_CONNECTOR_ADMIN)) {
-                    if (serverConnector.getDefaultProtocol().equals(DROPWIZARD_PROTOCOL_SSL)) {
-                        serverDetail.adminHttpsPort = serverConnector.getLocalPort();
-                    }
-                    else if (serverConnector.getDefaultProtocol().startsWith(DROPWIZARD_PROTOCOL_HTTP)) {
-                        serverDetail.adminHttpPort = serverConnector.getLocalPort();
-                    }
-                }
-            }
+            return fetchStandardServerDetails(environment, server);
         }
     }
 
-    static void fetchSimpleServerDetail(ServerDetail serverDetail, Server server) {
+    static ServerDetail fetchStandardServerDetails(Environment environment, Server server) {
+
+        Map<String, Integer> adminConnectorDetails = extractPortDetailsByConnectorType(server, DROPWIZARD_CONNECTOR_ADMIN);
+        Map<String, Integer> appConnectorDetails = extractPortDetailsByConnectorType(server, DROPWIZARD_CONNECTOR_APPLICATION);
+
+        return new ServerDetail(
+                environment.getName(),
+                environment.getAdminContext().getContextPath(),
+                appConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
+                appConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL),
+                adminConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
+                adminConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL));
+    }
+
+    static ServerDetail fetchSimpleServerDetail(Environment environment, Server server) {
         for (Connector connector : server.getConnectors()) {
             if (connector instanceof ServerConnector) {
                 ServerConnector serverConnector = (ServerConnector) connector;
-                serverDetail.serverHttpPort = serverConnector.getLocalPort();
-                serverDetail.adminHttpPort = serverConnector.getLocalPort();
-                break;
+                return new ServerDetail(
+                        environment.getName(),
+                        environment.getAdminContext().getContextPath(),
+                        serverConnector.getLocalPort(),
+                        null,
+                        serverConnector.getLocalPort(),
+                        null);
             }
         }
+        return new ServerDetail(environment.getName(), environment.getAdminContext().getContextPath(), null, null, null, null);
+    }
+
+    private static Map<String, Integer> extractPortDetailsByConnectorType(Server server, String connectorType) {
+        return Arrays.stream(server.getConnectors())
+                .filter(connector -> {
+                    ServerConnector serverConnector = (ServerConnector) connector;
+
+                    return serverConnector.getName().equals(connectorType) &&
+                            (serverConnector.getDefaultProtocol().equals(DROPWIZARD_PROTOCOL_SSL) ||
+                                    serverConnector.getDefaultProtocol().contains(DROPWIZARD_PROTOCOL_HTTP));
+                })
+                .map(connector -> (ServerConnector) connector)
+                .collect(Collectors.toMap(ServerConnector::getDefaultProtocol, ServerConnector::getLocalPort));
     }
 
     public static class ServerDetail {
@@ -84,17 +89,23 @@ public class ServerDetailFinder {
 
         private final String adminPath;
 
-        Integer serverHttpPort;
+        private final Integer serverHttpPort;
 
-        Integer serverHttpsPort;
+        private final Integer serverHttpsPort;
 
-        Integer adminHttpPort;
+        private final Integer adminHttpPort;
 
-        Integer adminHttpsPort;
+        private final Integer adminHttpsPort;
 
-        ServerDetail(String applicationName, String adminPath) {
+        ServerDetail(String applicationName, String adminPath,
+                            Integer serverHttpPort, Integer serverHttpsPort,
+                            Integer adminHttpPort, Integer adminHttpsPort) {
             this.applicationName = applicationName;
             this.adminPath = adminPath;
+            this.serverHttpPort = serverHttpPort;
+            this.serverHttpsPort = serverHttpsPort;
+            this.adminHttpPort = adminHttpPort;
+            this.adminHttpsPort = adminHttpsPort;
         }
 
         public String toLogOutputString() {
@@ -105,21 +116,21 @@ public class ServerDetailFinder {
             sb.append("| ------------------------------------------------------------------------------------ \n");
 
             if (serverHttpPort != null) {
-                appendUrlLog(sb, "| Server HTTP base URL  ", HTTP_LOCAL_HOST_BASE_URL, serverHttpPort, "");
+                appendUrlLog(sb, "| Server HTTP base URL  ", generateApplicationBaseUrl(false));
             }
 
             if (serverHttpsPort != null) {
-                appendUrlLog(sb, "| Server HTTPS base URL ", HTTPS_LOCAL_HOST_BASE_URL, serverHttpsPort, "");
+                appendUrlLog(sb, "| Server HTTPS base URL ", generateApplicationBaseUrl(true));
             }
 
             if (adminHttpPort != null) {
-                appendUrlLog(sb, "| Admin HTTP Url        ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "?pretty=true");
-                appendUrlLog(sb, "| Healthcheck HTTP URL  ", HTTP_LOCAL_HOST_BASE_URL, adminHttpPort, adminPath + "/healthcheck?pretty=true");
+                appendUrlLog(sb, "| Admin HTTP Url        ", generateAdminUrl(false));
+                appendUrlLog(sb, "| Healthcheck HTTP URL  ", generateHealthcheckUrl(false));
             }
 
             if (adminHttpsPort != null) {
-                appendUrlLog(sb, "| Admin HTTPS Url       ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "?pretty=true");
-                appendUrlLog(sb, "| Healthcheck HTTPS URL ", HTTPS_LOCAL_HOST_BASE_URL, adminHttpsPort, adminPath + "/healthcheck?pretty=true");
+                appendUrlLog(sb, "| Admin HTTPS Url       ", generateAdminUrl(true));
+                appendUrlLog(sb, "| Healthcheck HTTPS URL ", generateHealthcheckUrl(true));
             }
 
             sb.append("======================================================================================\n");
@@ -139,15 +150,39 @@ public class ServerDetailFinder {
         }
 
         String generateAdminUrl(boolean isSsl) {
-            return generateAdminBaseUrl(isSsl) + "/" + adminPath + "?pretty=true";
+            return generateAdminBaseUrl(isSsl) + adminPath + "?pretty=true";
         }
 
         String generateHealthcheckUrl(boolean isSsl) {
-            return generateAdminBaseUrl(isSsl) + "/" + adminPath + "/healthcheck?pretty=true";
+            return generateAdminBaseUrl(isSsl) + adminPath + "/healthcheck?pretty=true";
         }
 
-        private void appendUrlLog(StringBuilder sb, String description, String baseUrl, Integer port, String subPath) {
-            sb.append(description).append(" - ").append(baseUrl).append(":").append(port).append(subPath).append("\n");
+        String getApplicationName() {
+            return applicationName;
+        }
+
+        String getAdminPath() {
+            return adminPath;
+        }
+
+        Integer getServerHttpPort() {
+            return serverHttpPort;
+        }
+
+        Integer getServerHttpsPort() {
+            return serverHttpsPort;
+        }
+
+        Integer getAdminHttpPort() {
+            return adminHttpPort;
+        }
+
+        Integer getAdminHttpsPort() {
+            return adminHttpsPort;
+        }
+
+        private void appendUrlLog(StringBuilder sb, String description, String url) {
+            sb.append(description).append(" - ").append(url).append("\n");
         }
     }
 }

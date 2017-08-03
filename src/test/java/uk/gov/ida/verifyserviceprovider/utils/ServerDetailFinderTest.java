@@ -1,23 +1,12 @@
 package uk.gov.ida.verifyserviceprovider.utils;
 
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.DropwizardTestSupport;
-import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.jetty.MutableServletContextHandler;
+import io.dropwizard.setup.Environment;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,17 +35,19 @@ public class ServerDetailFinderTest {
         when(adminSsl.getDefaultProtocol()).thenReturn(ServerDetailFinder.DROPWIZARD_PROTOCOL_SSL);
 
         Server mockServer = mock(Server.class);
-
         ServerConnector[] serverConnectors = {applicationHttp, applicationSsl, adminHttp, adminSsl};
         when(mockServer.getConnectors()).thenReturn(serverConnectors);
 
-        ServerDetailFinder.ServerDetail actualResult = new ServerDetailFinder.ServerDetail("test", "test-admin-path");
-        ServerDetailFinder.fetchStandardServerDetails(actualResult, mockServer);
+        Environment environment = createMockEnvironment();
 
-        assertThat(actualResult.serverHttpPort).isEqualTo(applicationHttp.getLocalPort());
-        assertThat(actualResult.serverHttpsPort).isEqualTo(applicationSsl.getLocalPort());
-        assertThat(actualResult.adminHttpPort).isEqualTo(adminHttp.getLocalPort());
-        assertThat(actualResult.adminHttpsPort).isEqualTo(adminSsl.getLocalPort());
+        ServerDetailFinder.ServerDetail actualResult = ServerDetailFinder.fetchStandardServerDetails(environment, mockServer);
+
+        assertThat(actualResult.getApplicationName()).isEqualTo(environment.getName());
+        assertThat(actualResult.getAdminPath()).isEqualTo(environment.getAdminContext().getContextPath());
+        assertThat(actualResult.getServerHttpPort()).isEqualTo(applicationHttp.getLocalPort());
+        assertThat(actualResult.getServerHttpsPort()).isEqualTo(applicationSsl.getLocalPort());
+        assertThat(actualResult.getAdminHttpPort()).isEqualTo(adminHttp.getLocalPort());
+        assertThat(actualResult.getAdminHttpsPort()).isEqualTo(adminSsl.getLocalPort());
     }
 
     @Test
@@ -66,18 +57,19 @@ public class ServerDetailFinderTest {
         when(unknownConnectorType.getLocalPort()).thenReturn(666);
         when(unknownConnectorType.getDefaultProtocol()).thenReturn(ServerDetailFinder.DROPWIZARD_PROTOCOL_SSL);
 
+        Environment environment = createMockEnvironment();
+
         Server mockServer = mock(Server.class);
 
         ServerConnector[] serverConnectors = {unknownConnectorType};
         when(mockServer.getConnectors()).thenReturn(serverConnectors);
 
-        ServerDetailFinder.ServerDetail actualResult = new ServerDetailFinder.ServerDetail("test", "test-admin-path");
-        ServerDetailFinder.fetchStandardServerDetails(actualResult, mockServer);
+        ServerDetailFinder.ServerDetail actualResult = ServerDetailFinder.fetchStandardServerDetails(environment, mockServer);
 
-        assertThat(actualResult.serverHttpPort).isNull();
-        assertThat(actualResult.serverHttpsPort).isNull();
-        assertThat(actualResult.adminHttpPort).isNull();
-        assertThat(actualResult.adminHttpsPort).isNull();
+        assertThat(actualResult.getServerHttpPort()).isNull();
+        assertThat(actualResult.getServerHttpsPort()).isNull();
+        assertThat(actualResult.getAdminHttpPort()).isNull();
+        assertThat(actualResult.getAdminHttpsPort()).isNull();
     }
 
     @Test
@@ -85,28 +77,29 @@ public class ServerDetailFinderTest {
         ServerConnector serverConnector = mock(ServerConnector.class);
         when(serverConnector.getLocalPort()).thenReturn(55555);
 
+        Environment environment = createMockEnvironment();
+
         Server mockServer = mock(Server.class);
 
         ServerConnector[] serverConnectors = {serverConnector};
         when(mockServer.getConnectors()).thenReturn(serverConnectors);
 
-        ServerDetailFinder.ServerDetail actualResult = new ServerDetailFinder.ServerDetail("test", "test-admin-path");
-        ServerDetailFinder.fetchSimpleServerDetail(actualResult, mockServer);
+        ServerDetailFinder.ServerDetail actualResult = ServerDetailFinder.fetchSimpleServerDetail(environment, mockServer);
 
-        assertThat(actualResult.serverHttpsPort).isNull();
-        assertThat(actualResult.adminHttpsPort).isNull();
-        assertThat(actualResult.serverHttpPort).isEqualTo(serverConnector.getLocalPort());
-        assertThat(actualResult.adminHttpPort).isEqualTo(serverConnector.getLocalPort());
+        assertThat(actualResult.getServerHttpsPort()).isNull();
+        assertThat(actualResult.getAdminHttpsPort()).isNull();
+        assertThat(actualResult.getServerHttpPort()).isEqualTo(serverConnector.getLocalPort());
+        assertThat(actualResult.getAdminHttpPort()).isEqualTo(serverConnector.getLocalPort());
     }
 
     @Test
     public void shouldGenerateBaseUrlCorrectly() {
 
-        ServerDetailFinder.ServerDetail serverDetail = new ServerDetailFinder.ServerDetail("test-app", "test-admin-path");
-        serverDetail.serverHttpPort = 11111;
-        serverDetail.serverHttpsPort = 11112;
-        serverDetail.adminHttpPort = 11113;
-        serverDetail.adminHttpsPort = 11114;
+        Environment environment = createMockEnvironment();
+
+        ServerDetailFinder.ServerDetail serverDetail =
+                new ServerDetailFinder.ServerDetail(environment.getName(), environment.getAdminContext().getContextPath(),
+                        11111, 11112, 11113, 11114);
 
         assertThat(serverDetail.generateApplicationBaseUrl(true)).isEqualTo("https://localhost:11112");
         assertThat(serverDetail.generateApplicationBaseUrl(false)).isEqualTo("http://localhost:11111");
@@ -116,5 +109,16 @@ public class ServerDetailFinderTest {
         assertThat(serverDetail.generateAdminUrl(false)).isEqualTo("http://localhost:11113/test-admin-path?pretty=true");
         assertThat(serverDetail.generateHealthcheckUrl(true)).isEqualTo("https://localhost:11114/test-admin-path/healthcheck?pretty=true");
         assertThat(serverDetail.generateHealthcheckUrl(false)).isEqualTo("http://localhost:11113/test-admin-path/healthcheck?pretty=true");
+    }
+
+    private Environment createMockEnvironment() {
+        Environment environment = mock(Environment.class);
+        when(environment.getName()).thenReturn("test-app");
+
+        MutableServletContextHandler adminContext = mock(MutableServletContextHandler.class);
+        when(adminContext.getContextPath()).thenReturn("/test-admin-path");
+
+        when(environment.getAdminContext()).thenReturn(adminContext);
+        return environment;
     }
 }
