@@ -12,6 +12,7 @@ import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.verifyserviceprovider.dto.NotImplementedPublicKey;
+import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -32,7 +33,7 @@ public class ResponseFactory {
         return new StringToOpenSamlObjectTransformer<>(
             new NotNullSamlStringValidator(),
             new Base64StringDecoder(),
-            input -> { },
+            new ResponseSizeValidator(),
             new OpenSamlXMLObjectUnmarshaller<>(new SamlObjectParser())
         );
     }
