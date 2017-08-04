@@ -1,15 +1,11 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
 import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.NameID;
-import org.opensaml.saml.saml2.core.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
-import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
 import javax.ws.rs.Consumes;
@@ -19,10 +15,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
-import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,8 +32,15 @@ public class TranslateSamlResponseResource {
 
     @POST
     public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) throws Base64DecodingException, IOException {
-        return Response
-            .ok(responseService.convertTranslatedResponseBody(translateSamlResponseBody.getSamlResponse()))
-            .build();
+        try {
+            return Response
+                .ok(responseService.convertTranslatedResponseBody(translateSamlResponseBody.getSamlResponse()))
+                .build();
+        } catch (SamlResponseValidationException e) {
+            return Response
+                    .status(BAD_REQUEST)
+                    .entity(new ErrorBody(BAD_REQUEST.name(), e.getMessage()))
+                    .build();
+        }
     }
 }

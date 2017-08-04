@@ -7,6 +7,7 @@ import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,23 +27,26 @@ public class ResponseService {
         this.assertionDecrypter = assertionDecrypter;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse) throws IOException {
+    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse) throws IOException, SamlResponseValidationException {
         Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
 
         List<Assertion> assertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
 
-        // TODO: test for error if assertions.size() != 1
+        if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
+            throw new SamlResponseValidationException("Only one assertion is expected.");
+        }
 
         Subject subject = assertions.get(0).getSubject();
-
-        // TODO: what if subject is null?
+        if (subject == null) {
+            throw new SamlResponseValidationException("Subject is missing from the assertion.");
+        }
 
         NameID nameID = subject.getNameID();
-
-        // TODO: what if name ID is null?
+        if (nameID == null) {
+            throw new SamlResponseValidationException("NameID is missing from the subject of the assertion.");
+        }
 
         String pid = nameID.getValue();
-
 
         return new TranslatedResponseBody(
             "MATCH",
@@ -51,4 +55,5 @@ public class ResponseService {
             null
         );
     }
+
 }

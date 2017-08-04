@@ -10,8 +10,8 @@ import io.dropwizard.setup.Environment;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
-import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
+import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 
 import java.util.Arrays;
 

@@ -1,7 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.builders;
 
-import uk.gov.ida.saml.core.test.TestCertificateStrings;
-
 import javax.ws.rs.client.Entity;
 import java.util.HashMap;
 import java.util.List;

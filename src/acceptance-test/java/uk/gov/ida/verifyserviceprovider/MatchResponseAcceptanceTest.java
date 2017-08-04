@@ -24,7 +24,8 @@ import java.net.URI;
 import java.util.Map;
 
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
-import static javax.ws.rs.client.Entity.*;
+import static javax.ws.rs.client.Entity.form;
+import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
