@@ -1,6 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
-import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
@@ -31,16 +30,16 @@ public class TranslateSamlResponseResource {
     }
 
     @POST
-    public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) throws Base64DecodingException, IOException {
+    public Response translateResponse(TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         try {
             return Response
                 .ok(responseService.convertTranslatedResponseBody(translateSamlResponseBody.getSamlResponse()))
                 .build();
         } catch (SamlResponseValidationException e) {
             return Response
-                    .status(BAD_REQUEST)
-                    .entity(new ErrorBody(BAD_REQUEST.name(), e.getMessage()))
-                    .build();
+                .status(BAD_REQUEST)
+                .entity(new ErrorBody(BAD_REQUEST.name(), e.getMessage()))
+                .build();
         }
     }
 }

@@ -8,6 +8,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 
 import static uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory.createStringToResponseTransformer;
 
@@ -44,7 +45,7 @@ public class VerifyServiceProviderFactory {
 
     public TranslateSamlResponseResource getTranslateSamlResponseResource() {
         AssertionDecrypter assertionDecrypter = responseFactory.createAssertionDecrypter();
-        ResponseService responseService = new ResponseService(createStringToResponseTransformer(), assertionDecrypter);
+        ResponseService responseService = new ResponseService(createStringToResponseTransformer(), assertionDecrypter, new AssertionTranslator());
         return new TranslateSamlResponseResource(responseService);
     }
 }
