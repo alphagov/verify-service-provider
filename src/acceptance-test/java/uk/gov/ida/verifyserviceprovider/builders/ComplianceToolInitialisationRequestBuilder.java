@@ -15,7 +15,7 @@ public class ComplianceToolInitialisationRequestBuilder {
     private String assertionConsumerServiceUrl = "http://verify-service-provider-acceptance-test/response";
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
-    private String expectedPID = "verify-service-provider-pid";
+    private String expectedPID = "default-expected-pid";
     private String matchingServiceEntityId = "http://verify-service-provider-acceptance-test/msa";
     private String matchingServiceSigningPrivateKey = TEST_RP_MS_PRIVATE_SIGNING_KEY;
     private List<String> userAccountCreationAttributes = emptyList();
