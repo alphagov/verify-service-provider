@@ -16,8 +16,11 @@ import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public class ResponseFactory {
 
@@ -48,7 +51,12 @@ public class ResponseFactory {
 
     private IdaKeyStore createKeyStore() {
         KeyPair primaryEncryptionKeyPair = new KeyPair(new NotImplementedPublicKey(samlPrimaryEncryptionKey), samlPrimaryEncryptionKey);
-        KeyPair secondaryEncryptionKeyPair = new KeyPair(new NotImplementedPublicKey(samlSecondaryEncryptionKey), samlSecondaryEncryptionKey);
-        return new IdaKeyStore(null, asList(primaryEncryptionKeyPair, secondaryEncryptionKeyPair));
+        List<KeyPair> encryptionKeyPairs;
+        if (samlSecondaryEncryptionKey == null) {
+            encryptionKeyPairs = singletonList(primaryEncryptionKeyPair);
+        } else {
+            encryptionKeyPairs = asList(primaryEncryptionKeyPair, new KeyPair(new NotImplementedPublicKey(samlSecondaryEncryptionKey), samlSecondaryEncryptionKey));
+        }
+        return new IdaKeyStore(null, encryptionKeyPairs);
     }
 }
