@@ -6,6 +6,7 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -39,10 +40,7 @@ public class MatchResponseAcceptanceTest {
 
     private static Client client = application.client();
     private static ComplianceToolService complianceTool = new ComplianceToolService(client);
-    private static GenerateRequestService generateRequestService = new GenerateRequestService(
-        client,
-        complianceTool
-    );
+    private static GenerateRequestService generateRequestService = new GenerateRequestService(client);
 
     @Test
     public void shouldHandleASuccessMatchResponse() {
@@ -53,9 +51,10 @@ public class MatchResponseAcceptanceTest {
                 .build()
         );
 
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", generateRequestService.generateSuccessMatchSamlResponseString(application.getLocalPort()),
-            "requestId", "string-to-be-fixed"
+            "samlResponse", complianceTool.createSuccessMatchResponseFor(requestResponseBody.getSamlRequest()),
+            "requestId", requestResponseBody.getRequestId()
         );
 
         Response response = client

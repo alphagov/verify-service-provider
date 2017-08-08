@@ -8,6 +8,7 @@ import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.util.List;
 
@@ -29,9 +30,16 @@ public class ResponseService {
         this.responseSignatureValidator = responseSignatureValidator;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse) {
+    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo) {
         Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
+
         ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
+
+        if (!expectedInResponseTo.equals(response.getInResponseTo())) {
+            throw new SamlResponseValidationException(
+                "Expected InResponseTo to be " + expectedInResponseTo + ", but was " + response.getInResponseTo());
+        }
+
         List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
 
         return assertionTranslator.translate(assertions);

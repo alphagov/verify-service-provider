@@ -13,27 +13,17 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 public class GenerateRequestService {
 
     private final Client client;
-    private final ComplianceToolService complianceTool;
 
-    public GenerateRequestService(
-        Client client,
-        ComplianceToolService complianceTool
-    ) {
+    public GenerateRequestService(Client client) {
         this.client = client;
-        this.complianceTool = complianceTool;
     }
 
-    public String generateSuccessMatchSamlResponseString(int localPort) {
-        Response authnResponse = client
+    public RequestResponseBody generateAuthnRequest(int localPort) {
+        return client
             .target(URI.create(String.format("http://localhost:%d/generate-request", localPort)))
             .request()
             .buildPost(json(new RequestGenerationBody(LEVEL_2)))
-            .invoke();
-
-        return complianceTool.createSuccessMatchResponseFor(
-            authnResponse
-                .readEntity(RequestResponseBody.class)
-                .getSamlRequest()
-        );
+            .invoke()
+            .readEntity(RequestResponseBody.class);
     }
 }

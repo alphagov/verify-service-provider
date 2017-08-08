@@ -32,7 +32,10 @@ public class TranslateSamlResponseResource {
     public Response translateResponse(@Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         try {
             return Response
-                .ok(responseService.convertTranslatedResponseBody(translateSamlResponseBody.getSamlResponse()))
+                .ok(responseService.convertTranslatedResponseBody(
+                    translateSamlResponseBody.getSamlResponse(),
+                    translateSamlResponseBody.getRequestId())
+                )
                 .build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
             return Response

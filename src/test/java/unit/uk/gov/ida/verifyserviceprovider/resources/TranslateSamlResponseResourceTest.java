@@ -26,6 +26,7 @@ import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -57,7 +58,7 @@ public class TranslateSamlResponseResourceTest {
             .request()
             .post(json(translateResponseRequest.toString()));
 
-        verify(responseService, times(1)).convertTranslatedResponseBody(translateResponseRequest.getString("samlResponse"));
+        verify(responseService, times(1)).convertTranslatedResponseBody(translateResponseRequest.getString("samlResponse"), "some-request-id");
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
@@ -65,7 +66,7 @@ public class TranslateSamlResponseResourceTest {
     public void shouldReturn400WhenSamlValidationExceptionThrown() throws Exception {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response").put("requestId", "some-request-id");
 
-        when(responseService.convertTranslatedResponseBody(any())).thenThrow(new SamlResponseValidationException("Some error."));
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"))).thenThrow(new SamlResponseValidationException("Some error."));
 
         Response response = resources.client()
                 .target("/translate-response")
@@ -83,7 +84,7 @@ public class TranslateSamlResponseResourceTest {
     public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() throws Exception {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response").put("requestId", "some-request-id");
 
-        when(responseService.convertTranslatedResponseBody(any())).thenThrow(new SamlTransformationErrorException("Some error.", Level.ERROR));
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"))).thenThrow(new SamlTransformationErrorException("Some error.", Level.ERROR));
 
         Response response = resources.client()
             .target("/translate-response")

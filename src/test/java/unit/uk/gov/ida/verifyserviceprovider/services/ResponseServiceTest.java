@@ -23,6 +23,7 @@ import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
@@ -86,7 +87,10 @@ public class ResponseServiceTest {
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
         Response response = createResponseSignedBy(testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(responseToBase64StringTransformer.apply(response));
+        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+            responseToBase64StringTransformer.apply(response),
+            response.getInResponseTo()
+        );
 
         assertThat(result).isEqualTo(new TranslatedResponseBody(
             "MATCH",
@@ -98,58 +102,73 @@ public class ResponseServiceTest {
 
     @Test(expected = SamlTransformationErrorException.class)
     public void shouldFailValidationWhenMetadataDoesNotContainCorrectCertificate() throws Exception {
-
         Response response = createResponseSignedBy(testRpSigningCredential);
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_PUBLIC_CERT);
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-
-        responseService.convertTranslatedResponseBody(responseToBase64StringTransformer.apply(response));
+        responseService.convertTranslatedResponseBody(
+            responseToBase64StringTransformer.apply(response),
+            response.getInResponseTo()
+        );
     }
 
     @Test(expected = SamlTransformationErrorException.class)
     public void shouldFailValidationWhenResponseIsNotSigned() throws Exception {
-
         Response response = createResponseBuilder().withoutSigning().build();
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        responseService.convertTranslatedResponseBody(responseToBase64StringTransformer.apply(response));
+        responseService.convertTranslatedResponseBody(
+            responseToBase64StringTransformer.apply(response),
+            response.getInResponseTo()
+        );
+    }
+
+    @Test(expected = SamlResponseValidationException.class)
+    public void shouldFailWhenInResponseToDoesNotMatchRequestId() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+        Response response = createResponseSignedBy(testRpSigningCredential);
+
+        responseService.convertTranslatedResponseBody(
+            responseToBase64StringTransformer.apply(response),
+            "some-incorrect-request-id"
+        );
     }
 
     private EntityDescriptor createEntityDescriptorWithSigningCertificate(String signingCert) throws MarshallingException, SignatureException {
         return anEntityDescriptor()
-                .addSpServiceDescriptor(anSpServiceDescriptor()
-                    .withoutDefaultSigningKey()
-                    .addKeyDescriptor(aKeyDescriptor().withX509ForSigning(signingCert).build())
-                    .build()
-                )
-                .build();
+            .addSpServiceDescriptor(anSpServiceDescriptor()
+                .withoutDefaultSigningKey()
+                .addKeyDescriptor(aKeyDescriptor().withX509ForSigning(signingCert).build())
+                .build()
+            )
+            .build();
     }
 
     private Response createResponseSignedBy(Credential signingCredential) throws MarshallingException, SignatureException {
         return createResponseBuilder()
-                .withSigningCredential(signingCredential).build();
+            .withSigningCredential(signingCredential).build();
     }
 
     private ResponseBuilder createResponseBuilder() {
         return aResponse()
-                .withNoDefaultAssertion()
-                .addEncryptedAssertion(
-                    anAssertion()
-                        .withSubject(aSubject()
-                            .withNameId(aNameId().withValue("some-pid").build())
-                            .build())
-                        .addAuthnStatement(anAuthnStatement()
-                            .withAuthnContext(anAuthnContext()
-                                .withAuthnContextClassRef(anAuthnContextClassRef()
-                                    .withAuthnContextClasRefValue(IdaAuthnContext.LEVEL_2_AUTHN_CTX)
-                                    .build())
+            .withNoDefaultAssertion()
+            .addEncryptedAssertion(
+                anAssertion()
+                    .withSubject(aSubject()
+                        .withNameId(aNameId().withValue("some-pid").build())
+                        .build())
+                    .addAuthnStatement(anAuthnStatement()
+                        .withAuthnContext(anAuthnContext()
+                            .withAuthnContextClassRef(anAuthnContextClassRef()
+                                .withAuthnContextClasRefValue(IdaAuthnContext.LEVEL_2_AUTHN_CTX)
                                 .build())
                             .build())
-                        .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
-                );
+                        .build())
+                    .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
+            );
     }
 }
