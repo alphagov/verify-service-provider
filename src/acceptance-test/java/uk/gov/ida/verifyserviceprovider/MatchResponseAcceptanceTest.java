@@ -22,6 +22,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_E
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.configuration.MetadataUri.COMPLIANCE_TOOL;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class MatchResponseAcceptanceTest {
@@ -32,7 +33,8 @@ public class MatchResponseAcceptanceTest {
         resourceFilePath("verify-service-provider-acceptance-test.yml"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("hubSsoLocation", ComplianceToolService.SSO_LOCATION),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+        ConfigOverride.config("verifyHubMetadata.uri", COMPLIANCE_TOOL.getUri().toString())
     );
 
     private static Client client = application.client();

@@ -1,5 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
+import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -33,7 +34,7 @@ public class TranslateSamlResponseResource {
             return Response
                 .ok(responseService.convertTranslatedResponseBody(translateSamlResponseBody.getSamlResponse()))
                 .build();
-        } catch (SamlResponseValidationException e) {
+        } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
             return Response
                 .status(BAD_REQUEST)
                 .entity(new ErrorBody(BAD_REQUEST.name(), e.getMessage()))

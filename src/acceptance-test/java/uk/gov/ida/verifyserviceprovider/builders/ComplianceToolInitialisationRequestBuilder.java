@@ -35,6 +35,7 @@ public class ComplianceToolInitialisationRequestBuilder {
         map.put("matchingServiceEntityId", matchingServiceEntityId);
         map.put("matchingServiceSigningPrivateKey", matchingServiceSigningPrivateKey);
         map.put("userAccountCreationAttributes", userAccountCreationAttributes);
+        map.put("useSimpleProfile", false);
 
         return Entity.json(map);
     }
