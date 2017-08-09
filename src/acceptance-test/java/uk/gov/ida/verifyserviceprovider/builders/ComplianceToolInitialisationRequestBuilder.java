@@ -49,4 +49,9 @@ public class ComplianceToolInitialisationRequestBuilder {
         this.expectedPID = expectedPid;
         return this;
     }
+
+    public ComplianceToolInitialisationRequestBuilder withUserAccountCreationAttributes(List<String> userAccountCreationAttributes) {
+        this.userAccountCreationAttributes = userAccountCreationAttributes;
+        return this;
+    }
 }

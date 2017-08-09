@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import com.google.common.collect.ImmutableMap;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
@@ -20,7 +21,6 @@ public class ComplianceToolService {
     public final static String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
     public final static String SSO_LOCATION = HOST + "/SAML2/SSO";
 
-
     private final Client client;
 
     public ComplianceToolService(Client client) {
@@ -38,19 +38,39 @@ public class ComplianceToolService {
     }
 
     public String createSuccessMatchResponseFor(String samlRequest) {
-        Response response = client.target(getSuccessfulMatchResponseUrlFor(samlRequest))
+        return getExtractedSamlResponse(getSuccessfulMatchResponseUrlFor(samlRequest));
+    }
+
+    public String createUserAccountCreationResponseFor(String samlRequest) {
+        return getExtractedSamlResponse(getUserAccountCreationResponseUrlFor(samlRequest));
+    }
+
+    private String getExtractedSamlResponse(String endpoint) {
+        Response response = client.target(endpoint)
             .request()
             .buildGet()
             .invoke();
 
-        String successMatchResponse = extractSamlResponse(response.readEntity(String.class));
+        String samlResponse = extractSamlResponse(response.readEntity(String.class));
 
-        assertThat(successMatchResponse).isNotEmpty();
+        assertThat(samlResponse).isNotEmpty();
 
-        return successMatchResponse;
+        return samlResponse;
     }
 
     private String getSuccessfulMatchResponseUrlFor(String samlRequest) {
+        JSONObject successCase = getComplianceToolTestCases(samlRequest).getJSONObject(0);
+
+        return successCase.getString("executeUri");
+    }
+
+    private String getUserAccountCreationResponseUrlFor(String samlRequest) {
+        JSONObject userAccountCreationCase = getComplianceToolTestCases(samlRequest).getJSONObject(5);
+
+        return userAccountCreationCase.getString("executeUri");
+    }
+
+    private JSONArray getComplianceToolTestCases(String samlRequest) {
         Response complianceToolSsoResponse = client
             .target(SSO_LOCATION)
             .request()
@@ -65,10 +85,7 @@ public class ComplianceToolService {
             .buildGet()
             .invoke();
 
-        JSONObject complianceToolScenarios = new JSONObject(complianceToolScenariosResponse.readEntity(String.class));
-        JSONObject successCase = complianceToolScenarios.getJSONArray("testCases").getJSONObject(0);
-
-        return successCase.getString("executeUri");
+        return new JSONObject(complianceToolScenariosResponse.readEntity(String.class)).getJSONArray("testCases");
     }
 
     private String extractSamlResponse(String complianceToolResponseBody) {

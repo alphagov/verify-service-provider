@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
+import org.opensaml.saml.saml2.core.impl.AttributeBuilder;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -16,12 +17,15 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
@@ -125,18 +129,18 @@ public class ResponseServiceTest {
 
     private Assertion anAssertionWithLevelOfAssurance(String levelOfAssurance) {
         return anAssertion()
-                .addAuthnStatement(anAuthnStatement()
-                    .withAuthnContext(anAuthnContext()
-                        .withAuthnContextClassRef(anAuthnContextClassRef()
-                            .withAuthnContextClasRefValue(levelOfAssurance).build())
-                        .build())
+            .addAuthnStatement(anAuthnStatement()
+                .withAuthnContext(anAuthnContext()
+                    .withAuthnContextClassRef(anAuthnContextClassRef()
+                        .withAuthnContextClasRefValue(levelOfAssurance).build())
                     .build())
-                .buildUnencrypted();
+                .build())
+            .buildUnencrypted();
     }
 
     private Assertion anAssertionWithPid(String expectedPid) {
         return anAssertion().withSubject(
-                aSubject().withPersistentId(expectedPid).build()
+            aSubject().withPersistentId(expectedPid).build()
         ).buildUnencrypted();
     }
 

@@ -36,4 +36,18 @@ public class GenerateRequestService {
                 .getSamlRequest()
         );
     }
+
+    public String generateUserAccountCreationSamlResponseString(int localPort) {
+        Response authnResponse = client
+            .target(URI.create(String.format("http://localhost:%d/generate-request", localPort)))
+            .request()
+            .buildPost(json(new RequestGenerationBody(LEVEL_2)))
+            .invoke();
+
+        return complianceTool.createUserAccountCreationResponseFor(
+            authnResponse
+                .readEntity(RequestResponseBody.class)
+                .getSamlRequest()
+        );
+    }
 }

@@ -7,14 +7,14 @@ import java.util.Optional;
 
 public class TranslatedResponseBody {
 
-    private final String scenario;
+    private final Scenario scenario;
     private final String pid;
     private final LevelOfAssurance levelOfAssurance;
     private final Attributes attributes;
 
     @JsonCreator
     public TranslatedResponseBody(
-        @JsonProperty("scenario") String scenario,
+        @JsonProperty("scenario") Scenario scenario,
         @JsonProperty("pid") String pid,
         @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
         @JsonProperty("attributes") Attributes attributes
@@ -25,7 +25,7 @@ public class TranslatedResponseBody {
         this.attributes = attributes;
     }
 
-    public String getScenario() {
+    public Scenario getScenario() {
         return scenario;
     }
 
@@ -48,7 +48,7 @@ public class TranslatedResponseBody {
 
         TranslatedResponseBody that = (TranslatedResponseBody) o;
 
-        if (scenario != null ? !scenario.equals(that.scenario) : that.scenario != null) return false;
+        if (scenario != that.scenario) return false;
         if (pid != null ? !pid.equals(that.pid) : that.pid != null) return false;
         if (levelOfAssurance != that.levelOfAssurance) return false;
         return attributes != null ? attributes.equals(that.attributes) : that.attributes == null;

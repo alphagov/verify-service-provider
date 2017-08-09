@@ -6,6 +6,7 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -64,7 +65,7 @@ public class MatchResponseAcceptanceTest {
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         assertThat(response.readEntity(TranslatedResponseBody.class)).isEqualTo(new TranslatedResponseBody(
-            "MATCH",
+            Scenario.SUCCESS_MATCH,
             "some-expected-pid",
             LEVEL_2,
             null)

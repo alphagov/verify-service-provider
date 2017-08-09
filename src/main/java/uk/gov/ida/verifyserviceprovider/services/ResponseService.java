@@ -6,11 +6,17 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.verifyserviceprovider.dto.Attributes;
+import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.VerifiableAttribute;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
@@ -48,12 +54,22 @@ public class ResponseService {
 
         String pid = nameID.getValue();
 
-        return new TranslatedResponseBody(
-            "MATCH",
-            pid,
-            LEVEL_2,
-            null
-        );
+        if (assertions.get(0).getAttributeStatements().isEmpty()) {
+            return new TranslatedResponseBody(
+                Scenario.SUCCESS_MATCH,
+                pid,
+                LEVEL_2,
+                null
+            );
+        } else {
+            // Assume it is user account creation
+            return new TranslatedResponseBody(
+                Scenario.ACCOUNT_CREATION,
+                pid,
+                LEVEL_2,
+                AttributeTranslationService.translateAttributes(assertions.get(0).getAttributeStatements().get(0))
+                );
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package uk.gov.ida.verifyserviceprovider;
 
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -43,6 +44,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
             )
         );
         IdaSamlBootstrap.bootstrap();
+        bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
     }
 
     @Override
