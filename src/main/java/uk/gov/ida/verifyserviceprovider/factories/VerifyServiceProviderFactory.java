@@ -42,7 +42,10 @@ public class VerifyServiceProviderFactory {
     }
 
     public TranslateSamlResponseResource getTranslateSamlResponseResource() throws ComponentInitializationException {
-        return new TranslateSamlResponseResource(responseFactory.createResponseService(getHubMetadataResolver()));
+        return new TranslateSamlResponseResource(responseFactory.createResponseService(
+            getHubMetadataResolver(),
+            responseFactory.createAssertionTranslator(getMsaMetadataResolver()))
+        );
     }
 
     private MetadataResolver getHubMetadataResolver() {

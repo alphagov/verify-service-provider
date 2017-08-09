@@ -50,4 +50,14 @@ public class ComplianceToolInitialisationRequestBuilder {
         this.expectedPID = expectedPid;
         return this;
     }
+
+    public ComplianceToolInitialisationRequestBuilder withMatchingServiceSigningPrivateKey(String privateKey) {
+        this.matchingServiceSigningPrivateKey = privateKey;
+        return this;
+    }
+
+    public ComplianceToolInitialisationRequestBuilder withMatchingServiceEntityId(String matchingServiceEntityId) {
+        this.matchingServiceEntityId = matchingServiceEntityId;
+        return this;
+    }
 }

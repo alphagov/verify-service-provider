@@ -17,6 +17,7 @@ import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
@@ -67,19 +68,34 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService createResponseService(MetadataResolver metadataResolver) throws ComponentInitializationException {
+    public ResponseService createResponseService(
+        MetadataResolver hubMetadataResolver,
+        AssertionTranslator assertionTranslator
+    ) throws ComponentInitializationException {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(hubMetadataResolver);
+
+        return new ResponseService(
+            createStringToResponseTransformer(),
+            assertionDecrypter,
+            assertionTranslator,
+            new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator))
+        );
+    }
+
+    public AssertionTranslator createAssertionTranslator(MetadataResolver msaMetadataResolver) throws ComponentInitializationException {
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(msaMetadataResolver);
+        SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
+        return new AssertionTranslator(new SamlAssertionsSignatureValidator(samlMessageSignatureValidator));
+    }
+
+    private MetadataBackedSignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver) throws ComponentInitializationException {
         MetadataCredentialResolver metadataCredentialResolver = getMetadataCredentialResolver(metadataResolver);
         ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(
             metadataCredentialResolver,
             DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver()
         );
-
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator =
-            MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
-
-        return new ResponseService(createStringToResponseTransformer(), assertionDecrypter, new AssertionTranslator(),
-            new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)));
+        return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
     }
 
     private MetadataCredentialResolver getMetadataCredentialResolver(MetadataResolver metadataResolver) throws ComponentInitializationException {

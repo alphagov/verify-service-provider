@@ -17,9 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ComplianceToolService {
 
-    public final static String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
-    public final static String SSO_LOCATION = HOST + "/SAML2/SSO";
+    public static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    public static final String SSO_LOCATION = HOST + "/SAML2/SSO";
 
+    private static final int SUCCESS_MATCH_INDEX = 0;
+    private static final int INCORRECTLY_SIGNED_MATCH_INDEX = 6;
 
     private final Client client;
 
@@ -38,7 +40,7 @@ public class ComplianceToolService {
     }
 
     public String createSuccessMatchResponseFor(String samlRequest) {
-        Response response = client.target(getSuccessfulMatchResponseUrlFor(samlRequest))
+        Response response = client.target(getResponseUrlFor(SUCCESS_MATCH_INDEX, samlRequest))
             .request()
             .buildGet()
             .invoke();
@@ -50,7 +52,20 @@ public class ComplianceToolService {
         return successMatchResponse;
     }
 
-    private String getSuccessfulMatchResponseUrlFor(String samlRequest) {
+    public String createIncorrectlySignedMatchResponseFor(String samlRequest) {
+        Response response = client.target(getResponseUrlFor(INCORRECTLY_SIGNED_MATCH_INDEX, samlRequest))
+            .request()
+            .buildGet()
+            .invoke();
+
+        String successMatchResponse = extractSamlResponse(response.readEntity(String.class));
+
+        assertThat(successMatchResponse).isNotEmpty();
+
+        return successMatchResponse;
+    }
+
+    private String getResponseUrlFor(int testCaseIndex, String samlRequest) {
         Response complianceToolSsoResponse = client
             .target(SSO_LOCATION)
             .request()
@@ -66,7 +81,7 @@ public class ComplianceToolService {
             .invoke();
 
         JSONObject complianceToolScenarios = new JSONObject(complianceToolScenariosResponse.readEntity(String.class));
-        JSONObject successCase = complianceToolScenarios.getJSONArray("testCases").getJSONObject(0);
+        JSONObject successCase = complianceToolScenarios.getJSONArray("testCases").getJSONObject(testCaseIndex);
 
         return successCase.getString("executeUri");
     }

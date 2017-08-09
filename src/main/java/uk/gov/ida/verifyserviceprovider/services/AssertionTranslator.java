@@ -6,6 +6,8 @@ import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -15,6 +17,11 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 public class AssertionTranslator {
+    private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
+
+    public AssertionTranslator(SamlAssertionsSignatureValidator assertionsSignatureValidator) {
+        this.assertionsSignatureValidator = assertionsSignatureValidator;
+    }
 
     public TranslatedResponseBody translate(List<Assertion> assertions) {
         if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
@@ -22,6 +29,9 @@ public class AssertionTranslator {
         }
 
         Assertion assertion = assertions.get(0);
+
+        assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+
         Subject subject = assertion.getSubject();
         if (subject == null) {
             throw new SamlResponseValidationException("Subject is missing from the assertion.");
