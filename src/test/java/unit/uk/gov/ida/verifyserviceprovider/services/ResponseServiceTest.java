@@ -109,8 +109,11 @@ public class ResponseServiceTest {
         ));
     }
 
-    @Test(expected = SamlTransformationErrorException.class)
+    @Test
     public void shouldFailValidationWhenMetadataDoesNotContainCorrectCertificate() throws Exception {
+        expectedException.expect(SamlTransformationErrorException.class);
+        expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
+
         Response response = createResponseSignedBy(testRpSigningCredential);
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_PUBLIC_CERT);
 
@@ -122,8 +125,11 @@ public class ResponseServiceTest {
         );
     }
 
-    @Test(expected = SamlTransformationErrorException.class)
+    @Test
     public void shouldFailValidationWhenResponseIsNotSigned() throws Exception {
+        expectedException.expect(SamlTransformationErrorException.class);
+        expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
+
         Response response = createResponseBuilder().withoutSigning().build();
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
 
@@ -135,8 +141,11 @@ public class ResponseServiceTest {
         );
     }
 
-    @Test(expected = SamlResponseValidationException.class)
+    @Test
     public void shouldFailWhenInResponseToDoesNotMatchRequestId() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Expected InResponseTo to be some-incorrect-request-id, but was default-request-id");
+
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
         Response response = createResponseSignedBy(testRpSigningCredential);
