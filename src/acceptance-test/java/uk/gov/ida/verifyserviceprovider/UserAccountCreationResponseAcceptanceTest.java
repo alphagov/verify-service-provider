@@ -11,7 +11,6 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
 
@@ -32,6 +31,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
 import static uk.gov.ida.verifyserviceprovider.configuration.MetadataUri.COMPLIANCE_TOOL;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 
 public class UserAccountCreationResponseAcceptanceTest {
 
@@ -69,7 +69,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
-        assertThat(jsonResponse.getString("scenario")).isEqualTo(Scenario.ACCOUNT_CREATION.name());
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(ACCOUNT_CREATION.name());
         assertThat(jsonResponse.getString("pid")).isEqualTo("some-expected-pid");
         assertThat(jsonResponse.keys()).contains("attributes");
     }

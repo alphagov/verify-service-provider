@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.ida.verifyserviceprovider.exceptions.FailedToRequestVerifiedException;
 import uk.gov.ida.verifyserviceprovider.exceptions.RequestedOnlyVerifiedException;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.util.Optional;
 

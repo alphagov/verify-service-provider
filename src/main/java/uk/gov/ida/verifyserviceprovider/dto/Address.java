@@ -2,8 +2,6 @@ package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Lists;
-import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 
 import java.time.LocalDate;
 import java.util.List;

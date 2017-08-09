@@ -7,8 +7,6 @@ import org.joda.time.DateTime;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.xmlsec.signature.support.SignatureException;
-import uk.gov.ida.saml.core.test.TestCertificateStrings;
-import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.metadata.test.factories.metadata.EntityDescriptorFactory;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
 

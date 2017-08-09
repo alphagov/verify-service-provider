@@ -23,7 +23,6 @@ import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
@@ -51,6 +50,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class ResponseServiceTest {
 
@@ -99,7 +99,7 @@ public class ResponseServiceTest {
         );
 
         assertThat(result).isEqualTo(new TranslatedResponseBody(
-            Scenario.SUCCESS_MATCH,
+            SUCCESS_MATCH,
             "some-pid",
             LevelOfAssurance.LEVEL_2,
             null

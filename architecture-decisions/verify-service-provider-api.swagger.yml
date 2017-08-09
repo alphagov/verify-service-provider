@@ -167,7 +167,6 @@ definitions:
           - CANCELLATION
       message:
         type: string
-
   Attributes:
     description: >-
       An object containing user attributes

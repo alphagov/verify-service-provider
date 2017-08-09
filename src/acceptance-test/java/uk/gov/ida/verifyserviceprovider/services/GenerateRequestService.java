@@ -4,7 +4,6 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Response;
 import java.net.URI;
 
 import static javax.ws.rs.client.Entity.json;

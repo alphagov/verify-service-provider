@@ -3,7 +3,6 @@ package uk.gov.ida.verifyserviceprovider.services;
 import com.google.common.collect.Lists;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
-import org.opensaml.saml.saml2.core.AttributeValue;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.Verified;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
