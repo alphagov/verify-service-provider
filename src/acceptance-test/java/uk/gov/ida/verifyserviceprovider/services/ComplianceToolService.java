@@ -17,11 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ComplianceToolService {
 
-    public static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
     public static final String SSO_LOCATION = HOST + "/SAML2/SSO";
 
-    private static final int SUCCESS_MATCH_INDEX = 0;
-    private static final int INCORRECTLY_SIGNED_MATCH_INDEX = 6;
+    private static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID = 1;
+    // public static final int BASIC_NO_MATCH_ID = 2;
+    // public static final int NO_AUTHENTICATION_CONTEXT_ID = 3;
+    // public static final int AUTHENTICATION_FAILED_ID = 4;
+    // public static final int REQUESTER_ERROR_ID = 5;
+    // public static final int ACCOUNT_CREATION_LOA2_ID = 6;
+    // public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID = 7;
+    // public static final int ACCOUNT_CREATION_LOA1_ID = 8;
+    private static final int BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID = 9;
 
     private final Client client;
 
@@ -40,7 +47,7 @@ public class ComplianceToolService {
     }
 
     public String createSuccessMatchResponseFor(String samlRequest) {
-        Response response = client.target(getResponseUrlFor(SUCCESS_MATCH_INDEX, samlRequest))
+        Response response = client.target(getResponseUrlById(BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID, samlRequest))
             .request()
             .buildGet()
             .invoke();
@@ -53,7 +60,7 @@ public class ComplianceToolService {
     }
 
     public String createIncorrectlySignedMatchResponseFor(String samlRequest) {
-        Response response = client.target(getResponseUrlFor(INCORRECTLY_SIGNED_MATCH_INDEX, samlRequest))
+        Response response = client.target(getResponseUrlById(BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID, samlRequest))
             .request()
             .buildGet()
             .invoke();
@@ -65,7 +72,7 @@ public class ComplianceToolService {
         return successMatchResponse;
     }
 
-    private String getResponseUrlFor(int testCaseIndex, String samlRequest) {
+    private String getResponseUrlById(int testCaseId, String samlRequest) {
         Response complianceToolSsoResponse = client
             .target(SSO_LOCATION)
             .request()
@@ -81,9 +88,15 @@ public class ComplianceToolService {
             .invoke();
 
         JSONObject complianceToolScenarios = new JSONObject(complianceToolScenariosResponse.readEntity(String.class));
-        JSONObject successCase = complianceToolScenarios.getJSONArray("testCases").getJSONObject(testCaseIndex);
+        for (Object object : complianceToolScenarios.getJSONArray("testCases")) {
+            JSONObject jsonObject = (JSONObject) object;
+            int id = jsonObject.getInt("id");
+            if (id == testCaseId) {
+                return jsonObject.getString("executeUri");
+            }
+        }
 
-        return successCase.getString("executeUri");
+        throw new RuntimeException("Couldn't find a test case with id + " + testCaseId);
     }
 
     private String extractSamlResponse(String complianceToolResponseBody) {
