@@ -54,7 +54,7 @@ public class HubMetadataFeatureTest {
             resourceFilePath("verify-service-provider-test.yml"),
             config("verifyHubMetadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
             config("verifyHubMetadata.trustStorePath", "verify-production-truststore.ts"),
-            config("msaMetadata.uri", () -> String.format("http://localhost:%s/matching-service/metadata", msaServer.port())),
+            config("msaMetadata.uri", msaServer::getUri),
             config("verifyHubMetadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubMetadata.trustStorePath", verifyHubKeystoreResource.getAbsolutePath()),

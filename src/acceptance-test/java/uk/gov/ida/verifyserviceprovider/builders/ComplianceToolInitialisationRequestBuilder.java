@@ -35,6 +35,7 @@ public class ComplianceToolInitialisationRequestBuilder {
         map.put("matchingServiceEntityId", matchingServiceEntityId);
         map.put("matchingServiceSigningPrivateKey", matchingServiceSigningPrivateKey);
         map.put("userAccountCreationAttributes", userAccountCreationAttributes);
+        map.put("useSimpleProfile", false);
 
         return Entity.json(map);
     }
@@ -52,6 +53,16 @@ public class ComplianceToolInitialisationRequestBuilder {
 
     public ComplianceToolInitialisationRequestBuilder withUserAccountCreationAttributes(List<String> userAccountCreationAttributes) {
         this.userAccountCreationAttributes = userAccountCreationAttributes;
+        return this;
+    }
+
+    public ComplianceToolInitialisationRequestBuilder withMatchingServiceSigningPrivateKey(String privateKey) {
+        this.matchingServiceSigningPrivateKey = privateKey;
+        return this;
+    }
+
+    public ComplianceToolInitialisationRequestBuilder withMatchingServiceEntityId(String matchingServiceEntityId) {
+        this.matchingServiceEntityId = matchingServiceEntityId;
         return this;
     }
 }

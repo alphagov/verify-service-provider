@@ -6,17 +6,25 @@ import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
+import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
 
 import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerifyServiceProviderApplication.class);
+
     private boolean fileSystemConfig;
 
     private VerifyServiceProviderApplication(boolean fileSystemConfig) {
@@ -60,12 +68,14 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
                 configuration.getSamlSigningKey());
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
 
+        environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
-
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
+
+        environment.lifecycle().addServerLifecycleListener(createServerLifecycleListener(configuration, environment));
     }
 
     private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
@@ -74,5 +84,13 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         } else {
             return new ResourceConfigurationSourceProvider();
         }
+    }
+
+    private ServerLifecycleListener createServerLifecycleListener(VerifyServiceProviderConfiguration config, Environment environment) {
+
+        return server -> {
+            ServerDetailFinder.ServerDetail serverDetail = ServerDetailFinder.fetchServerDetails(server, config, environment);
+            LOGGER.info(serverDetail.toLogOutputString());
+        };
     }
 }

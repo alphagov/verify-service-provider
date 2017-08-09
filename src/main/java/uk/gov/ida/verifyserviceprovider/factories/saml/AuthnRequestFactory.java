@@ -17,13 +17,14 @@ import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SignatureFactory;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NotImplementedPublicKey;
 
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.UUID;
+
+import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivateKey;
 
 public class AuthnRequestFactory {
 
@@ -61,7 +62,7 @@ public class AuthnRequestFactory {
     }
 
     private Signature createSignature() {
-        KeyPair signingKeyPair = new KeyPair(new NotImplementedPublicKey(signingKey), signingKey);
+        KeyPair signingKeyPair = new KeyPair(publicKeyFromPrivateKey(signingKey), signingKey);
         IdaKeyStore keyStore = new IdaKeyStore(signingKeyPair, Collections.emptyList());
         IdaKeyStoreCredentialRetriever keyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
         SignatureRSASHA256 signatureAlgorithm = new SignatureRSASHA256();
