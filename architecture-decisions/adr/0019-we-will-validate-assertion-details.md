@@ -48,11 +48,10 @@ We'll validate:
 * The `SubjectConfirmationData` method MUST be `...bearer`
 * If there's a `NotBefore` on the `SubjectConfirmationData` then it MUST be valid
 * There MUST be a `NotOnOrAfter` on the `SubjectConfirmationData` and it MUST be valid
-* There MUST be a `NotOnOrAfter` on the `SubjectConfirmationData` and it MUST be valid
 * `InResponseTo` MUST be present on the `SubjectConfirmationData` and it MUST be valid
 * `Conditions` MUST be present
 * If `Conditions` has `NotBefore` or `NotOnOrAfter` they MUST be valid
-* `Conditions` MUST NOT contain any `Condition`, `OneTimeUse` or `ProxyRestriction` elements
+* `Conditions` MUST NOT contain any `OneTimeUse` or `ProxyRestriction` elements
 * There MUST be exactly one `AudienceRestriction` and it must match our `entityID`
 
 

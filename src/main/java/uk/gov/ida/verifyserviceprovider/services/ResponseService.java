@@ -42,6 +42,6 @@ public class ResponseService {
 
         List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
 
-        return assertionTranslator.translate(assertions);
+        return assertionTranslator.translate(assertions, expectedInResponseTo);
     }
 }

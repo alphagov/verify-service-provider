@@ -24,7 +24,10 @@ public class VerifyServiceProviderFactory {
     ) {
         this.environment = environment;
         this.configuration = configuration;
-        this.responseFactory = new ResponseFactory(configuration.getSamlPrimaryEncryptionKey(), configuration.getSamlSecondaryEncryptionKey());
+        this.responseFactory = new ResponseFactory(
+            configuration.getServiceEntityId(),
+            configuration.getSamlPrimaryEncryptionKey(),
+            configuration.getSamlSecondaryEncryptionKey());
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {

@@ -20,9 +20,7 @@ import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.test.builders.ResponseBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
-import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
@@ -35,7 +33,6 @@ import java.security.PrivateKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
@@ -44,9 +41,11 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
@@ -55,6 +54,8 @@ import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.a
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
 
 public class ResponseServiceTest {
+
+    private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
     private ResponseService responseService;
 
@@ -76,11 +77,11 @@ public class ResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
 
         responseService = responseFactory.createResponseService(
             hubMetadataResolver,
-            new AssertionTranslator(mock(SamlAssertionsSignatureValidator.class))
+            new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, mock(SamlAssertionsSignatureValidator.class))
         );
     }
 
@@ -168,6 +169,12 @@ public class ResponseServiceTest {
                 anAssertion()
                     .withSubject(aSubject()
                         .withNameId(aNameId().withValue("some-pid").build())
+                        .build())
+                    .withConditions(aConditions()
+                        .withoutDefaultAudienceRestriction()
+                        .addAudienceRestriction(anAudienceRestriction()
+                            .withAudienceId(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
+                            .build())
                         .build())
                     .addAuthnStatement(anAuthnStatement()
                         .withAuthnContext(anAuthnContext()
