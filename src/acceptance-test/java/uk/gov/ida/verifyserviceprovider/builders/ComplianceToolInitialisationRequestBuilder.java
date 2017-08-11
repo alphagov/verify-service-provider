@@ -51,6 +51,11 @@ public class ComplianceToolInitialisationRequestBuilder {
         return this;
     }
 
+    public ComplianceToolInitialisationRequestBuilder withUserAccountCreationAttributes(List<String> userAccountCreationAttributes) {
+        this.userAccountCreationAttributes = userAccountCreationAttributes;
+        return this;
+    }
+
     public ComplianceToolInitialisationRequestBuilder withMatchingServiceSigningPrivateKey(String privateKey) {
         this.matchingServiceSigningPrivateKey = privateKey;
         return this;

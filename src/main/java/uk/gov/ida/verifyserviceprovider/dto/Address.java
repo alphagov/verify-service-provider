@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Address {
 
-    private final boolean verified;
     private final List<String> lines;
     private final String postCode;
     private final String internationalPostCode;
@@ -18,7 +17,6 @@ public class Address {
 
     @JsonCreator
     public Address(
-        @JsonProperty("verified") boolean verified,
         @JsonProperty("lines") List<String> lines,
         @JsonProperty("postCode") String postCode,
         @JsonProperty("internationalPostCode") String internationalPostCode,
@@ -26,17 +24,12 @@ public class Address {
         @JsonProperty("fromDate") LocalDate fromDate,
         @JsonProperty("toDate") LocalDate toDate
     ) {
-        this.verified = verified;
         this.lines = lines;
         this.postCode = postCode;
         this.internationalPostCode = internationalPostCode;
         this.uprn = uprn;
         this.fromDate = fromDate;
         this.toDate = toDate;
-    }
-
-    public boolean isVerified() {
-        return verified;
     }
 
     public List<String> getLines() {
@@ -70,7 +63,6 @@ public class Address {
 
         Address address = (Address) o;
 
-        if (verified != address.verified) return false;
         if (lines != null ? !lines.equals(address.lines) : address.lines != null) return false;
         if (postCode != null ? !postCode.equals(address.postCode) : address.postCode != null) return false;
         if (internationalPostCode != null ? !internationalPostCode.equals(address.internationalPostCode) : address.internationalPostCode != null)
@@ -82,8 +74,7 @@ public class Address {
 
     @Override
     public int hashCode() {
-        int result = (verified ? 1 : 0);
-        result = 31 * result + (lines != null ? lines.hashCode() : 0);
+        int result = lines != null ? lines.hashCode() : 0;
         result = 31 * result + (postCode != null ? postCode.hashCode() : 0);
         result = 31 * result + (internationalPostCode != null ? internationalPostCode.hashCode() : 0);
         result = 31 * result + (uprn != null ? uprn.hashCode() : 0);
@@ -95,7 +86,6 @@ public class Address {
     @Override
     public String toString() {
         return "Address{" +
-            "verified=" + verified +
             ", lines=" + lines +
             ", postCode='" + postCode + '\'' +
             ", internationalPostCode='" + internationalPostCode + '\'' +

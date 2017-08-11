@@ -1,81 +1,57 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class Attributes {
 
-    private final String firstName;
-    private final boolean firstNameVerified;
-    private final String middleName;
-    private final boolean middleNameVerified;
-    private final String surname;
-    private final boolean surnameVerified;
-    private final LocalDate dateOfBirth;
-    private final boolean dateOfBirthVerified;
-    private final Address address;
+    private final VerifiableAttribute<String> firstName;
+    private final VerifiableAttribute<String>  middleName;
+    private final VerifiableAttribute<String>  surname;
+    private final VerifiableAttribute<LocalDate> dateOfBirth;
+    private final VerifiableAttribute<Address> address;
     private final String cycle3;
 
     @JsonCreator
     public Attributes(
-        @JsonProperty("firstName") String firstName,
-        @JsonProperty("firstNameVerified") boolean firstNameVerified,
-        @JsonProperty("middleName") String middleName,
-        @JsonProperty("middleNameVerified") boolean middleNameVerified,
-        @JsonProperty("surname") String surname,
-        @JsonProperty("surnameVerified") boolean surnameVerified,
-        @JsonProperty("dateOfBirth") LocalDate dateOfBirth,
-        @JsonProperty("dateOfBirthVerified") boolean dateOfBirthVerified,
-        @JsonProperty("address") Address address,
+        @JsonProperty("firstName") VerifiableAttribute<String> firstName,
+        @JsonProperty("middleName") VerifiableAttribute<String> middleName,
+        @JsonProperty("surname") VerifiableAttribute<String> surname,
+        @JsonProperty("dateOfBirth") VerifiableAttribute<LocalDate> dateOfBirth,
+        @JsonProperty("address") VerifiableAttribute<Address> address,
         @JsonProperty("cycle3") String cycle3
     ) {
         this.firstName = firstName;
-        this.firstNameVerified = firstNameVerified;
         this.middleName = middleName;
-        this.middleNameVerified = middleNameVerified;
         this.surname = surname;
-        this.surnameVerified = surnameVerified;
         this.dateOfBirth = dateOfBirth;
-        this.dateOfBirthVerified = dateOfBirthVerified;
         this.address = address;
         this.cycle3 = cycle3;
     }
 
-    public String getFirstName() {
+    public VerifiableAttribute<String> getFirstName() {
         return firstName;
     }
 
-    public boolean isFirstNameVerified() {
-        return firstNameVerified;
-    }
-
-    public String getMiddleName() {
+    public VerifiableAttribute<String> getMiddleName() {
         return middleName;
     }
 
-    public boolean isMiddleNameVerified() {
-        return middleNameVerified;
-    }
-
-    public String getSurname() {
+    public VerifiableAttribute<String> getSurname() {
         return surname;
     }
 
-    public boolean isSurnameVerified() {
-        return surnameVerified;
-    }
-
-    public LocalDate getDateOfBirth() {
+    public VerifiableAttribute<LocalDate> getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public boolean isDateOfBirthVerified() {
-        return dateOfBirthVerified;
-    }
-
-    public Address getAddress() {
+    public VerifiableAttribute<Address> getAddress() {
         return address;
     }
 
@@ -89,11 +65,6 @@ public class Attributes {
         if (o == null || getClass() != o.getClass()) return false;
 
         Attributes that = (Attributes) o;
-
-        if (firstNameVerified != that.firstNameVerified) return false;
-        if (middleNameVerified != that.middleNameVerified) return false;
-        if (surnameVerified != that.surnameVerified) return false;
-        if (dateOfBirthVerified != that.dateOfBirthVerified) return false;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (middleName != null ? !middleName.equals(that.middleName) : that.middleName != null) return false;
         if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
@@ -105,13 +76,9 @@ public class Attributes {
     @Override
     public int hashCode() {
         int result = firstName != null ? firstName.hashCode() : 0;
-        result = 31 * result + (firstNameVerified ? 1 : 0);
         result = 31 * result + (middleName != null ? middleName.hashCode() : 0);
-        result = 31 * result + (middleNameVerified ? 1 : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
-        result = 31 * result + (surnameVerified ? 1 : 0);
         result = 31 * result + (dateOfBirth != null ? dateOfBirth.hashCode() : 0);
-        result = 31 * result + (dateOfBirthVerified ? 1 : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (cycle3 != null ? cycle3.hashCode() : 0);
         return result;
@@ -119,18 +86,9 @@ public class Attributes {
 
     @Override
     public String toString() {
-        return "Attributes{" +
-            "firstName='" + firstName + '\'' +
-            ", firstNameVerified=" + firstNameVerified +
-            ", middleName='" + middleName + '\'' +
-            ", middleNameVerified=" + middleNameVerified +
-            ", surname='" + surname + '\'' +
-            ", surnameVerified=" + surnameVerified +
-            ", dateOfBirth=" + dateOfBirth +
-            ", dateOfBirthVerified=" + dateOfBirthVerified +
-            ", address=" + address +
-            ", cycle3='" + cycle3 + '\'' +
-            '}';
+        return String.format(
+            "Attributes{ firstName=%s, middleName=%s, surname=%s, dateOfBirth=%s, address=%s, cycle3=%s}",
+            firstName, middleName, surname, dateOfBirth, address, cycle3);
     }
 
 }

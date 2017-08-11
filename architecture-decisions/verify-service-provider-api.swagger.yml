@@ -78,6 +78,16 @@ definitions:
       - LEVEL_1
       - LEVEL_2
       - LEVEL_3
+  Scenario:
+      type: string
+      enum:
+        - SUCCESS_MATCH
+        - ACCOUNT_CREATION
+        - NO_MATCH                                                                                                         |
+        - CANCELLATION                                                                                                     |
+        - AUTHENTICATION_FAILED                                                                                           |
+        - REQUEST_ERROR                                                                                                 |
+        - INTERNAL_SERVER_ERROR
   RequestGenerationBody:
     type: object
     properties:
@@ -125,8 +135,11 @@ definitions:
   TranslatedResponseBody:
     type: object
     required:
+      - scenario
       - pid
     properties:
+      scenario:
+        $ref: '#/definitions/Scenario'
       pid:
         description: >-
           A unique identifier that can identify a user against an internal
@@ -160,23 +173,41 @@ definitions:
     type: object
     properties:
       firstName:
-        type: string
-      firstNameVerified:
-        type: boolean
+        type: object
+        properties:
+          value:
+            type: string
+          verified:
+            type: boolean
       middleName:
-        type: string
-      middleNameVerified:
-        type: boolean
+        type: object
+        properties:
+          value:
+            type: string
+          verified:
+            type: boolean
       surname:
-        type: string
-      surnameVerified:
-        type: boolean
+        type: object
+        properties:
+          value:
+            type: string
+          verified:
+            type: boolean
       dateOfBirth:
-        type: string
-      dateOfBirthVerified:
-        type: boolean
+        type: object
+        properties:
+          value:
+            description: Format yyyy-MM-dd
+            type: string
+          verified:
+            type: boolean
       address:
-        $ref: '#/definitions/Address'
+        type: object
+        properties:
+          value:
+            $ref: '#/definitions/Address'
+          verified:
+            type: boolean
       cycle3:
         type: string
   Address:
@@ -184,8 +215,6 @@ definitions:
       An object describing the address fields of a user
     type: object
     properties:
-      verified:
-        type: boolean
       lines:
         type: array
         items:
@@ -195,4 +224,10 @@ definitions:
       internationalPostCode:
         type: string
       uprn:
+        type: string
+      fromDate:
+        description: Format yyyy-MM-dd
+        type: string
+      toDate:
+        description: Format yyyy-MM-dd
         type: string

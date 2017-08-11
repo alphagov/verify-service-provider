@@ -59,6 +59,7 @@ import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilde
 import static uk.gov.ida.saml.core.test.builders.metadata.IdpSsoDescriptorBuilder.anIdpSsoDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class AssertionTranslatorTest {
 
@@ -101,7 +102,7 @@ public class AssertionTranslatorTest {
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO);
         assertThat(result).isEqualTo(new TranslatedResponseBody(
-            "MATCH",
+            SUCCESS_MATCH,
             "some-pid",
             LEVEL_2,
             null

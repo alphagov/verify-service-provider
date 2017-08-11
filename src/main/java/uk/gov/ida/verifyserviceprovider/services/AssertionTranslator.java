@@ -1,17 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import org.joda.time.DateTime;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.Audience;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
-import org.opensaml.saml.saml2.core.AuthnContext;
-import org.opensaml.saml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.NameID;
-import org.opensaml.saml.saml2.core.Subject;
-import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -24,6 +14,8 @@ import static java.util.Optional.ofNullable;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class AssertionTranslator {
     private final String verifyServiceProviderEntityId;
@@ -65,13 +57,23 @@ public class AssertionTranslator {
             throw new SamlResponseValidationException("Level of assurance '" + levelOfAssuranceString + "' is not supported.");
         }
 
-        return new TranslatedResponseBody(
-            "MATCH",
-            nameID.getValue(),
-            levelOfAssurance,
-            null
-        );
-
+        List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
+        if (attributeStatements.isEmpty()) {
+            return new TranslatedResponseBody(
+                SUCCESS_MATCH,
+                nameID.getValue(),
+                levelOfAssurance,
+                null
+            );
+        } else {
+            // Assume it is user account creation
+            return new TranslatedResponseBody(
+                ACCOUNT_CREATION,
+                nameID.getValue(),
+                levelOfAssurance,
+                AttributeTranslationService.translateAttributes(attributeStatements.get(0))
+            );
+        }
     }
 
     private void validateConditions(Conditions conditionsElement) {
