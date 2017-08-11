@@ -7,6 +7,8 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,7 +32,7 @@ public class GenerateAuthnRequestResource {
     }
 
     @POST
-    public Response generateAuthnRequest(RequestGenerationBody requestGenerationBody) {
+    public Response generateAuthnRequest(@NotNull @Valid RequestGenerationBody requestGenerationBody) {
         AuthnRequest authnRequest = this.authnRequestFactory.build(requestGenerationBody.getLevelOfAssurance());
         XmlObjectToBase64EncodedStringTransformer xmlToBase64Transformer = new XmlObjectToBase64EncodedStringTransformer();
         String samlRequest = xmlToBase64Transformer.apply(authnRequest);

@@ -7,6 +7,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,7 +30,7 @@ public class TranslateSamlResponseResource {
     }
 
     @POST
-    public Response translateResponse(@Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
+    public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         try {
             return Response
                 .ok(responseService.convertTranslatedResponseBody(

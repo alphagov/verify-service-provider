@@ -41,9 +41,11 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
@@ -53,6 +55,8 @@ import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class ResponseServiceTest {
+
+    private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
     private ResponseService responseService;
 
@@ -74,11 +78,11 @@ public class ResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
 
         responseService = responseFactory.createResponseService(
             hubMetadataResolver,
-            new AssertionTranslator(mock(SamlAssertionsSignatureValidator.class))
+            new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, mock(SamlAssertionsSignatureValidator.class))
         );
     }
 
@@ -106,8 +110,11 @@ public class ResponseServiceTest {
         ));
     }
 
-    @Test(expected = SamlTransformationErrorException.class)
+    @Test
     public void shouldFailValidationWhenMetadataDoesNotContainCorrectCertificate() throws Exception {
+        expectedException.expect(SamlTransformationErrorException.class);
+        expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
+
         Response response = createResponseSignedBy(testRpSigningCredential);
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_PUBLIC_CERT);
 
@@ -119,8 +126,11 @@ public class ResponseServiceTest {
         );
     }
 
-    @Test(expected = SamlTransformationErrorException.class)
+    @Test
     public void shouldFailValidationWhenResponseIsNotSigned() throws Exception {
+        expectedException.expect(SamlTransformationErrorException.class);
+        expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
+
         Response response = createResponseBuilder().withoutSigning().build();
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
 
@@ -132,8 +142,11 @@ public class ResponseServiceTest {
         );
     }
 
-    @Test(expected = SamlResponseValidationException.class)
+    @Test
     public void shouldFailWhenInResponseToDoesNotMatchRequestId() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Expected InResponseTo to be some-incorrect-request-id, but was default-request-id");
+
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
         Response response = createResponseSignedBy(testRpSigningCredential);
@@ -166,6 +179,12 @@ public class ResponseServiceTest {
                 anAssertion()
                     .withSubject(aSubject()
                         .withNameId(aNameId().withValue("some-pid").build())
+                        .build())
+                    .withConditions(aConditions()
+                        .withoutDefaultAudienceRestriction()
+                        .addAudienceRestriction(anAudienceRestriction()
+                            .withAudienceId(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
+                            .build())
                         .build())
                     .addAuthnStatement(anAuthnStatement()
                         .withAuthnContext(anAuthnContext()
