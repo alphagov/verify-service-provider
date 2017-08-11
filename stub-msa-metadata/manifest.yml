@@ -1,0 +1,5 @@
+---
+applications:
+- name: verify-service-provider-stub-msa-metadata
+  memory: 64M
+  buildpack: staticfile_buildpack

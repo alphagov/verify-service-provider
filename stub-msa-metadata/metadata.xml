@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" validUntil="2817-08-10T15:43:34.900Z">
+  <md:EntityDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" entityID="https://verify-service-provider-stub-msa" xsi:type="md:EntityDescriptorType">
+    <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" xsi:type="md:IDPSSODescriptorType">
+      <md:KeyDescriptor use="signing" xsi:type="md:KeyDescriptorType">
+        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xsi:type="ds:KeyInfoType">
+          <ds:KeyName>https://verify-service-provider-stub-msa</ds:KeyName>
+          <ds:X509Data xsi:type="ds:X509DataType">
+            <ds:X509Certificate>MIICtDCCAZwCCQCI1LzEa0eJ6jANBgkqhkiG9w0BAQsFADAbMRkwFwYDVQQDExBT
+dHViIE1TQSBTaWduaW5nMCAXDTE3MDgxMDE1MTE0NFoYDzIxMTcwNzE3MTUxMTQ0
+WjAbMRkwFwYDVQQDExBTdHViIE1TQSBTaWduaW5nMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEA0GkWg+cNCcrYUMebZtuqP1e6ZggmQisnStHUDe95aHt/
+TJmy4ih0JYn/oe+KguOXQWObT3qtK9apkzeh8bnQA1XkBzR5iw8FSS3iSfPvBm82
+XEDwrLxBEWNG9Pz1SDVfanRo43qg+LiteVVVoDcMdC6OEgrnykWSq2s3ybWFpPzK
+wWqGEOzBKBJWh4zH4zIgrDuGFF4tdeG9iPH73dJLM/YhRCx2T4VbBtfSqa5v57aH
+5yUSWv7/bpytMSzVLdYdtpeIxQ23XYOf9qpuaAyMu04GmEeqE9aBhPUzSeNKKNAs
+DCDAkkMMw4VAWDALHQcsGUJIz8SOr3Rl130SeCR3mQIDAQABMA0GCSqGSIb3DQEB
+CwUAA4IBAQAegleVEFsIk1psHgWs8iaxSNMIDzBuiYlOEbMFelLBn2Eo8ktxBDkp
+vL1kpXhbyY8jwko9PcKNa1w8RRk8irnxdr1kcCkaqgYUOfdveb+R+IuNK1QXJ7jS
+1HmgBh9iDSj6QVi7kGur7R3aOTBRNsq3BPQSHqrBywHK/PVV78NVXmtISLmTUCHh
+hYVqPyOo7Tr/dBIulJMbYhZCN5+n9hmbuk+Amqk8P8jV1ladlMzh3SBJPWeDof8+
+YGVZVwUbCvYvpEdQVKJIxwclLBN92nwUua77G/3FkSZ/xncTZnXKAMpfbgg3pB4l
+nx13JhSPXZnB+t2rL+V6ppqwbCI/z3EO</ds:X509Certificate>
+          </ds:X509Data>
+        </ds:KeyInfo>
+      </md:KeyDescriptor>
+      <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"/>
+    </md:IDPSSODescriptor>
+  </md:EntityDescriptor>
+</md:EntitiesDescriptor>
