@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 
@@ -231,18 +232,5 @@ public class AttributeTranslationServiceTests {
             .build();
 
         AttributeTranslationService.translateAttributes(attributeStatement);
-    }
-
-    private Attribute createVerifiedAttribute(String name, boolean value) {
-        Attribute attribute = new OpenSamlXmlObjectFactory().createAttribute();
-        attribute.setName(name);
-
-        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-        Verified verifiedValue = (Verified) builderFactory.getBuilder(Verified.TYPE_NAME).buildObject(Verified.DEFAULT_ELEMENT_NAME, Verified.TYPE_NAME);
-        verifiedValue.setValue(value);
-
-        attribute.getAttributeValues().add(verifiedValue);
-
-        return attribute;
     }
 }

@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -33,7 +34,7 @@ import static uk.gov.ida.verifyserviceprovider.configuration.MetadataUri.COMPLIA
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class ResponseAcceptanceTest {
+public class InvalidSamlAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
@@ -66,29 +67,6 @@ public class ResponseAcceptanceTest {
                 .withEncryptionCertificate(TEST_RP_PUBLIC_ENCRYPTION_CERT)
                 .withExpectedPid("some-expected-pid")
                 .build()
-        );
-    }
-
-    @Test
-    public void shouldHandleASuccessMatchResponse() {
-        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
-        Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createSuccessMatchResponseFor(requestResponseBody.getSamlRequest()),
-            "requestId", requestResponseBody.getRequestId()
-        );
-
-        Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
-
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class)).isEqualTo(new TranslatedResponseBody(
-            SUCCESS_MATCH,
-            "some-expected-pid",
-            LEVEL_2,
-            null)
         );
     }
 
