@@ -1,6 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
-import com.google.common.collect.Lists;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
@@ -16,6 +15,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
 
 public class AttributeTranslationService {
 
@@ -91,7 +92,7 @@ public class AttributeTranslationService {
 
     private static Address toAddress(AddressImpl address) {
         return new Address(
-            Lists.transform(address.getLines(), StringValueSamlObject::getValue),
+            address.getLines().stream().map(StringValueSamlObject::getValue).collect(toList()),
             getValueOrNull(address.getPostCode()),
             getValueOrNull(address.getInternationalPostCode()),
             getValueOrNull(address.getUPRN()),

@@ -19,9 +19,9 @@ public class VerifiableAttribute<T> {
         this.verified = verified;
     }
 
-    public static VerifiableAttribute fromOptionals(Optional value, Optional<Boolean> verified) {
+    public static <Y> VerifiableAttribute<Y> fromOptionals(Optional<Y> value, Optional<Boolean> verified) {
         if (value.isPresent() && verified.isPresent()) {
-            return new VerifiableAttribute(value.get(), verified.get());
+            return new VerifiableAttribute<>(value.get(), verified.get());
         }
 
         if (!value.isPresent() && !verified.isPresent()) {
