@@ -1,10 +1,11 @@
-package uk.gov.ida.verifyserviceprovider.utils;
+package unit.uk.gov.ida.verifyserviceprovider.utils;
 
 import io.dropwizard.jetty.MutableServletContextHandler;
 import io.dropwizard.setup.Environment;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

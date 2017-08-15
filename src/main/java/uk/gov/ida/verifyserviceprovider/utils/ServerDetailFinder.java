@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
  */
 public class ServerDetailFinder {
 
-    static final String DROPWIZARD_CONNECTOR_APPLICATION = "application";
+    public static final String DROPWIZARD_CONNECTOR_APPLICATION = "application";
 
-    static final String DROPWIZARD_CONNECTOR_ADMIN = "admin";
+    public static final String DROPWIZARD_CONNECTOR_ADMIN = "admin";
 
-    static final String DROPWIZARD_PROTOCOL_SSL = "SSL";
+    public static final String DROPWIZARD_PROTOCOL_SSL = "SSL";
 
-    static final String DROPWIZARD_PROTOCOL_HTTP = "HTTP";
+    public static final String DROPWIZARD_PROTOCOL_HTTP = "HTTP";
 
     public static ServerDetail fetchServerDetails(Server server, Configuration config, Environment environment) {
 
@@ -34,7 +34,7 @@ public class ServerDetailFinder {
         }
     }
 
-    static ServerDetail fetchStandardServerDetails(Environment environment, Server server) {
+    public static ServerDetail fetchStandardServerDetails(Environment environment, Server server) {
 
         Map<String, Integer> adminConnectorDetails = extractPortDetailsByConnectorType(server, DROPWIZARD_CONNECTOR_ADMIN);
         Map<String, Integer> appConnectorDetails = extractPortDetailsByConnectorType(server, DROPWIZARD_CONNECTOR_APPLICATION);
@@ -48,7 +48,7 @@ public class ServerDetailFinder {
                 adminConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL));
     }
 
-    static ServerDetail fetchSimpleServerDetail(Environment environment, Server server) {
+    public static ServerDetail fetchSimpleServerDetail(Environment environment, Server server) {
         for (Connector connector : server.getConnectors()) {
             if (connector instanceof ServerConnector) {
                 ServerConnector serverConnector = (ServerConnector) connector;
@@ -97,7 +97,7 @@ public class ServerDetailFinder {
 
         private final Integer adminHttpsPort;
 
-        ServerDetail(String applicationName, String adminPath,
+        public ServerDetail(String applicationName, String adminPath,
                             Integer serverHttpPort, Integer serverHttpsPort,
                             Integer adminHttpPort, Integer adminHttpsPort) {
             this.applicationName = applicationName;
@@ -137,47 +137,47 @@ public class ServerDetailFinder {
             return sb.toString();
         }
 
-        String generateApplicationBaseUrl(boolean isSsl) {
+        public String generateApplicationBaseUrl(boolean isSsl) {
             String baseUrl = isSsl ? HTTPS_LOCAL_HOST_BASE_URL : HTTP_LOCAL_HOST_BASE_URL;
             int port = isSsl ? serverHttpsPort : serverHttpPort;
             return baseUrl + ":" + port;
         }
 
-        String generateAdminBaseUrl(boolean isSsl) {
+        public String generateAdminBaseUrl(boolean isSsl) {
             String baseUrl = isSsl ? HTTPS_LOCAL_HOST_BASE_URL : HTTP_LOCAL_HOST_BASE_URL;
             int port = isSsl ? adminHttpsPort : adminHttpPort;
             return baseUrl + ":" + port;
         }
 
-        String generateAdminUrl(boolean isSsl) {
+        public String generateAdminUrl(boolean isSsl) {
             return generateAdminBaseUrl(isSsl) + adminPath + "?pretty=true";
         }
 
-        String generateHealthcheckUrl(boolean isSsl) {
+        public String generateHealthcheckUrl(boolean isSsl) {
             return generateAdminBaseUrl(isSsl) + adminPath + "/healthcheck?pretty=true";
         }
 
-        String getApplicationName() {
+        public String getApplicationName() {
             return applicationName;
         }
 
-        String getAdminPath() {
+        public String getAdminPath() {
             return adminPath;
         }
 
-        Integer getServerHttpPort() {
+        public Integer getServerHttpPort() {
             return serverHttpPort;
         }
 
-        Integer getServerHttpsPort() {
+        public Integer getServerHttpsPort() {
             return serverHttpsPort;
         }
 
-        Integer getAdminHttpPort() {
+        public Integer getAdminHttpPort() {
             return adminHttpPort;
         }
 
-        Integer getAdminHttpsPort() {
+        public Integer getAdminHttpsPort() {
             return adminHttpsPort;
         }
 

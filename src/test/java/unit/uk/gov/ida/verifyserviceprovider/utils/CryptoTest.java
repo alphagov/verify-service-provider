@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.utils;
+package unit.uk.gov.ida.verifyserviceprovider.utils;
 
 import org.junit.Test;
 
