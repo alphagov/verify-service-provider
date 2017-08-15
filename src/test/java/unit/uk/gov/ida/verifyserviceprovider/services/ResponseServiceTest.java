@@ -9,16 +9,23 @@ import org.junit.rules.ExpectedException;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
+import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.ResponseBuilder;
+import uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
@@ -31,6 +38,7 @@ import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
 import java.security.PrivateKey;
 
+import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -41,6 +49,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
@@ -48,10 +57,14 @@ import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnSt
 import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
+import static uk.gov.ida.saml.core.test.builders.StatusBuilder.aStatus;
+import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.NO_MATCH;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class ResponseServiceTest {
@@ -81,8 +94,8 @@ public class ResponseServiceTest {
         ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
 
         responseService = responseFactory.createResponseService(
-            hubMetadataResolver,
-            new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, mock(SamlAssertionsSignatureValidator.class))
+                hubMetadataResolver,
+                new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, mock(SamlAssertionsSignatureValidator.class))
         );
     }
 
@@ -92,22 +105,112 @@ public class ResponseServiceTest {
     }
 
     @Test
-    public void shouldConvertTranslatedResponseBody() throws Exception {
+    public void shouldHandleSuccessMatchSaml() throws Exception {
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
-        Response response = createResponseSignedBy(testRpSigningCredential);
+
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
-            responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
         );
 
         assertThat(result).isEqualTo(new TranslatedResponseBody(
-            SUCCESS_MATCH,
-            "some-pid",
-            LevelOfAssurance.LEVEL_2,
-            null
+                SUCCESS_MATCH,
+                "some-pid",
+                LevelOfAssurance.LEVEL_2,
+                null
         ));
+    }
+
+    @Test
+    public void shouldHandleAccountCreationSaml() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = signResponse(createAttributeResponseBuilder(successStatus), testRpSigningCredential);
+
+        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
+        );
+
+        assertThat(result.getScenario()).isEqualTo(ACCOUNT_CREATION);
+        assertThat(result.getAttributes()).isNotNull();
+    }
+
+    @Test
+    public void shouldHandleNoMatchSaml() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Status noMatchStatus = aStatus().
+                withStatusCode(
+                        aStatusCode()
+                                .withValue(StatusCode.RESPONDER)
+                                .withSubStatusCode(aStatusCode().withValue(SamlStatusCode.NO_MATCH).build())
+                                .build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
+
+        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
+        );
+
+        assertThat(result.getScenario()).isEqualTo(NO_MATCH);
+    }
+
+    @Test
+    public void shouldFailWhenUnrecognizedStatus() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Unknown SAML status: UNKNOWN");
+
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Status noMatchStatus = aStatus().
+                withStatusCode(
+                        aStatusCode()
+                                .withValue("UNKNOWN")
+                                .build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
+
+        responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
+        );
+    }
+
+    @Test
+    public void shouldFailWhenUnrecognizedSubStatus() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Unknown SAML sub-status: UNKNOWN");
+
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Status noMatchStatus = aStatus().
+                withStatusCode(
+                        aStatusCode()
+                                .withValue(StatusCode.RESPONDER)
+                                .withSubStatusCode(aStatusCode().withValue("UNKNOWN").build())
+                                .build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
+
+        responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
+        );
     }
 
     @Test
@@ -115,14 +218,17 @@ public class ResponseServiceTest {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
 
-        Response response = createResponseSignedBy(testRpSigningCredential);
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_PUBLIC_CERT);
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
         responseService.convertTranslatedResponseBody(
-            responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
         );
     }
 
@@ -131,14 +237,17 @@ public class ResponseServiceTest {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
 
-        Response response = createResponseBuilder().withoutSigning().build();
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = createNoAttributeResponseBuilder(successStatus).withoutSigning().build();
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
         responseService.convertTranslatedResponseBody(
-            responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo()
         );
     }
 
@@ -149,51 +258,78 @@ public class ResponseServiceTest {
 
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
-        Response response = createResponseSignedBy(testRpSigningCredential);
+
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
         responseService.convertTranslatedResponseBody(
-            responseToBase64StringTransformer.apply(response),
-            "some-incorrect-request-id"
+                responseToBase64StringTransformer.apply(response),
+                "some-incorrect-request-id"
         );
     }
 
     private EntityDescriptor createEntityDescriptorWithSigningCertificate(String signingCert) throws MarshallingException, SignatureException {
         return anEntityDescriptor()
-            .addSpServiceDescriptor(anSpServiceDescriptor()
-                .withoutDefaultSigningKey()
-                .addKeyDescriptor(aKeyDescriptor().withX509ForSigning(signingCert).build())
-                .build()
-            )
-            .build();
+                .addSpServiceDescriptor(anSpServiceDescriptor()
+                        .withoutDefaultSigningKey()
+                        .addKeyDescriptor(aKeyDescriptor().withX509ForSigning(signingCert).build())
+                        .build()
+                )
+                .build();
     }
 
-    private Response createResponseSignedBy(Credential signingCredential) throws MarshallingException, SignatureException {
-        return createResponseBuilder()
-            .withSigningCredential(signingCredential).build();
+    private Response signResponse(ResponseBuilder responseBuilder, Credential signingCredential) throws MarshallingException, SignatureException {
+        return responseBuilder
+                .withSigningCredential(signingCredential).build();
     }
 
-    private ResponseBuilder createResponseBuilder() {
+    private ResponseBuilder createNoAttributeResponseBuilder(Status samlStatus) {
         return aResponse()
-            .withNoDefaultAssertion()
-            .addEncryptedAssertion(
-                anAssertion()
-                    .withSubject(aSubject()
-                        .withNameId(aNameId().withValue("some-pid").build())
-                        .build())
-                    .withConditions(aConditions()
-                        .withoutDefaultAudienceRestriction()
-                        .addAudienceRestriction(anAudienceRestriction()
-                            .withAudienceId(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
-                            .build())
-                        .build())
-                    .addAuthnStatement(anAuthnStatement()
-                        .withAuthnContext(anAuthnContext()
-                            .withAuthnContextClassRef(anAuthnContextClassRef()
-                                .withAuthnContextClasRefValue(IdaAuthnContext.LEVEL_2_AUTHN_CTX)
-                                .build())
-                            .build())
-                        .build())
-                    .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
-            );
+                .withStatus(samlStatus)
+                .withNoDefaultAssertion()
+                .addEncryptedAssertion(aDefaultAssertion()
+                        .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
+                );
     }
+
+    private ResponseBuilder createAttributeResponseBuilder(Status samlStatus) {
+        return aResponse()
+                .withStatus(samlStatus)
+                .withNoDefaultAssertion()
+                .addEncryptedAssertion(aDefaultAssertion()
+                        .addAttributeStatement(
+                                anAttributeStatement()
+                                        .addAttribute(new SimpleStringAttributeBuilder()
+                                                .withName("FIRST_NAME")
+                                                .withSimpleStringValue("Bob")
+                                                .build())
+                                        .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+                                        .build())
+                            .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
+                    );
+    }
+
+    private AssertionBuilder aDefaultAssertion() {
+        return
+                anAssertion()
+                        .withSubject(aSubject()
+                                .withNameId(aNameId().withValue("some-pid").build())
+                                .build())
+                        .withConditions(aConditions()
+                                .withoutDefaultAudienceRestriction()
+                                .addAudienceRestriction(anAudienceRestriction()
+                                        .withAudienceId(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
+                                        .build())
+                                .build())
+                        .addAuthnStatement(anAuthnStatement()
+                                .withAuthnContext(anAuthnContext()
+                                        .withAuthnContextClassRef(anAuthnContextClassRef()
+                                                .withAuthnContextClasRefValue(IdaAuthnContext.LEVEL_2_AUTHN_CTX)
+                                                .build())
+                                        .build())
+                                .build());
+    }
+
 }
