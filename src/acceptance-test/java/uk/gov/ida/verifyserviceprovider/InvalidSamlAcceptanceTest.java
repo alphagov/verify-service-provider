@@ -2,10 +2,10 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
@@ -51,10 +51,10 @@ public class InvalidSamlAcceptanceTest {
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
-        ErrorBody errorBody = response.readEntity(ErrorBody.class);
+        ErrorMessage errorBody = response.readEntity(ErrorMessage.class);
 
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-        assertThat(errorBody.getReason()).isEqualTo("BAD_REQUEST");
+        assertThat(errorBody.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
         assertThat(errorBody.getMessage()).contains("SAML Validation Specification: Signature was not valid.");
     }
 }

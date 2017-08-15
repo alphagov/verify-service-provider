@@ -1,9 +1,9 @@
 package uk.gov.ida.verifyserviceprovider.exceptions;
 
+import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.jersey.validation.ConstraintMessage;
 import io.dropwizard.jersey.validation.JerseyViolationException;
 import org.apache.http.HttpStatus;
-import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -18,7 +18,7 @@ public class JerseyViolationExceptionMapper implements ExceptionMapper<JerseyVio
 
         return Response
             .status(HttpStatus.SC_UNPROCESSABLE_ENTITY)
-            .entity(new ErrorBody(String.valueOf(HttpStatus.SC_UNPROCESSABLE_ENTITY), errors))
+            .entity(new ErrorMessage(HttpStatus.SC_UNPROCESSABLE_ENTITY, errors))
             .build();
     }
 }

@@ -2,10 +2,10 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import org.json.JSONObject;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
@@ -85,7 +85,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         Response response = getResponse("DATE_OF_BIRTH_VERIFIED");
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
-        ErrorBody errorResponse = response.readEntity(ErrorBody.class);
+        ErrorMessage errorResponse = response.readEntity(ErrorMessage.class);
 
         assertThat(errorResponse.getMessage()).isEqualTo("Invalid attributes request: Cannot request verification status without requesting attribute value");
     }
@@ -95,7 +95,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         Response response = getResponse("SURNAME");
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
-        ErrorBody errorResponse = response.readEntity(ErrorBody.class);
+        ErrorMessage errorResponse = response.readEntity(ErrorMessage.class);
 
         assertThat(errorResponse.getMessage()).isEqualTo("Invalid attributes request: Cannot request attribute without requesting verification status. Please check your MSA configuration settings.");
     }

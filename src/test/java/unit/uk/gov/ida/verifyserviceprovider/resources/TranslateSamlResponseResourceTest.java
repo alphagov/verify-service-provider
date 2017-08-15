@@ -1,6 +1,7 @@
 package unit.uk.gov.ida.verifyserviceprovider.resources;
 
 import com.google.common.collect.ImmutableSet;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Level;
@@ -11,8 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.verifyserviceprovider.dto.ErrorBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
+import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
@@ -41,6 +42,7 @@ public class TranslateSamlResponseResourceTest {
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
         .addProvider(JerseyViolationExceptionMapper.class)
+        .addProvider(JsonProcessingExceptionMapper.class)
         .addResource(new TranslateSamlResponseResource(responseService))
         .build();
 
@@ -75,8 +77,8 @@ public class TranslateSamlResponseResourceTest {
 
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
-        ErrorBody actualError = response.readEntity(ErrorBody.class);
-        assertThat(actualError.getReason()).isEqualTo(BAD_REQUEST.name());
+        ErrorMessage actualError = response.readEntity(ErrorMessage.class);
+        assertThat(actualError.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
         assertThat(actualError.getMessage()).isEqualTo("Some error.");
     }
 
@@ -93,8 +95,8 @@ public class TranslateSamlResponseResourceTest {
 
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
-        ErrorBody actualError = response.readEntity(ErrorBody.class);
-        assertThat(actualError.getReason()).isEqualTo(BAD_REQUEST.name());
+        ErrorMessage actualError = response.readEntity(ErrorMessage.class);
+        assertThat(actualError.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
         assertThat(actualError.getMessage()).isEqualTo("Some error.");
     }
 
@@ -107,11 +109,11 @@ public class TranslateSamlResponseResourceTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_UNPROCESSABLE_ENTITY);
 
-        ErrorBody actualErrorBody = response.readEntity(ErrorBody.class);
-        assertThat(actualErrorBody.getReason()).isEqualTo(String.valueOf(HttpStatus.SC_UNPROCESSABLE_ENTITY));
+        ErrorMessage actualErrorMessage = response.readEntity(ErrorMessage.class);
+        assertThat(actualErrorMessage.getCode()).isEqualTo(HttpStatus.SC_UNPROCESSABLE_ENTITY);
 
         Set<String> expectedErrors = ImmutableSet.of("requestId may not be null", "samlResponse may not be null");
-        Set<String> actualErrors = Arrays.stream(actualErrorBody.getMessage().split(", ")).collect(Collectors.toSet());
+        Set<String> actualErrors = Arrays.stream(actualErrorMessage.getMessage().split(", ")).collect(Collectors.toSet());
         assertThat(actualErrors).isEqualTo(expectedErrors);
     }
 
