@@ -52,7 +52,6 @@ public class ResponseService {
                 return translateNonSuccessResponse(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
-
                 return assertionTranslator.translate(assertions, expectedInResponseTo);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
@@ -67,6 +66,8 @@ public class ResponseService {
         switch (subStatus) {
             case SamlStatusCode.NO_MATCH:
                 return new TranslatedResponseBody(Scenario.NO_MATCH, null, null, null);
+            case "urn:oasis:names:tc:SAML:2.0:status:Requester":
+                return new TranslatedResponseBody(Scenario.REQUEST_ERROR, null, null, null);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
         }
