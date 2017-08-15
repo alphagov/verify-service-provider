@@ -18,6 +18,7 @@ import java.util.Map;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID;
 
 public class InvalidSamlAcceptanceTest {
 
@@ -40,7 +41,7 @@ public class InvalidSamlAcceptanceTest {
     public void shouldRespondWithErrorWhenAssertionSignedByHub() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createIncorrectlySignedMatchResponseFor(requestResponseBody.getSamlRequest()),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID),
             "requestId", requestResponseBody.getRequestId()
         );
 

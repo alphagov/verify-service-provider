@@ -25,6 +25,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVAT
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
 
 public class UserAccountCreationResponseAcceptanceTest {
 
@@ -113,7 +114,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
 
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createUserAccountCreationResponseFor(requestResponseBody.getSamlRequest()),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), ACCOUNT_CREATION_LOA2_ID),
             "requestId", requestResponseBody.getRequestId()
         );
 

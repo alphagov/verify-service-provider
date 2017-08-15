@@ -24,7 +24,7 @@ public class ComplianceToolService {
     private static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
     public static final String SSO_LOCATION = HOST + "/SAML2/SSO";
 
-    private static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID = 1;
+    public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID = 1;
     public static final int BASIC_NO_MATCH_ID = 2;
     public static final int NO_AUTHENTICATION_CONTEXT_ID = 3;
     // public static final int AUTHENTICATION_FAILED_ID = 4;
@@ -32,7 +32,7 @@ public class ComplianceToolService {
     public static final int ACCOUNT_CREATION_LOA2_ID = 6;
     // public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID = 7;
     // public static final int ACCOUNT_CREATION_LOA1_ID = 8;
-    private static final int BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID = 9;
+    public static final int BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID = 9;
 
     private final Client client;
 
@@ -65,28 +65,8 @@ public class ComplianceToolService {
         );
     }
 
-    public String createSuccessMatchResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID, samlRequest));
-    }
-
-    public String createNoMatchResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(BASIC_NO_MATCH_ID, samlRequest));
-    }
-
-    public String createNoAuthnContextResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(NO_AUTHENTICATION_CONTEXT_ID, samlRequest));
-    }
-
-    public String createErrorResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(REQUESTER_ERROR_ID, samlRequest));
-    }
-
-    public String createUserAccountCreationResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(ACCOUNT_CREATION_LOA2_ID, samlRequest));
-    }
-
-    public String createIncorrectlySignedMatchResponseFor(String samlRequest) {
-        return getExtractedSamlResponse(getResponseUrlById(BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID, samlRequest));
+    public String createResponseFor(String samlRequest, int testCaseId) {
+        return getExtractedSamlResponse(getResponseUrlById(testCaseId, samlRequest));
     }
 
     private String getExtractedSamlResponse(String endpoint) {

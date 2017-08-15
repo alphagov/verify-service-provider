@@ -19,6 +19,7 @@ import java.util.Map;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_ID;
 
 public class NoAuthnContextResponseAcceptanceTest {
 
@@ -41,15 +42,15 @@ public class NoAuthnContextResponseAcceptanceTest {
     public void shouldRespondWithSuccessWhenNoAuthnContext() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-                "samlResponse", complianceTool.createNoAuthnContextResponseFor(requestResponseBody.getSamlRequest()),
-                "requestId", requestResponseBody.getRequestId()
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_ID),
+            "requestId", requestResponseBody.getRequestId()
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-                .request()
-                .buildPost(json(translateResponseRequestData))
-                .invoke();
+            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+            .request()
+            .buildPost(json(translateResponseRequestData))
+            .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         assertThat(response.readEntity(TranslatedResponseBody.class).getScenario()).isEqualTo(Scenario.CANCELLATION);
