@@ -9,11 +9,11 @@ import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public class ResponseService {
         this.responseSignatureValidator = responseSignatureValidator;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo) {
+    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
         Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
 
         ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
@@ -52,7 +52,7 @@ public class ResponseService {
                 return translateNonSuccessResponse(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
-                return assertionTranslator.translate(assertions, expectedInResponseTo);
+                return assertionTranslator.translate(assertions, expectedInResponseTo, expectedLevelOfAssurance);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
         }

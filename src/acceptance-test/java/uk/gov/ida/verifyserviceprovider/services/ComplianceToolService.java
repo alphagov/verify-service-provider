@@ -30,8 +30,8 @@ public class ComplianceToolService {
     public static final int AUTHENTICATION_FAILED_ID = 4;
     public static final int REQUESTER_ERROR_ID = 5;
     public static final int ACCOUNT_CREATION_LOA2_ID = 6;
-    // public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID = 7;
-    // public static final int ACCOUNT_CREATION_LOA1_ID = 8;
+    public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID = 7;
+    public static final int ACCOUNT_CREATION_LOA1_ID = 8;
     public static final int BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID = 9;
 
     private final Client client;

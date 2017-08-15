@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
+import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -53,22 +54,29 @@ public class TranslateSamlResponseResourceTest {
 
     @Test
     public void shouldUseResponseServiceToTranslateSaml() throws Exception {
-        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response").put("requestId", "some-request-id");
+        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
+                .put("requestId", "some-request-id")
+                .put("levelOfAssurance", LevelOfAssurance.LEVEL_2.name());
 
         Response response = resources.client()
             .target("/translate-response")
             .request()
             .post(json(translateResponseRequest.toString()));
 
-        verify(responseService, times(1)).convertTranslatedResponseBody(translateResponseRequest.getString("samlResponse"), "some-request-id");
+        verify(responseService, times(1)).convertTranslatedResponseBody(
+                translateResponseRequest.getString("samlResponse"), "some-request-id", LevelOfAssurance.LEVEL_2
+        );
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
     public void shouldReturn400WhenSamlValidationExceptionThrown() throws Exception {
-        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response").put("requestId", "some-request-id");
+        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
+                .put("requestId", "some-request-id")
+                .put("levelOfAssurance", LevelOfAssurance.LEVEL_2.name());
 
-        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"))).thenThrow(new SamlResponseValidationException("Some error."));
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LevelOfAssurance.LEVEL_2)))
+                .thenThrow(new SamlResponseValidationException("Some error."));
 
         Response response = resources.client()
                 .target("/translate-response")
@@ -84,9 +92,12 @@ public class TranslateSamlResponseResourceTest {
 
     @Test
     public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() throws Exception {
-        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response").put("requestId", "some-request-id");
+        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
+                .put("requestId", "some-request-id")
+                .put("levelOfAssurance", LevelOfAssurance.LEVEL_2.name());
 
-        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"))).thenThrow(new SamlTransformationErrorException("Some error.", Level.ERROR));
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LevelOfAssurance.LEVEL_2)))
+                .thenThrow(new SamlTransformationErrorException("Some error.", Level.ERROR));
 
         Response response = resources.client()
             .target("/translate-response")
@@ -112,7 +123,7 @@ public class TranslateSamlResponseResourceTest {
         ErrorMessage actualErrorMessage = response.readEntity(ErrorMessage.class);
         assertThat(actualErrorMessage.getCode()).isEqualTo(HttpStatus.SC_UNPROCESSABLE_ENTITY);
 
-        Set<String> expectedErrors = ImmutableSet.of("requestId may not be null", "samlResponse may not be null");
+        Set<String> expectedErrors = ImmutableSet.of("requestId may not be null", "samlResponse may not be null", "levelOfAssurance may not be null");
         Set<String> actualErrors = Arrays.stream(actualErrorMessage.getMessage().split(", ")).collect(Collectors.toSet());
         assertThat(actualErrors).isEqualTo(expectedErrors);
     }

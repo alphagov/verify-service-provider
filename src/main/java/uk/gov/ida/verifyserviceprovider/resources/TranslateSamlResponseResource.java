@@ -35,7 +35,8 @@ public class TranslateSamlResponseResource {
             return Response
                 .ok(responseService.convertTranslatedResponseBody(
                     translateSamlResponseBody.getSamlResponse(),
-                    translateSamlResponseBody.getRequestId())
+                    translateSamlResponseBody.getRequestId(),
+                    translateSamlResponseBody.getLevelOfAssurance())
                 )
                 .build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {

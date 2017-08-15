@@ -1,7 +1,18 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import org.joda.time.DateTime;
-import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.AuthnContext;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -27,7 +38,7 @@ public class AssertionTranslator {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
     }
 
-    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo) {
+    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
         if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
             throw new SamlResponseValidationException("Exactly one assertion is expected.");
         }
@@ -55,6 +66,11 @@ public class AssertionTranslator {
             levelOfAssurance = LevelOfAssurance.fromSamlValue(levelOfAssuranceString);
         } catch (Exception ex) {
             throw new SamlResponseValidationException("Level of assurance '" + levelOfAssuranceString + "' is not supported.");
+        }
+
+        if (expectedLevelOfAssurance.isGreaterThan(levelOfAssurance)) {
+            throw new SamlResponseValidationException(
+                    String.format("Expected Level of Assurance to be at least %s, but was %s", expectedLevelOfAssurance, levelOfAssurance));
         }
 
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();

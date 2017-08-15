@@ -9,8 +9,6 @@ import org.junit.rules.ExpectedException;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
@@ -119,7 +117,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result).isEqualTo(new TranslatedResponseBody(
@@ -142,7 +141,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result.getScenario()).isEqualTo(ACCOUNT_CREATION);
@@ -165,7 +165,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result.getScenario()).isEqualTo(NO_MATCH);
@@ -187,7 +188,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+            response.getInResponseTo(),
+            LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result.getScenario()).isEqualTo(REQUEST_ERROR);
@@ -209,7 +211,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+            response.getInResponseTo(),
+            LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result.getScenario()).isEqualTo(CANCELLATION);
@@ -231,7 +234,8 @@ public class ResponseServiceTest {
 
         TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
-            response.getInResponseTo()
+            response.getInResponseTo(),
+            LevelOfAssurance.LEVEL_2
         );
 
         assertThat(result.getScenario()).isEqualTo(AUTHENTICATION_FAILED);
@@ -255,7 +259,8 @@ public class ResponseServiceTest {
 
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
     }
 
@@ -278,7 +283,8 @@ public class ResponseServiceTest {
 
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
     }
 
@@ -297,7 +303,8 @@ public class ResponseServiceTest {
 
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
     }
 
@@ -316,7 +323,8 @@ public class ResponseServiceTest {
 
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo()
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
         );
     }
 
@@ -335,7 +343,8 @@ public class ResponseServiceTest {
 
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
-                "some-incorrect-request-id"
+                "some-incorrect-request-id",
+                LevelOfAssurance.LEVEL_2
         );
     }
 
