@@ -66,8 +66,10 @@ public class ResponseService {
         switch (subStatus) {
             case SamlStatusCode.NO_MATCH:
                 return new TranslatedResponseBody(Scenario.NO_MATCH, null, null, null);
-            case "urn:oasis:names:tc:SAML:2.0:status:Requester":
+            case StatusCode.REQUESTER:
                 return new TranslatedResponseBody(Scenario.REQUEST_ERROR, null, null, null);
+            case StatusCode.NO_AUTHN_CONTEXT:
+                return new TranslatedResponseBody(Scenario.CANCELLATION, null, null, null);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
         }
