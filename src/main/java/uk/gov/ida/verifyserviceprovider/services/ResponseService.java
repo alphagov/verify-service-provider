@@ -70,6 +70,8 @@ public class ResponseService {
                 return new TranslatedResponseBody(Scenario.REQUEST_ERROR, null, null, null);
             case StatusCode.NO_AUTHN_CONTEXT:
                 return new TranslatedResponseBody(Scenario.CANCELLATION, null, null, null);
+            case StatusCode.AUTHN_FAILED:
+                return new TranslatedResponseBody(Scenario.AUTHENTICATION_FAILED, null, null, null);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
         }

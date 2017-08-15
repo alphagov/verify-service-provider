@@ -64,6 +64,7 @@ import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilde
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.Scenario.AUTHENTICATION_FAILED;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.CANCELLATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.NO_MATCH;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.REQUEST_ERROR;
@@ -212,6 +213,28 @@ public class ResponseServiceTest {
         );
 
         assertThat(result.getScenario()).isEqualTo(CANCELLATION);
+    }
+
+    @Test
+    public void shouldHandleAuthenticationFailedSaml() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Status noMatchStatus = aStatus().
+            withStatusCode(
+                aStatusCode()
+                    .withValue(StatusCode.RESPONDER)
+                    .withSubStatusCode(aStatusCode().withValue(StatusCode.AUTHN_FAILED).build())
+                    .build())
+            .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
+
+        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+            responseToBase64StringTransformer.apply(response),
+            response.getInResponseTo()
+        );
+
+        assertThat(result.getScenario()).isEqualTo(AUTHENTICATION_FAILED);
     }
 
     @Test
