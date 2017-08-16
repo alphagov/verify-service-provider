@@ -6,6 +6,7 @@ import io.dropwizard.jersey.errors.ErrorMessage;
 import org.json.JSONObject;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
@@ -24,8 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
+import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA1_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA2_ID;
 
 public class UserAccountCreationResponseAcceptanceTest {
 
@@ -41,7 +45,8 @@ public class UserAccountCreationResponseAcceptanceTest {
 
     @Test
     public void shouldHandleAUserAccountCreationResponse() {
-        Response response = getResponse("FIRST_NAME",
+        Response response = getResponse(LEVEL_2,
+            "FIRST_NAME",
             "FIRST_NAME_VERIFIED",
             "DATE_OF_BIRTH",
             "DATE_OF_BIRTH_VERIFIED",
@@ -54,11 +59,31 @@ public class UserAccountCreationResponseAcceptanceTest {
         assertThat(jsonResponse.getString("scenario")).isEqualTo(ACCOUNT_CREATION.name());
         assertThat(jsonResponse.getString("pid")).isEqualTo("some-expected-pid");
         assertThat(jsonResponse.keys()).contains("attributes");
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_2.name());
+    }
+
+    @Test
+    public void shouldHandleLoA1UserAccountCreationResponse() {
+        Response response = getResponse(LEVEL_1,
+                "FIRST_NAME",
+                "FIRST_NAME_VERIFIED",
+                "DATE_OF_BIRTH",
+                "DATE_OF_BIRTH_VERIFIED",
+                "CURRENT_ADDRESS",
+                "CURRENT_ADDRESS_VERIFIED",
+                "CYCLE_3");
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(ACCOUNT_CREATION.name());
+        assertThat(jsonResponse.getString("pid")).isEqualTo("some-expected-pid");
+        assertThat(jsonResponse.keys()).contains("attributes");
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
     }
 
     @Test
     public void shouldOnlyReturnRequestedAttributes() {
-        Response response = getResponse("FIRST_NAME", "FIRST_NAME_VERIFIED", "DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
+        Response response = getResponse(LEVEL_2, "FIRST_NAME", "FIRST_NAME_VERIFIED", "DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
@@ -68,8 +93,8 @@ public class UserAccountCreationResponseAcceptanceTest {
     }
 
     @Test
-    public void dateFormatIsISO8601() {
-        Response response = getResponse("DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
+    public void shouldUseISO8601DateFormat() {
+        Response response = getResponse(LEVEL_2, "DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -82,7 +107,7 @@ public class UserAccountCreationResponseAcceptanceTest {
 
     @Test
     public void shouldErrorIfOnlyVerifiedIsRequested() {
-        Response response = getResponse("DATE_OF_BIRTH_VERIFIED");
+        Response response = getResponse(LEVEL_2, "DATE_OF_BIRTH_VERIFIED");
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
         ErrorMessage errorResponse = response.readEntity(ErrorMessage.class);
@@ -92,7 +117,7 @@ public class UserAccountCreationResponseAcceptanceTest {
 
     @Test
     public void shouldErrorIfVerifiedIsNotRequested() {
-        Response response = getResponse("SURNAME");
+        Response response = getResponse(LEVEL_2, "SURNAME");
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
 
         ErrorMessage errorResponse = response.readEntity(ErrorMessage.class);
@@ -100,7 +125,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         assertThat(errorResponse.getMessage()).isEqualTo("Invalid attributes request: Cannot request attribute without requesting verification status. Please check your MSA configuration settings.");
     }
 
-    private Response getResponse(String... attributes) {
+    private Response getResponse(LevelOfAssurance levelOfAssurance, String... attributes) {
         complianceTool.initialiseWith(
             aComplianceToolInitialisationRequest()
                 .withMatchingServiceSigningPrivateKey(TEST_RP_MS_PRIVATE_SIGNING_KEY)
@@ -113,9 +138,11 @@ public class UserAccountCreationResponseAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
 
+        int testCaseId = levelOfAssurance == LEVEL_2 ? ACCOUNT_CREATION_LOA2_ID : ACCOUNT_CREATION_LOA1_ID;
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), ACCOUNT_CREATION_LOA2_ID),
-            "requestId", requestResponseBody.getRequestId()
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), testCaseId),
+            "requestId", requestResponseBody.getRequestId(),
+            "levelOfAssurance", levelOfAssurance.name()
         );
 
         Response response = client

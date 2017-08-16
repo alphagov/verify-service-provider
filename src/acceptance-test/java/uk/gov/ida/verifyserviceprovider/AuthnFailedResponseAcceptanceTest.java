@@ -19,8 +19,8 @@ import java.util.Map;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.AUTHENTICATION_FAILED_ID;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_NO_MATCH_ID;
 
 public class AuthnFailedResponseAcceptanceTest {
 
@@ -44,7 +44,8 @@ public class AuthnFailedResponseAcceptanceTest {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_ID),
-            "requestId", requestResponseBody.getRequestId()
+            "requestId", requestResponseBody.getRequestId(),
+            "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client

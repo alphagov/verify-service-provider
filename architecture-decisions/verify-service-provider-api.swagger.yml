@@ -125,6 +125,7 @@ definitions:
     required:
       - samlResponse
       - requestId
+      - levelOfAssurance
     properties:
       samlResponse:
         description: A SAML Authn response as a base64 string.
@@ -137,6 +138,9 @@ definitions:
           same browser.
         type: string
         format: byte
+      levelOfAssurance:
+        description: The minimum level of assurance required
+        $ref: '#/definitions/ReceivedLevelOfAssurance'
   TranslatedResponseBody:
     type: object
     required:
