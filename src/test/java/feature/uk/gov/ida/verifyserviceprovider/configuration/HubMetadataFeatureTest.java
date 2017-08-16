@@ -9,7 +9,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.opensaml.xmlsec.algorithm.descriptors.DigestMD5;
+import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.TestCertificateStrings;
+import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.builders.SignatureBuilder;
+import uk.gov.ida.saml.metadata.test.factories.metadata.EntitiesDescriptorFactory;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
@@ -17,6 +23,7 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -79,6 +86,42 @@ public class HubMetadataFeatureTest {
                 .willReturn(aResponse()
                     .withStatus(500)
                 )
+        );
+
+        applicationTestSupport.before();
+        Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
+
+        Response response = client
+            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .request()
+            .buildGet()
+            .invoke();
+
+        String expectedResult = "\"hubMetadata\":{\"healthy\":false";
+
+        wireMockServer.verify(getRequestedFor(urlEqualTo("/SAML2/metadata")));
+
+        assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(response.readEntity(String.class)).contains(expectedResult);
+    }
+
+    @Test
+    public void shouldFailHealthcheckWhenHubMetadataIsSignedWithMD5() {
+        String id = UUID.randomUUID().toString();
+        Signature signature = SignatureBuilder.aSignature()
+            .withDigestAlgorithm(id, new DigestMD5())
+            .withX509Data(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT)
+            .withSigningCredential(new TestCredentialFactory(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT,
+                    TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY).getSigningCredential()).build();
+        String metadata = new MetadataFactory().metadata(new EntitiesDescriptorFactory().signedEntitiesDescriptor(id, signature));
+
+        wireMockServer.stubFor(
+                get(urlEqualTo("/SAML2/metadata"))
+                        .willReturn(
+                                aResponse()
+                                        .withStatus(200)
+                                        .withBody(metadata)
+                        )
         );
 
         applicationTestSupport.before();

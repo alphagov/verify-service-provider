@@ -3,11 +3,12 @@ apply plugin: 'application'
 apply plugin: 'idea'
 
 repositories {
-    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
 }
 
 project.ext {
     openSamlVersion = '3.3.0'
+    samlMetaDataBindingVersion = '44'
 }
 
 dependencies {
@@ -15,7 +16,7 @@ dependencies {
         'io.dropwizard:dropwizard-core:1.1.2',
         'org.json:json:20170516',
         "org.opensaml:opensaml-core:$openSamlVersion",
-        "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-42",
+        "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:saml-serializers:$openSamlVersion-14",
         "uk.gov.ida:saml-security:$openSamlVersion-33"
@@ -24,7 +25,7 @@ dependencies {
         'junit:junit:4.12',
         'io.dropwizard:dropwizard-testing:1.1.0',
         'org.mockito:mockito-core:2.7.22',
-        "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-42",
+        "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-$samlMetaDataBindingVersion",
         "uk.gov.ida:common-test-utils:2.0.0-31",
         "org.jsoup:jsoup:1.10.3",
     )
