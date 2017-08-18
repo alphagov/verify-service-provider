@@ -57,9 +57,6 @@ public class ComplianceToolService {
     public void initialiseWithPid(String pid) {
         initialiseWith(
             aComplianceToolInitialisationRequest()
-                .withMatchingServiceSigningPrivateKey(TEST_RP_MS_PRIVATE_SIGNING_KEY)
-                .withMatchingServiceEntityId(MockMsaServer.MSA_ENTITY_ID)
-                .withEncryptionCertificate(TEST_RP_PUBLIC_ENCRYPTION_CERT)
                 .withExpectedPid(pid)
                 .build()
         );

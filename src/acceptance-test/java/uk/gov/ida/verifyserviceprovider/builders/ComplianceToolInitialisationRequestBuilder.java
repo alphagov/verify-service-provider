@@ -1,5 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.builders;
 
+import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+
 import javax.ws.rs.client.Entity;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,7 @@ public class ComplianceToolInitialisationRequestBuilder {
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
     private String expectedPID = "default-expected-pid";
-    private String matchingServiceEntityId = "http://verify-service-provider-acceptance-test/msa";
+    private String matchingServiceEntityId = MockMsaServer.MSA_ENTITY_ID;
     private String matchingServiceSigningPrivateKey = TEST_RP_MS_PRIVATE_SIGNING_KEY;
     private List<String> userAccountCreationAttributes = emptyList();
 

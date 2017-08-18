@@ -15,13 +15,14 @@ import static uk.gov.ida.verifyserviceprovider.configuration.MetadataUri.COMPLIA
 
 public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
 
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer) {
+    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey) {
         super(
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider-acceptance-test.yml"),
             ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
             ConfigOverride.config("hubSsoLocation", ComplianceToolService.SSO_LOCATION),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+            ConfigOverride.config("samlSecondaryEncryptionKey", secondaryEncryptionKey),
             ConfigOverride.config("verifyHubMetadata.uri", COMPLIANCE_TOOL.getUri().toString()),
             ConfigOverride.config("msaMetadata.uri", () -> {
                 IdaSamlBootstrap.bootstrap();
@@ -29,5 +30,9 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
                 return msaServer.getUri();
             })
         );
+    }
+
+    public VerifyServiceProviderAppRule(MockMsaServer msaServer) {
+        this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY);
     }
 }
