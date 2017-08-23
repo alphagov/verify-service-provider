@@ -8,7 +8,7 @@ repositories {
 
 project.ext {
     openSamlVersion = '3.3.0'
-    samlMetaDataBindingVersion = '44'
+    samlMetaDataBindingVersion = '46'
 }
 
 dependencies {
@@ -18,8 +18,8 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
-        "uk.gov.ida:saml-serializers:$openSamlVersion-14",
-        "uk.gov.ida:saml-security:$openSamlVersion-33"
+        "uk.gov.ida:saml-serializers:$openSamlVersion-18",
+        "uk.gov.ida:saml-security:$openSamlVersion-40"
     )
     testCompile(
         'junit:junit:4.12',
