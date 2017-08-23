@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.resources;
 
 import io.dropwizard.jersey.errors.ErrorMessage;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -24,6 +25,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
 
     public TranslateSamlResponseResource(ResponseService responseService) {
         this.responseService = responseService;
@@ -32,14 +34,17 @@ public class TranslateSamlResponseResource {
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         try {
-            return Response
+            Response response = Response
                 .ok(responseService.convertTranslatedResponseBody(
                     translateSamlResponseBody.getSamlResponse(),
                     translateSamlResponseBody.getRequestId(),
                     translateSamlResponseBody.getLevelOfAssurance())
                 )
                 .build();
+            LOG.info(String.format("Translated response for requestID: %s", translateSamlResponseBody.getRequestId()));
+            return response;
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
+            LOG.warn(String.format("Error translating saml response for requestID: %s, Message: %s", translateSamlResponseBody.getRequestId(), e.getMessage()));
             return Response
                 .status(BAD_REQUEST)
                 .entity(new ErrorMessage(BAD_REQUEST.getStatusCode(), e.getMessage()))
