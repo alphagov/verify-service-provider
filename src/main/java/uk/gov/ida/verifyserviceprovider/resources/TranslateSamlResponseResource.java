@@ -4,6 +4,7 @@ import io.dropwizard.jersey.errors.ErrorMessage;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
@@ -34,15 +35,17 @@ public class TranslateSamlResponseResource {
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         try {
-            Response response = Response
-                .ok(responseService.convertTranslatedResponseBody(
-                    translateSamlResponseBody.getSamlResponse(),
+            TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
+                translateSamlResponseBody.getSamlResponse(),
+                translateSamlResponseBody.getRequestId(),
+                translateSamlResponseBody.getLevelOfAssurance()
+            );
+
+            LOG.info(String.format("Translated response for requestID: %s, Scenario: %s",
                     translateSamlResponseBody.getRequestId(),
-                    translateSamlResponseBody.getLevelOfAssurance())
-                )
-                .build();
-            LOG.info(String.format("Translated response for requestID: %s", translateSamlResponseBody.getRequestId()));
-            return response;
+                    translatedResponseBody.getScenario()));
+
+            return Response.ok(translatedResponseBody).build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
             LOG.warn(String.format("Error translating saml response for requestID: %s, Message: %s", translateSamlResponseBody.getRequestId(), e.getMessage()));
             return Response

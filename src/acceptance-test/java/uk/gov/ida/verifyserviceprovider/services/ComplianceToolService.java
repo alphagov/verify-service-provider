@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import com.google.common.collect.ImmutableMap;
-import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
@@ -15,8 +14,6 @@ import java.net.URI;
 import static javax.ws.rs.client.Entity.form;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
 
 public class ComplianceToolService {
