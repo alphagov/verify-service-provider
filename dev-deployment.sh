@@ -33,6 +33,8 @@ cfLogin() {
 
 ./pre-commit.sh
 
+./gradlew distZip
+
 cfLogin
 
 cf push -f dev-manifest.yml
