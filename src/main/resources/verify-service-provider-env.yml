@@ -11,8 +11,6 @@ server:
 
 logging:
   level: ${LOG_LEVEL:-INFO}
-  loggers:
-    "uk.gov": DEBUG
   appenders:
     - type: console
     - type: file
