@@ -37,5 +37,5 @@ cfLogin() {
 
 cfLogin
 
-cf push -f dev-manifest.yml
-
+# Finds the most up-to-date zip and deploys that
+cf push -f dev-manifest.yml -p $(ls -t $(find -f build/distributions) | head -1)
