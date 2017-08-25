@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -e
-CURRENT_DIR=$PWD
+CURRENT_DIR="$PWD"
 function cleanup {
-  cd "$CURRENT_DIR"
-  rm -r "$CURRENT_DIR/work"
+  rm -rf "$CURRENT_DIR/work"
 }
 trap cleanup EXIT
 cd "$(dirname "$0")"
@@ -38,4 +37,6 @@ cfLogin() {
 cfLogin
 
 # Finds the most up-to-date zip and deploys that
-cf push -f dev-manifest.yml -p $(ls -t $(find -f build/distributions) | head -1)
+zipFile="$(cd build/distributions && echo "$(pwd)/$(ls -t ./*.zip | head -1)")"
+cf push -f dev-manifest.yml -p "$zipFile"
+
