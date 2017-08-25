@@ -1,6 +1,7 @@
 memory: 256M
 applications:
   - name: verify-service-provider-dev
+    buildpack: java_buildpack
     env:
       SERVICE_ENTITY_ID: http://verify-service-provider-dev-service
       HUB_SSO_LOCATION: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
