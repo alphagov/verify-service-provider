@@ -7,6 +7,7 @@ repositories {
 }
 
 project.ext {
+    version_number = '0.1'
     openSamlVersion = '3.3.0'
     samlMetaDataBindingVersion = '46'
 }
@@ -45,6 +46,8 @@ sourceSets {
         compileClasspath += sourceSets.test.output
     }
 }
+
+version = "$version_number-" + System.getenv('BUILD_NUMBER')
 
 distributions {
     main {
