@@ -32,11 +32,9 @@ cfLogin() {
 
 ./pre-commit.sh
 
-./gradlew distZip
+./gradlew clean distZip
 
 cfLogin
 
-# Finds the most up-to-date zip and deploys that
-zipFile="$(cd build/distributions && echo "$(pwd)/$(ls -t ./*.zip | head -1)")"
-cf push -f dev-manifest.yml -p "$zipFile"
+cf push -f dev-manifest.yml -p build/distributions/verify-service-provider-*.zip
 
