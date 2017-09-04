@@ -19,10 +19,12 @@ import org.opensaml.saml.saml2.core.impl.ProxyRestrictionBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
+import uk.gov.ida.saml.core.test.builders.AuthnContextBuilder;
 import uk.gov.ida.saml.core.test.builders.ConditionsBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
@@ -283,7 +285,7 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataNotOnOrAfterIsAfterNow() throws Exception {
+    public void shouldThrowExceptionWhenNotOnOrAfterIsBeforeNow() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Assertion is not valid on or after ");
 
@@ -303,13 +305,46 @@ public class AssertionTranslatorTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenNotOnOrAfterIsTooFarInTheFuture() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("NotOnOrAfter is too far into the future ");
+
+        SubjectConfirmation subjectConfirmation = aSubjectConfirmation()
+                .withSubjectConfirmationData(aSubjectConfirmationData()
+                        .withNotOnOrAfter(DateTime.now().plusMinutes(200))
+                        .build())
+                .build();
+
+        Assertion assertion = aSignedAssertion()
+                .withSubject(aSubject()
+                        .withSubjectConfirmation(subjectConfirmation)
+                        .build())
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenAuthnInstantIsInFuture() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("AuthnInstant is in the future ");
+
+        Assertion assertion = aSignedAssertion()
+                .addAuthnStatement(anAuthnStatement()
+                    .withAuthnInstant(DateTime.now().plusMinutes(10))
+                    .build())
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
     public void shouldThrowExceptionWhenSubjectConfirmationDataHasNoInResponseTo() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Subject confirmation data must contain 'InResponseTo'.");
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withNotOnOrAfter(DateTime.now().plusYears(50))
                 .withInResponseTo(null)
                 .build()
         ).build();
@@ -326,14 +361,13 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataInResponseToDoesNotMatchTheRequestId() throws Exception {
+    public void shouldThrowExceptionWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
         String expectedInResponseTo = "some-non-matching-request-id";
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("'InResponseTo' must match requestId. Expected " + expectedInResponseTo + " but was " + IN_RESPONSE_TO);
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withNotOnOrAfter(DateTime.now().plusYears(50))
                 .withInResponseTo(IN_RESPONSE_TO)
                 .build()
         ).build();
@@ -399,6 +433,30 @@ public class AssertionTranslatorTest {
         Assertion assertion = aSignedAssertion()
             .withConditions(conditionsElement)
             .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIssueInstantIsTooOld() {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Assertion IssueInstant is too far in the past ");
+
+        Assertion assertion = aSignedAssertion()
+                .withIssueInstant(DateTime.now().minusMinutes(10))
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIssueInstantIsInTheFuture() {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Assertion IssueInstant is in the future ");
+
+        Assertion assertion = aSignedAssertion()
+                .withIssueInstant(DateTime.now().plusMinutes(1))
+                .buildUnencrypted();
 
         translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
     }
@@ -572,7 +630,7 @@ public class AssertionTranslatorTest {
             .withSubjectConfirmation(
                 aSubjectConfirmation()
                     .withSubjectConfirmationData(aSubjectConfirmationData()
-                        .withNotOnOrAfter(DateTime.now().plusYears(50))
+                        .withNotOnOrAfter(DateTime.now().plusMinutes(15))
                         .withInResponseTo(IN_RESPONSE_TO)
                         .build())
                     .build());

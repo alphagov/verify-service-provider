@@ -2,6 +2,7 @@ package unit.uk.gov.ida.verifyserviceprovider.services;
 
 import com.google.common.collect.ImmutableList;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +34,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 
 import java.security.PrivateKey;
 
@@ -96,7 +98,9 @@ public class ResponseServiceTest {
 
         responseService = responseFactory.createResponseService(
                 hubMetadataResolver,
-                new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, mock(SamlAssertionsSignatureValidator.class))
+                new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID,
+                        mock(SamlAssertionsSignatureValidator.class),
+                        new IssueInstantValidator("Assertion"))
         );
     }
 
@@ -344,6 +348,42 @@ public class ResponseServiceTest {
         responseService.convertTranslatedResponseBody(
                 responseToBase64StringTransformer.apply(response),
                 "some-incorrect-request-id",
+                LevelOfAssurance.LEVEL_2
+        );
+    }
+
+    @Test
+    public void shouldFailWhenIssueInstantIsTooOld() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Response IssueInstant is too far in the past ");
+
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        ResponseBuilder responseBuilder = aResponse().withIssueInstant(DateTime.now().minusMinutes(10));
+        Response response = signResponse(responseBuilder, testRpSigningCredential);
+
+        responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2
+        );
+    }
+
+    @Test
+    public void shouldFailWhenIssueInstantIsInTheFuture() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Response IssueInstant is in the future ");
+
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        ResponseBuilder responseBuilder = aResponse().withIssueInstant(DateTime.now().plusMinutes(1));
+        Response response = signResponse(responseBuilder, testRpSigningCredential);
+
+        responseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2
         );
     }
