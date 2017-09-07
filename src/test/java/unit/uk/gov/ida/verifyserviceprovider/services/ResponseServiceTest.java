@@ -3,6 +3,7 @@ package unit.uk.gov.ida.verifyserviceprovider.services;
 import com.google.common.collect.ImmutableList;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +35,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 
 import java.security.PrivateKey;
@@ -95,12 +97,14 @@ public class ResponseServiceTest {
         hubMetadataResolver = mock(MetadataResolver.class);
 
         ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
+        DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
 
         responseService = responseFactory.createResponseService(
                 hubMetadataResolver,
                 new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID,
                         mock(SamlAssertionsSignatureValidator.class),
-                        new IssueInstantValidator("Assertion"))
+                        new IssueInstantValidator("Assertion", dateTimeComparator), dateTimeComparator),
+                dateTimeComparator
         );
     }
 

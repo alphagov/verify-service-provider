@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.factories.saml;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.PredicateRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Response;
@@ -23,6 +24,7 @@ import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgori
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 
@@ -73,7 +75,8 @@ public class ResponseFactory {
 
     public ResponseService createResponseService(
         MetadataResolver hubMetadataResolver,
-        AssertionTranslator assertionTranslator
+        AssertionTranslator assertionTranslator,
+        DateTimeComparator dateTimeComparator
     ) throws ComponentInitializationException {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(hubMetadataResolver);
@@ -83,16 +86,18 @@ public class ResponseFactory {
             assertionDecrypter,
             assertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-            new IssueInstantValidator("Response")
+            new IssueInstantValidator("Response", dateTimeComparator)
         );
     }
 
-    public AssertionTranslator createAssertionTranslator(MetadataResolver msaMetadataResolver) throws ComponentInitializationException {
+    public AssertionTranslator createAssertionTranslator(MetadataResolver msaMetadataResolver, DateTimeComparator dateTimeComparator)
+            throws ComponentInitializationException {
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(msaMetadataResolver);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         return new AssertionTranslator(verifyServiceProviderEntityId,
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
-                new IssueInstantValidator("Assertion"));
+                new IssueInstantValidator("Assertion", dateTimeComparator),
+                dateTimeComparator);
     }
 
     private MetadataBackedSignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver) throws ComponentInitializationException {

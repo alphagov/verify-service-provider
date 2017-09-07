@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
+import org.joda.time.Duration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -52,6 +53,11 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @Valid
     private MetadataConfigurationWithMsaDefaults msaMetadata;
 
+    @JsonProperty
+    @NotNull
+    @Valid
+    private Duration clockSkew;
+
     public String getServiceEntityId() {
         return serviceEntityId;
     }
@@ -68,7 +74,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlPrimaryEncryptionKey;
     }
 
-
     public PrivateKey getSamlSecondaryEncryptionKey() {
         return samlSecondaryEncryptionKey;
     }
@@ -79,5 +84,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public MetadataConfigurationWithHubDefaults getVerifyHubMetadata() {
         return verifyHubMetadata;
+    }
+
+    public Duration getClockSkew() {
+        return clockSkew;
     }
 }

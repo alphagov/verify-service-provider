@@ -1,8 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.Audience;
@@ -20,6 +18,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 
 import java.util.List;
@@ -32,17 +31,18 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class AssertionTranslator {
-    private static final Duration ASSERTION_LIFETIME = Duration.standardMinutes(180);
     private final String verifyServiceProviderEntityId;
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final IssueInstantValidator issueInstantValidator;
+    private final DateTimeComparator dateTimeComparator;
 
     public AssertionTranslator(String verifyServiceProviderEntityId,
                                SamlAssertionsSignatureValidator assertionsSignatureValidator,
-                               IssueInstantValidator issueInstantValidator) {
+                               IssueInstantValidator issueInstantValidator, DateTimeComparator dateTimeComparator) {
         this.verifyServiceProviderEntityId = verifyServiceProviderEntityId;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.issueInstantValidator = issueInstantValidator;
+        this.dateTimeComparator = dateTimeComparator;
     }
 
     public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
@@ -183,21 +183,15 @@ public class AssertionTranslator {
 
     private void validateNotOnOrAfter(DateTime notOnOrAfter) {
         DateTime now = DateTime.now();
-        if (now.isEqual(notOnOrAfter) || now.isAfter(notOnOrAfter)) {
+        if (!dateTimeComparator.isBeforeFuzzy(now, notOnOrAfter)) {
             throw new SamlResponseValidationException("Assertion is not valid on or after "
-                    + notOnOrAfter.withZone(UTC).toString(dateHourMinuteSecond())
-            );
-        }
-        
-        if (notOnOrAfter.isAfter(Instant.now().plus(ASSERTION_LIFETIME))) {
-            throw new SamlResponseValidationException("NotOnOrAfter is too far into the future "
                     + notOnOrAfter.withZone(UTC).toString(dateHourMinuteSecond())
             );
         }
     }
 
     private void validateAuthnInstant(DateTime authnInstant) {
-        if (authnInstant.isAfter(Instant.now())) {
+        if (!dateTimeComparator.isBeforeNowFuzzy(authnInstant)) {
             throw new SamlResponseValidationException("AuthnInstant is in the future " +
                     authnInstant.withZone(UTC).toString(dateHourMinuteSecond())
             );
@@ -205,7 +199,7 @@ public class AssertionTranslator {
     }
 
     private void validateNotBefore(DateTime notBefore) {
-        if (notBefore != null && DateTime.now().isBefore(notBefore)) {
+        if (notBefore != null && !dateTimeComparator.isAfterFuzzy(DateTime.now(), notBefore)) {
             throw new SamlResponseValidationException("Assertion is not valid before " + notBefore.withZone(UTC).toString(dateHourMinuteSecond()));
         }
     }

@@ -2,6 +2,7 @@ package unit.uk.gov.ida.verifyserviceprovider.services;
 
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,12 +20,10 @@ import org.opensaml.saml.saml2.core.impl.ProxyRestrictionBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
-import uk.gov.ida.saml.core.test.builders.AuthnContextBuilder;
 import uk.gov.ida.saml.core.test.builders.ConditionsBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
@@ -33,6 +32,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import java.security.PrivateKey;
 import java.util.Collections;
@@ -88,9 +88,10 @@ public class AssertionTranslatorTest {
             .build();
 
         MetadataResolver msaMetadataResolver = mock(MetadataResolver.class);
+        DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         when(msaMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        translator = responseFactory.createAssertionTranslator(msaMetadataResolver);
+        translator = responseFactory.createAssertionTranslator(msaMetadataResolver, dateTimeComparator);
     }
 
     @Rule
@@ -300,26 +301,6 @@ public class AssertionTranslatorTest {
                     .build()
             )
             .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNotOnOrAfterIsTooFarInTheFuture() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("NotOnOrAfter is too far into the future ");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation()
-                .withSubjectConfirmationData(aSubjectConfirmationData()
-                        .withNotOnOrAfter(DateTime.now().plusMinutes(200))
-                        .build())
-                .build();
-
-        Assertion assertion = aSignedAssertion()
-                .withSubject(aSubject()
-                        .withSubjectConfirmation(subjectConfirmation)
-                        .build())
-                .buildUnencrypted();
 
         translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
     }
