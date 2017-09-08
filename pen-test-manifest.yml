@@ -3,6 +3,7 @@ applications:
   - name: verify-service-provider-pentest
     path: build/distributions/verify-service-provider.zip
     env:
+      CLOCK_SKEW: PT5s
       SERVICE_ENTITY_ID: http://verify-service-provider-pentest-service
       HUB_SSO_LOCATION: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
       MSA_ENTITY_ID: https://verify-service-provider-stub-msa
