@@ -2,6 +2,7 @@ package unit.uk.gov.ida.verifyserviceprovider.services;
 
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import java.security.PrivateKey;
 import java.util.Collections;
@@ -86,9 +88,10 @@ public class AssertionTranslatorTest {
             .build();
 
         MetadataResolver msaMetadataResolver = mock(MetadataResolver.class);
+        DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         when(msaMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        translator = responseFactory.createAssertionTranslator(msaMetadataResolver);
+        translator = responseFactory.createAssertionTranslator(msaMetadataResolver, dateTimeComparator);
     }
 
     @Rule
@@ -283,7 +286,7 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataNotOnOrAfterIsAfterNow() throws Exception {
+    public void shouldThrowExceptionWhenNotOnOrAfterIsBeforeNow() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Assertion is not valid on or after ");
 
@@ -303,13 +306,26 @@ public class AssertionTranslatorTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenAuthnInstantIsInFuture() throws Exception {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("AuthnInstant is in the future ");
+
+        Assertion assertion = aSignedAssertion()
+                .addAuthnStatement(anAuthnStatement()
+                    .withAuthnInstant(DateTime.now().plusMinutes(10))
+                    .build())
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
     public void shouldThrowExceptionWhenSubjectConfirmationDataHasNoInResponseTo() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Subject confirmation data must contain 'InResponseTo'.");
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withNotOnOrAfter(DateTime.now().plusYears(50))
                 .withInResponseTo(null)
                 .build()
         ).build();
@@ -326,14 +342,13 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataInResponseToDoesNotMatchTheRequestId() throws Exception {
+    public void shouldThrowExceptionWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
         String expectedInResponseTo = "some-non-matching-request-id";
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("'InResponseTo' must match requestId. Expected " + expectedInResponseTo + " but was " + IN_RESPONSE_TO);
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withNotOnOrAfter(DateTime.now().plusYears(50))
                 .withInResponseTo(IN_RESPONSE_TO)
                 .build()
         ).build();
@@ -399,6 +414,30 @@ public class AssertionTranslatorTest {
         Assertion assertion = aSignedAssertion()
             .withConditions(conditionsElement)
             .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIssueInstantIsTooOld() {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Assertion IssueInstant is too far in the past ");
+
+        Assertion assertion = aSignedAssertion()
+                .withIssueInstant(DateTime.now().minusMinutes(10))
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIssueInstantIsInTheFuture() {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Assertion IssueInstant is in the future ");
+
+        Assertion assertion = aSignedAssertion()
+                .withIssueInstant(DateTime.now().plusMinutes(1))
+                .buildUnencrypted();
 
         translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
     }
@@ -572,7 +611,7 @@ public class AssertionTranslatorTest {
             .withSubjectConfirmation(
                 aSubjectConfirmation()
                     .withSubjectConfirmationData(aSubjectConfirmationData()
-                        .withNotOnOrAfter(DateTime.now().plusYears(50))
+                        .withNotOnOrAfter(DateTime.now().plusMinutes(15))
                         .withInResponseTo(IN_RESPONSE_TO)
                         .build())
                     .build());

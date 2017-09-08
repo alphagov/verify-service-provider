@@ -7,6 +7,7 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 public class VerifyServiceProviderFactory {
 
@@ -17,6 +18,7 @@ public class VerifyServiceProviderFactory {
 
     private volatile MetadataResolver hubMetadataResolver;
     private volatile MetadataResolver msaMetadataResolver;
+    private final DateTimeComparator dateTimeComparator;
 
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
@@ -28,6 +30,7 @@ public class VerifyServiceProviderFactory {
             configuration.getServiceEntityId(),
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
+        this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -47,7 +50,8 @@ public class VerifyServiceProviderFactory {
     public TranslateSamlResponseResource getTranslateSamlResponseResource() throws ComponentInitializationException {
         return new TranslateSamlResponseResource(responseFactory.createResponseService(
             getHubMetadataResolver(),
-            responseFactory.createAssertionTranslator(getMsaMetadataResolver()))
+            responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
+            dateTimeComparator)
         );
     }
 

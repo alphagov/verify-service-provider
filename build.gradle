@@ -9,7 +9,7 @@ repositories {
 project.ext {
     version_number = '0.1.1'
     openSamlVersion = '3.3.0'
-    samlMetaDataBindingVersion = '46'
+    samlMetaDataBindingVersion = '47'
 }
 
 dependencies {
