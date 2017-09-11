@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: This a proposed API for the Verify Serivce Provider
-  version: 0.1.1
+  version: 0.2.0
   title: Verify Service Provider
 basePath: /
 tags:
