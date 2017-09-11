@@ -1,0 +1,24 @@
+# Host to use for canonical URL generation (without trailing slash)
+host: https://github.com/alphagov/verify-service-provider
+
+# Header-related options
+show_govuk_logo: true
+service_name: Verify Service Provider API
+service_link: https://github.com/alphagov/verify-service-provider
+phase: Beta
+
+# Links to show on right-hand-side of header
+header_links:
+  # Status: https://api.digitalmarketplace.service.gov.uk/_status
+  # Documentation: /
+
+# Tracking ID from Google Analytics (e.g. UA-XXXX-Y)
+ga_tracking_id:
+
+# Table of contents depth – how many levels to include in the table of contents.
+# If your ToC is too long, reduce this number and we'll only show higher-level
+# headings.
+max_toc_heading_level: 6
+
+# Prevent robots from indexing (e.g. whilst in development)
+prevent_indexing: true

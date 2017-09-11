@@ -15,3 +15,4 @@ artefacts/
 data/**
 /.mongo/*
 !/.mongo/.gitkeep
+node_modules

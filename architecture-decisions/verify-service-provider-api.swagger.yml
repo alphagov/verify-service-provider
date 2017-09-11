@@ -1,11 +1,17 @@
 swagger: '2.0'
 info:
   description: This a proposed API for the Verify Serivce Provider
-  version: 1.0.0
+  version: 0.1.1
   title: Verify Service Provider
+basePath: /
+tags:
+- name: 'Verify Service Provider API'
 paths:
   /generate-request:
     post:
+      tags:
+      - 'Verify Service Provider API'
+      description: 'Generate an authn request'
       consumes:
         - application/json
       produces:
@@ -13,31 +19,36 @@ paths:
       parameters:
         - name: requestGenerationBody
           in: body
-          required: false
+          required: true
           schema:
             $ref: '#/definitions/RequestGenerationBody'
       responses:
-        '200':
+        200:
           description: An object containing a SAML request.
           schema:
             $ref: '#/definitions/RequestResponseBody'
-        '400':
-          description: >-
-            An error due to a problem with creating the SAML request. Can be
-            because of given parameters are not recognized.
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-        '422':
+        422:
           description: >-
             An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
           schema:
             $ref: '#/definitions/ErrorMessage'
-        '500':
+          examples:
+            'errorMessage':
+              code: 422
+              message: "Some error message"
+        500:
           description: An error due to an internal server error.
           schema:
             $ref: '#/definitions/ErrorMessage'
+          examples:
+            'errorMessage':
+              code: 500
+              message: "Some error message"
   /translate-response:
     post:
+      tags:
+      - 'Verify Service Provider API'
+      description: 'Create a translated response'
       consumes:
         - application/json
       produces:
@@ -48,26 +59,38 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TranslateResponseRequestBody'
+            $ref: '#/definitions/TranslateSamlResponseBody'
       responses:
-        '200':
+        200:
           description: >-
             Response contains an object with details of a translated SAML
             response.
           schema:
             $ref: '#/definitions/TranslatedResponseBody'
-        '400':
+        400:
           description: an error due to a problem with translating the Response
           schema:
             $ref: '#/definitions/ErrorMessage'
-        '401':
-          description: Response identifies failures when authenticating the user
+          examples:
+            'errorMessage':
+              code: 400
+              message: "Some error message"
+        422:
+          description: An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
           schema:
             $ref: '#/definitions/ErrorMessage'
-        '500':
+          examples:
+            'errorMessage':
+              code: 422
+              message: "Some error message"
+        500:
           description: an error due to an internal server error
           schema:
             $ref: '#/definitions/ErrorMessage'
+          examples:
+            'errorMessage':
+              code: 500
+              message: "Some error message"
 definitions:
   ExpectedLevelOfAssurance:
     description: Level of assurance requested by the Service
@@ -75,14 +98,12 @@ definitions:
     enum:
       - LEVEL_1
       - LEVEL_2
-      - LEVEL_3
   ReceivedLevelOfAssurance:
     description: Level of assurance the user authenticated with.
     type: string
     enum:
       - LEVEL_1
       - LEVEL_2
-      - LEVEL_3
   Scenario:
       type: string
       enum:
@@ -92,7 +113,6 @@ definitions:
         - CANCELLATION
         - AUTHENTICATION_FAILED
         - REQUEST_ERROR
-        - INTERNAL_SERVER_ERROR
   RequestGenerationBody:
     type: object
     properties:
@@ -120,7 +140,7 @@ definitions:
         description: The url for Verify HUB SSO. The entrypoint for saml authn flow.
         type: string
         format: url
-  TranslateResponseRequestBody:
+  TranslateSamlResponseBody:
     type: object
     required:
       - samlResponse
