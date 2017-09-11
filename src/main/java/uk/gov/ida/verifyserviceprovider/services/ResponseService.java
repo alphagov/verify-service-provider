@@ -1,7 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
-import org.joda.time.DateTime;
-import org.joda.time.ReadableDuration;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
@@ -15,36 +13,31 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
+import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-
 public class ResponseService {
 
-    private static final Duration ISSUE_INSTANT_VALIDITY = Duration.ofMinutes(5);
     private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
     private final AssertionTranslator assertionTranslator;
     private final SamlResponseSignatureValidator responseSignatureValidator;
-    private final IssueInstantValidator issueInstantValidator;
+    private final DateTimeComparator dateTimeComparator;
 
     public ResponseService(
             StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
             AssertionDecrypter assertionDecrypter,
             AssertionTranslator assertionTranslator,
             SamlResponseSignatureValidator responseSignatureValidator,
-            IssueInstantValidator issueInstantValidator) {
+            DateTimeComparator dateTimeComparator) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionTranslator = assertionTranslator;
         this.responseSignatureValidator = responseSignatureValidator;
-        this.issueInstantValidator = issueInstantValidator;
+        this.dateTimeComparator = dateTimeComparator;
     }
 
     public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
@@ -57,7 +50,7 @@ public class ResponseService {
                     "Expected InResponseTo to be " + expectedInResponseTo + ", but was " + response.getInResponseTo());
         }
 
-        issueInstantValidator.validate(validatedResponse.getIssueInstant());
+        new InstantValidator("Response IssueInstant", dateTimeComparator).validate(validatedResponse.getIssueInstant());
 
         StatusCode statusCode = validatedResponse.getStatus().getStatusCode();
 

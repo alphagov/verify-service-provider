@@ -36,7 +36,6 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 
 import java.security.PrivateKey;
 
@@ -103,7 +102,7 @@ public class ResponseServiceTest {
                 hubMetadataResolver,
                 new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID,
                         mock(SamlAssertionsSignatureValidator.class),
-                        new IssueInstantValidator("Assertion", dateTimeComparator), dateTimeComparator),
+                        dateTimeComparator),
                 dateTimeComparator
         );
     }

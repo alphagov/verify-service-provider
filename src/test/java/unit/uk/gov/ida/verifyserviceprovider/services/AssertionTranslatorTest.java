@@ -306,6 +306,20 @@ public class AssertionTranslatorTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenAuthnInstantIsTooOld() {
+        expectedException.expect(SamlResponseValidationException.class);
+        expectedException.expectMessage("Assertion AuthnInstant is too far in the past ");
+
+        Assertion assertion = aSignedAssertion()
+                .addAuthnStatement(anAuthnStatement()
+                        .withAuthnInstant(DateTime.now().minusMinutes(10))
+                        .build())
+                .buildUnencrypted();
+
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+    }
+
+    @Test
     public void shouldThrowExceptionWhenAuthnInstantIsInFuture() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("AuthnInstant is in the future ");

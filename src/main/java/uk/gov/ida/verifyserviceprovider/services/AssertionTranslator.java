@@ -19,7 +19,7 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import java.util.List;
 
@@ -33,15 +33,13 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 public class AssertionTranslator {
     private final String verifyServiceProviderEntityId;
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
-    private final IssueInstantValidator issueInstantValidator;
     private final DateTimeComparator dateTimeComparator;
 
     public AssertionTranslator(String verifyServiceProviderEntityId,
                                SamlAssertionsSignatureValidator assertionsSignatureValidator,
-                               IssueInstantValidator issueInstantValidator, DateTimeComparator dateTimeComparator) {
+                               DateTimeComparator dateTimeComparator) {
         this.verifyServiceProviderEntityId = verifyServiceProviderEntityId;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
-        this.issueInstantValidator = issueInstantValidator;
         this.dateTimeComparator = dateTimeComparator;
     }
 
@@ -52,7 +50,7 @@ public class AssertionTranslator {
 
         Assertion assertion = assertions.get(0);
 
-        issueInstantValidator.validate(assertion.getIssueInstant());
+        new InstantValidator("Assertion IssueInstant", dateTimeComparator).validate(assertion.getIssueInstant());
         NameID nameID = validateSubject(expectedInResponseTo, assertion.getSubject());
         validateConditions(assertion.getConditions());
 
@@ -64,7 +62,7 @@ public class AssertionTranslator {
         }
 
         AuthnStatement authnStatement = authnStatements.get(0);
-        validateAuthnInstant(authnStatement.getAuthnInstant());
+        new InstantValidator("Assertion AuthnInstant", dateTimeComparator).validate(authnStatement.getAuthnInstant());
         String levelOfAssuranceString = ofNullable(authnStatement.getAuthnContext())
             .map(AuthnContext::getAuthnContextClassRef)
             .map(AuthnContextClassRef::getAuthnContextClassRef)
@@ -186,14 +184,6 @@ public class AssertionTranslator {
         if (!dateTimeComparator.isBeforeFuzzy(now, notOnOrAfter)) {
             throw new SamlResponseValidationException("Assertion is not valid on or after "
                     + notOnOrAfter.withZone(UTC).toString(dateHourMinuteSecond())
-            );
-        }
-    }
-
-    private void validateAuthnInstant(DateTime authnInstant) {
-        if (!dateTimeComparator.isBeforeNowFuzzy(authnInstant)) {
-            throw new SamlResponseValidationException("AuthnInstant is in the future " +
-                    authnInstant.withZone(UTC).toString(dateHourMinuteSecond())
             );
         }
     }

@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.factories.saml;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.PredicateRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Response;
@@ -25,7 +24,6 @@ import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValida
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.validators.IssueInstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 
 import java.security.KeyPair;
@@ -86,7 +84,7 @@ public class ResponseFactory {
             assertionDecrypter,
             assertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-            new IssueInstantValidator("Response", dateTimeComparator)
+            dateTimeComparator
         );
     }
 
@@ -96,7 +94,6 @@ public class ResponseFactory {
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         return new AssertionTranslator(verifyServiceProviderEntityId,
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
-                new IssueInstantValidator("Assertion", dateTimeComparator),
                 dateTimeComparator);
     }
 
