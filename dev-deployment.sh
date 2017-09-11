@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -e
-CURRENT_DIR="$PWD"
+
+ROOT_DIR="$(dirname "$0")"
+cd "$ROOT_DIR"
+
 function cleanup {
-  rm -rf "$CURRENT_DIR/work"
+  rm -rf "$ROOT_DIR/work"
 }
 trap cleanup EXIT
-cd "$(dirname "$0")"
 
 
 cfLogin() {
@@ -19,7 +21,7 @@ cfLogin() {
 
     # CloudFoundry will cache credentials in ~/.cf/config.json by default.
     # Create a dedicated work area to avoid contaminating the user's credential cache
-    export CF_HOME="$CURRENT_DIR/work"
+    export CF_HOME="$ROOT_DIR/work"
     rm -rf "$CF_HOME"
     mkdir -p "$CF_HOME"
     echo "Authenticating to CloudFoundry at '$CF_API' ($CF_ORG/$CF_SPACE) as '$CF_USER'" >&2
