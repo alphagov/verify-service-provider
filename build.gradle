@@ -34,12 +34,19 @@ dependencies {
 }
 
 sourceSets {
+    test {
+        resources {
+            srcDir 'src/../configuration'
+        }
+    }
+
     acceptanceTest {
         java {
             srcDir 'src/acceptance-test/java'
         }
         resources {
             srcDir 'src/acceptance-test/resources'
+            srcDir 'src/../configuration'
         }
         compileClasspath += sourceSets.main.runtimeClasspath
         compileClasspath += sourceSets.test.runtimeClasspath

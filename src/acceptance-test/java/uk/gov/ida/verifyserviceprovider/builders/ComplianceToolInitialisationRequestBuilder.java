@@ -13,8 +13,8 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 
 public class ComplianceToolInitialisationRequestBuilder {
 
-    private String serviceEntityId = "http://verify-service-provider-acceptance-test";
-    private String assertionConsumerServiceUrl = "http://verify-service-provider-acceptance-test/response";
+    private String serviceEntityId = "http://verify-service-provider";
+    private String assertionConsumerServiceUrl = "http://verify-service-provider/response";
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
     private String expectedPID = "default-expected-pid";

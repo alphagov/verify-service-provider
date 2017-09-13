@@ -36,7 +36,8 @@ public class ApplicationConfigurationFeatureTests {
         keyStoreResource.create();
         application = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider-test.yml"),
+            resourceFilePath("verify-service-provider.yml"),
+            ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("verifyHubMetadata.trustStorePath", keyStoreResource.getAbsolutePath()),
             ConfigOverride.config("verifyHubMetadata.trustStorePassword", keyStoreResource.getPassword())
         );
