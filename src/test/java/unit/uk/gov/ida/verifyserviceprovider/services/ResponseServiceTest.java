@@ -36,6 +36,10 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
+import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.PrivateKey;
 
@@ -97,12 +101,16 @@ public class ResponseServiceTest {
 
         ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
         responseService = responseFactory.createResponseService(
                 hubMetadataResolver,
-                new AssertionTranslator(VERIFY_SERVICE_PROVIDER_ENTITY_ID,
-                        mock(SamlAssertionsSignatureValidator.class),
-                        dateTimeComparator),
+                new AssertionTranslator(
+                    mock(SamlAssertionsSignatureValidator.class),
+                    new InstantValidator(dateTimeComparator),
+                    new SubjectValidator(timeRestrictionValidator),
+                    new ConditionsValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator)
+                ),
                 dateTimeComparator
         );
     }

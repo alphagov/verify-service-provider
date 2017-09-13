@@ -12,15 +12,13 @@ import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 public class InstantValidator {
 
     private static final Duration MAXIMUM_INSTANT_AGE = Duration.standardMinutes(5);
-    private final String instantName;
     private final DateTimeComparator dateTimeComparator;
 
-    public InstantValidator(String instantName, DateTimeComparator dateTimeComparator) {
-        this.instantName = instantName;
+    public InstantValidator(DateTimeComparator dateTimeComparator) {
         this.dateTimeComparator = dateTimeComparator;
     }
 
-    public void validate(DateTime instant) {
+    public void validate(DateTime instant, String instantName) {
         Duration age = new Duration(instant, DateTime.now());
         if (age.isLongerThan(MAXIMUM_INSTANT_AGE)) {
             throw new SamlResponseValidationException(String.format("%s is too far in the past %s",
@@ -29,7 +27,7 @@ public class InstantValidator {
             );
         }
 
-        if (!dateTimeComparator.isBeforeNowFuzzy(instant)) {
+        if (dateTimeComparator.isDefinitelyAfterNow(instant)) {
             throw new SamlResponseValidationException(String.format("%s is in the future %s",
                     instantName,
                     instant.withZone(UTC).toString(dateHourMinuteSecond()))

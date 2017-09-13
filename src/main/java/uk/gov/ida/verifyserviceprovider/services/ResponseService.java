@@ -13,7 +13,6 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import java.util.List;
@@ -25,19 +24,18 @@ public class ResponseService {
     private final AssertionDecrypter assertionDecrypter;
     private final AssertionTranslator assertionTranslator;
     private final SamlResponseSignatureValidator responseSignatureValidator;
-    private final DateTimeComparator dateTimeComparator;
+    private final InstantValidator instantValidator;
 
     public ResponseService(
-            StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
-            AssertionDecrypter assertionDecrypter,
-            AssertionTranslator assertionTranslator,
-            SamlResponseSignatureValidator responseSignatureValidator,
-            DateTimeComparator dateTimeComparator) {
+        StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
+        AssertionDecrypter assertionDecrypter,
+        AssertionTranslator assertionTranslator,
+        SamlResponseSignatureValidator responseSignatureValidator, InstantValidator instantValidator) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionTranslator = assertionTranslator;
         this.responseSignatureValidator = responseSignatureValidator;
-        this.dateTimeComparator = dateTimeComparator;
+        this.instantValidator = instantValidator;
     }
 
     public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
@@ -47,10 +45,11 @@ public class ResponseService {
 
         if (!expectedInResponseTo.equals(validatedResponse.getInResponseTo())) {
             throw new SamlResponseValidationException(
-                    "Expected InResponseTo to be " + expectedInResponseTo + ", but was " + response.getInResponseTo());
+                String.format("Expected InResponseTo to be %s, but was %s", expectedInResponseTo, response.getInResponseTo())
+            );
         }
 
-        new InstantValidator("Response IssueInstant", dateTimeComparator).validate(validatedResponse.getIssueInstant());
+        instantValidator.validate(validatedResponse.getIssueInstant(), "Response IssueInstant");
 
         StatusCode statusCode = validatedResponse.getStatus().getStatusCode();
 
