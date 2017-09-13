@@ -31,7 +31,9 @@ public class AuthnRequestAcceptanceTest {
     @ClassRule
     public static DropwizardAppRule<VerifyServiceProviderConfiguration> application = new DropwizardAppRule<>(
         VerifyServiceProviderApplication.class,
-        resourceFilePath("verify-service-provider-acceptance-test.yml"),
+        resourceFilePath("verify-service-provider.yml"),
+        ConfigOverride.config("server.connector.port", String.valueOf(0)),
+        ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("hubSsoLocation", String.format("%s/%s", COMPLIANCE_TOOL_HOST, "SAML2/SSO"))
     );

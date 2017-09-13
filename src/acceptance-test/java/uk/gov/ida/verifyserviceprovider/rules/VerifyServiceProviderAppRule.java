@@ -18,7 +18,9 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey) {
         super(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider-acceptance-test.yml"),
+            resourceFilePath("verify-service-provider.yml"),
+            ConfigOverride.config("server.connector.port", String.valueOf(0)),
+            ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
             ConfigOverride.config("hubSsoLocation", ComplianceToolService.SSO_LOCATION),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),

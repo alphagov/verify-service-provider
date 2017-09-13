@@ -1,6 +1,8 @@
 # This configuration will be used when no YAML file is specified.
 # For example when the application is being configured with environment variables.
 
+# Dropwizard server connector configuration
+# see: http://www.dropwizard.io/1.1.2/docs/manual/configuration.html#servers
 server:
   type: simple
   applicationContextPath: /
@@ -9,6 +11,8 @@ server:
     type: http
     port: ${PORT:-50400}
 
+# Logging configuration
+# see: http://www.dropwizard.io/1.1.2/docs/manual/configuration.html#logging
 logging:
   level: ${LOG_LEVEL:-INFO}
   appenders:
@@ -19,19 +23,31 @@ logging:
 
 clockSkew: ${CLOCK_SKEW:-PT5s}
 
+# Entity ID that uniquely identifies your service
 serviceEntityId: ${SERVICE_ENTITY_ID:-}
 
+# Location where Verify Hub authentication flow begins
 hubSsoLocation: ${HUB_SSO_LOCATION:-}
 
+# Location of hub metadata
+# Verify Service Provider consumes the metadata and
+# Hub Public certificates from the metadata to identify the hub
 verifyHubMetadata:
   uri: ${HUB_METADATA_URL:-https://www.signin.service.gov.uk/SAML2/metadata/federation}
 
+# Location of Matching Service Metadata
+# Verify Service Provider consumes the metadata and uses
+# public certificates from it to identify the msa
 msaMetadata:
   uri: ${MSA_METADATA_URL:-}
   expectedEntityId: ${MSA_ENTITY_ID:-}
 
+# Private key that is used to sign an AuthnRequest
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
+# Private key used to decrypt Assertions in the Response
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 
+# Secondary private key used to decrypt Assertions in the Response
+# This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
