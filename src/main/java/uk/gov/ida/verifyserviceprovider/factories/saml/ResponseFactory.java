@@ -24,7 +24,11 @@ import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValida
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
+import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -84,7 +88,7 @@ public class ResponseFactory {
             assertionDecrypter,
             assertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-            dateTimeComparator
+            new InstantValidator(dateTimeComparator)
         );
     }
 
@@ -92,9 +96,13 @@ public class ResponseFactory {
             throws ComponentInitializationException {
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(msaMetadataResolver);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
-        return new AssertionTranslator(verifyServiceProviderEntityId,
-                new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
-                dateTimeComparator);
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
+        return new AssertionTranslator(
+            new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
+            new InstantValidator(dateTimeComparator),
+            new SubjectValidator(timeRestrictionValidator),
+            new ConditionsValidator(verifyServiceProviderEntityId, timeRestrictionValidator)
+        );
     }
 
     private MetadataBackedSignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver) throws ComponentInitializationException {

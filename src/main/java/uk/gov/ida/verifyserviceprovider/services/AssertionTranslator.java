@@ -1,90 +1,66 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
-import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeStatement;
-import org.opensaml.saml.saml2.core.Audience;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.AuthnContext;
 import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.NameID;
-import org.opensaml.saml.saml2.core.Subject;
-import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
+import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
+import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
-import static org.joda.time.DateTimeZone.UTC;
-import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
-import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class AssertionTranslator {
-    private final String verifyServiceProviderEntityId;
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
-    private final DateTimeComparator dateTimeComparator;
+    private final InstantValidator instantValidator;
+    private final SubjectValidator subjectValidator;
+    private final ConditionsValidator conditionsValidator;
 
-    public AssertionTranslator(String verifyServiceProviderEntityId,
-                               SamlAssertionsSignatureValidator assertionsSignatureValidator,
-                               DateTimeComparator dateTimeComparator) {
-        this.verifyServiceProviderEntityId = verifyServiceProviderEntityId;
+    public AssertionTranslator(SamlAssertionsSignatureValidator assertionsSignatureValidator,
+                               InstantValidator instantValidator,
+                               SubjectValidator subjectValidator,
+                               ConditionsValidator conditionsValidator) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
-        this.dateTimeComparator = dateTimeComparator;
+        this.instantValidator = instantValidator;
+        this.subjectValidator = subjectValidator;
+        this.conditionsValidator = conditionsValidator;
     }
 
     public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
-        if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
-            throw new SamlResponseValidationException("Exactly one assertion is expected.");
-        }
+        Assertion assertion = getAssertion(assertions);
 
-        Assertion assertion = assertions.get(0);
+        instantValidator.validate(assertion.getIssueInstant(), "Assertion IssueInstant");
 
-        new InstantValidator("Assertion IssueInstant", dateTimeComparator).validate(assertion.getIssueInstant());
-        NameID nameID = validateSubject(expectedInResponseTo, assertion.getSubject());
-        validateConditions(assertion.getConditions());
+        subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
+        String nameID = assertion.getSubject().getNameID().getValue();
+
+        conditionsValidator.validate(assertion.getConditions());
 
         assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
-        List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
-        if (authnStatements == null || authnStatements.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one authn statement is expected.");
-        }
+        AuthnStatement authnStatement = getAuthnStatement(assertion);
 
-        AuthnStatement authnStatement = authnStatements.get(0);
-        new InstantValidator("Assertion AuthnInstant", dateTimeComparator).validate(authnStatement.getAuthnInstant());
-        String levelOfAssuranceString = ofNullable(authnStatement.getAuthnContext())
-            .map(AuthnContext::getAuthnContextClassRef)
-            .map(AuthnContextClassRef::getAuthnContextClassRef)
-            .orElseThrow(() -> new SamlResponseValidationException("Expected a level of assurance."));
+        instantValidator.validate(authnStatement.getAuthnInstant(), "Assertion AuthnInstant");
 
-        LevelOfAssurance levelOfAssurance;
-        try {
-            levelOfAssurance = LevelOfAssurance.fromSamlValue(levelOfAssuranceString);
-        } catch (Exception ex) {
-            throw new SamlResponseValidationException("Level of assurance '" + levelOfAssuranceString + "' is not supported.");
-        }
-
-        if (expectedLevelOfAssurance.isGreaterThan(levelOfAssurance)) {
-            throw new SamlResponseValidationException(
-                    String.format("Expected Level of Assurance to be at least %s, but was %s", expectedLevelOfAssurance, levelOfAssurance));
-        }
+        LevelOfAssurance levelOfAssurance = getLevelOfAssurance(authnStatement);
+        LevelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
 
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
         if (attributeStatements.isEmpty()) {
             return new TranslatedResponseBody(
                 SUCCESS_MATCH,
-                nameID.getValue(),
+                nameID,
                 levelOfAssurance,
                 null
             );
@@ -92,105 +68,39 @@ public class AssertionTranslator {
             // Assume it is user account creation
             return new TranslatedResponseBody(
                 ACCOUNT_CREATION,
-                nameID.getValue(),
+                nameID,
                 levelOfAssurance,
                 AttributeTranslationService.translateAttributes(attributeStatements.get(0))
             );
         }
     }
 
-    private void validateConditions(Conditions conditionsElement) {
-        if (conditionsElement == null) {
-            throw new SamlResponseValidationException("Conditions is missing from the assertion.");
-        }
 
-        validateNotBefore(conditionsElement.getNotBefore());
-
-        DateTime notOnOrAfter = conditionsElement.getNotOnOrAfter();
-        if (notOnOrAfter != null) {
-            validateNotOnOrAfter(notOnOrAfter);
+    private AuthnStatement getAuthnStatement(Assertion assertion) {
+        List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
+        if (authnStatements == null || authnStatements.size() != 1) {
+            throw new SamlResponseValidationException("Exactly one authn statement is expected.");
         }
-
-        if (conditionsElement.getProxyRestriction() != null) {
-            throw new SamlResponseValidationException("Conditions should not contain proxy restriction element.");
-        }
-
-        if (conditionsElement.getOneTimeUse() != null) {
-            throw new SamlResponseValidationException("Conditions should not contain one time use element.");
-        }
-
-        List<AudienceRestriction> audienceRestrictions = conditionsElement.getAudienceRestrictions();
-        if (audienceRestrictions == null || audienceRestrictions.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one audience restriction is expected.");
-        }
-
-        List<Audience> audiences = audienceRestrictions.get(0).getAudiences();
-        if (audiences == null || audiences.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one audience is expected.");
-        }
-
-        String audience = audiences.get(0).getAudienceURI();
-        if (!verifyServiceProviderEntityId.equals(audience)) {
-            throw new SamlResponseValidationException("Audience must match entity ID. Expected " + verifyServiceProviderEntityId + " but was " + audience);
-        }
+        return authnStatements.get(0);
     }
 
-    private NameID validateSubject(String expectedInResponseTo, Subject subject) {
-        if (subject == null) {
-            throw new SamlResponseValidationException("Subject is missing from the assertion.");
+    private Assertion getAssertion(List<Assertion> assertions) {
+        if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
+            throw new SamlResponseValidationException("Exactly one assertion is expected.");
         }
-
-        if (subject.getSubjectConfirmations().size() != 1) {
-            throw new SamlResponseValidationException("Exactly one subject confirmation is expected.");
-        }
-
-        SubjectConfirmation subjectConfirmation = subject.getSubjectConfirmations().get(0);
-        if (!METHOD_BEARER.equals(subjectConfirmation.getMethod())) {
-            throw new SamlResponseValidationException("Subject confirmation method must be 'bearer'.");
-        }
-
-        SubjectConfirmationData subjectConfirmationData = subjectConfirmation.getSubjectConfirmationData();
-        if (subjectConfirmationData == null) {
-            throw new SamlResponseValidationException("Subject confirmation data is missing from the assertion.");
-        }
-
-        validateNotBefore(subjectConfirmationData.getNotBefore());
-
-        DateTime notOnOrAfter = subjectConfirmationData.getNotOnOrAfter();
-        if (notOnOrAfter == null) {
-            throw new SamlResponseValidationException("Subject confirmation data must contain 'NotOnOrAfter'.");
-        }
-
-        validateNotOnOrAfter(notOnOrAfter);
-
-        String actualInResponseTo = subjectConfirmationData.getInResponseTo();
-        if (actualInResponseTo == null) {
-            throw new SamlResponseValidationException("Subject confirmation data must contain 'InResponseTo'.");
-        }
-
-        if (!expectedInResponseTo.equals(actualInResponseTo)) {
-            throw new SamlResponseValidationException("'InResponseTo' must match requestId. Expected " + expectedInResponseTo + " but was " + actualInResponseTo);
-        }
-
-        NameID nameID = subject.getNameID();
-        if (nameID == null) {
-            throw new SamlResponseValidationException("NameID is missing from the subject of the assertion.");
-        }
-        return nameID;
+        return assertions.get(0);
     }
 
-    private void validateNotOnOrAfter(DateTime notOnOrAfter) {
-        DateTime now = DateTime.now();
-        if (!dateTimeComparator.isBeforeFuzzy(now, notOnOrAfter)) {
-            throw new SamlResponseValidationException("Assertion is not valid on or after "
-                    + notOnOrAfter.withZone(UTC).toString(dateHourMinuteSecond())
-            );
-        }
-    }
+    private LevelOfAssurance getLevelOfAssurance(AuthnStatement authnStatement) {
+        String levelOfAssuranceString = ofNullable(authnStatement.getAuthnContext())
+            .map(AuthnContext::getAuthnContextClassRef)
+            .map(AuthnContextClassRef::getAuthnContextClassRef)
+            .orElseThrow(() -> new SamlResponseValidationException("Expected a level of assurance."));
 
-    private void validateNotBefore(DateTime notBefore) {
-        if (notBefore != null && !dateTimeComparator.isAfterFuzzy(DateTime.now(), notBefore)) {
-            throw new SamlResponseValidationException("Assertion is not valid before " + notBefore.withZone(UTC).toString(dateHourMinuteSecond()));
+        try {
+            return LevelOfAssurance.fromSamlValue(levelOfAssuranceString);
+        } catch (Exception ex) {
+            throw new SamlResponseValidationException(String.format("Level of assurance '%s' is not supported.", levelOfAssuranceString));
         }
     }
 }
