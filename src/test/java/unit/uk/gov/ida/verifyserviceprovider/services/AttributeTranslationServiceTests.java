@@ -33,10 +33,10 @@ public class AttributeTranslationServiceTests {
     public void shouldReturnCorrectRequestedAttributes() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue("Bob")
                 .build())
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", false))
+            .addAttribute(createVerifiedAttribute("firstname_verified", false))
             .build();
 
         Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
@@ -48,27 +48,27 @@ public class AttributeTranslationServiceTests {
     public void shouldReturnAllSimpleRequestedAttributes() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue("Joe")
                 .build())
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("MIDDLE_NAME")
+                .withName("middlename")
                 .withSimpleStringValue("Bob")
                 .build())
-            .addAttribute(createVerifiedAttribute("MIDDLE_NAME_VERIFIED", false))
+            .addAttribute(createVerifiedAttribute("middlename_verified", false))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("SURNAME")
+                .withName("surname")
                 .withSimpleStringValue("Bloggs")
                 .build())
-            .addAttribute(createVerifiedAttribute("SURNAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("surname_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("DATE_OF_BIRTH")
+                .withName("dateofbirth")
                 .withSimpleStringValue("1977-07-21 11:15:34AM")
                 .build())
-            .addAttribute(createVerifiedAttribute("DATE_OF_BIRTH_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("dateofbirth_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("CYCLE_3")
+                .withName("cycle_3")
                 .withSimpleStringValue("1")
                 .build())
             .build();
@@ -92,11 +92,11 @@ public class AttributeTranslationServiceTests {
                 .withTo(DateTime.parse("2017-07-30"))
                 .build())
             .buildCurrentAddress();
-        addressAttribute.setName("CURRENT_ADDRESS");
+        addressAttribute.setName("currentaddress");
 
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(addressAttribute)
-            .addAttribute(createVerifiedAttribute("CURRENT_ADDRESS_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("currentaddress_verified", true))
             .build();
 
         Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
@@ -108,10 +108,10 @@ public class AttributeTranslationServiceTests {
     public void shouldIncludeEmptyAttributes() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue("")
                 .build())
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
         Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
@@ -123,10 +123,10 @@ public class AttributeTranslationServiceTests {
     public void shouldNotReturnUnrequestedAttributes() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue("Bob")
                 .build())
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
         Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
@@ -143,27 +143,27 @@ public class AttributeTranslationServiceTests {
 
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue(firstName)
                 .build())
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("MIDDLE_NAME")
+                .withName("middlename")
                 .withSimpleStringValue(middleName)
                 .build())
-            .addAttribute(createVerifiedAttribute("MIDDLE_NAME_VERIFIED", false))
+            .addAttribute(createVerifiedAttribute("middlename_verified", false))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("SURNAME")
+                .withName("surname")
                 .withSimpleStringValue(surname)
                 .build())
-            .addAttribute(createVerifiedAttribute("SURNAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("surname_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("DATE_OF_BIRTH")
+                .withName("dateofbirth")
                 .withSimpleStringValue("1977-07-21 11:15:34AM")
                 .build())
-            .addAttribute(createVerifiedAttribute("DATE_OF_BIRTH_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("dateofbirth_verified", true))
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("CYCLE_3")
+                .withName("cycle_3")
                 .withSimpleStringValue(cycle3)
                 .build())
             .build();
@@ -194,11 +194,11 @@ public class AttributeTranslationServiceTests {
                 .withTo(to)
                 .build())
             .buildCurrentAddress();
-        addressAttribute.setName("CURRENT_ADDRESS");
+        addressAttribute.setName("currentaddress");
 
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(addressAttribute)
-            .addAttribute(createVerifiedAttribute("CURRENT_ADDRESS_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("currentaddress_verified", true))
             .build();
 
         Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
@@ -213,7 +213,7 @@ public class AttributeTranslationServiceTests {
     public void shouldThrowExceptionWhenVerifiedNotRequested() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
-                .withName("FIRST_NAME")
+                .withName("firstname")
                 .withSimpleStringValue("Bob")
                 .build())
             .build();
@@ -224,7 +224,7 @@ public class AttributeTranslationServiceTests {
     @Test(expected = RequestedOnlyVerifiedException.class)
     public void shouldThrowExceptionWhenOnlyRequestingVerified() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(createVerifiedAttribute("FIRST_NAME_VERIFIED", true))
+            .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
         AttributeTranslationService.translateAttributes(attributeStatement);

@@ -25,12 +25,12 @@ public class AttributeTranslationService {
     public static Attributes translateAttributes(AttributeStatement attributeStatement) {
         List<Attribute> statementAttributes = attributeStatement.getAttributes();
 
-        VerifiableAttribute<String> verifiableFirstName = getVerifiableStringAttribute(statementAttributes, "FIRST_NAME", "FIRST_NAME_VERIFIED");
-        VerifiableAttribute<String> verifiableMiddleName = getVerifiableStringAttribute(statementAttributes, "MIDDLE_NAME", "MIDDLE_NAME_VERIFIED");
-        VerifiableAttribute<String> verifiableSurname = getVerifiableStringAttribute(statementAttributes, "SURNAME", "SURNAME_VERIFIED");
-        VerifiableAttribute<LocalDate> verifiableDob = getVerifiableDateAttribute(statementAttributes, "DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
-        VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "CURRENT_ADDRESS", "CURRENT_ADDRESS_VERIFIED");
-        Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "CYCLE_3");
+        VerifiableAttribute<String> verifiableFirstName = getVerifiableStringAttribute(statementAttributes, "firstname", "firstname_verified");
+        VerifiableAttribute<String> verifiableMiddleName = getVerifiableStringAttribute(statementAttributes, "middlename", "middlename_verified");
+        VerifiableAttribute<String> verifiableSurname = getVerifiableStringAttribute(statementAttributes, "surname", "surname_verified");
+        VerifiableAttribute<LocalDate> verifiableDob = getVerifiableDateAttribute(statementAttributes, "dateofbirth", "dateofbirth_verified");
+        VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "currentaddress", "currentaddress_verified");
+        Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "cycle_3");
         return new Attributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, cycle3.orElse(null));
     }
 
