@@ -20,8 +20,6 @@ import static java.util.stream.Collectors.toList;
 
 public class AttributeTranslationService {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ssa";
-
     public static Attributes translateAttributes(AttributeStatement attributeStatement) {
         List<Attribute> statementAttributes = attributeStatement.getAttributes();
 
@@ -70,15 +68,13 @@ public class AttributeTranslationService {
     }
 
     private static Optional<LocalDate> getDateAttributeValue(List<Attribute> attributes, String attributeName) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         return getStringAttributeValue(attributes, attributeName).map(x -> {
             try {
-                return LocalDate.parse(x, formatter);
+                return LocalDate.parse(x, DateTimeFormatter.ISO_DATE);
             } catch (DateTimeParseException e) {
                 throw new SamlResponseValidationException(
-                    String.format("Error in SAML date format for attribute '%s'. Expected pattern: '%s', got: '%s'",
+                    String.format("Error in SAML date format for attribute '%s'. Expected ISO date format, got: '%s'",
                         attributeName,
-                        DATE_TIME_FORMAT,
                         e.getParsedString())
                 );
             }
