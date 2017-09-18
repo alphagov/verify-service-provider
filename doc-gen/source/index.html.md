@@ -9,33 +9,39 @@ highlight_theme: darkula
 
 # Verify Service Provider v0.2.0
 
-> Scroll down for example requests and responses.
 
-This a proposed API for the Verify Serivce Provider
+<p>The Verify Service Provider (VSP) API uses a `/generate-request`, `/translate-response` command format, where the response both contains all user attributes and identifies each as either ‘verified’, or 'unverified'</p>
+
+<p>Use the `/generate-request` command to obtain a Request Response from the Verify environment.</p>
+
+<p>Use the `/translate-response` command to translate the SAML response into JSON.</p>
 
 
-# Verify Service Provider API
+
+# Interactions
 
 ## POST /generate-request
 
-Generate an authn request
+<p>Use the `/generate-request` command to specify the Level of Assurance (LoA) required by the Service and to provoke the environment to generate an Authntication (Authn) request.</p>
+
+<p>POST the body to `/generate-request` to generate a SAML AuthnRequest.</p>
 
 ### Parameters
 
 Parameter|In|Type|Description
----|---|---|---|---|
-body|body|[RequestGenerationBody](#schemarequestgenerationbody)|No description (required)
-» levelOfAssurance|body|string|Level of assurance requested by the Service
+---|---|---|---|--:--|
+body|body|[RequestGenerationBody](#schemarequestgenerationbody)|-
+»levelOfAssurance|body|string|User's Level of Assurance, as provided by the IDP.
 
 
 #### Enumerated Values
 
 |Parameter|Value|
 |---|---|
-» levelOfAssurance|LEVEL_1|
-» levelOfAssurance|LEVEL_2|
+|» levelOfAssurance|LEVEL_1|
+|» levelOfAssurance|LEVEL_2|
 
-> Example request body
+> For Example:
 
 ```json
 {
@@ -44,15 +50,12 @@ body|body|[RequestGenerationBody](#schemarequestgenerationbody)|No description (
 ```
 ### Responses
 
+
 Status|Meaning|Description|Schema
 ---|---|---|---|
-200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|An object containing a SAML request.|[RequestResponseBody](#schemarequestresponsebody)
-422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).|[ErrorMessage](#schemaerrormessage)
-500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|An error due to an internal server error.|[ErrorMessage](#schemaerrormessage)
-
-<aside class="success">
-This operation does not require authentication
-</aside>
+200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|The object received contained a valid SAML request.|[RequestResponseBody](#schemarequestresponsebody)
+422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|<p>The JSON request format is invalid.</p> For example: mandatory parameters were missing.|[ErrorMessage](#schemaerrormessage)
+500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|An internal server error prevented correct processing.|[ErrorMessage](#schemaerrormessage)
 
 > Example responses
 
@@ -78,23 +81,25 @@ This operation does not require authentication
 
 ## POST /translate-response
 
-Create a translated response
+<p>The `/translate-response` command body contains three mandatory parameters, which form the SAML Authn Response.</p>   
+<p>POST the body to `/translate-response` to create a translated Response message.</p>
+
 ### Parameters
 
 Parameter|In|Type|Description
 ---|---|---|---|---|
-body|body|[TranslateSamlResponseBody](#schematranslatesamlresponsebody)|An object containing a details of a SAML Authn response. (required)
-» samlResponse|body|string(byte)|A SAML Authn response as a base64 string. (required)
-» requestId|body|string(byte)|A token that was generated for the original SAML Authn request. The token is used to verify that the request and response are from the same browser. (required)
-» levelOfAssurance|body|string|Level of assurance the user authenticated with. (required)
+body|body|[TranslateSamlResponseBody](#schematranslatesamlresponsebody)|An object that contains details of a SAML Authn response.
+»samlResponse|body|string (byte)|The base 64 SAML Authn response string.
+»requestId|body|string (byte)|A token generated for the original SAML Authn request, used to verify that both the request and response are from the same browser.
+»levelOfAssurance|body|string|User's Level of Assurance, as supplied by the IDP.
 
 
 #### Enumerated Values
 
 |Parameter|Value|
 |---|---|
-» levelOfAssurance|LEVEL_1|
-» levelOfAssurance|LEVEL_2|
+|»levelOfAssurance|LEVEL_1|
+|»levelOfAssurance|LEVEL_2|
 
 > Example request body
 
@@ -109,14 +114,12 @@ body|body|[TranslateSamlResponseBody](#schematranslatesamlresponsebody)|An objec
 
 Status|Meaning|Description|Schema
 ---|---|---|---|
-200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Response contains an object with details of a translated SAML response.|[TranslatedResponseBody](#schematranslatedresponsebody)
-400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|an error due to a problem with translating the Response|[ErrorMessage](#schemaerrormessage)
-422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).|[ErrorMessage](#schemaerrormessage)
-500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|an error due to an internal server error|[ErrorMessage](#schemaerrormessage)
+200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|The Response contains an object that includes a valid translated SAML response.|[TranslatedResponseBody](#schematranslatedresponsebody)
+400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|The Response was not translated correctly.|[ErrorMessage](#schemaerrormessage)
+422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|<p>An invalid JSON request format.</p><p>For example: mandatory parameters were missing.</p>|[ErrorMessage](#schemaerrormessage)
+500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|An internal server error prevented correct processing.|[ErrorMessage](#schemaerrormessage)
 
-<aside class="success">
-This operation does not require authentication
-</aside>
+
 
 > Example responses
 
@@ -168,13 +171,13 @@ This operation does not require authentication
 ```json
 {
   "code": 422,
-  "message": "Some error message"
+  "message": "A different error message"
 }
 ```
 ```json
 {
   "code": 500,
-  "message": "Some error message"
+  "message": "Yet anoher error message"
 }
 ```
 
@@ -183,130 +186,143 @@ This operation does not require authentication
 ## ExpectedLevelOfAssurance
 
 <a name="schemaexpectedlevelofassurance"></a>
+<p>For example:</p>
 
 ```json
-"LEVEL_1" 
+"LEVEL_1"
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-simple|string|false|Level of assurance requested by the Service
+simple|string|false|The Level of Assurance requested by the Service.
 
 
 
 ## ReceivedLevelOfAssurance
 
 <a name="schemareceivedlevelofassurance"></a>
+<p>For example:</p>
 
 ```json
-"LEVEL_1" 
+"LEVEL_1"
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-simple|string|false|Level of assurance the user authenticated with.
+simple|string|false|The user's Level of Assurance, as supplied by the IDP.
 
 
 
 ## Scenario
 
 <a name="schemascenario"></a>
+<p>For example:</p>
 
 ```json
-"SUCCESS_MATCH" 
+"SUCCESS_MATCH"
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-simple|string|false|No description
+simple|string|false|In this case: The IDP has confirmed the user's information and this information has been found by the Local Matching Service.
 
 
 
 ## RequestGenerationBody
 
 <a name="schemarequestgenerationbody"></a>
+<p>For example:</p>
 
 ```json
 {
   "levelOfAssurance": "LEVEL_1"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-levelOfAssurance|string|false|Level of assurance requested by the Service
+levelOfAssurance|string|false|The Level of Assurance requested by the Service.
 
 
 #### Enumerated Values
 
 |Property|Value|
 |---|---|
-levelOfAssurance|LEVEL_1|
-levelOfAssurance|LEVEL_2|
+|levelOfAssurance|LEVEL_1|
+|levelOfAssurance|LEVEL_2|
 
 
 ## RequestResponseBody
 
 <a name="schemarequestresponsebody"></a>
+<p>If the `/generate-request` command receives a valid (200) response from the environment then the `RequestResponseBody` will contain three mandatory elements: `samlRequest`, `requestID` and `ssolocation`.</p>
+<p>For example:</p>
 
 ```json
 {
   "samlRequest": "string",
   "requestId": "string",
   "ssoLocation": "string"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-samlRequest|string(byte)|true|SAML authn request string as a base64 string
-requestId|string(byte)|true|A token that identifies the authn request. This can be used to later verify that the request and response have passed through the same browser.
-ssoLocation|string(url)|true|The url for Verify HUB SSO. The entrypoint for saml authn flow.
+samlRequest|String (byte)|True|The base 64 SAML Authn request string.
+requestId|String (byte)|True|A token used to identify the Authn request and verify that the request / response pair have passed through the same browser.
+ssoLocation|String (url)|True|The SAML Authn flow entrypoint (The Verify environment SSO url).
+
+
+
 
 
 
 ## TranslateSamlResponseBody
 
 <a name="schematranslatesamlresponsebody"></a>
+<p>The `TranslateSamlResponseBody` contains three elements: the SAML Authn response data, a token used to identify the specific request and the user LoA, as provided by the IDP.</p>
+
+<p>For example:</p>
 
 ```json
 {
   "samlResponse": "string",
   "requestId": "string",
   "levelOfAssurance": "LEVEL_1"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-samlResponse|string(byte)|true|A SAML Authn response as a base64 string.
-requestId|string(byte)|true|A token that was generated for the original SAML Authn request. The token is used to verify that the request and response are from the same browser.
-levelOfAssurance|string|true|Level of assurance the user authenticated with.
+samlResponse|string (byte)|true|A SAML Authn response as a base64 string.
+requestId|string (byte)|true|The token generated for the original SAML Authn request, used to confirm that the request and response are from the same browser.
+levelOfAssurance|string|true|The user's Level of assurance, as provided by the IDP.
 
 
 #### Enumerated Values
 
 |Property|Value|
 |---|---|
-levelOfAssurance|LEVEL_1|
-levelOfAssurance|LEVEL_2|
+|levelOfAssurance|LEVEL_1|
+|levelOfAssurance|LEVEL_2|
 
 
 ## TranslatedResponseBody
 
 <a name="schematranslatedresponsebody"></a>
+<p>For example:</p>
 
 ```json
 {
@@ -345,53 +361,39 @@ levelOfAssurance|LEVEL_2|
     },
     "cycle3": "string"
   }
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-scenario|string|true|No description
-pid|string(byte)|true|A unique identifier that can identify a user against an internal record.
-levelOfAssurance|string|false|Level of assurance the user authenticated with.
-attributes|[Attributes](#schemaattributes)|false|An object containing user attributes
-» firstName|object|false|No description
-»» value|string|false|No description
-»» verified|boolean|false|No description
-» middleName|object|false|No description
-»» value|string|false|No description
-»» verified|boolean|false|No description
-» surname|object|false|No description
-»» value|string|false|No description
-»» verified|boolean|false|No description
-» dateOfBirth|object|false|No description
-»» value|string|false|Format yyyy-MM-dd
-»» verified|boolean|false|No description
-» address|object|false|No description
-»» value|[Address](#schemaaddress)|false|An object describing the address fields of a user
-»»» postCode|string|false|No description
-»»» internationalPostCode|string|false|No description
-»»» uprn|string|false|No description
-»»» fromDate|string|false|Format yyyy-MM-dd
-»»» toDate|string|false|Format yyyy-MM-dd
-»»» lines|[string]|false|No description
-»» verified|boolean|false|No description
-» cycle3|string|false|No description
-
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-scenario|SUCCESS_MATCH|
-scenario|ACCOUNT_CREATION|
-scenario|NO_MATCH|
-scenario|CANCELLATION|
-scenario|AUTHENTICATION_FAILED|
-scenario|REQUEST_ERROR|
-levelOfAssurance|LEVEL_1|
-levelOfAssurance|LEVEL_2|
+scenario|string|True|<p>SUCCESS_MATCH</p><p>ACCOUNT_CREATION</p><p>NO_MATCH</p><p>CANCELLATION </p><p>AuthnTICATION_FAILED</p><p>REQUEST_ERROR</p>
+pid|string (byte)|True|<p>The unique code used to link a returning user with an existing local record.</p><p>NOTE: The user must apply to GOV.UK Verify using the same IDP, or a new pid is generated.</p>
+levelOfAssurance|string|False|<p>User's Level of Assurance, as provided by the IDP:</p><p>LEVEL_1</p><p>LEVEL_2</p>|
+[Attributes](#schemaattributes)|-|False|An object containing user attributes.
+»firstName|object|False|-
+»»value|string|False|-
+»»verified|boolean|False|-
+»middleName|object|False|-
+»»value|string|False|-
+»»verified|boolean|False|-
+»surname|object|False|-
+»»value|string|False|-
+»»verified|boolean|False|-
+»dateOfBirth|object|False|-
+»»value|string|False|Format yyyy-MM-dd
+»»verified|boolean|False|-
+»address|object|False|-
+»»value|[Address](#schemaaddress)|False|An object describing the user's address fields.
+»»»postCode|string|False|-
+»»»internationalPostCode|string|False|-
+»»»uprn|string|False|-
+»»»fromDate|string|False|Format yyyy-MM-dd
+»»»toDate|string|False|Format yyyy-MM-dd
+»»»lines|[string]|False|-
+»»verified|boolean|False|-
+»cycle3|string|False|-
 
 
 ## ErrorMessage
@@ -402,15 +404,15 @@ levelOfAssurance|LEVEL_2|
 {
   "code": 0,
   "message": "string"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-code|number|true|No description
-message|string|true|No description
+code|number|true|-
+message|string|true|-
 
 
 
@@ -450,35 +452,35 @@ message|string|true|No description
     "verified": true
   },
   "cycle3": "string"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-firstName|object|false|No description
-» value|string|false|No description
-» verified|boolean|false|No description
-middleName|object|false|No description
-» value|string|false|No description
-» verified|boolean|false|No description
-surname|object|false|No description
-» value|string|false|No description
-» verified|boolean|false|No description
-dateOfBirth|object|false|No description
-» value|string|false|Format yyyy-MM-dd
-» verified|boolean|false|No description
-address|object|false|No description
-» value|[Address](#schemaaddress)|false|An object describing the address fields of a user
-»» postCode|string|false|No description
-»» internationalPostCode|string|false|No description
-»» uprn|string|false|No description
-»» fromDate|string|false|Format yyyy-MM-dd
-»» toDate|string|false|Format yyyy-MM-dd
-»» lines|[string]|false|No description
-» verified|boolean|false|No description
-cycle3|string|false|No description
+firstName|object|False|-
+» value|string|False|-
+» verified|boolean|False|-
+middleName|object|False|-
+» value|string|False|-
+» verified|boolean|False|-
+surname|object|False|-
+» value|string|False|-
+» verified|boolean|False|-
+dateOfBirth|object|False|-
+» value|string|False|Format: yyyy-MM-dd
+» verified|boolean|False|-
+address|object|False|-
+» value|[Address](#schemaaddress)|False|An object describing the user's address fields.
+»» postCode|string|False|-
+»» internationalPostCode|string|False|-
+»» uprn|string|False|-
+»» fromDate|string|False|Format yyyy-MM-dd
+»» toDate|string|False|Format yyyy-MM-dd
+»» lines|[string]|False|-
+» verified|boolean|False|-
+cycle3|string|False|-
 
 
 
@@ -496,21 +498,16 @@ cycle3|string|false|No description
   "uprn": "string",
   "fromDate": "string",
   "toDate": "string"
-} 
+}
 ```
 
 ### Properties
 
 Name|Type|Required|Description
 ---|---|---|---|
-postCode|string|false|No description
-internationalPostCode|string|false|No description
-uprn|string|false|No description
-fromDate|string|false|Format yyyy-MM-dd
-toDate|string|false|Format yyyy-MM-dd
-lines|[string]|false|No description
-
-
-
-
-
+postCode|string|False|-
+internationalPostCode|string|False|-
+uprn|string|False|-
+fromDate|string|False|Format yyyy-MM-dd
+toDate|string|False|Format yyyy-MM-dd
+lines|[string]|False|-
