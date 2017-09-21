@@ -20,17 +20,15 @@ import static java.util.stream.Collectors.toList;
 
 public class AttributeTranslationService {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ssa";
-
     public static Attributes translateAttributes(AttributeStatement attributeStatement) {
         List<Attribute> statementAttributes = attributeStatement.getAttributes();
 
-        VerifiableAttribute<String> verifiableFirstName = getVerifiableStringAttribute(statementAttributes, "FIRST_NAME", "FIRST_NAME_VERIFIED");
-        VerifiableAttribute<String> verifiableMiddleName = getVerifiableStringAttribute(statementAttributes, "MIDDLE_NAME", "MIDDLE_NAME_VERIFIED");
-        VerifiableAttribute<String> verifiableSurname = getVerifiableStringAttribute(statementAttributes, "SURNAME", "SURNAME_VERIFIED");
-        VerifiableAttribute<LocalDate> verifiableDob = getVerifiableDateAttribute(statementAttributes, "DATE_OF_BIRTH", "DATE_OF_BIRTH_VERIFIED");
-        VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "CURRENT_ADDRESS", "CURRENT_ADDRESS_VERIFIED");
-        Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "CYCLE_3");
+        VerifiableAttribute<String> verifiableFirstName = getVerifiableStringAttribute(statementAttributes, "firstname", "firstname_verified");
+        VerifiableAttribute<String> verifiableMiddleName = getVerifiableStringAttribute(statementAttributes, "middlename", "middlename_verified");
+        VerifiableAttribute<String> verifiableSurname = getVerifiableStringAttribute(statementAttributes, "surname", "surname_verified");
+        VerifiableAttribute<LocalDate> verifiableDob = getVerifiableDateAttribute(statementAttributes, "dateofbirth", "dateofbirth_verified");
+        VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "currentaddress", "currentaddress_verified");
+        Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "cycle_3");
         return new Attributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, cycle3.orElse(null));
     }
 
@@ -70,15 +68,13 @@ public class AttributeTranslationService {
     }
 
     private static Optional<LocalDate> getDateAttributeValue(List<Attribute> attributes, String attributeName) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         return getStringAttributeValue(attributes, attributeName).map(x -> {
             try {
-                return LocalDate.parse(x, formatter);
+                return LocalDate.parse(x, DateTimeFormatter.ISO_DATE);
             } catch (DateTimeParseException e) {
                 throw new SamlResponseValidationException(
-                    String.format("Error in SAML date format for attribute '%s'. Expected pattern: '%s', got: '%s'",
+                    String.format("Error in SAML date format for attribute '%s'. Expected ISO date format, got: '%s'",
                         attributeName,
-                        DATE_TIME_FORMAT,
                         e.getParsedString())
                 );
             }
