@@ -1,5 +1,5 @@
 ---
-title: Verify Service Provider v0.2.0
+title: Verify Service Provider v0.3.0
 language_tabs: []
 toc_footers: []
 includes: []
@@ -7,7 +7,7 @@ search: true
 highlight_theme: darkula
 ---
 
-# Verify Service Provider v0.2.0
+# Verify Service Provider v0.3.0
 
 > Scroll down for example requests and responses.
 
