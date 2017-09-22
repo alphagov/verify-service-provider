@@ -9,9 +9,11 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 
 public class SubjectValidator {
+    private final String verifyServiceProviderEntityId;
     private final TimeRestrictionValidator timeRestrictionValidator;
 
-    public SubjectValidator(TimeRestrictionValidator timeRestrictionValidator) {
+    public SubjectValidator(String verifyServiceProviderEntityId, TimeRestrictionValidator timeRestrictionValidator) {
+        this.verifyServiceProviderEntityId = verifyServiceProviderEntityId;
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 
