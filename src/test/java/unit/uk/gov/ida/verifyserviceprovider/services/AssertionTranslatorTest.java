@@ -12,7 +12,6 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.OneTimeUseBuilder;
@@ -70,6 +69,7 @@ public class AssertionTranslatorTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
+    private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
     private AssertionTranslator translator;
     private Credential testRpMsaSigningCredential =
         new TestCredentialFactory(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY).getSigningCredential();
@@ -77,7 +77,7 @@ public class AssertionTranslatorTest {
     @Before
     public void setUp() throws Exception {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
-        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, ASSERTION_CONSUMER_SERVICE_URI, privateKey, privateKey);
 
         EntityDescriptor entityDescriptor = anEntityDescriptor()
             .withIdpSsoDescriptor(anIdpSsoDescriptor()
@@ -184,67 +184,6 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectIsMissing() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject is missing from the assertion.");
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(null)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenMultipleSubjectConfirmation() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one subject confirmation is expected.");
-
-        Subject subject = aSubject().build();
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().build();
-        subject.getSubjectConfirmations().addAll(ImmutableList.of(subjectConfirmation, subjectConfirmation));
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(subject)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationMethodIsNotBearer() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation method must be 'bearer'.");
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(aSubjectConfirmation().withMethod("anything-but-not-bearer").build())
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataMissing() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation data is missing from the assertion.");
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(aSubjectConfirmation().withSubjectConfirmationData(null).build())
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
     public void shouldThrowExceptionWhenSubjectConfirmationDataNotBeforeIsAfterTheCurrentTime() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
         DateTime notBefore = DateTime.now().plusYears(50);
@@ -252,26 +191,6 @@ public class AssertionTranslatorTest {
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData().withNotBefore(notBefore).build()
-        ).build();
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(subjectConfirmation)
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataNotOnOrAfterIsMissing() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation data must contain 'NotOnOrAfter'.");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData().withNotOnOrAfter(null).build()
         ).build();
 
         Assertion assertion = aSignedAssertion()
@@ -329,63 +248,6 @@ public class AssertionTranslatorTest {
                     .withAuthnInstant(DateTime.now().plusMinutes(10))
                     .build())
                 .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataHasNoInResponseTo() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation data must contain 'InResponseTo'.");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData()
-                .withInResponseTo(null)
-                .build()
-        ).build();
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(subjectConfirmation)
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
-        String expectedInResponseTo = "some-non-matching-request-id";
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("'InResponseTo' must match requestId. Expected " + expectedInResponseTo + " but was " + IN_RESPONSE_TO);
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData()
-                .withInResponseTo(IN_RESPONSE_TO)
-                .build()
-        ).build();
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(subjectConfirmation)
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), expectedInResponseTo, LEVEL_2);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNameIdIsMissing() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("NameID is missing from the subject of the assertion.");
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(aValidSubject().withNameId(null).build())
-            .buildUnencrypted();
 
         translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
     }
@@ -627,6 +489,7 @@ public class AssertionTranslatorTest {
                     .withSubjectConfirmationData(aSubjectConfirmationData()
                         .withNotOnOrAfter(DateTime.now().plusMinutes(15))
                         .withInResponseTo(IN_RESPONSE_TO)
+                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
                         .build())
                     .build());
     }
