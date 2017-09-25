@@ -111,7 +111,7 @@ public class ResponseServiceTest {
                 new AssertionTranslator(
                     mock(SamlAssertionsSignatureValidator.class),
                     new InstantValidator(dateTimeComparator),
-                    new SubjectValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator),
+                    new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator),
                     new ConditionsValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator)
                 ),
                 dateTimeComparator
@@ -450,7 +450,7 @@ public class ResponseServiceTest {
                                 .withSubjectConfirmation(
                                         aSubjectConfirmation()
                                                 .withSubjectConfirmationData(aSubjectConfirmationData()
-                                                        .withRecipient(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
+                                                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
                                                         .build())
                                         .build())
                                 .withNameId(aNameId().withValue("some-pid").build())
