@@ -181,7 +181,7 @@ public class SubjectValidatorTest {
     public void shouldThrowExceptionWhenRecipientInSubjectConfirmationDataDoesNotMatchConsumerURI() throws Exception {
         String recipient = "recipient";
         expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Recipient' must match entity id. Expected " + ASSERTION_CONSUMER_SERVICE_URI + " but was " + recipient);
+        expectedException.expectMessage("Recipient' must match assertion consumer service URI. Expected " + ASSERTION_CONSUMER_SERVICE_URI + " but was " + recipient);
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
                 aSubjectConfirmationData()

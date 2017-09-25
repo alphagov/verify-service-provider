@@ -25,6 +25,8 @@ clockSkew: ${CLOCK_SKEW:-PT5s}
 
 # Entity ID that uniquely identifies your service
 serviceEntityId: ${SERVICE_ENTITY_ID:-http://verify-service-provider}
+
+# Location where Verify Hub would send the assertions to
 assertionConsumerServiceUri: ${ASSERTION_CONSUMER_SERVICE_URI:-http://localhost:3200/verify/response}
 
 # Location where Verify Hub authentication flow begins
