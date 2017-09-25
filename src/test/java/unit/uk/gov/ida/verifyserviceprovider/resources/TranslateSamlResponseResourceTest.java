@@ -41,12 +41,13 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 public class TranslateSamlResponseResourceTest {
 
     private static ResponseService responseService = mock(ResponseService.class);
+    private static final String defaultEntityId = "http://default-entity-id";
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
         .addProvider(JerseyViolationExceptionMapper.class)
         .addProvider(JsonProcessingExceptionMapper.class)
-        .addResource(new TranslateSamlResponseResource(responseService))
+        .addResource(new TranslateSamlResponseResource(responseService, defaultEntityId))
         .build();
 
     @After
@@ -60,7 +61,7 @@ public class TranslateSamlResponseResourceTest {
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
 
-        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2)))
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(defaultEntityId)))
                 .thenReturn(new TranslatedResponseBody(Scenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
 
         Response response = resources.client()
@@ -69,7 +70,7 @@ public class TranslateSamlResponseResourceTest {
             .post(json(translateResponseRequest.toString()));
 
         verify(responseService, times(1)).convertTranslatedResponseBody(
-                translateResponseRequest.getString("samlResponse"), "some-request-id", LEVEL_2
+                translateResponseRequest.getString("samlResponse"), "some-request-id", LEVEL_2, defaultEntityId
         );
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
@@ -80,7 +81,7 @@ public class TranslateSamlResponseResourceTest {
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
 
-        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2)))
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(defaultEntityId)))
                 .thenThrow(new SamlResponseValidationException("Some error."));
 
         Response response = resources.client()
@@ -101,7 +102,7 @@ public class TranslateSamlResponseResourceTest {
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
 
-        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2)))
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(defaultEntityId)))
                 .thenThrow(new SamlTransformationErrorException("Some error.", Level.ERROR));
 
         Response response = resources.client()

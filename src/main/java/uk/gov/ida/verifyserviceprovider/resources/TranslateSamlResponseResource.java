@@ -27,18 +27,22 @@ public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
+    private final String defaultEntityId;
 
-    public TranslateSamlResponseResource(ResponseService responseService) {
+    public TranslateSamlResponseResource(ResponseService responseService, String defaultEntityId) {
         this.responseService = responseService;
+        this.defaultEntityId = defaultEntityId;
     }
 
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
+        String entityId = translateSamlResponseBody.getEntityId() != null ? translateSamlResponseBody.getEntityId() : defaultEntityId;
         try {
             TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),
                 translateSamlResponseBody.getRequestId(),
-                translateSamlResponseBody.getLevelOfAssurance()
+                translateSamlResponseBody.getLevelOfAssurance(),
+                entityId
             );
 
             LOG.info(String.format("Translated response for requestID: %s, Scenario: %s",

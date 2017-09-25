@@ -77,7 +77,7 @@ public class AssertionTranslatorTest {
     @Before
     public void setUp() throws Exception {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
-        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
 
         EntityDescriptor entityDescriptor = anEntityDescriptor()
             .withIdpSsoDescriptor(anIdpSsoDescriptor()
@@ -103,10 +103,10 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldTranslateValidAssertion() {
+    public void shouldtranslateValidAssertion() {
         TranslatedResponseBody result = translator.translate(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
-        ), IN_RESPONSE_TO, LEVEL_2);
+        ), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedResponseBody(
             SUCCESS_MATCH,
             "some-pid",
@@ -119,7 +119,7 @@ public class AssertionTranslatorTest {
     public void shouldAllowHigherLevelOfAssuranceThanRequested() throws Exception {
         TranslatedResponseBody result = translator.translate(ImmutableList.of(
                 anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
-        ), IN_RESPONSE_TO, LEVEL_1);
+        ), IN_RESPONSE_TO, LEVEL_1, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedResponseBody(
                 SUCCESS_MATCH,
                 "some-pid",
@@ -133,7 +133,7 @@ public class AssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        translator.translate(Collections.emptyList(), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(Collections.emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class AssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        translator.translate(null, IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(null, IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -155,7 +155,8 @@ public class AssertionTranslatorTest {
                 anAssertion().buildUnencrypted()
             ),
             IN_RESPONSE_TO,
-                LEVEL_2);
+                LEVEL_2,
+            VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -166,7 +167,9 @@ public class AssertionTranslatorTest {
         translator.translate(Collections.singletonList(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).withoutSigning().buildUnencrypted()),
             IN_RESPONSE_TO,
-                LEVEL_2);
+            LEVEL_2,
+            VERIFY_SERVICE_PROVIDER_ENTITY_ID
+        );
     }
 
     @Test
@@ -180,7 +183,9 @@ public class AssertionTranslatorTest {
                 .withSignature(aSignature().withSigningCredential(unknownSigningCredential).build())
                 .buildUnencrypted()),
             IN_RESPONSE_TO,
-                LEVEL_2);
+            LEVEL_2,
+            VERIFY_SERVICE_PROVIDER_ENTITY_ID
+        );
     }
 
     @Test
@@ -192,7 +197,7 @@ public class AssertionTranslatorTest {
             .withSubject(null)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -209,7 +214,7 @@ public class AssertionTranslatorTest {
             .withSubject(subject)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -225,7 +230,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -241,7 +246,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -262,7 +267,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -282,7 +287,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -302,7 +307,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -316,7 +321,7 @@ public class AssertionTranslatorTest {
                         .build())
                 .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -330,7 +335,7 @@ public class AssertionTranslatorTest {
                     .build())
                 .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -352,7 +357,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -375,7 +380,7 @@ public class AssertionTranslatorTest {
             )
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), expectedInResponseTo, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), expectedInResponseTo, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -387,7 +392,7 @@ public class AssertionTranslatorTest {
             .withSubject(aValidSubject().withNameId(null).build())
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -399,7 +404,7 @@ public class AssertionTranslatorTest {
             .withConditions(null)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -414,7 +419,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -429,7 +434,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -441,7 +446,7 @@ public class AssertionTranslatorTest {
                 .withIssueInstant(DateTime.now().minusMinutes(10))
                 .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -453,7 +458,7 @@ public class AssertionTranslatorTest {
                 .withIssueInstant(DateTime.now().plusMinutes(1))
                 .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -469,7 +474,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -484,7 +489,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -498,7 +503,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -519,7 +524,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -539,7 +544,7 @@ public class AssertionTranslatorTest {
             .withConditions(conditionsElement)
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -551,7 +556,7 @@ public class AssertionTranslatorTest {
             .buildUnencrypted();
         assertion.getAuthnStatements().clear();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -564,7 +569,7 @@ public class AssertionTranslatorTest {
             .addAuthnStatement(anAuthnStatement().build())
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -579,7 +584,7 @@ public class AssertionTranslatorTest {
             .addAuthnStatement(authnStatement
             ).buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -597,7 +602,7 @@ public class AssertionTranslatorTest {
                 .build())
             .buildUnencrypted();
 
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -608,7 +613,7 @@ public class AssertionTranslatorTest {
         Assertion assertion = anAssertionWith("some-pid", LEVEL_1_AUTHN_CTX).buildUnencrypted();
 
         LevelOfAssurance expectedLevelOfAssurance = LevelOfAssurance.LEVEL_2;
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, expectedLevelOfAssurance);
+        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, expectedLevelOfAssurance, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     private AssertionBuilder aSignedAssertion() {

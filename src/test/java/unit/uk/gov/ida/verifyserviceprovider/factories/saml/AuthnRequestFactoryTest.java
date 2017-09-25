@@ -20,7 +20,6 @@ public class AuthnRequestFactoryTest {
 
     private static AuthnRequestFactory factory = new AuthnRequestFactory(
         DESTINATION,
-        SERVICE_ENTITY_ID,
         new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getSigningPrivateKey()
     );
 
@@ -32,7 +31,7 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void containsCorrectAttributes() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2);
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
         assertThat(authnRequest.getID()).isNotEmpty();
         assertThat(authnRequest.getIssueInstant()).isNotNull();
@@ -43,25 +42,25 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void shouldNotForceAuthn() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2);
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
         assertThat(authnRequest.isForceAuthn()).isFalse();
     }
 
     @Test
     public void signatureIDReferencesAuthnRequestID() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2);
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
         assertThat(authnRequest.getSignatureReferenceID()).isEqualTo(authnRequest.getID());
     }
 
     @Test
     public void destinationShouldMatchConfiguredSSOLocation() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2);
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
         assertThat(authnRequest.getDestination()).isEqualTo(DESTINATION.toString());
     }
 
     @Test
     public void issuerShouldMatchConfiguredEntityID() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2);
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
         assertThat(authnRequest.getIssuer().getValue()).isEqualTo(SERVICE_ENTITY_ID);
     }
 }

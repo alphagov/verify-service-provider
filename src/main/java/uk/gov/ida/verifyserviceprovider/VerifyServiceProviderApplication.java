@@ -65,13 +65,12 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
                 configuration.getHubSsoLocation(),
-                configuration.getServiceEntityId(),
                 configuration.getSamlSigningKey());
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
-        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
+        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation(), configuration.getServiceEntityId()));
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());

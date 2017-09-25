@@ -28,6 +28,7 @@ import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when;
 public class GenerateAuthnRequestTest {
 
     private static final URI HUB_SSO_LOCATION = URI.create("http://example.com/SAML2/SSO");
+    private static final String defaultEntityId = "http://default-entity-id";
 
     private static AuthnRequestFactory authnRequestFactory = Mockito.mock(AuthnRequestFactory.class);
 
@@ -44,7 +46,7 @@ public class GenerateAuthnRequestTest {
     public static final ResourceTestRule resources = ResourceTestRule.builder()
         .addProvider(JerseyViolationExceptionMapper.class)
         .addProvider(JsonProcessingExceptionMapper.class)
-        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION))
+        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, defaultEntityId))
         .build();
 
     @Before
@@ -61,8 +63,8 @@ public class GenerateAuthnRequestTest {
 
     @Test
     public void returnsAnOKResponse() {
-        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2);
+        when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
+        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
 
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
@@ -70,7 +72,7 @@ public class GenerateAuthnRequestTest {
 
     @Test
     public void responseContainsExpectedFields() {
-        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
+        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         assertThat(requestResponseBody.getSamlRequest()).isNotEmpty();
         assertThat(requestResponseBody.getRequestId()).isNotEmpty();
@@ -79,14 +81,14 @@ public class GenerateAuthnRequestTest {
 
     @Test
     public void ssoLocationIsSameAsConfiguration() {
-        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
+        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         assertThat(requestResponseBody.getSsoLocation()).isEqualTo(HUB_SSO_LOCATION);
     }
 
     @Test
     public void samlRequestIsBase64EncodedAuthnRequest() {
-        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
+        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         try {
             Base64.getDecoder().decode(requestResponseBody.getSamlRequest());
@@ -121,9 +123,9 @@ public class GenerateAuthnRequestTest {
 
     @Test
     public void returns500IfARuntimeExceptionIsThrown() {
-        when(authnRequestFactory.build(any())).thenThrow(RuntimeException.class);
+        when(authnRequestFactory.build(any(), any())).thenThrow(RuntimeException.class);
 
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2);
+        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
 
         ErrorMessage responseEntity = response.readEntity(ErrorMessage.class);
@@ -133,7 +135,7 @@ public class GenerateAuthnRequestTest {
     }
 
     private RequestResponseBody generateRequest() {
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2);
+        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
         return response.readEntity(RequestResponseBody.class);
     }

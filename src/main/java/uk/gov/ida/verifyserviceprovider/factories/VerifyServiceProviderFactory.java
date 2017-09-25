@@ -27,7 +27,6 @@ public class VerifyServiceProviderFactory {
         this.environment = environment;
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(
-            configuration.getServiceEntityId(),
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
@@ -51,7 +50,8 @@ public class VerifyServiceProviderFactory {
         return new TranslateSamlResponseResource(responseFactory.createResponseService(
             getHubMetadataResolver(),
             responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
-            dateTimeComparator)
+            dateTimeComparator),
+            configuration.getServiceEntityId()
         );
     }
 

@@ -21,7 +21,7 @@ public class GenerateRequestService {
         return client
             .target(URI.create(String.format("http://localhost:%d/generate-request", localPort)))
             .request()
-            .buildPost(json(new RequestGenerationBody(LEVEL_2)))
+            .buildPost(json(new RequestGenerationBody(LEVEL_2, null)))
             .invoke()
             .readEntity(RequestResponseBody.class);
     }

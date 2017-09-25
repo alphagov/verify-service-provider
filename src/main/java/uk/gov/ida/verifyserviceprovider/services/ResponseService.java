@@ -30,7 +30,8 @@ public class ResponseService {
         StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
         AssertionDecrypter assertionDecrypter,
         AssertionTranslator assertionTranslator,
-        SamlResponseSignatureValidator responseSignatureValidator, InstantValidator instantValidator) {
+        SamlResponseSignatureValidator responseSignatureValidator,
+        InstantValidator instantValidator) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionTranslator = assertionTranslator;
@@ -38,7 +39,7 @@ public class ResponseService {
         this.instantValidator = instantValidator;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
+    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
         Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
 
         ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
@@ -58,7 +59,7 @@ public class ResponseService {
                 return translateNonSuccessResponse(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
-                return assertionTranslator.translate(assertions, expectedInResponseTo, expectedLevelOfAssurance);
+                return assertionTranslator.translate(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
         }

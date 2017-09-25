@@ -42,6 +42,10 @@ public class ComplianceToolInitialisationRequestBuilder {
         return Entity.json(map);
     }
 
+    public ComplianceToolInitialisationRequestBuilder withEntityId(String entityId) {
+        this.serviceEntityId = entityId;
+        return this;
+    }
 
     public ComplianceToolInitialisationRequestBuilder withEncryptionCertificate(String encryptionCertificate) {
         this.encryptionCertificate = encryptionCertificate;

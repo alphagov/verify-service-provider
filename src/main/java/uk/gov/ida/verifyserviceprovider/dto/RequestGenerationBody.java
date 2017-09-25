@@ -8,14 +8,22 @@ import javax.validation.constraints.NotNull;
 public class RequestGenerationBody {
 
     private final LevelOfAssurance levelOfAssurance;
+    private final String entityId;
 
     @JsonCreator
-    public RequestGenerationBody(@JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance) {
+    public RequestGenerationBody(
+        @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
+        @JsonProperty("entityId") String entityId) {
         this.levelOfAssurance = levelOfAssurance;
+        this.entityId = entityId;
     }
 
     @NotNull
     public LevelOfAssurance getLevelOfAssurance() {
         return levelOfAssurance;
+    }
+
+    public String getEntityId() {
+        return entityId;
     }
 }

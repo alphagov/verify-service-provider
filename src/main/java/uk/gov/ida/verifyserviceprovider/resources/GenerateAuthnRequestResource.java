@@ -24,16 +24,19 @@ public class GenerateAuthnRequestResource {
 
     private final URI ssoLocation;
     private final AuthnRequestFactory authnRequestFactory;
+    private final String defaultEntityId;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(GenerateAuthnRequestResource.class);
 
-    public GenerateAuthnRequestResource(AuthnRequestFactory authnRequestFactory, URI ssoLocation) {
+    public GenerateAuthnRequestResource(AuthnRequestFactory authnRequestFactory, URI ssoLocation, String defaultEntityId) {
         this.authnRequestFactory = authnRequestFactory;
         this.ssoLocation = ssoLocation;
+        this.defaultEntityId = defaultEntityId;
     }
 
     @POST
     public Response generateAuthnRequest(@NotNull @Valid RequestGenerationBody requestGenerationBody) {
-        AuthnRequest authnRequest = this.authnRequestFactory.build(requestGenerationBody.getLevelOfAssurance());
+        String entityId = requestGenerationBody.getEntityId() != null ? requestGenerationBody.getEntityId() : defaultEntityId;
+        AuthnRequest authnRequest = this.authnRequestFactory.build(requestGenerationBody.getLevelOfAssurance(), entityId);
         XmlObjectToBase64EncodedStringTransformer xmlToBase64Transformer = new XmlObjectToBase64EncodedStringTransformer();
         String samlRequest = xmlToBase64Transformer.apply(authnRequest);
 

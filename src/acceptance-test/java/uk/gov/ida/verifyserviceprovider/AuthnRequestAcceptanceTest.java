@@ -40,25 +40,15 @@ public class AuthnRequestAcceptanceTest {
 
     private static Client client = application.client();
 
-    @Before
-    public void setupComplianceTool() throws Exception {
-        Entity initializationRequest = aComplianceToolInitialisationRequest().build();
-
-        Response complianceToolResponse = client
-            .target(URI.create(String.format("%s/%s", COMPLIANCE_TOOL_HOST, "service-test-data")))
-            .request()
-            .buildPost(initializationRequest)
-            .invoke();
-
-        assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());
-    }
 
     @Test
-    public void shouldGenerateValidAuthnRequest() throws Exception {
+    public void shouldGenerateValidAuthnRequestUsingDefaultEntityId() throws Exception {
+        setupComplianceToolWithDefaultEntityId();
+
         Response authnResponse = client
             .target(URI.create(String.format("http://localhost:%d/generate-request", application.getLocalPort())))
             .request()
-            .buildPost(Entity.json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2)))
+            .buildPost(Entity.json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null)))
             .invoke();
 
         RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
@@ -72,5 +62,53 @@ public class AuthnRequestAcceptanceTest {
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
         assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
         assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
+    }
+
+    @Test
+    public void shouldGenerateValidAuthnRequestWhenPassedAnEntityId() throws Exception {
+        String entityId = "http://some-entity-id";
+        setupComplianceToolWithEntityId(entityId);
+
+        Response authnResponse = client
+            .target(URI.create(String.format("http://localhost:%d/generate-request", application.getLocalPort())))
+            .request()
+            .buildPost(Entity.json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, entityId)))
+            .invoke();
+
+        RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
+
+        Response complianceToolResponse = client
+            .target(authnSaml.getSsoLocation())
+            .request()
+            .buildPost(Entity.form(new MultivaluedHashMap<>(ImmutableMap.of("SAMLRequest", authnSaml.getSamlRequest()))))
+            .invoke();
+
+        JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
+        assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
+        assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
+    }
+
+    private void setupComplianceToolWithDefaultEntityId() throws Exception {
+        Entity initializationRequest = aComplianceToolInitialisationRequest().build();
+
+        Response complianceToolResponse = client
+            .target(URI.create(String.format("%s/%s", COMPLIANCE_TOOL_HOST, "service-test-data")))
+            .request()
+            .buildPost(initializationRequest)
+            .invoke();
+
+        assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    }
+
+    private void setupComplianceToolWithEntityId(String entityId) throws Exception {
+        Entity initializationRequest = aComplianceToolInitialisationRequest().withEntityId(entityId).build();
+
+        Response complianceToolResponse = client
+            .target(URI.create(String.format("%s/%s", COMPLIANCE_TOOL_HOST, "service-test-data")))
+            .request()
+            .buildPost(initializationRequest)
+            .invoke();
+
+        assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());
     }
 }
