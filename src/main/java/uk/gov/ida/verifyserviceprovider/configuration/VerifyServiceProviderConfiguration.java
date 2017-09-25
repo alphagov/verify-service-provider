@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import org.joda.time.Duration;
+import uk.gov.ida.verifyserviceprovider.dto.ServiceDetails;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
+import java.util.List;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -17,15 +19,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private String serviceEntityId;
-
-    @JsonProperty
-    @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
-    @Valid
-    private String assertionConsumerServiceUri;
+    private List<ServiceDetails> services;
 
     @JsonProperty
     @NotNull
@@ -64,12 +59,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @Valid
     private Duration clockSkew;
 
-    public String getServiceEntityId() {
-        return serviceEntityId;
-    }
-
-    public String getAssertionConsumerServiceUri() {
-        return assertionConsumerServiceUri;
+    public List<ServiceDetails> getServices() {
+        return services;
     }
 
     public URI getHubSsoLocation() {

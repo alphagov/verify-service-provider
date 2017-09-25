@@ -6,6 +6,7 @@ import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
+import uk.gov.ida.verifyserviceprovider.utils.ServiceDetailFinder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,18 +25,18 @@ public class GenerateAuthnRequestResource {
 
     private final URI ssoLocation;
     private final AuthnRequestFactory authnRequestFactory;
-    private final String defaultEntityId;
+    private final ServiceDetailFinder serviceDetailFinder;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(GenerateAuthnRequestResource.class);
 
-    public GenerateAuthnRequestResource(AuthnRequestFactory authnRequestFactory, URI ssoLocation, String defaultEntityId) {
+    public GenerateAuthnRequestResource(AuthnRequestFactory authnRequestFactory, URI ssoLocation, ServiceDetailFinder serviceDetailFinder) {
         this.authnRequestFactory = authnRequestFactory;
         this.ssoLocation = ssoLocation;
-        this.defaultEntityId = defaultEntityId;
+        this.serviceDetailFinder = serviceDetailFinder;
     }
 
     @POST
     public Response generateAuthnRequest(@NotNull @Valid RequestGenerationBody requestGenerationBody) {
-        String entityId = requestGenerationBody.getEntityId() != null ? requestGenerationBody.getEntityId() : defaultEntityId;
+        String entityId = serviceDetailFinder.getServiceDetails(requestGenerationBody.getEntityId()).getEntityId();
         AuthnRequest authnRequest = this.authnRequestFactory.build(requestGenerationBody.getLevelOfAssurance(), entityId);
         XmlObjectToBase64EncodedStringTransformer xmlToBase64Transformer = new XmlObjectToBase64EncodedStringTransformer();
         String samlRequest = xmlToBase64Transformer.apply(authnRequest);

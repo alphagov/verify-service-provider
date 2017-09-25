@@ -33,7 +33,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator);
+        subjectValidator = new SubjectValidator(timeRestrictionValidator);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class SubjectValidatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Subject is missing from the assertion.");
 
-        subjectValidator.validate(null, IN_RESPONSE_TO);
+        subjectValidator.validate(null, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class SubjectValidatorTest {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().build();
         subject.getSubjectConfirmations().addAll(ImmutableList.of(subjectConfirmation, subjectConfirmation));
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(aSubjectConfirmation().withMethod("anything-but-not-bearer").build())
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(aSubjectConfirmation().withSubjectConfirmationData(null).build())
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, expectedInResponseTo);
+        subjectValidator.validate(subject, expectedInResponseTo, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class SubjectValidatorTest {
                 .withNameId(null)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class SubjectValidatorTest {
                 .withSubjectConfirmation(subjectConfirmation)
                 .build();
 
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator.validate(subject, IN_RESPONSE_TO, ASSERTION_CONSUMER_SERVICE_URI);
     }
 
 }

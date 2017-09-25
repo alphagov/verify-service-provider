@@ -30,6 +30,7 @@ import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.ServiceDetails;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
@@ -81,6 +82,7 @@ public class ResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
     private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
+    private static final ServiceDetails SERVICE_DETAILS = new ServiceDetails(VERIFY_SERVICE_PROVIDER_ENTITY_ID, ASSERTION_CONSUMER_SERVICE_URI);
 
     private ResponseService responseService;
 
@@ -102,7 +104,7 @@ public class ResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(ASSERTION_CONSUMER_SERVICE_URI, privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -111,7 +113,7 @@ public class ResponseServiceTest {
                 new AssertionTranslator(
                     mock(SamlAssertionsSignatureValidator.class),
                     new InstantValidator(dateTimeComparator),
-                    new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator),
+                    new SubjectValidator(timeRestrictionValidator),
                     new ConditionsValidator(timeRestrictionValidator)
                 ),
                 dateTimeComparator
@@ -137,7 +139,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
 
         assertThat(result).isEqualTo(new TranslatedResponseBody(
@@ -162,7 +164,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
 
         assertThat(result.getScenario()).isEqualTo(ACCOUNT_CREATION);
@@ -187,7 +189,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
 
         assertThat(result.getScenario()).isEqualTo(NO_MATCH);
@@ -211,7 +213,7 @@ public class ResponseServiceTest {
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
-            VERIFY_SERVICE_PROVIDER_ENTITY_ID
+            SERVICE_DETAILS
         );
 
         assertThat(result.getScenario()).isEqualTo(REQUEST_ERROR);
@@ -235,7 +237,7 @@ public class ResponseServiceTest {
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
-            VERIFY_SERVICE_PROVIDER_ENTITY_ID
+            SERVICE_DETAILS
         );
 
         assertThat(result.getScenario()).isEqualTo(CANCELLATION);
@@ -259,7 +261,7 @@ public class ResponseServiceTest {
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
-            VERIFY_SERVICE_PROVIDER_ENTITY_ID
+            SERVICE_DETAILS
         );
 
         assertThat(result.getScenario()).isEqualTo(AUTHENTICATION_FAILED);
@@ -285,7 +287,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -310,7 +312,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -331,7 +333,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -352,7 +354,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -373,7 +375,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 "some-incorrect-request-id",
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -392,7 +394,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 
@@ -411,7 +413,7 @@ public class ResponseServiceTest {
                 responseToBase64StringTransformer.apply(response),
                 response.getInResponseTo(),
                 LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+                SERVICE_DETAILS
         );
     }
 

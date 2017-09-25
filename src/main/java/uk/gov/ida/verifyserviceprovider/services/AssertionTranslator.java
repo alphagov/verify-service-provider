@@ -8,6 +8,7 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.ServiceDetails;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
@@ -37,15 +38,15 @@ public class AssertionTranslator {
         this.conditionsValidator = conditionsValidator;
     }
 
-    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
+    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, ServiceDetails serviceDetails) {
         Assertion assertion = getAssertion(assertions);
 
         instantValidator.validate(assertion.getIssueInstant(), "Assertion IssueInstant");
 
-        subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
+        subjectValidator.validate(assertion.getSubject(), expectedInResponseTo, serviceDetails.getAssertionConsumerServiceUri());
         String nameID = assertion.getSubject().getNameID().getValue();
 
-        conditionsValidator.validate(assertion.getConditions(), entityId);
+        conditionsValidator.validate(assertion.getConditions(), serviceDetails.getEntityId());
 
         assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
