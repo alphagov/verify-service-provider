@@ -66,6 +66,7 @@ public class AssertionTranslatorTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
+    private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
     private AssertionTranslator translator;
     private Credential testRpMsaSigningCredential =
         new TestCredentialFactory(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY).getSigningCredential();
@@ -73,7 +74,7 @@ public class AssertionTranslatorTest {
     @Before
     public void setUp() throws Exception {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
-        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, ASSERTION_CONSUMER_SERVICE_URI, privateKey, privateKey);
 
         EntityDescriptor entityDescriptor = anEntityDescriptor()
             .withIdpSsoDescriptor(anIdpSsoDescriptor()
@@ -485,6 +486,7 @@ public class AssertionTranslatorTest {
                     .withSubjectConfirmationData(aSubjectConfirmationData()
                         .withNotOnOrAfter(DateTime.now().plusMinutes(15))
                         .withInResponseTo(IN_RESPONSE_TO)
+                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
                         .build())
                     .build());
     }
