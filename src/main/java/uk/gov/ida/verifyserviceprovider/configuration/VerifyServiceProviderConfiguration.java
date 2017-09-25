@@ -23,6 +23,12 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
+    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
+    @Valid
+    private String assertionConsumerServiceUri;
+
+    @JsonProperty
+    @NotNull
     @Valid
     private URI hubSsoLocation;
 
@@ -60,6 +66,10 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public String getServiceEntityId() {
         return serviceEntityId;
+    }
+
+    public String getAssertionConsumerServiceUri() {
+        return assertionConsumerServiceUri;
     }
 
     public URI getHubSsoLocation() {
