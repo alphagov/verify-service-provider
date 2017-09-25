@@ -17,19 +17,21 @@ To run VSP against a locally running compliance tool you need to make a number o
 ### verify-service-provider:
 -> Change hubSsoLocation in configuration/verify-service-provider.yml to `http://localhost:50270/SAML2/SSO`
 
--> Change verifyHubMetadata/uri to `http://localhost:55000/compliance-tool-local/metadata.xml`
-
 -> Copy `verify-test-truststore.ts` from src/main/resources to the verify-service-provider root directory
 
--> Change verifyHubMetadata/trustStorePath to `verify-test-truststore.ts`
-
+-> Change verifyHubMetadata section to
+```
+verifyHubMetadata:
+  uri: ${HUB_METADATA_URL:-http://localhost:55000/compliance-tool-local/metadata.xml}
+  trustStorePath: verify-test-truststore.ts
+```
 The above will allow you to run the VSP against compliance tool locally if you configure (with POST request) it properly.
 
 ### To run service provider acceptance-tests:
--> Change COMPLIANCE_TOOL_HOST in AuthnRequestAcceptanceTest to `http://localhost:50270`
+-> Change `COMPLIANCE_TOOL_HOST` in AuthnRequestAcceptanceTest to `http://localhost:50270`
 
 -> Change the verifyHubMetadata.uri ConfigOverride in VerifyServiceProviderAppRule to `http://localhost:55000/compliance-tool-local/metadata.xml`
 
--> Change HOST in ComplainceToolService to `http://localhost:50270`
+-> Change `HOST` in ComplianceToolService to `http://localhost:50270`
 
--> Comment out or change the expectedEntityId assertion in ApplicationConfigurationFeatureTests to use `https://local.sigin.service.gov.uk`
+-> Either comment out the ```expectedEntityId``` assertion in ApplicationConfigurationFeatureTests or change it to use `https://local.sigin.service.gov.uk`
