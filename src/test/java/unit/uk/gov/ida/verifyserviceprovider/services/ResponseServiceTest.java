@@ -111,7 +111,7 @@ public class ResponseServiceTest {
                 new AssertionTranslator(
                     mock(SamlAssertionsSignatureValidator.class),
                     new InstantValidator(dateTimeComparator),
-                    new SubjectValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator),
+                    new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator),
                     new ConditionsValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator)
                 ),
                 dateTimeComparator
