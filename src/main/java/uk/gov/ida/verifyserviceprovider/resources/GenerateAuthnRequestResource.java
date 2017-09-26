@@ -35,16 +35,27 @@ public class GenerateAuthnRequestResource {
 
     @POST
     public Response generateAuthnRequest(@NotNull @Valid RequestGenerationBody requestGenerationBody) {
-        String entityId = requestGenerationBody.getEntityId() != null ? requestGenerationBody.getEntityId() : defaultEntityId;
+        String entityId = getEntityId(requestGenerationBody);
         AuthnRequest authnRequest = this.authnRequestFactory.build(requestGenerationBody.getLevelOfAssurance(), entityId);
         XmlObjectToBase64EncodedStringTransformer xmlToBase64Transformer = new XmlObjectToBase64EncodedStringTransformer();
         String samlRequest = xmlToBase64Transformer.apply(authnRequest);
 
         RequestResponseBody requestResponseBody = new RequestResponseBody(samlRequest, authnRequest.getID(), ssoLocation);
 
-        LOG.info(String.format("AuthnRequest generated with requestID: %s", requestResponseBody.getRequestId()));
-        LOG.debug(String.format("AuthnRequest generated with saml: %s", requestResponseBody.getSamlRequest()));
+        LOG.info(String.format("AuthnRequest generated for entityId: %s with requestID: %s", entityId, requestResponseBody.getRequestId()));
+        LOG.debug(String.format("AuthnRequest generated for entityId: %s with saml: %s", entityId, requestResponseBody.getSamlRequest()));
 
         return Response.ok(requestResponseBody).build();
+    }
+
+    private String getEntityId(RequestGenerationBody requestGenerationBody) {
+        if (requestGenerationBody.getEntityId() != null) {
+            String entityId = requestGenerationBody.getEntityId();
+            LOG.info(String.format("Received request to generate authn request specifying entityId: %s", entityId));
+            return entityId;
+        } else {
+            LOG.info(String.format("Received request to generate authn request using configured entityId: %s", defaultEntityId));
+            return defaultEntityId;
+        }
     }
 }

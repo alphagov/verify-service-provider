@@ -36,7 +36,7 @@ public class TranslateSamlResponseResource {
 
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
-        String entityId = translateSamlResponseBody.getEntityId() != null ? translateSamlResponseBody.getEntityId() : defaultEntityId;
+        String entityId = getEntityId(translateSamlResponseBody);
         try {
             TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),
@@ -45,17 +45,29 @@ public class TranslateSamlResponseResource {
                 entityId
             );
 
-            LOG.info(String.format("Translated response for requestID: %s, Scenario: %s",
+            LOG.info(String.format("Translated response for entityId: %s, requestID: %s, got Scenario: %s",
+                    entityId,
                     translateSamlResponseBody.getRequestId(),
                     translatedResponseBody.getScenario()));
 
             return Response.ok(translatedResponseBody).build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
-            LOG.warn(String.format("Error translating saml response for requestID: %s, Message: %s", translateSamlResponseBody.getRequestId(), e.getMessage()));
+            LOG.warn(String.format("Error translating saml response for entityId: %s, requestID: %s, got Message: %s", entityId, translateSamlResponseBody.getRequestId(), e.getMessage()));
             return Response
                 .status(BAD_REQUEST)
                 .entity(new ErrorMessage(BAD_REQUEST.getStatusCode(), e.getMessage()))
                 .build();
+        }
+    }
+
+    private String getEntityId(TranslateSamlResponseBody translateSamlResponseBody) {
+        if (translateSamlResponseBody.getEntityId() != null) {
+            String entityId = translateSamlResponseBody.getEntityId();
+            LOG.info(String.format("Received request to translate a saml response for specified entityId: %s", entityId));
+            return entityId;
+        } else {
+            LOG.info(String.format("Received request to translate a saml response for configured entityId: %s", defaultEntityId));
+            return defaultEntityId;
         }
     }
 }
