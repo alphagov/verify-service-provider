@@ -8,7 +8,6 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceDetailFinder;
 
 public class VerifyServiceProviderFactory {
 
@@ -28,6 +27,7 @@ public class VerifyServiceProviderFactory {
         this.environment = environment;
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(
+            configuration.getAssertionConsumerServiceUri(),
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
@@ -52,7 +52,7 @@ public class VerifyServiceProviderFactory {
             getHubMetadataResolver(),
             responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
             dateTimeComparator),
-            new ServiceDetailFinder(configuration.getServices())
+            configuration.getServiceEntityId()
         );
     }
 

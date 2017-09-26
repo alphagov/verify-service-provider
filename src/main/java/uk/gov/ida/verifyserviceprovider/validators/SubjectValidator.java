@@ -9,13 +9,15 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 
 public class SubjectValidator {
+    private final String assertionConsumerServiceUri;
     private final TimeRestrictionValidator timeRestrictionValidator;
 
-    public SubjectValidator(TimeRestrictionValidator timeRestrictionValidator) {
+    public SubjectValidator(String assertionConsumerServiceUri, TimeRestrictionValidator timeRestrictionValidator) {
+        this.assertionConsumerServiceUri = assertionConsumerServiceUri;
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 
-    public void validate(Subject subject, String expectedInResponseTo, String assertionConsumerServiceUri) {
+    public void validate(Subject subject, String expectedInResponseTo) {
         if (subject == null) {
             throw new SamlResponseValidationException("Subject is missing from the assertion.");
         }

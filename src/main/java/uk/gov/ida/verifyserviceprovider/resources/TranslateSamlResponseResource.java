@@ -3,12 +3,10 @@ package uk.gov.ida.verifyserviceprovider.resources;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.verifyserviceprovider.dto.ServiceDetails;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceDetailFinder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -29,22 +27,22 @@ public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
-    private final ServiceDetailFinder serviceDetailFinder;
+    private final String defaultEntityId;
 
-    public TranslateSamlResponseResource(ResponseService responseService, ServiceDetailFinder serviceDetailFinder) {
+    public TranslateSamlResponseResource(ResponseService responseService, String defaultEntityId) {
         this.responseService = responseService;
-        this.serviceDetailFinder = serviceDetailFinder;
+        this.defaultEntityId = defaultEntityId;
     }
 
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
-        ServiceDetails serviceDetails = serviceDetailFinder.getServiceDetails(translateSamlResponseBody.getEntityId());
+        String entityId = translateSamlResponseBody.getEntityId() != null ? translateSamlResponseBody.getEntityId() : defaultEntityId;
         try {
             TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),
                 translateSamlResponseBody.getRequestId(),
                 translateSamlResponseBody.getLevelOfAssurance(),
-                serviceDetails
+                entityId
             );
 
             LOG.info(String.format("Translated response for requestID: %s, Scenario: %s",

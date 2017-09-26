@@ -23,14 +23,11 @@ logging:
 
 clockSkew: ${CLOCK_SKEW:-PT5s}
 
-services:
-    # Entity ID that uniquely identifies your service
-  - entityId: ${SERVICE_ENTITY_ID:-http://verify-service-provider}
-    # Location where Verify Hub would send the assertions to
-    assertionConsumerServiceUri: ${ASSERTION_CONSUMER_SERVICE_URI:-http://localhost:3200/verify/response}
-# To use the Verify Service Provider for multiple services, specify the above for each service here. E.g.;
-# - entityId: service2EntityId
-#   assertionConsumerServiceUri: service2AssertionConsumerServiceUri
+# Entity ID that uniquely identifies your service
+serviceEntityId: ${SERVICE_ENTITY_ID:-http://verify-service-provider}
+
+# Location where Verify Hub would send the assertions to
+assertionConsumerServiceUri: ${ASSERTION_CONSUMER_SERVICE_URI:-http://localhost:3200/verify/response}
 
 # Location where Verify Hub authentication flow begins
 hubSsoLocation: ${HUB_SSO_LOCATION:-https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO}
