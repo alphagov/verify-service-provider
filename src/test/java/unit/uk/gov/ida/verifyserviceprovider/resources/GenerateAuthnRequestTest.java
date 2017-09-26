@@ -62,9 +62,18 @@ public class GenerateAuthnRequestTest {
     }
 
     @Test
-    public void returnsAnOKResponse() {
+    public void returnsAnOKResponseWithNoEntityIdSent() {
         when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
+
+        Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    @Test
+    public void returnsAnOKResponseWithAnEntityIdSent() {
+        when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
+        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, "http://some-entity-id");
 
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

@@ -25,4 +25,13 @@ public class GenerateRequestService {
             .invoke()
             .readEntity(RequestResponseBody.class);
     }
+
+    public RequestResponseBody generateAuthnRequest(int localPort, String entityId) {
+        return client
+            .target(URI.create(String.format("http://localhost:%d/generate-request", localPort)))
+            .request()
+            .buildPost(json(new RequestGenerationBody(LEVEL_2, entityId)))
+            .invoke()
+            .readEntity(RequestResponseBody.class);
+    }
 }

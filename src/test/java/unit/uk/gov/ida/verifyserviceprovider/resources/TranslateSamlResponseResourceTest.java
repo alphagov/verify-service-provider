@@ -56,13 +56,13 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldUseResponseServiceToTranslateSaml() throws Exception {
+    public void shouldUseResponseServiceToTranslateSamlUsingDefaultEntityIdWhenNoneProvided() throws Exception {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
-                .put("requestId", "some-request-id")
-                .put("levelOfAssurance", LEVEL_2.name());
+            .put("requestId", "some-request-id")
+            .put("levelOfAssurance", LEVEL_2.name());
 
         when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(defaultEntityId)))
-                .thenReturn(new TranslatedResponseBody(Scenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
+            .thenReturn(new TranslatedResponseBody(Scenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
 
         Response response = resources.client()
             .target("/translate-response")
@@ -70,7 +70,29 @@ public class TranslateSamlResponseResourceTest {
             .post(json(translateResponseRequest.toString()));
 
         verify(responseService, times(1)).convertTranslatedResponseBody(
-                translateResponseRequest.getString("samlResponse"), "some-request-id", LEVEL_2, defaultEntityId
+            translateResponseRequest.getString("samlResponse"), "some-request-id", LEVEL_2, defaultEntityId
+        );
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    @Test
+    public void shouldUseResponseServiceToTranslateSamlUsingProvidedEntityIdWhenOneProvided() throws Exception {
+        String providedEntityId = "http://provided-entity-id";
+        JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
+            .put("requestId", "some-request-id")
+            .put("levelOfAssurance", LEVEL_2.name())
+            .put("entityId", providedEntityId);
+
+        when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(providedEntityId)))
+            .thenReturn(new TranslatedResponseBody(Scenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
+
+        Response response = resources.client()
+            .target("/translate-response")
+            .request()
+            .post(json(translateResponseRequest.toString()));
+
+        verify(responseService, times(1)).convertTranslatedResponseBody(
+            translateResponseRequest.getString("samlResponse"), "some-request-id", LEVEL_2, providedEntityId
         );
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
