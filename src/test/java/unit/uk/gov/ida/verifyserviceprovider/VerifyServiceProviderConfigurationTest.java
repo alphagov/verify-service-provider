@@ -45,7 +45,6 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage(containsString("server may not be null"));
         expectedException.expectMessage(containsString("serviceEntityId may not be null"));
-        expectedException.expectMessage(containsString("assertionConsumerServiceUri may not be null"));
         expectedException.expectMessage(containsString("hubSsoLocation may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
