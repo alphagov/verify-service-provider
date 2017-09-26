@@ -100,7 +100,7 @@ public class ResponseFactory {
         return new AssertionTranslator(
             new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
             new InstantValidator(dateTimeComparator),
-            new SubjectValidator(verifyServiceProviderEntityId, timeRestrictionValidator),
+            new SubjectValidator(timeRestrictionValidator),
             new ConditionsValidator(verifyServiceProviderEntityId, timeRestrictionValidator)
         );
     }

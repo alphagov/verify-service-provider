@@ -21,8 +21,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubjectValidatorTest {
-
-    private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
+    
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator subjectValidator;
 
@@ -35,7 +34,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator);
+        subjectValidator = new SubjectValidator(timeRestrictionValidator);
     }
 
     @Test
