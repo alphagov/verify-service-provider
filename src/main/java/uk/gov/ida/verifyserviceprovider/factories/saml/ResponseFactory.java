@@ -48,12 +48,10 @@ public class ResponseFactory {
     private static final EncryptionAlgorithmValidator encryptionAlgorithmValidator = new EncryptionAlgorithmValidator();
     private static final DecrypterFactory decrypterFactory = new DecrypterFactory();
 
-    private final String assertionConsumerServiceUri;
     private final PrivateKey samlPrimaryEncryptionKey;
     private final PrivateKey samlSecondaryEncryptionKey;
 
-    public ResponseFactory(String assertionConsumerServiceUri, PrivateKey samlPrimaryEncryptionKey, PrivateKey samlSecondaryEncryptionKey) {
-        this.assertionConsumerServiceUri = assertionConsumerServiceUri;
+    public ResponseFactory(PrivateKey samlPrimaryEncryptionKey, PrivateKey samlSecondaryEncryptionKey) {
         this.samlPrimaryEncryptionKey = samlPrimaryEncryptionKey;
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
     }
@@ -100,7 +98,7 @@ public class ResponseFactory {
         return new AssertionTranslator(
             new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
             new InstantValidator(dateTimeComparator),
-            new SubjectValidator(assertionConsumerServiceUri, timeRestrictionValidator),
+            new SubjectValidator(timeRestrictionValidator),
             new ConditionsValidator(timeRestrictionValidator)
         );
     }

@@ -27,7 +27,6 @@ public class VerifyServiceProviderFactory {
         this.environment = environment;
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(
-            configuration.getAssertionConsumerServiceUri(),
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());

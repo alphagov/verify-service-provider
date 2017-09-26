@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.validators;
+package unit.uk.gov.ida.verifyserviceprovider.validators;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -12,6 +12,8 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
@@ -19,8 +21,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubjectValidatorTest {
-
-    private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
+    
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator subjectValidator;
 
@@ -33,22 +34,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator);
-    }
-
-    @Test
-    public void shouldNotThrowExceptionForValidSubject() {
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
-                        .build())
-                .build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator = new SubjectValidator(timeRestrictionValidator);
     }
 
     @Test
@@ -150,7 +136,6 @@ public class SubjectValidatorTest {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
                 aSubjectConfirmationData()
                         .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
                         .build()).build();
         Subject subject = aSubject()
                 .withSubjectConfirmation(subjectConfirmation)
@@ -160,39 +145,5 @@ public class SubjectValidatorTest {
         subjectValidator.validate(subject, IN_RESPONSE_TO);
     }
 
-    @Test
-    public void shouldThrowExceptionWhenRecipientInSubjectConfirmationDataIsNull() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation data must contain 'Recipient'.");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(null)
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenRecipientInSubjectConfirmationDataDoesNotMatchConsumerURI() throws Exception {
-        String recipient = "recipient";
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Recipient' must match assertion consumer service URI. Expected " + ASSERTION_CONSUMER_SERVICE_URI + " but was " + recipient);
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(recipient)
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
 
 }
