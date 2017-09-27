@@ -58,6 +58,7 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
+            put("SERVICE_ENTITY_ID", "\"http://some-service-entity-id\"");
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
@@ -74,8 +75,42 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
-
         assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
+        assertThat(configuration.getServiceEntityIds()).containsExactly("http://some-service-entity-id");
+        assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
+        assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
+        assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
+        assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(5));
+    }
+
+    @Test
+    public void applicationShouldStartUpWithListOfServiceEntityIds() throws Exception {
+        environmentHelper.setEnv(new HashMap<String, String>() {{
+            put("PORT", "50555");
+            put("LOG_LEVEL", "ERROR");
+            put("HUB_SSO_LOCATION", "some-hub-sso-location");
+            put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
+            put("MSA_METADATA_URL", "some-msa-metadata-url");
+            put("MSA_ENTITY_ID", "some-msa-entity-id");
+            put("SERVICE_ENTITY_ID", "\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"");
+            put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
+            put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
+            put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
+            put("CLOCK_SKEW", "PT5s");
+        }});
+
+        application.getTestSupport().before();
+
+        VerifyServiceProviderConfiguration configuration = application.getConfiguration();
+
+        assertThat(application.getLocalPort()).isEqualTo(50555);
+        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
+        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo("some-hub-sso-location");
+        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
+        assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
+        assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
+        assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
+        assertThat(configuration.getServiceEntityIds()).containsExactly("http://some-service-entity-id", "http://some-other-service-entity-id");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));

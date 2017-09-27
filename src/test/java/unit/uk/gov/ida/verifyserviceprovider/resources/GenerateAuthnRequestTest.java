@@ -15,20 +15,24 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
+import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +42,8 @@ public class GenerateAuthnRequestTest {
     private static final URI HUB_SSO_LOCATION = URI.create("http://example.com/SAML2/SSO");
     private static final String defaultEntityId = "http://default-entity-id";
 
-    private static AuthnRequestFactory authnRequestFactory = Mockito.mock(AuthnRequestFactory.class);
+    private static AuthnRequestFactory authnRequestFactory = mock(AuthnRequestFactory.class);
+    private static ServiceEntityIdHelper serviceEntityIdHelper = mock(ServiceEntityIdHelper.class);
 
     private AuthnRequest authnRequest;
 
@@ -46,7 +51,8 @@ public class GenerateAuthnRequestTest {
     public static final ResourceTestRule resources = ResourceTestRule.builder()
         .addProvider(JerseyViolationExceptionMapper.class)
         .addProvider(JsonProcessingExceptionMapper.class)
-        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, defaultEntityId))
+        .addProvider(InvalidEntityIdExceptionMapper.class)
+        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, serviceEntityIdHelper))
         .build();
 
     @Before
@@ -61,19 +67,15 @@ public class GenerateAuthnRequestTest {
         IdaSamlBootstrap.bootstrap();
     }
 
-    @Test
-    public void returnsAnOKResponseWithNoEntityIdSent() {
-        when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
-
-        Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
-        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    @Before
+    public void mockServiceEntityIdHelper() {
+        when(serviceEntityIdHelper.getEntityId(any(RequestGenerationBody.class))).thenReturn(defaultEntityId);
     }
 
     @Test
-    public void returnsAnOKResponseWithAnEntityIdSent() {
+    public void returnsAnOKResponse() {
         when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, "http://some-entity-id");
+        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
 
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

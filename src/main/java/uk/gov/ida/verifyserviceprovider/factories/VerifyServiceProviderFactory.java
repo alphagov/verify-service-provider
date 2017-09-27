@@ -4,10 +4,13 @@ import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
+import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
 
 public class VerifyServiceProviderFactory {
 
@@ -19,6 +22,7 @@ public class VerifyServiceProviderFactory {
     private volatile MetadataResolver hubMetadataResolver;
     private volatile MetadataResolver msaMetadataResolver;
     private final DateTimeComparator dateTimeComparator;
+    private final ServiceEntityIdHelper serviceEntityIdHelper;
 
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
@@ -30,6 +34,7 @@ public class VerifyServiceProviderFactory {
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
+        this.serviceEntityIdHelper = new ServiceEntityIdHelper(configuration.getServiceEntityIds());
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -46,12 +51,26 @@ public class VerifyServiceProviderFactory {
         );
     }
 
+    public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws ComponentInitializationException {
+        AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
+            configuration.getHubSsoLocation(),
+            configuration.getSamlSigningKey());
+
+        return new GenerateAuthnRequestResource(
+            authnRequestFactory,
+            configuration.getHubSsoLocation(),
+            serviceEntityIdHelper
+        );
+    }
+
     public TranslateSamlResponseResource getTranslateSamlResponseResource() throws ComponentInitializationException {
-        return new TranslateSamlResponseResource(responseFactory.createResponseService(
-            getHubMetadataResolver(),
-            responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
-            dateTimeComparator),
-            configuration.getServiceEntityId()
+        return new TranslateSamlResponseResource(
+            responseFactory.createResponseService(
+                getHubMetadataResolver(),
+                responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
+                dateTimeComparator
+            ),
+            serviceEntityIdHelper
         );
     }
 

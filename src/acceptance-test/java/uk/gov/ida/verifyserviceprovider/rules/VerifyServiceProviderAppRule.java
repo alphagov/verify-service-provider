@@ -15,10 +15,11 @@ import static uk.gov.ida.verifyserviceprovider.configuration.MetadataUri.COMPLIA
 
 public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
 
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey) {
+    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
+            ConfigOverride.config("serviceEntityId", serviceEntityIdOverride),
             ConfigOverride.config("server.connector.port", String.valueOf(0)),
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
@@ -35,6 +36,10 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     }
 
     public VerifyServiceProviderAppRule(MockMsaServer msaServer) {
-        this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY);
+        this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
+    }
+
+    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String serviceEntityIdOverride) {
+        this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, serviceEntityIdOverride);
     }
 }
