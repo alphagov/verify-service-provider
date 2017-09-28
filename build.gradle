@@ -67,6 +67,14 @@ distributions {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+                "Version": version
+        )
+    }
+}
+
 task testAcceptance(type: Test) {
     testClassesDir = sourceSets.acceptanceTest.output.classesDir
     classpath += sourceSets.acceptanceTest.runtimeClasspath

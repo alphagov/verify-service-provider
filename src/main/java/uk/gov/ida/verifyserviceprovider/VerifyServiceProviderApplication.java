@@ -19,6 +19,8 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
+import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
+import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
 
 import java.util.Arrays;
@@ -69,6 +71,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
+        environment.jersey().register(new VersionNumberResource(new ManifestReader()));
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
