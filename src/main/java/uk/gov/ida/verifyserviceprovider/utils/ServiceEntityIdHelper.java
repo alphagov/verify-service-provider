@@ -19,39 +19,29 @@ public class ServiceEntityIdHelper {
     }
 
     public String getEntityId(RequestGenerationBody requestGenerationBody) {
-        if (requestGenerationBody.getEntityId() != null) {
-            String entityId = requestGenerationBody.getEntityId();
-            LOG.info(String.format("Received request to generate authn request specifying entityId: %s", entityId));
-            if (configuredEntityIds.contains(entityId)) {
-                return entityId;
-            } else {
-                throw new InvalidEntityIdException(String.format("Provided entityId: %s is not listed in config", entityId));
-            }
-        } else {
-            LOG.info(String.format("Received request to generate authn request using default entityId"));
-            if (defaultEntityId != null) {
-                return defaultEntityId;
-            } else {
-                throw new InvalidEntityIdException("No entityId was provided, and there are several in config");
-            }
-        }
+        String entityId = requestGenerationBody.getEntityId();
+        LOG.info(String.format("Received request to generate authn request with entityId %s", entityId != null ? entityId : "from config"));
+        return getEntityId(entityId);
     }
 
     public String getEntityId(TranslateSamlResponseBody translateSamlResponseBody) {
-        if (translateSamlResponseBody.getEntityId() != null) {
-            String entityId = translateSamlResponseBody.getEntityId();
-            LOG.info(String.format("Received request to translate a saml response for specified entityId: %s", entityId));
-            if (configuredEntityIds.contains(entityId)) {
-                return entityId;
-            } else {
-                throw new InvalidEntityIdException(String.format("Provided entityId: %s is not listed in config", entityId));
-            }
-        } else {
-            LOG.info("Received request to translate a saml response using default entityId");
+        String entityId = translateSamlResponseBody.getEntityId();
+        LOG.info(String.format("Received request to translate a saml response with entityId %s", entityId != null ? entityId : "from config"));
+        return getEntityId(entityId);
+    }
+
+    private String getEntityId(String providedEntityId) {
+        if (providedEntityId == null) {
             if (defaultEntityId != null) {
                 return defaultEntityId;
             } else {
                 throw new InvalidEntityIdException("No entityId was provided, and there are several in config");
+            }
+        } else {
+            if (configuredEntityIds.contains(providedEntityId)) {
+                return providedEntityId;
+            } else {
+                throw new InvalidEntityIdException(String.format("Provided entityId: %s is not listed in config", providedEntityId));
             }
         }
     }
