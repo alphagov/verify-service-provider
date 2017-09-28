@@ -43,7 +43,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("hubSsoLocation", String.format("%s/%s", COMPLIANCE_TOOL_HOST, "SAML2/SSO")),
-        ConfigOverride.config("serviceEntityId", String.format("%s", SINGLE_ENTITY_ID))
+        ConfigOverride.config("serviceEntityIds", String.format("%s", SINGLE_ENTITY_ID))
     );
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
@@ -53,7 +53,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("hubSsoLocation", String.format("%s/%s", COMPLIANCE_TOOL_HOST, "SAML2/SSO")),
-        ConfigOverride.config("serviceEntityId", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2))
+        ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2))
     );
 
 

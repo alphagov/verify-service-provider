@@ -20,7 +20,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Size(min = 1, message = NOT_EMPTY_MESSAGE)
     @Valid
-    private List<String> serviceEntityId;
+    private List<String> serviceEntityIds;
 
     @JsonProperty
     @NotNull
@@ -60,7 +60,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private Duration clockSkew;
 
     public List<String> getServiceEntityIds() {
-        return serviceEntityId;
+        return serviceEntityIds;
     }
 
     public URI getHubSsoLocation() {
