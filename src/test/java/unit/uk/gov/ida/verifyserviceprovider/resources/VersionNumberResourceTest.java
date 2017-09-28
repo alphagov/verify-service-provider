@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import java.util.jar.Attributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,5 +47,15 @@ public class VersionNumberResourceTest {
         verify(manifestReader, times(1)).getManifest();
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(response.readEntity(String.class)).isEqualTo(versionNumber);
+    }
+
+    @Test
+    public void returns500WhenManifestReaderThrowsException() {
+        doThrow(new RuntimeException("exception")).when(manifestReader).getManifest();
+
+        Response response = resources.target("/version-number").request().get();
+
+        verify(manifestReader, times(1)).getManifest();
+        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 }
