@@ -43,7 +43,7 @@ public class GenerateAuthnRequestResource {
 
         RequestResponseBody requestResponseBody = new RequestResponseBody(samlRequest, authnRequest.getID(), ssoLocation);
 
-        LOG.info(String.format("AuthnRequest generated for entityId: %s with requestID: %s", entityId, requestResponseBody.getRequestId()));
+        LOG.info(String.format("AuthnRequest generated for entityId: %s with requestId: %s", entityId, requestResponseBody.getRequestId()));
         LOG.debug(String.format("AuthnRequest generated for entityId: %s with saml: %s", entityId, requestResponseBody.getSamlRequest()));
 
         return Response.ok(requestResponseBody).build();

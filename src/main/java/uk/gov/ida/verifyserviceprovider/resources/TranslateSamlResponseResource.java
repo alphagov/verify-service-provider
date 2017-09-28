@@ -49,14 +49,14 @@ public class TranslateSamlResponseResource {
                 entityId
             );
 
-            LOG.info(String.format("Translated response for entityId: %s, requestID: %s, got Scenario: %s",
+            LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
                     entityId,
                     translateSamlResponseBody.getRequestId(),
                     translatedResponseBody.getScenario()));
 
             return Response.ok(translatedResponseBody).build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {
-            LOG.warn(String.format("Error translating saml response for entityId: %s, requestID: %s, got Message: %s", entityId, translateSamlResponseBody.getRequestId(), e.getMessage()));
+            LOG.warn(String.format("Error translating saml response for entityId: %s, requestId: %s, got Message: %s", entityId, translateSamlResponseBody.getRequestId(), e.getMessage()));
             return Response
                 .status(BAD_REQUEST)
                 .entity(new ErrorMessage(BAD_REQUEST.getStatusCode(), e.getMessage()))

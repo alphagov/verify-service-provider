@@ -20,4 +20,5 @@ The verify service provider will not validate the assertion consumer service url
 
 ## Consequences
 
+We will not be performing a check that the SAML specification says should be performed (however, as above, we believe this is covered by the audience restriction check).
 We will have to revert some commits already merged.
