@@ -58,7 +58,7 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
-            put("SERVICE_ENTITY_IDS", "\"http://some-service-entity-id\"");
+            put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
@@ -92,7 +92,7 @@ public class ApplicationConfigurationFeatureTests {
             put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
-            put("SERVICE_ENTITY_IDS", "\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"");
+            put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);

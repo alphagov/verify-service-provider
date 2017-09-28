@@ -24,7 +24,7 @@ logging:
 clockSkew: ${CLOCK_SKEW:-PT5s}
 
 # Entity ID that uniquely identifies your service
-serviceEntityIds: [${SERVICE_ENTITY_IDS:-"http://verify-service-provider"}]
+serviceEntityIds: ${SERVICE_ENTITY_IDS:-["http://verify-service-provider"]}
 # To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
 # ["service-one-entity-id", "service-two-entity-id"]
 
