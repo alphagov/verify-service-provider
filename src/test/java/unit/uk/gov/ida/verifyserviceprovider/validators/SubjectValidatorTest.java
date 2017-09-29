@@ -35,7 +35,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(VERIFY_SERVICE_PROVIDER_ENTITY_ID, timeRestrictionValidator);
+        subjectValidator = new SubjectValidator(timeRestrictionValidator);
     }
 
     @Test
