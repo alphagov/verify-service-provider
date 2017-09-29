@@ -65,8 +65,6 @@ import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 import static uk.gov.ida.saml.core.test.builders.StatusBuilder.aStatus;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
@@ -80,7 +78,6 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 public class ResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
-    private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
 
     private ResponseService responseService;
 
@@ -102,7 +99,7 @@ public class ResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, ASSERTION_CONSUMER_SERVICE_URI, privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(VERIFY_SERVICE_PROVIDER_ENTITY_ID, privateKey, privateKey);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -447,12 +444,6 @@ public class ResponseServiceTest {
         return
                 anAssertion()
                         .withSubject(aSubject()
-                                .withSubjectConfirmation(
-                                        aSubjectConfirmation()
-                                                .withSubjectConfirmationData(aSubjectConfirmationData()
-                                                        .withRecipient(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
-                                                        .build())
-                                        .build())
                                 .withNameId(aNameId().withValue("some-pid").build())
                                 .build())
                         .withConditions(aConditions()
