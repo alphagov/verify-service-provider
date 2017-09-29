@@ -22,7 +22,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 @RunWith(MockitoJUnitRunner.class)
 public class SubjectValidatorTest {
 
-    private static final String ASSERTION_CONSUMER_SERVICE_URI = "http://localhost:3200/verify/response";
+    private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator subjectValidator;
 
@@ -35,22 +35,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(ASSERTION_CONSUMER_SERVICE_URI, timeRestrictionValidator);
-    }
-
-    @Test
-    public void shouldNotThrowExceptionForValidSubject() {
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
-                        .build())
-                .build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
+        subjectValidator = new SubjectValidator(timeRestrictionValidator);
     }
 
     @Test
@@ -152,7 +137,6 @@ public class SubjectValidatorTest {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
                 aSubjectConfirmationData()
                         .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
                         .build()).build();
         Subject subject = aSubject()
                 .withSubjectConfirmation(subjectConfirmation)
@@ -162,39 +146,5 @@ public class SubjectValidatorTest {
         subjectValidator.validate(subject, IN_RESPONSE_TO);
     }
 
-    @Test
-    public void shouldThrowExceptionWhenRecipientInSubjectConfirmationDataIsNull() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation data must contain 'Recipient'.");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(null)
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenRecipientInSubjectConfirmationDataDoesNotMatchConsumerURI() throws Exception {
-        String recipient = "recipient";
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Recipient' must match assertion consumer service URI. Expected " + ASSERTION_CONSUMER_SERVICE_URI + " but was " + recipient);
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .withRecipient(recipient)
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
 
 }

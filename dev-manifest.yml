@@ -5,7 +5,6 @@ applications:
     env:
       CLOCK_SKEW: PT5s
       SERVICE_ENTITY_ID: http://verify-service-provider-dev-service
-      ASSERTION_CONSUMER_SERVICE_URI: https://passport-verify-stub-relying-party-dev.cloudapps.digital/verify/response
       HUB_SSO_LOCATION: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
       MSA_ENTITY_ID: https://verify-service-provider-stub-msa
       HUB_METADATA_URL: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation

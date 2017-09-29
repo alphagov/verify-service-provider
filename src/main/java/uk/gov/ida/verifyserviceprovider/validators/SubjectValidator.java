@@ -9,11 +9,9 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 
 public class SubjectValidator {
-    private final String assertionConsumerServiceUri;
     private final TimeRestrictionValidator timeRestrictionValidator;
 
-    public SubjectValidator(String assertionConsumerServiceUri, TimeRestrictionValidator timeRestrictionValidator) {
-        this.assertionConsumerServiceUri = assertionConsumerServiceUri;
+    public SubjectValidator(TimeRestrictionValidator timeRestrictionValidator) {
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 
@@ -52,16 +50,6 @@ public class SubjectValidator {
 
         if (!expectedInResponseTo.equals(actualInResponseTo)) {
             throw new SamlResponseValidationException(String.format("'InResponseTo' must match requestId. Expected %s but was %s", expectedInResponseTo, actualInResponseTo));
-        }
-
-        String recipient = subjectConfirmationData.getRecipient();
-        if (recipient == null) {
-            throw new SamlResponseValidationException("Subject confirmation data must contain 'Recipient'.");
-        }
-
-        if (!assertionConsumerServiceUri.equals(recipient)) {
-            throw new SamlResponseValidationException(String.format("'Recipient' must match assertion consumer service URI. Expected %s but was %s",
-                    assertionConsumerServiceUri, recipient));
         }
 
         if (subject.getNameID() == null) {
