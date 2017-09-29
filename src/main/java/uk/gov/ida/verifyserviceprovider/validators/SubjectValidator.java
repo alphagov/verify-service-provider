@@ -60,8 +60,7 @@ public class SubjectValidator {
         }
 
         if (!assertionConsumerServiceUri.equals(recipient)) {
-            throw new SamlResponseValidationException(String.format("'Recipient' must match assertion consumer service URI. Expected %s but was %s",
-                    assertionConsumerServiceUri, recipient));
+            throw new SamlResponseValidationException(String.format("'Recipient' must match entity id. Expected %s but was %s", assertionConsumerServiceUri, recipient));
         }
 
         if (subject.getNameID() == null) {
