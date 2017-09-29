@@ -450,7 +450,7 @@ public class ResponseServiceTest {
                                 .withSubjectConfirmation(
                                         aSubjectConfirmation()
                                                 .withSubjectConfirmationData(aSubjectConfirmationData()
-                                                        .withRecipient(ASSERTION_CONSUMER_SERVICE_URI)
+                                                        .withRecipient(VERIFY_SERVICE_PROVIDER_ENTITY_ID)
                                                         .build())
                                         .build())
                                 .withNameId(aNameId().withValue("some-pid").build())
