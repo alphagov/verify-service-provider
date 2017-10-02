@@ -9,9 +9,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/version-number")
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.TEXT_PLAIN)
 public class VersionNumberResource {
 
+    public static final String UNKNOWN_VERSION = "UNKNOWN_VERSION";
     private final ManifestReader manifestReader;
 
     public VersionNumberResource(ManifestReader manifestReader) {
@@ -20,7 +21,7 @@ public class VersionNumberResource {
 
     @GET
     public Response getVersionNumber() {
-        String version = manifestReader.getManifest().getValue("Version");
+        String version = manifestReader.getManifest().map(x -> x.getValue("Version")).orElse(UNKNOWN_VERSION);
         return Response.ok(version).build();
     }
 }
