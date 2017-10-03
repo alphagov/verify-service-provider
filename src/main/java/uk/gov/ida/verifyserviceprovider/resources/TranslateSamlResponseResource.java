@@ -28,17 +28,17 @@ public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
-    private final EntityIdService entityIdHelper;
+    private final EntityIdService entityIdService;
 
 
-    public TranslateSamlResponseResource(ResponseService responseService, EntityIdService entityIdHelper) {
+    public TranslateSamlResponseResource(ResponseService responseService, EntityIdService entityIdService) {
         this.responseService = responseService;
-        this.entityIdHelper = entityIdHelper;
+        this.entityIdService = entityIdService;
     }
 
     @POST
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
-        String entityId = entityIdHelper.getEntityId(translateSamlResponseBody);
+        String entityId = entityIdService.getEntityId(translateSamlResponseBody);
         try {
             TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),

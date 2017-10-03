@@ -57,7 +57,7 @@ public class TranslateSamlResponseResourceTest {
         .build();
 
     @Before
-    public void mockServiceEntityIdHelper() {
+    public void mockEntityIdService() {
         when(entityIdService.getEntityId(any(TranslateSamlResponseBody.class))).thenReturn(defaultEntityId);
     }
 

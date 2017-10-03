@@ -66,7 +66,7 @@ public class GenerateAuthnRequestTest {
     }
 
     @Before
-    public void mockServiceEntityIdHelper() {
+    public void mockEntityIdService() {
         when(entityIdService.getEntityId(any(RequestGenerationBody.class))).thenReturn(defaultEntityId);
     }
 
