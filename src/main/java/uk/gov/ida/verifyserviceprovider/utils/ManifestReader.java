@@ -1,25 +1,33 @@
 package uk.gov.ida.verifyserviceprovider.utils;
 
-import com.google.common.base.Throwables;
-
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
+import java.util.Optional;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 @Singleton
 public class ManifestReader {
-    public Attributes getManifest() {
-        URLClassLoader cl = (URLClassLoader) getClass().getClassLoader();
-        Manifest manifest;
+    private static final String MANIFEST_FILE_LOCATION = "/META-INF/MANIFEST.MF";
+
+    public Optional<Attributes> getManifest() {
+        Optional<String> manifestPath = getManifestFilePath();
+        return manifestPath.map(this::getManifestAttributes);
+    }
+
+    private Attributes getManifestAttributes(String manifestPath) {
         try {
-            URL url = cl.findResource("META-INF/MANIFEST.MF");
-            manifest = new Manifest(url.openStream());
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            return new Manifest(new URL(manifestPath).openStream()).getMainAttributes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return manifest.getMainAttributes();
+    }
+
+    private Optional<String> getManifestFilePath() {
+        String simpleName = this.getClass().getSimpleName() + ".class";
+        String pathToClass = this.getClass().getResource(simpleName).toString();
+        String pathToJar = pathToClass.substring(0, pathToClass.lastIndexOf("!") + 1);
+        return pathToJar.isEmpty() ? Optional.empty() : Optional.of(pathToJar + MANIFEST_FILE_LOCATION);
     }
 }

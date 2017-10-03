@@ -21,7 +21,6 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubjectValidatorTest {
-    
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator subjectValidator;
 
