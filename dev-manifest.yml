@@ -1,10 +1,10 @@
-memory: 256M
+memory: 1024M
 applications:
   - name: verify-service-provider-dev
     buildpack: java_buildpack
     env:
       CLOCK_SKEW: PT5s
-      SERVICE_ENTITY_ID: http://verify-service-provider-dev-service
+      SERVICE_ENTITY_IDS: '["http://verify-service-provider-dev-service"]'
       HUB_SSO_LOCATION: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
       MSA_ENTITY_ID: https://verify-service-provider-stub-msa
       HUB_METADATA_URL: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation

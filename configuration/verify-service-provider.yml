@@ -23,10 +23,11 @@ logging:
 
 clockSkew: ${CLOCK_SKEW:-PT5s}
 
-# Entity ID that uniquely identifies your service
+# Entity ID (or IDs) that uniquely identifies your service (or services)
 serviceEntityIds: ${SERVICE_ENTITY_IDS:-["http://verify-service-provider"]}
+# This should be provided as a JSON array, e.g. '["service-entity-id"]'
 # To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
-# ["service-one-entity-id", "service-two-entity-id"]
+# '["service-one-entity-id", "service-two-entity-id"]'
 
 # Location where Verify Hub authentication flow begins
 hubSsoLocation: ${HUB_SSO_LOCATION:-https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO}
