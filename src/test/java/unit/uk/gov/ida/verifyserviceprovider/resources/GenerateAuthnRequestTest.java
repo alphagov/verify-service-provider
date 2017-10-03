@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.impl.AuthnRequestBuilder;
@@ -20,13 +19,12 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
+import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +41,7 @@ public class GenerateAuthnRequestTest {
     private static final String defaultEntityId = "http://default-entity-id";
 
     private static AuthnRequestFactory authnRequestFactory = mock(AuthnRequestFactory.class);
-    private static ServiceEntityIdHelper serviceEntityIdHelper = mock(ServiceEntityIdHelper.class);
+    private static EntityIdService entityIdService = mock(EntityIdService.class);
 
     private AuthnRequest authnRequest;
 
@@ -52,7 +50,7 @@ public class GenerateAuthnRequestTest {
         .addProvider(JerseyViolationExceptionMapper.class)
         .addProvider(JsonProcessingExceptionMapper.class)
         .addProvider(InvalidEntityIdExceptionMapper.class)
-        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, serviceEntityIdHelper))
+        .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, entityIdService))
         .build();
 
     @Before
@@ -69,7 +67,7 @@ public class GenerateAuthnRequestTest {
 
     @Before
     public void mockServiceEntityIdHelper() {
-        when(serviceEntityIdHelper.getEntityId(any(RequestGenerationBody.class))).thenReturn(defaultEntityId);
+        when(entityIdService.getEntityId(any(RequestGenerationBody.class))).thenReturn(defaultEntityId);
     }
 
     @Test

@@ -5,10 +5,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdException;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,7 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -30,10 +28,10 @@ public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
-    private final ServiceEntityIdHelper entityIdHelper;
+    private final EntityIdService entityIdHelper;
 
 
-    public TranslateSamlResponseResource(ResponseService responseService, ServiceEntityIdHelper entityIdHelper) {
+    public TranslateSamlResponseResource(ResponseService responseService, EntityIdService entityIdHelper) {
         this.responseService = responseService;
         this.entityIdHelper = entityIdHelper;
     }

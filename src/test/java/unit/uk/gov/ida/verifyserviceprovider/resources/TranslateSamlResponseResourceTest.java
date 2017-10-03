@@ -16,14 +16,13 @@ import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdException;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
 
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 public class TranslateSamlResponseResourceTest {
 
     private static ResponseService responseService = mock(ResponseService.class);
-    private static ServiceEntityIdHelper serviceEntityIdHelper = mock(ServiceEntityIdHelper.class);
+    private static EntityIdService entityIdService = mock(EntityIdService.class);
     private static final String defaultEntityId = "http://default-entity-id";
 
     @ClassRule
@@ -54,12 +53,12 @@ public class TranslateSamlResponseResourceTest {
         .addProvider(JerseyViolationExceptionMapper.class)
         .addProvider(JsonProcessingExceptionMapper.class)
         .addProvider(InvalidEntityIdExceptionMapper.class)
-        .addResource(new TranslateSamlResponseResource(responseService, serviceEntityIdHelper))
+        .addResource(new TranslateSamlResponseResource(responseService, entityIdService))
         .build();
 
     @Before
     public void mockServiceEntityIdHelper() {
-        when(serviceEntityIdHelper.getEntityId(any(TranslateSamlResponseBody.class))).thenReturn(defaultEntityId);
+        when(entityIdService.getEntityId(any(TranslateSamlResponseBody.class))).thenReturn(defaultEntityId);
     }
 
     @After

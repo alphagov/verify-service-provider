@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.utils;
+package uk.gov.ida.verifyserviceprovider.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +8,12 @@ import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdException;
 
 import java.util.List;
 
-public class ServiceEntityIdHelper {
+public class EntityIdService {
     private final List<String> configuredEntityIds;
     private final String defaultEntityId;
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceEntityIdHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EntityIdService.class);
 
-    public ServiceEntityIdHelper(List<String> configuredEntityIds) {
+    public EntityIdService(List<String> configuredEntityIds) {
         this.configuredEntityIds = configuredEntityIds;
         this.defaultEntityId = configuredEntityIds.size() == 1 ? configuredEntityIds.get(0) : null;
     }

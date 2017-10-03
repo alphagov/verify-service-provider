@@ -9,8 +9,8 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.utils.ServiceEntityIdHelper;
 
 public class VerifyServiceProviderFactory {
 
@@ -22,7 +22,7 @@ public class VerifyServiceProviderFactory {
     private volatile MetadataResolver hubMetadataResolver;
     private volatile MetadataResolver msaMetadataResolver;
     private final DateTimeComparator dateTimeComparator;
-    private final ServiceEntityIdHelper serviceEntityIdHelper;
+    private final EntityIdService entityIdService;
 
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
@@ -34,7 +34,7 @@ public class VerifyServiceProviderFactory {
             configuration.getSamlPrimaryEncryptionKey(),
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
-        this.serviceEntityIdHelper = new ServiceEntityIdHelper(configuration.getServiceEntityIds());
+        this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -59,7 +59,7 @@ public class VerifyServiceProviderFactory {
         return new GenerateAuthnRequestResource(
             authnRequestFactory,
             configuration.getHubSsoLocation(),
-            serviceEntityIdHelper
+            entityIdService
         );
     }
 
@@ -70,7 +70,7 @@ public class VerifyServiceProviderFactory {
                 responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
                 dateTimeComparator
             ),
-            serviceEntityIdHelper
+            entityIdService
         );
     }
 
