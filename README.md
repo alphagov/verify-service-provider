@@ -81,9 +81,6 @@ There are prebuilt clients for the following languages and frameworks:
 |------------------------------------------------|----------------------------------------------------------------|
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
 
-If you're not using one of these frameworks you can interact with the HTTP API directly.
-See the [swagger documentation](https://alphagov.github.io/verify-service-provider) for details.
-
 ## Advanced Configuration
 
 Yaml based configuration provides more fine grained controls over the application. For example, you are able to configure HTTPS endpoints.
