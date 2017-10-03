@@ -93,7 +93,9 @@ definitions:
     type: object
     properties:
       levelOfAssurance:
-        $ref: '#/definitions/LevelOfAssurance'
+        $ref: '#/definitions/RequiredLevelOfAssurance'
+      entityId:
+        $ref: '#/definitions/EntityId'
   RequestResponseBody:
     type: object
     required:
@@ -135,7 +137,9 @@ definitions:
         type: string
         format: byte
       levelOfAssurance:
-        $ref: '#/definitions/LevelOfAssurance'
+        $ref: '#/definitions/RequiredLevelOfAssurance'
+      entityId:
+        $ref: '#/definitions/EntityId'
   TranslatedResponseBody:
     type: object
     required:
@@ -154,12 +158,19 @@ definitions:
         $ref: '#/definitions/ReceivedLevelOfAssurance'
       attributes:
         $ref: '#/definitions/Attributes'
-  LevelOfAssurance:
+  RequiredLevelOfAssurance:
     description: 'The minimum level of assurance required by the Relying Party Service.'
     type: string
     enum:
       - LEVEL_1
       - LEVEL_2
+  EntityId:
+    description: >-
+      The Entity Id for the service interacting with the Verify Service Provider.
+      This is required if the Verify Service Provider is set up for multi-tenanted
+      use, otherwise it is optional. The value, if provided, must be one of those
+      listed in the configuration for the Verify Service Provider.
+    type: string
   ReceivedLevelOfAssurance:
     description: 'Level of assurance the user was authenticated with.'
     type: string
