@@ -36,7 +36,7 @@ paths:
               code: 422
               message: 'Some error message'
         500:
-          description: 'An error due to an internal server error.''
+          description: 'An error due to an internal server error.'
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
