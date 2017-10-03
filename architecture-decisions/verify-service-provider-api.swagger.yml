@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: This a proposed API for the Verify Serivce Provider
+  description: 'This is a description of the API for the Verify Service Provider.'
   version: 0.3.0
   title: Verify Service Provider
 basePath: /
@@ -11,120 +11,89 @@ paths:
     post:
       tags:
       - 'Verify Service Provider API'
-      description: 'Generate an authn request'
+      description: 'Generate a SAML Authentication Request (AuthnRequest).'
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - name: requestGenerationBody
+        - name: RequestGenerationBody
           in: body
           required: true
           schema:
             $ref: '#/definitions/RequestGenerationBody'
       responses:
         200:
-          description: An object containing a SAML request.
+          description: 'Contains an object with a valid SAML Authentication request that can be consumed by the Verify service.'
           schema:
             $ref: '#/definitions/RequestResponseBody'
         422:
-          description: >-
-            An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
+          description: 'An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).'
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
             'errorMessage':
               code: 422
-              message: "Some error message"
+              message: 'Some error message'
         500:
-          description: An error due to an internal server error.
+          description: 'An error due to an internal server error.''
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
             'errorMessage':
               code: 500
-              message: "Some error message"
+              message: 'Some error message'
   /translate-response:
     post:
       tags:
       - 'Verify Service Provider API'
-      description: 'Create a translated response'
+      description: 'Consumes a SAML Response received from the Verify service and returns JSON.'
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - name: responseBody
-          description: An object containing a details of a SAML Authn response.
+        - name: TranslateSamlResponseBody
+          description: 'An object containing the SAML response returned by the Verify service.'
           in: body
           required: true
           schema:
             $ref: '#/definitions/TranslateSamlResponseBody'
       responses:
         200:
-          description: >-
-            Response contains an object with details of a translated SAML
-            response.
+          description: 'Contains the details of the SAML response, translated into JSON.'
           schema:
             $ref: '#/definitions/TranslatedResponseBody'
         400:
-          description: an error due to a problem with translating the Response
+          description: 'An error due to a problem with translating the Response.'
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
             'errorMessage':
               code: 400
-              message: "Some error message"
+              message: 'Some error message'
         422:
-          description: An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
+          description: 'An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).'
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
             'errorMessage':
               code: 422
-              message: "Some error message"
+              message: 'Some error message'
         500:
-          description: an error due to an internal server error
+          description: 'An error due to an internal server error.'
           schema:
             $ref: '#/definitions/ErrorMessage'
           examples:
             'errorMessage':
               code: 500
-              message: "Some error message"
+              message: 'Some error message'
 definitions:
-  ExpectedLevelOfAssurance:
-    description: Level of assurance requested by the Service
-    type: string
-    enum:
-      - LEVEL_1
-      - LEVEL_2
-  ReceivedLevelOfAssurance:
-    description: Level of assurance the user authenticated with.
-    type: string
-    enum:
-      - LEVEL_1
-      - LEVEL_2
-  Scenario:
-      type: string
-      enum:
-        - SUCCESS_MATCH
-        - ACCOUNT_CREATION
-        - NO_MATCH
-        - CANCELLATION
-        - AUTHENTICATION_FAILED
-        - REQUEST_ERROR
   RequestGenerationBody:
     type: object
     properties:
       levelOfAssurance:
-        $ref: '#/definitions/ExpectedLevelOfAssurance'
-      entityId:
-        description: >-
-          The Entity Id for the service interacting with the Verify Service Provider.
-          This is required if the Verify Service Provider is set up for multi-tenanted
-          use, otherwise it is optional. The value, if provided, must be one of those
-          listed in the configuration for the Verify Service Provider.
-        type: string
+        $ref: '#/definitions/LevelOfAssurance'
   RequestResponseBody:
     type: object
     required:
@@ -133,18 +102,18 @@ definitions:
       - ssoLocation
     properties:
       samlRequest:
-        description: SAML authn request string as a base64 string
+        description: 'SAML Authn Request as a base64 string.'
         type: string
         format: byte
       requestId:
         description: >-
-          A token that identifies the authn request. This can be used to later
-          verify that the request and response have passed through the same
+          A token that identifies the Authn Request. This is used later to
+          verify that the Authn Request and SAML Response have passed through the same
           browser.
         type: string
         format: byte
       ssoLocation:
-        description: The url for Verify HUB SSO. The entrypoint for saml authn flow.
+        description: 'The url for Verify Hub SSO. The entrypoint for SAML authentication flow.'
         type: string
         format: url
   TranslateSamlResponseBody:
@@ -155,26 +124,18 @@ definitions:
       - levelOfAssurance
     properties:
       samlResponse:
-        description: A SAML Authn response as a base64 string.
+        description: 'A SAML Response as a base64 string.'
         type: string
         format: byte
       requestId:
         description: >-
-          A token that was generated for the original SAML Authn request. The
-          token is used to verify that the request and response are from the
+          A token that was generated for the original SAML Authn Request. This is used
+          to verify that the Authn Request and SAML Response have passed  through the
           same browser.
         type: string
         format: byte
       levelOfAssurance:
-        description: The minimum level of assurance required
-        $ref: '#/definitions/ReceivedLevelOfAssurance'
-      entityId:
-        description: >-
-          The Entity Id for the service interacting with the Verify Service Provider.
-          This is required if the Verify Service Provider is set up for multi-tenanted
-          use, otherwise it is optional. The value, if provided, must be one of those
-          listed in the configuration for the Verify Service Provider.
-        type: string
+        $ref: '#/definitions/LevelOfAssurance'
   TranslatedResponseBody:
     type: object
     required:
@@ -192,21 +153,33 @@ definitions:
       levelOfAssurance:
         $ref: '#/definitions/ReceivedLevelOfAssurance'
       attributes:
-        description: An optional attributes-object if no match was possible
         $ref: '#/definitions/Attributes'
-  ErrorMessage:
-    type: object
-    required:
-      - code
-      - message
-    properties:
-      code:
-        type: number
-      message:
-        type: string
+  LevelOfAssurance:
+    description: 'The minimum level of assurance required by the Relying Party Service.'
+    type: string
+    enum:
+      - LEVEL_1
+      - LEVEL_2
+  ReceivedLevelOfAssurance:
+    description: 'Level of assurance the user was authenticated with.'
+    type: string
+    enum:
+      - LEVEL_1
+      - LEVEL_2
+  Scenario:
+    type: string
+    enum:
+      - SUCCESS_MATCH
+      - ACCOUNT_CREATION
+      - NO_MATCH
+      - CANCELLATION
+      - AUTHENTICATION_FAILED
+      - REQUEST_ERROR
   Attributes:
     description: >-
-      An object containing user attributes
+      An optional object containing attributes.
+      If user-account-creation is enabled in the Relying Party  Service, and no
+      match was possible, these attributes are used to create a new account.
     type: object
     properties:
       firstName:
@@ -267,4 +240,14 @@ definitions:
         type: string
       toDate:
         description: Format yyyy-MM-dd
+        type: string
+  ErrorMessage:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: number
+      message:
         type: string
