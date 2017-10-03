@@ -1,17 +1,20 @@
 package uk.gov.ida.verifyserviceprovider.utils;
 
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-@Singleton
 public class ManifestReader {
     private static final String MANIFEST_FILE_LOCATION = "/META-INF/MANIFEST.MF";
+    private static final String UNKNOWN_VERSION = "UNKNOWN_VERSION";
 
-    public Optional<Attributes> getManifest() {
+    public String getVersion() {
+        return getManifest().map(x -> x.getValue("Version")).orElse(UNKNOWN_VERSION);
+    }
+
+    private Optional<Attributes> getManifest() {
         Optional<String> manifestPath = getManifestFilePath();
         return manifestPath.map(this::getManifestAttributes);
     }

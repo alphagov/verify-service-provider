@@ -4,9 +4,13 @@ import org.joda.time.DateTime;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.common.SAMLRuntimeException;
+import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.Extensions;
 import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.impl.AttributeBuilder;
 import org.opensaml.saml.saml2.core.impl.AuthnRequestBuilder;
+import org.opensaml.saml.saml2.core.impl.ExtensionsBuilder;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA256;
@@ -17,6 +21,11 @@ import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SignatureFactory;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.saml.extensions.ApplicationVersion;
+import uk.gov.ida.verifyserviceprovider.saml.extensions.ApplicationVersionImpl;
+import uk.gov.ida.verifyserviceprovider.saml.extensions.Version;
+import uk.gov.ida.verifyserviceprovider.saml.extensions.VersionImpl;
+import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
 import java.net.URI;
 import java.security.KeyPair;
@@ -30,10 +39,12 @@ public class AuthnRequestFactory {
 
     private final URI destination;
     private final PrivateKey signingKey;
+    private final ManifestReader manifestReader;
 
-    public AuthnRequestFactory(URI destination, PrivateKey signingKey) {
+    public AuthnRequestFactory(URI destination, PrivateKey signingKey, ManifestReader manifestReader) {
         this.destination = destination;
         this.signingKey = signingKey;
+        this.manifestReader = manifestReader;
     }
 
     public AuthnRequest build(LevelOfAssurance levelOfAssurance, String serviceEntityId) {
@@ -42,6 +53,7 @@ public class AuthnRequestFactory {
         authnRequest.setIssueInstant(DateTime.now());
         authnRequest.setForceAuthn(false);
         authnRequest.setDestination(destination.toString());
+        authnRequest.setExtensions(createExtensions());
 
         Issuer issuer = new IssuerBuilder().buildObject();
         issuer.setValue(serviceEntityId);
@@ -57,6 +69,22 @@ public class AuthnRequestFactory {
         }
 
         return authnRequest;
+    }
+
+    private Extensions createExtensions() {
+        Extensions extensions = new ExtensionsBuilder().buildObject();
+        Attribute attribute = new AttributeBuilder().buildObject();
+        attribute.getAttributeValues().add(createApplicationVersion());
+        extensions.getUnknownXMLObjects().add(attribute);
+        return extensions;
+    }
+
+    private Version createApplicationVersion() {
+        ApplicationVersion applicationVersion = new ApplicationVersionImpl();
+        applicationVersion.setValue(manifestReader.getVersion());
+        Version version = new VersionImpl();
+        version.setApplicationVersion(applicationVersion);
+        return version;
     }
 
     private Signature createSignature() {

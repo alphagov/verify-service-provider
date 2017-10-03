@@ -11,6 +11,7 @@ import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
 public class VerifyServiceProviderFactory {
 
@@ -52,9 +53,10 @@ public class VerifyServiceProviderFactory {
     }
 
     public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws ComponentInitializationException {
+        ManifestReader manifestReader = new ManifestReader();
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
-            configuration.getHubSsoLocation(),
-            configuration.getSamlSigningKey());
+                configuration.getHubSsoLocation(),
+                configuration.getSamlSigningKey(), manifestReader);
 
         return new GenerateAuthnRequestResource(
             authnRequestFactory,
