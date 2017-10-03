@@ -6,10 +6,6 @@ between Verify Hub and a Relying Party.
 
 Please refer to the [techinical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) to understand how services can technically integrate with Verify.
 
-__NOTE__: The Verify Service Provider is currently in a prototyping phase of development. The API and configuration options
-may change during development.
-
-
 Setup
 -----
 
@@ -80,6 +76,10 @@ There are prebuilt clients for the following languages and frameworks:
 |             Language / Framework               |                            Client Library                      |
 |------------------------------------------------|----------------------------------------------------------------|
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
+
+See [the swagger documentation](
+https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+) for details of the API.
 
 ## Advanced Configuration
 
