@@ -9,15 +9,13 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import java.util.List;
 
 public class ConditionsValidator {
-    private final String verifyServiceProviderEntityId;
     private final TimeRestrictionValidator timeRestrictionValidator;
 
-    public ConditionsValidator(String verifyServiceProviderEntityId, TimeRestrictionValidator timeRestrictionValidator) {
-        this.verifyServiceProviderEntityId = verifyServiceProviderEntityId;
+    public ConditionsValidator(TimeRestrictionValidator timeRestrictionValidator) {
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 
-    public void validate(Conditions conditionsElement) {
+    public void validate(Conditions conditionsElement, String entityId) {
         if (conditionsElement == null) {
             throw new SamlResponseValidationException("Conditions is missing from the assertion.");
         }
@@ -48,8 +46,8 @@ public class ConditionsValidator {
         }
 
         String audience = audiences.get(0).getAudienceURI();
-        if (!verifyServiceProviderEntityId.equals(audience)) {
-            throw new SamlResponseValidationException(String.format("Audience must match entity ID. Expected %s but was %s", verifyServiceProviderEntityId, audience));
+        if (!entityId.equals(audience)) {
+            throw new SamlResponseValidationException(String.format("Audience must match entity ID. Expected %s but was %s", entityId, audience));
         }
     }
 }

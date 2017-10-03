@@ -27,7 +27,7 @@ The following Environment Variables can be defined:
 ```
 #!/usr/bin/env sh
 
-export SERVICE_ENTITY_ID=... # The entity id of the service using Verify Service Provider
+export SERVICE_ENTITY_IDS=... # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'.
 export PORT=... # The TCP port where the application will listen for HTTP traffic
 export LOG_LEVEL=... # The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR) (default: INFO)
 export MSA_ENTITY_ID=... # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
@@ -94,6 +94,14 @@ https://github.com/alphagov/verify-service-provider/blob/master/configuration/ve
 
 Verify Service Provider is a Dropwizard application and thus supports all configuration options
 provided by Dropwizard: http://www.dropwizard.io/1.1.0/docs/manual/configuration.html
+
+## Multi Tenancy
+
+A single instance of the Verify Service Provider can be used with multiple different services.
+To do so, a list of all the possible service entity ids must be included in the configuration.
+
+This can be done by either in a yaml configuration file (see above) or by putting more than one
+item in the JSON array for the SERVICE_ENTITY_IDS environment variable.
 
 Development
 -----------

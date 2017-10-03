@@ -31,7 +31,7 @@ public class SecondaryEncryptionKeyAcceptanceTest {
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer, TEST_RP_MS_PRIVATE_ENCRYPTION_KEY);
+    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer, TEST_RP_MS_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
 
     private static Client client = application.client();
     private static ComplianceToolService complianceTool = new ComplianceToolService(client);

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
@@ -65,16 +66,13 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
-        AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
-                configuration.getHubSsoLocation(),
-                configuration.getServiceEntityId(),
-                configuration.getSamlSigningKey());
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
-        environment.jersey().register(new GenerateAuthnRequestResource(authnRequestFactory, configuration.getHubSsoLocation()));
+        environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(new VersionNumberResource(new ManifestReader()));
+        environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());

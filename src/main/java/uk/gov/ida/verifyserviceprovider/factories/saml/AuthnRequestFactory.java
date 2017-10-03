@@ -29,16 +29,14 @@ import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivate
 public class AuthnRequestFactory {
 
     private final URI destination;
-    private final String serviceEntityId;
     private final PrivateKey signingKey;
 
-    public AuthnRequestFactory(URI destination, String serviceEntityId, PrivateKey signingKey) {
+    public AuthnRequestFactory(URI destination, PrivateKey signingKey) {
         this.destination = destination;
-        this.serviceEntityId = serviceEntityId;
         this.signingKey = signingKey;
     }
 
-    public AuthnRequest build(LevelOfAssurance levelOfAssurance) {
+    public AuthnRequest build(LevelOfAssurance levelOfAssurance, String serviceEntityId) {
         AuthnRequest authnRequest = new AuthnRequestBuilder().buildObject();
         authnRequest.setID(String.format("_%s", UUID.randomUUID()));
         authnRequest.setIssueInstant(DateTime.now());

@@ -59,6 +59,15 @@ public class ComplianceToolService {
         );
     }
 
+    public void initialiseWithEntityIdAndPid(String entityId, String pid) {
+        initialiseWith(
+            aComplianceToolInitialisationRequest()
+                .withEntityId(entityId)
+                .withExpectedPid(pid)
+                .build()
+        );
+    }
+
     public String createResponseFor(String samlRequest, int testCaseId) {
         return getExtractedSamlResponse(getResponseUrlById(testCaseId, samlRequest));
     }

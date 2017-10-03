@@ -37,7 +37,7 @@ public class AssertionTranslator {
         this.conditionsValidator = conditionsValidator;
     }
 
-    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance) {
+    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
         Assertion assertion = getAssertion(assertions);
 
         instantValidator.validate(assertion.getIssueInstant(), "Assertion IssueInstant");
@@ -45,7 +45,7 @@ public class AssertionTranslator {
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         String nameID = assertion.getSubject().getNameID().getValue();
 
-        conditionsValidator.validate(assertion.getConditions());
+        conditionsValidator.validate(assertion.getConditions(), entityId);
 
         assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 

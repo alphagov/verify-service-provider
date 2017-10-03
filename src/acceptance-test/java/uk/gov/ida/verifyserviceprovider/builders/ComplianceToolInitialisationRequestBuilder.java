@@ -14,7 +14,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 public class ComplianceToolInitialisationRequestBuilder {
 
     private String serviceEntityId = "http://verify-service-provider";
-    private String assertionConsumerServiceUrl = "http://localhost:3200/verify/response";
+    private String assertionConsumerServiceUrl = "http://verify-service-provider/response";
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
     private String expectedPID = "default-expected-pid";
@@ -42,6 +42,10 @@ public class ComplianceToolInitialisationRequestBuilder {
         return Entity.json(map);
     }
 
+    public ComplianceToolInitialisationRequestBuilder withEntityId(String entityId) {
+        this.serviceEntityId = entityId;
+        return this;
+    }
 
     public ComplianceToolInitialisationRequestBuilder withEncryptionCertificate(String encryptionCertificate) {
         this.encryptionCertificate = encryptionCertificate;

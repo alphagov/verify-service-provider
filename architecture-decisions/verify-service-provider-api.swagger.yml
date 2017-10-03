@@ -118,6 +118,13 @@ definitions:
     properties:
       levelOfAssurance:
         $ref: '#/definitions/ExpectedLevelOfAssurance'
+      entityId:
+        description: >-
+          The Entity Id for the service interacting with the Verify Service Provider.
+          This is required if the Verify Service Provider is set up for multi-tenanted
+          use, otherwise it is optional. The value, if provided, must be one of those
+          listed in the configuration for the Verify Service Provider.
+        type: string
   RequestResponseBody:
     type: object
     required:
@@ -161,6 +168,13 @@ definitions:
       levelOfAssurance:
         description: The minimum level of assurance required
         $ref: '#/definitions/ReceivedLevelOfAssurance'
+      entityId:
+        description: >-
+          The Entity Id for the service interacting with the Verify Service Provider.
+          This is required if the Verify Service Provider is set up for multi-tenanted
+          use, otherwise it is optional. The value, if provided, must be one of those
+          listed in the configuration for the Verify Service Provider.
+        type: string
   TranslatedResponseBody:
     type: object
     required:
