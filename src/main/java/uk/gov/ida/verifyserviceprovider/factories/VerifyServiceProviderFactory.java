@@ -3,10 +3,12 @@ package uk.gov.ida.verifyserviceprovider.factories;
 import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import uk.gov.ida.saml.security.PublicKeyFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
+import uk.gov.ida.verifyserviceprovider.metadata.MetadataPublicKeyExtractor;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
@@ -52,11 +54,20 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws ComponentInitializationException {
-        ManifestReader manifestReader = new ManifestReader();
+    public GenerateAuthnRequestResource getGenerateAuthnRequestResource(ManifestReader manifestReader) throws Exception {
+        MetadataPublicKeyExtractor metadataPublicKeyExtractor = new MetadataPublicKeyExtractor(
+            configuration.getVerifyHubMetadata().getExpectedEntityId(),
+            getHubMetadataResolver(),
+            new PublicKeyFactory()
+        );
+        EncrypterFactory encrypterFactory = new EncrypterFactory(metadataPublicKeyExtractor);
+
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
-                configuration.getHubSsoLocation(),
-                configuration.getSamlSigningKey(), manifestReader);
+            configuration.getHubSsoLocation(),
+            configuration.getSamlSigningKey(),
+            manifestReader,
+            encrypterFactory
+        );
 
         return new GenerateAuthnRequestResource(
             authnRequestFactory,

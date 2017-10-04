@@ -18,8 +18,6 @@ import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
-import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
-import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
@@ -73,12 +71,14 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
+        ManifestReader manifestReader = new ManifestReader();
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
-        environment.jersey().register(new VersionNumberResource(new ManifestReader()));
-        environment.jersey().register(factory.getGenerateAuthnRequestResource());
+        environment.jersey().register(new VersionNumberResource(manifestReader));
+
+        environment.jersey().register(factory.getGenerateAuthnRequestResource(manifestReader));
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
