@@ -9,7 +9,6 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import org.opensaml.core.config.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -55,11 +54,6 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
             )
         );
         IdaSamlBootstrap.bootstrap();
-        try {
-            uk.gov.ida.verifyserviceprovider.saml.extensions.Bootstrap.bootstrap();
-        } catch (InitializationException e) {
-            throw new RuntimeException(e);
-        }
         bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
     }
 

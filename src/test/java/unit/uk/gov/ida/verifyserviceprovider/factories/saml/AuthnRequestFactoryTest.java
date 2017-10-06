@@ -16,14 +16,13 @@ import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.extensions.versioning.Version;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
-import uk.gov.ida.verifyserviceprovider.saml.extensions.Bootstrap;
-import uk.gov.ida.verifyserviceprovider.saml.extensions.Version;
 import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
 import java.net.URI;
@@ -50,9 +49,8 @@ public class AuthnRequestFactoryTest {
     private static AuthnRequestFactory factory;
 
     @Before
-    public void bootStrapOpenSaml() throws Exception {
+    public void bootStrapOpenSaml() {
         IdaSamlBootstrap.bootstrap();
-        Bootstrap.bootstrap();
         reset(manifestReader);
 
         final BasicCredential basicCredential = createBasicCredential();
