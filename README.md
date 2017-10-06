@@ -123,3 +123,10 @@ __Build a distribution__
 The distribution zip can be found at `build/distributions`.
 
 If you wish to run the verify service provider against a local copy of compliance tool, see the readme [here](https://github.com/alphagov/verify-service-provider/blob/master/LOCAL_COMPLIANCE_TOOL_README.md)
+
+## Responsible Disclosure
+
+If you think you have discovered a security issue in this code please email disclosure@digital.cabinet-office.gov.uk with details.
+
+For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the github issue tracker.
+
