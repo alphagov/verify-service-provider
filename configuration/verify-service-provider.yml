@@ -29,14 +29,12 @@ serviceEntityIds: ${SERVICE_ENTITY_IDS:-["http://verify-service-provider"]}
 # To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
 # '["service-one-entity-id", "service-two-entity-id"]'
 
-# Location where Verify Hub authentication flow begins
-hubSsoLocation: ${HUB_SSO_LOCATION:-https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO}
-
-# Location of hub metadata
-# Verify Service Provider consumes the metadata and
-# Hub Public certificates from the metadata to identify the hub
-verifyHubMetadata:
-  uri: ${HUB_METADATA_URL:-https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation}
+# Verify Hub Environment. This tells the service provider where the Verify Hub
+# authentication flow begins and where to find the hub metadata the Verify Service
+# Provider consumes to identify the hub.
+# Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
+verifyHubConfiguration:
+  environment: ${VERIFY_ENVIRONMENT:-COMPLIANCE_TOOL}
 
 # Location of Matching Service Metadata
 # Verify Service Provider consumes the metadata and uses

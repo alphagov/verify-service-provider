@@ -25,7 +25,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
-    private URI hubSsoLocation;
+    private VerifyHubConfiguration verifyHubConfiguration;
 
     @JsonProperty
     @NotNull
@@ -47,12 +47,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
-    private MetadataConfigurationWithHubDefaults verifyHubMetadata;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    private MetadataConfigurationWithMsaDefaults msaMetadata;
+    private MsaMetadataConfiguration msaMetadata;
 
     @JsonProperty
     @NotNull
@@ -64,7 +59,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     }
 
     public URI getHubSsoLocation() {
-        return hubSsoLocation;
+        return verifyHubConfiguration.getHubSsoLocation();
     }
 
     public PrivateKey getSamlSigningKey() {
@@ -79,12 +74,12 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlSecondaryEncryptionKey;
     }
 
-    public MetadataConfigurationWithMsaDefaults getMsaMetadata() {
+    public MsaMetadataConfiguration getMsaMetadata() {
         return msaMetadata;
     }
 
-    public MetadataConfigurationWithHubDefaults getVerifyHubMetadata() {
-        return verifyHubMetadata;
+    public HubMetadataConfiguration getVerifyHubMetadata() {
+        return verifyHubConfiguration.getHubMetadataConfiguration();
     }
 
     public Duration getClockSkew() {
