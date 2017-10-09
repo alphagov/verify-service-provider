@@ -11,11 +11,12 @@ project.ext {
     openSamlVersion = '3.3.0'
     samlMetaDataBindingVersion = '47'
     samlExtensionsVersion = "$openSamlVersion-1.2a"
+    dropwizardVersion = '1.2.0'
 }
 
 dependencies {
     compile(
-        'io.dropwizard:dropwizard-core:1.1.2',
+        "io.dropwizard:dropwizard-core:$dropwizardVersion",
         'org.json:json:20170516',
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
@@ -26,7 +27,7 @@ dependencies {
     )
     testCompile(
         'junit:junit:4.12',
-        'io.dropwizard:dropwizard-testing:1.1.0',
+        "io.dropwizard:dropwizard-testing:$dropwizardVersion",
         'org.mockito:mockito-core:2.7.22',
         "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-$samlMetaDataBindingVersion",
         "uk.gov.ida:common-test-utils:2.0.0-31",
