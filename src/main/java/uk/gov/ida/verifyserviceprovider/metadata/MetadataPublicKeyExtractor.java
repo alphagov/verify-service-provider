@@ -14,7 +14,6 @@ import uk.gov.ida.saml.security.PublicKeyFactory;
 import java.security.PublicKey;
 import java.text.MessageFormat;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class MetadataPublicKeyExtractor {
@@ -37,21 +36,20 @@ public class MetadataPublicKeyExtractor {
         try {
             CriteriaSet criteria = new CriteriaSet(new EntityIdCriterion(entityId));
             return Optional.ofNullable(metadataResolver.resolveSingle(criteria))
-                .map(this::getPublicKeys)
-                .orElseThrow(missingEntityIdException());
+                .flatMap(this::getPublicKeys)
+                .orElseThrow(this::missingEntityIdException);
         } catch (ResolverException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Supplier<RuntimeException> missingEntityIdException() {
-        return () -> new RuntimeException(MessageFormat.format(
-            "The entity-id: \"{0}\" could not be found in the metadata. Metadata could be expired, invalid, or missing entities",
-            entityId)
-        );
+    private RuntimeException missingEntityIdException() {
+        return new RuntimeException(MessageFormat.format(
+            "No public key for entity-id: \"{0}\" could be found in the metadata. Metadata could be expired, invalid, or missing entities",
+            entityId));
     }
 
-    private PublicKey getPublicKeys(EntityDescriptor entityDescriptor) {
+    private Optional<PublicKey> getPublicKeys(EntityDescriptor entityDescriptor) {
         return entityDescriptor
             .getSPSSODescriptor(SAMLConstants.SAML20P_NS)
             .getKeyDescriptors()
@@ -59,8 +57,7 @@ public class MetadataPublicKeyExtractor {
             .filter(keyDescriptor -> keyDescriptor.getUse() == UsageType.ENCRYPTION)
             .flatMap(this::getCertificateFromKeyDescriptor)
             .map(publicKeyFactory::create)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Public key not found in the metadata"));
+            .findFirst();
     }
 
     private Stream<X509Certificate> getCertificateFromKeyDescriptor(KeyDescriptor keyDescriptor) {

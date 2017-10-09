@@ -65,14 +65,12 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
-        ManifestReader manifestReader = new ManifestReader();
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
-        environment.jersey().register(new VersionNumberResource(manifestReader));
-
-        environment.jersey().register(factory.getGenerateAuthnRequestResource(manifestReader));
+        environment.jersey().register(factory.getVersionNumberResource());
+        environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());

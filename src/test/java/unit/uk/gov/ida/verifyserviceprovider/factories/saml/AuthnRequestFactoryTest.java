@@ -49,7 +49,7 @@ public class AuthnRequestFactoryTest {
     private static AuthnRequestFactory factory;
 
     @Before
-    public void bootStrapOpenSaml() {
+    public void setUp() {
         IdaSamlBootstrap.bootstrap();
         reset(manifestReader);
 

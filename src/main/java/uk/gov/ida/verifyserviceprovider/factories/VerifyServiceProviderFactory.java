@@ -11,6 +11,7 @@ import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.metadata.MetadataPublicKeyExtractor;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
@@ -26,6 +27,7 @@ public class VerifyServiceProviderFactory {
     private volatile MetadataResolver msaMetadataResolver;
     private final DateTimeComparator dateTimeComparator;
     private final EntityIdService entityIdService;
+    private final ManifestReader manifestReader;
 
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
@@ -38,6 +40,7 @@ public class VerifyServiceProviderFactory {
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
+        this.manifestReader = new ManifestReader();
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -54,7 +57,7 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public GenerateAuthnRequestResource getGenerateAuthnRequestResource(ManifestReader manifestReader) throws Exception {
+    public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws Exception {
         MetadataPublicKeyExtractor metadataPublicKeyExtractor = new MetadataPublicKeyExtractor(
             configuration.getVerifyHubMetadata().getExpectedEntityId(),
             getHubMetadataResolver(),
@@ -85,6 +88,10 @@ public class VerifyServiceProviderFactory {
             ),
             entityIdService
         );
+    }
+
+    public VersionNumberResource getVersionNumberResource() {
+        return new VersionNumberResource(manifestReader);
     }
 
     private MetadataResolver getHubMetadataResolver() {
