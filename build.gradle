@@ -25,6 +25,7 @@ dependencies {
         "uk.gov.ida:saml-security:$openSamlVersion-45",
         "uk.gov.ida:ida-saml-extensions:$samlExtensionsVersion-32"
     )
+    compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
