@@ -54,7 +54,7 @@ public class ApplicationConfigurationFeatureTests {
         environmentHelper.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
-            put("HUB_ENVIRONMENT", "COMPLIANCE_TOOL");
+            put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
@@ -87,7 +87,7 @@ public class ApplicationConfigurationFeatureTests {
         environmentHelper.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
-            put("HUB_ENVIRONMENT", "COMPLIANCE_TOOL");
+            put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");

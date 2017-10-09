@@ -34,7 +34,7 @@ serviceEntityIds: ${SERVICE_ENTITY_IDS:-}
 # Provider consumes to identify the hub.
 # Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
 verifyHubConfiguration:
-  environment: ${HUB_ENVIRONMENT:-}
+  environment: ${VERIFY_ENVIRONMENT:-}
 
 # Location of Matching Service Metadata
 # Verify Service Provider consumes the metadata and uses
