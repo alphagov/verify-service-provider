@@ -1,8 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.client.ssl.TlsConfiguration;
 
@@ -17,7 +15,7 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 
-public class MetadataConfigurationWithHubDefaults implements VerifyServiceProviderMetadataConfiguration {
+public class HubMetadataConfiguration implements VerifyServiceProviderMetadataConfiguration {
     /**
      * Note: our trust stores do not contain private keys,
      * so this password does not need to be managed securely.
@@ -36,26 +34,16 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
     private final String jerseyClientName;
     private final boolean shouldLoadTrustStoreFromResources;
 
-    @JsonCreator
-    public MetadataConfigurationWithHubDefaults(
-        @JsonProperty("trustStorePath") String trustStorePath,
-        @JsonProperty("trustStorePassword") String trustStorePassword,
-        @JsonProperty("uri") URI uri,
-        @JsonProperty("minRefreshDelay") Long minRefreshDelay,
-        @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
-        @JsonProperty("expectedEntityId") String expectedEntityId,
-        @JsonProperty("jerseyClientConfiguration") JerseyClientConfiguration jerseyClientConfiguration,
-        @JsonProperty("jerseyClientName") String jerseyClientName
-    ) {
-        this.trustStorePath = ofNullable(trustStorePath).orElseGet(() -> generateTrustStorePath(uri));
-        this.trustStorePassword = ofNullable(trustStorePassword).orElse(DEFAULT_TRUST_STORE_PASSWORD);
-        this.uri = uri;
-        this.minRefreshDelay = ofNullable(minRefreshDelay).orElse(60000L);
-        this.maxRefreshDelay = ofNullable(maxRefreshDelay).orElse(600000L);
-        this.expectedEntityId = generateExpectedEntityId(uri, expectedEntityId);
-        this.jerseyClientConfiguration = ofNullable(jerseyClientConfiguration).orElse(createClient());
-        this.jerseyClientName = ofNullable(jerseyClientName).orElse(HUB_JERSEY_CLIENT_NAME);
-        this.shouldLoadTrustStoreFromResources = (trustStorePath == null);
+    public HubMetadataConfiguration(HubEnvironment environment, MetadataConfigurationOverrides overrides) {
+        this.trustStorePath = ofNullable(overrides.getTrustStorePath()).orElseGet(() -> generateTrustStorePath(environment));
+        this.trustStorePassword = ofNullable(overrides.getTrustStorePassword()).orElse(DEFAULT_TRUST_STORE_PASSWORD);
+        this.uri = ofNullable(overrides.getUri()).orElse(environment.getMetadataUri());
+        this.minRefreshDelay = ofNullable(overrides.getMinRefreshDelay()).orElse(60000L);
+        this.maxRefreshDelay = ofNullable(overrides.getMaxRefreshDelay()).orElse(600000L);
+        this.expectedEntityId = ofNullable(overrides.getExpectedEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
+        this.jerseyClientConfiguration = ofNullable(overrides.getJerseyClientConfiguration()).orElse(createClient());
+        this.jerseyClientName = ofNullable(overrides.getJerseyClientName()).orElse(HUB_JERSEY_CLIENT_NAME);
+        this.shouldLoadTrustStoreFromResources = (overrides.getTrustStorePath() == null);
     }
 
     @NotNull
@@ -139,9 +127,9 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
         }};
     }
 
-    private static String generateTrustStorePath(URI uri) {
+    private static String generateTrustStorePath(HubEnvironment hubEnvironment) {
         String trustStoreName;
-        switch (MetadataUri.fromUri(uri)) {
+        switch (hubEnvironment) {
             case PRODUCTION:
                 trustStoreName = PRODUCTION_VERIFY_TRUSTSTORE_NAME;
                 break;
@@ -150,26 +138,22 @@ public class MetadataConfigurationWithHubDefaults implements VerifyServiceProvid
                 trustStoreName = TEST_VERIFY_TRUSTSTORE_NAME;
                 break;
             default:
-                throw new RuntimeException("No trust store configured for Metadata URI " + uri);
+                throw new RuntimeException("No trust store configured for Hub Environment: " + hubEnvironment.name());
         }
 
         return trustStoreName;
     }
 
-    private static String generateExpectedEntityId(URI uri, String providedExpectedEntityId) {
-        if (providedExpectedEntityId != null) {
-            return providedExpectedEntityId;
-        }
-
+    private static String generateExpectedEntityId(HubEnvironment hubEnvironment) {
         String expectedEntityId;
-        switch (MetadataUri.fromUri(uri)) {
+        switch (hubEnvironment) {
             case PRODUCTION:
             case INTEGRATION:
             case COMPLIANCE_TOOL:
                 expectedEntityId = "https://signin.service.gov.uk";
                 break;
             default:
-                throw new RuntimeException("No entity ID configured for Metadata URI " + uri);
+                throw new RuntimeException("No entity ID configured for Hub Environment: " + hubEnvironment.name());
         }
 
         return expectedEntityId;

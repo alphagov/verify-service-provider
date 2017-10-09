@@ -15,7 +15,7 @@ import static io.dropwizard.util.Duration.seconds;
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
 
-public class MetadataConfigurationWithMsaDefaults implements VerifyServiceProviderMetadataConfiguration {
+public class MsaMetadataConfiguration implements VerifyServiceProviderMetadataConfiguration {
 
     private final URI uri;
     private final Long minRefreshDelay;
@@ -25,7 +25,7 @@ public class MetadataConfigurationWithMsaDefaults implements VerifyServiceProvid
     private final String jerseyClientName;
 
     @JsonCreator
-    public MetadataConfigurationWithMsaDefaults(
+    public MsaMetadataConfiguration(
         @JsonProperty("uri") URI uri,
         @JsonProperty("minRefreshDelay") Long minRefreshDelay,
         @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,

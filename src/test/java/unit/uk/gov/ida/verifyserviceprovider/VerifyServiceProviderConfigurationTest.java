@@ -45,10 +45,9 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage(containsString("server may not be null"));
         expectedException.expectMessage(containsString("serviceEntityIds may not be null"));
-        expectedException.expectMessage(containsString("hubSsoLocation may not be null"));
         expectedException.expectMessage(containsString("samlSigningKey may not be null"));
         expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
-        expectedException.expectMessage(containsString("verifyHubMetadata may not be null"));
+        expectedException.expectMessage(containsString("verifyHubConfiguration may not be null"));
         expectedException.expectMessage(containsString("msaMetadata may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");

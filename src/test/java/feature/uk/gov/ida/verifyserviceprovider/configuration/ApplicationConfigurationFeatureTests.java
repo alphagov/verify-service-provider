@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.configuration.MetadataUri;
+import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import java.util.HashMap;
@@ -38,8 +38,8 @@ public class ApplicationConfigurationFeatureTests {
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-            ConfigOverride.config("verifyHubMetadata.trustStorePath", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("verifyHubMetadata.trustStorePassword", keyStoreResource.getPassword())
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStorePath", keyStoreResource.getAbsolutePath()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStorePassword", keyStoreResource.getPassword())
         );
     }
 
@@ -54,8 +54,7 @@ public class ApplicationConfigurationFeatureTests {
         environmentHelper.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
-            put("HUB_SSO_LOCATION", "some-hub-sso-location");
-            put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
+            put("HUB_ENVIRONMENT", "COMPLIANCE_TOOL");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
@@ -71,8 +70,8 @@ public class ApplicationConfigurationFeatureTests {
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
         assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
-        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo("some-hub-sso-location");
-        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
+        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
+        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
         assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
@@ -88,8 +87,7 @@ public class ApplicationConfigurationFeatureTests {
         environmentHelper.setEnv(new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
-            put("HUB_SSO_LOCATION", "some-hub-sso-location");
-            put("HUB_METADATA_URL", MetadataUri.PRODUCTION.getUri().toString());
+            put("HUB_ENVIRONMENT", "COMPLIANCE_TOOL");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");
@@ -105,8 +103,8 @@ public class ApplicationConfigurationFeatureTests {
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
         assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
-        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo("some-hub-sso-location");
-        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(MetadataUri.PRODUCTION.getUri().toString());
+        assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
+        assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
         assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
