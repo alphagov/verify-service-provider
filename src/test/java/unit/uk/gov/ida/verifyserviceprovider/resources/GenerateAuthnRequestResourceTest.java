@@ -24,6 +24,7 @@ import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Base64;
 
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GenerateAuthnRequestTest {
+public class GenerateAuthnRequestResourceTest {
 
     private static final URI HUB_SSO_LOCATION = URI.create("http://example.com/SAML2/SSO");
     private static final String defaultEntityId = "http://default-entity-id";

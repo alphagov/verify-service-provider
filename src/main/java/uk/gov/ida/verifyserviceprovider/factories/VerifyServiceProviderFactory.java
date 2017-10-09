@@ -3,14 +3,18 @@ package uk.gov.ida.verifyserviceprovider.factories;
 import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import uk.gov.ida.saml.security.PublicKeyFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
+import uk.gov.ida.verifyserviceprovider.metadata.MetadataPublicKeyExtractor;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
 public class VerifyServiceProviderFactory {
 
@@ -23,6 +27,7 @@ public class VerifyServiceProviderFactory {
     private volatile MetadataResolver msaMetadataResolver;
     private final DateTimeComparator dateTimeComparator;
     private final EntityIdService entityIdService;
+    private final ManifestReader manifestReader;
 
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
@@ -35,6 +40,7 @@ public class VerifyServiceProviderFactory {
             configuration.getSamlSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
+        this.manifestReader = new ManifestReader();
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -51,10 +57,20 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws ComponentInitializationException {
+    public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws Exception {
+        MetadataPublicKeyExtractor metadataPublicKeyExtractor = new MetadataPublicKeyExtractor(
+            configuration.getVerifyHubMetadata().getExpectedEntityId(),
+            getHubMetadataResolver(),
+            new PublicKeyFactory()
+        );
+        EncrypterFactory encrypterFactory = new EncrypterFactory(metadataPublicKeyExtractor);
+
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
             configuration.getHubSsoLocation(),
-            configuration.getSamlSigningKey());
+            configuration.getSamlSigningKey(),
+            manifestReader,
+            encrypterFactory
+        );
 
         return new GenerateAuthnRequestResource(
             authnRequestFactory,
@@ -72,6 +88,10 @@ public class VerifyServiceProviderFactory {
             ),
             entityIdService
         );
+    }
+
+    public VersionNumberResource getVersionNumberResource() {
+        return new VersionNumberResource(manifestReader);
     }
 
     private MetadataResolver getHubMetadataResolver() {

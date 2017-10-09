@@ -41,25 +41,23 @@ public class VersionNumberResourceTest {
 
     @Test
     public void returnsAnOKResponseWithVersionNumber() {
-        Attributes attributes = mock(Attributes.class);
         String versionNumber = "1.2.0";
-        when(attributes.getValue("Version")).thenReturn(versionNumber);
-        when(manifestReader.getManifest()).thenReturn(Optional.of(attributes));
+        when(manifestReader.getVersion()).thenReturn(versionNumber);
 
         Response response = resources.target("/version-number").request().get();
 
-        verify(manifestReader, times(1)).getManifest();
+        verify(manifestReader, times(1)).getVersion();
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(response.readEntity(String.class)).isEqualTo(versionNumber);
     }
 
     @Test
     public void returns500WhenManifestReaderThrowsException() {
-        doThrow(new RuntimeException("exception")).when(manifestReader).getManifest();
+        doThrow(new RuntimeException("exception")).when(manifestReader).getVersion();
 
         Response response = resources.target("/version-number").request().get();
 
-        verify(manifestReader, times(1)).getManifest();
+        verify(manifestReader, times(1)).getVersion();
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 }
