@@ -39,18 +39,14 @@ export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded
 
 #### Generating keys for testing
 
-If you have openssl installed you can generate a private key in the correct format with:
+If you have [openssl](https://www.openssl.org) installed you can generate a private key in the correct format with:
 
 ```
-openssl genrsa -des3 -passout pass:x -out "key-name.pass.key" 2048
-openssl rsa -passin pass:x -in "key-name.pass.key" -out "key-name.key"
-openssl pkcs8 -topk8 -inform PEM -outform DER -in "key-name.key" -out "key-name.pk8" -nocrypt
+# Generate an RSA key in PEM format
+openssl genrsa -des3 -passout pass:x 2048 | openssl rsa -passin pass:x -out key-name.pem
 
-# This command will print a base64 encoded PKCS8 RSA private key to standard out
-openssl base64 -in key-name.pk8 -out key-name.pk8.base64
-
-# Strip the newlines from the base64 encoded file and print to standard out
-tr -d '\n' < key-name.pk8.base64
+# Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print the key to standard out.
+openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openssl base64 -A; echo
 ```
 
 ### Run
@@ -122,3 +118,10 @@ __Build a distribution__
 The distribution zip can be found at `build/distributions`.
 
 If you wish to run the verify service provider against a local copy of compliance tool, see the readme [here](https://github.com/alphagov/verify-service-provider/blob/master/LOCAL_COMPLIANCE_TOOL_README.md)
+
+## Responsible Disclosure
+
+If you think you have discovered a security issue in this code please email disclosure@digital.cabinet-office.gov.uk with details.
+
+For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the github issue tracker.
+

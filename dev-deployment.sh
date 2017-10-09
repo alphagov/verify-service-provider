@@ -39,4 +39,5 @@ cfLogin() {
 cfLogin
 
 cf push -f dev-manifest.yml -p build/distributions/verify-service-provider-*.zip
+cf push -f dev-manifest-multi-tenant.yml -p build/distributions/verify-service-provider-*.zip
 
