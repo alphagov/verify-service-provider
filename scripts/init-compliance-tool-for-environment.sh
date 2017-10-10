@@ -1,24 +1,32 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -z "$PID" ] ; then
-	echo "no PID has been defined, exiting"
+if [ ! $# -eq 2 ] ; then
+	echo "this script requires the environment and a persistentId to be passed in as arguments. e.g."
+	echo "$ ./init-compliance-tool.sh <environment> <persistentId>"
+	echo "please try again, currently allowed environments are 'local' and 'dev'"
 	exit 1
 fi
 
-SERVICE_ENTITY_ID="http://verify-service-provider-dev-service"
-ASSERTION_CONSUMER_SERVICE_URL="https://passport-verify-stub-relying-party-dev.cloudapps.digital/verify/response"
+echo "setting persistentID as $2"
+PID=$2
 
-if [ $# -eq 0 ] ; then
-	echo "No arguments supplied: defaulting to configuring the compliance tool with the details of the VSP on PAAS"
-elif [ "$1" == "local" ] ; then
-	echo "configuring compliance tool for localhost VSP"
-	SERVICE_ENTITY_ID="http://verify-service-provider-local"
-	ASSERTION_CONSUMER_SERVICE_URL="http://localhost:3200/verify/response"
-else
-	echo "unrecognised environment option: $1 - exiting"
-	exit 1
-fi
+
+case $1 in
+  	'local')
+		echo "configuring compliance tool for Relying Party running on localhost:3200"
+		SERVICE_ENTITY_ID="http://verify-service-provider-local"
+		ASSERTION_CONSUMER_SERVICE_URL="http://localhost:3200/verify/response"
+		;;
+  	'dev')
+		echo "configuring compliance tool for Relying Party running on dev (on PaaS)"
+		SERVICE_ENTITY_ID="http://verify-service-provider-dev-service"
+		ASSERTION_CONSUMER_SERVICE_URL="https://passport-verify-stub-relying-party-dev.cloudapps.digital/verify/response"
+		;;
+	*)
+		echo "unrecognised environment option: $1 - exiting"
+		exit 1
+esac
 
 curl https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/service-test-data --data @- --header 'Content-Type: application/json' <<EOJSON
 {
