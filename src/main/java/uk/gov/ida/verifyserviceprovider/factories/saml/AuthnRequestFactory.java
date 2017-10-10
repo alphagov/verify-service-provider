@@ -83,9 +83,10 @@ public class AuthnRequestFactory {
 
     private Extensions createExtensions() {
         Extensions extensions = new ExtensionsBuilder().buildObject();
-        Attribute attribute = new AttributeBuilder().buildObject();
-        attribute.getAttributeValues().add(createApplicationVersion());
-        extensions.getUnknownXMLObjects().add(encrypt(attribute));
+        Attribute versionsAttribute = new AttributeBuilder().buildObject();
+        versionsAttribute.setName("Versions");
+        versionsAttribute.getAttributeValues().add(createApplicationVersion());
+        extensions.getUnknownXMLObjects().add(encrypt(versionsAttribute));
         return extensions;
     }
 

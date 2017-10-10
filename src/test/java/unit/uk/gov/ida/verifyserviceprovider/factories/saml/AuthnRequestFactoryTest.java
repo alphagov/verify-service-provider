@@ -112,6 +112,8 @@ public class AuthnRequestFactoryTest {
 
         Attribute attribute = decrypter.decrypt(encryptedAttribute);
         Version version = (Version) attribute.getAttributeValues().get(0);
+
+        assertThat(attribute.getName()).isEqualTo("Versions");
         assertThat(version.getApplicationVersion().getValue()).isEqualTo(versionNumber);
     }
 
