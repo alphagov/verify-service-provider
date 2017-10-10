@@ -16,7 +16,6 @@ verifyHubConfiguration:
   hubSsoLocation: http://localhost:50270/SAML2/SSO
   metadata:
     uri: https://localhost:55000/compliance-tool-local/metadata.xml
-    trustStorePath: verify-test-truststore.ts
     expectedEntityId: https://local.signin.service.gov.uk
     jerseyClientConfiguration:
       tls:
