@@ -21,7 +21,7 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
-        "uk.gov.ida:saml-serializers:$openSamlVersion-22",
+        "uk.gov.ida:saml-serializers:$openSamlVersion-23",
         "uk.gov.ida:saml-security:$openSamlVersion-45",
         "uk.gov.ida:ida-saml-extensions:$samlExtensionsVersion-32"
     )
