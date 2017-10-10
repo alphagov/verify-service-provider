@@ -117,7 +117,8 @@ __Build a distribution__
 
 The distribution zip can be found at `build/distributions`.
 
-If you wish to run the verify service provider against a local copy of compliance tool, see the readme [here](https://github.com/alphagov/verify-service-provider/blob/master/LOCAL_COMPLIANCE_TOOL_README.md)
+See `docs/development` for useful information for development on the service provider, including
+how to run against a local compliance tool and some advanced configuration options.
 
 ## Responsible Disclosure
 
