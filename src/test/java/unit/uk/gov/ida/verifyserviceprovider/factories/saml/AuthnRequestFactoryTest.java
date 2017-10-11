@@ -102,8 +102,7 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void shouldAddApplicationVersionInExtension() throws DecryptionException {
-        String versionNumber = "0.3.0";
-        when(manifestReader.getVersion()).thenReturn(versionNumber);
+        when(manifestReader.getVersion()).thenReturn("some-version");
 
         AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
@@ -114,7 +113,7 @@ public class AuthnRequestFactoryTest {
         Version version = (Version) attribute.getAttributeValues().get(0);
 
         assertThat(attribute.getName()).isEqualTo("Versions");
-        assertThat(version.getApplicationVersion().getValue()).isEqualTo(versionNumber);
+        assertThat(version.getApplicationVersion().getValue()).isEqualTo("some-version");
     }
 
     @Test

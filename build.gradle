@@ -10,7 +10,7 @@ project.ext {
     version_number = '0.3.0'
     openSamlVersion = '3.3.0'
     samlMetaDataBindingVersion = '47'
-    samlExtensionsVersion = "$openSamlVersion-1.2a"
+    samlExtensionsVersion = "$openSamlVersion-1.2a-33"
     dropwizardVersion = '1.2.0'
 }
 
@@ -21,9 +21,9 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
-        "uk.gov.ida:saml-serializers:$openSamlVersion-23",
-        "uk.gov.ida:saml-security:$openSamlVersion-45",
-        "uk.gov.ida:ida-saml-extensions:$samlExtensionsVersion-32"
+        "uk.gov.ida:saml-serializers:$openSamlVersion-24",
+        "uk.gov.ida:saml-security:$openSamlVersion-46",
+        "uk.gov.ida:ida-saml-extensions:$samlExtensionsVersion"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
