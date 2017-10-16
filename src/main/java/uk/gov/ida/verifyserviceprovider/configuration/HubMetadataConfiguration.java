@@ -37,10 +37,10 @@ public class HubMetadataConfiguration implements VerifyServiceProviderMetadataCo
     public HubMetadataConfiguration(HubEnvironment environment, MetadataConfigurationOverrides overrides) {
         this.trustStorePath = ofNullable(overrides.getTrustStorePath()).orElseGet(() -> generateTrustStorePath(environment));
         this.trustStorePassword = ofNullable(overrides.getTrustStorePassword()).orElse(DEFAULT_TRUST_STORE_PASSWORD);
-        this.uri = ofNullable(overrides.getUri()).orElse(environment.getMetadataUri());
+        this.uri = ofNullable(overrides.getMetadataUri()).orElse(environment.getMetadataUri());
         this.minRefreshDelay = ofNullable(overrides.getMinRefreshDelay()).orElse(60000L);
         this.maxRefreshDelay = ofNullable(overrides.getMaxRefreshDelay()).orElse(600000L);
-        this.expectedEntityId = ofNullable(overrides.getExpectedEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
+        this.expectedEntityId = ofNullable(overrides.getEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
         this.jerseyClientConfiguration = ofNullable(overrides.getJerseyClientConfiguration()).orElse(createClient());
         this.jerseyClientName = ofNullable(overrides.getJerseyClientName()).orElse(HUB_JERSEY_CLIENT_NAME);
         this.shouldLoadTrustStoreFromResources = (overrides.getTrustStorePath() == null);

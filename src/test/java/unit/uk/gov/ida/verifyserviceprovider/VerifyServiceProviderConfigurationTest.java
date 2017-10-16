@@ -45,30 +45,30 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage(containsString("server may not be null"));
         expectedException.expectMessage(containsString("serviceEntityIds may not be null"));
-        expectedException.expectMessage(containsString("samlSigningKey may not be null"));
-        expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
+        expectedException.expectMessage(containsString("signingKey may not be null"));
+        expectedException.expectMessage(containsString("primaryEncryptionKey may not be null"));
         expectedException.expectMessage(containsString("verifyHubConfiguration may not be null"));
-        expectedException.expectMessage(containsString("msaMetadata may not be null"));
+        expectedException.expectMessage(containsString("matchingServiceAdapter may not be null"));
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
 
     @Test
     public void shouldNotAllowEmptySamlSigningKey() throws Exception {
-        expectedException.expectMessage("Failed to parse configuration at: samlSigningKey");
-        factory.build(new StringConfigurationSourceProvider("samlSigningKey: \"\""), "");
+        expectedException.expectMessage("Failed to parse configuration at: signingKey");
+        factory.build(new StringConfigurationSourceProvider("signingKey: \"\""), "");
     }
 
     @Test
     public void shouldNotAllowEmptySamlPrimaryEncryptionKey() throws Exception {
-        expectedException.expectMessage("Failed to parse configuration at: samlPrimaryEncryptionKey");
-        factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
+        expectedException.expectMessage("Failed to parse configuration at: primaryEncryptionKey");
+        factory.build(new StringConfigurationSourceProvider("primaryEncryptionKey: \"\""), "");
     }
 
     @Test
-    public void shouldNotAllowEmptyMsaMetadataExpectedEntityId() throws Exception {
-        expectedException.expectMessage("msaMetadata.expectedEntityId may not be null");
-        factory.build(new StringConfigurationSourceProvider("msaMetadata: \n uri: https://some-url.com"), "");
+    public void shouldNotAllowEmptyMatchingServiceAdapterEntityId() throws Exception {
+        expectedException.expectMessage("matchingServiceAdapter.entityId may not be null");
+        factory.build(new StringConfigurationSourceProvider("matchingServiceAdapter: \n metadataUri: https://some-url.com"), "");
     }
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {

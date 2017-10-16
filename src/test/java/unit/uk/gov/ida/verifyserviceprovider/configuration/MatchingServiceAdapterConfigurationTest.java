@@ -1,18 +1,18 @@
 package unit.uk.gov.ida.verifyserviceprovider.configuration;
 
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.MatchingServiceAdapterConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
-public class MsaMetadataConfigurationTest {
+public class MatchingServiceAdapterConfigurationTest {
     @Test
     public void shouldSetDefaultConfigValuesWhenNotProvided() throws Exception {
-        String configurationAsString = "{\"uri\": \"http://some-msa-uri\"}";
+        String configurationAsString = "{\"metadataUri\": \"http://some-msa-uri\"}";
 
-        MsaMetadataConfiguration actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MsaMetadataConfiguration.class);
+        MatchingServiceAdapterConfiguration actualConfiguration = OBJECT_MAPPER.readValue(configurationAsString, MatchingServiceAdapterConfiguration.class);
 
         assertThat(actualConfiguration.getMinRefreshDelay()).isEqualTo(60000);
         assertThat(actualConfiguration.getMaxRefreshDelay()).isEqualTo(600000);

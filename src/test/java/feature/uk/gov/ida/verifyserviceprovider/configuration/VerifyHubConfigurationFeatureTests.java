@@ -70,7 +70,7 @@ public class VerifyHubConfigurationFeatureTests {
         String config = "{" +
             "\"environment\": \"INTEGRATION\"," +
             "\"metadata\": {" +
-            "\"expectedEntityId\": \"some-expected-entity-id\"" +
+            "\"entityId\": \"some-expected-entity-id\"" +
             "}}";
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
@@ -108,7 +108,7 @@ public class VerifyHubConfigurationFeatureTests {
         String config = "{" +
             "\"environment\": \"INTEGRATION\"," +
             "\"metadata\": {" +
-            "\"uri\": \"http://some-metadata-location\"" +
+            "\"metadataUri\": \"http://some-metadata-location\"" +
             "}}";
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);

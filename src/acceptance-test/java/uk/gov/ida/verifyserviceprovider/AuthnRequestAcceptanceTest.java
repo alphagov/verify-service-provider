@@ -41,7 +41,7 @@ public class AuthnRequestAcceptanceTest {
         resourceFilePath("verify-service-provider.yml"),
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-        ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+        ConfigOverride.config("signingKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", SINGLE_ENTITY_ID)
     );
@@ -51,7 +51,7 @@ public class AuthnRequestAcceptanceTest {
         resourceFilePath("verify-service-provider.yml"),
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-        ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+        ConfigOverride.config("signingKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2))
     );

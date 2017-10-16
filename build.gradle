@@ -49,7 +49,6 @@ sourceSets {
             srcDir 'src/acceptance-test/java'
         }
         resources {
-            srcDir 'src/acceptance-test/resources'
             srcDir 'src/../configuration'
         }
         compileClasspath += sourceSets.main.runtimeClasspath

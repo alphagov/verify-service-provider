@@ -59,11 +59,11 @@ public class HubMetadataFeatureTest {
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
-            config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
+            config("verifyHubConfiguration.metadata.metadataUri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
             config("verifyHubConfiguration.metadata.trustStorePath", "verify-production-truststore.ts"),
-            config("msaMetadata.uri", msaServer::getUri),
-            config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
-            config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
+            config("matchingServiceAdapter.metadataUri", msaServer::getUri),
+            config("verifyHubConfiguration.metadata.entityId", HUB_ENTITY_ID),
+            config("matchingServiceAdapter.entityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStorePath", verifyHubKeystoreResource.getAbsolutePath()),
             config("verifyHubConfiguration.metadata.trustStorePassword", verifyHubKeystoreResource.getPassword())
         );
