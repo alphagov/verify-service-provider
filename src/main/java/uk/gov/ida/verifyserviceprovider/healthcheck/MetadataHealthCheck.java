@@ -15,8 +15,9 @@ public class MetadataHealthCheck extends HealthCheck {
     private String expectedEntityId;
 
     public MetadataHealthCheck(
-            MetadataResolver metadataProvider,
-            String expectedEntityId) {
+        MetadataResolver metadataProvider,
+        String expectedEntityId
+    ) {
         this.metadataResolver = metadataProvider;
         this.expectedEntityId = expectedEntityId;
     }
@@ -36,7 +37,7 @@ public class MetadataHealthCheck extends HealthCheck {
     }
 
     private String getMessage(String message) {
-        return "Could not load entity " + this.expectedEntityId + " from the metadata provider. " + message + ". See the logs for more details.";
+        return "Could not load metadata for entity " + this.expectedEntityId + ". " + message + ". See the logs for more details.";
     }
 }
 

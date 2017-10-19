@@ -28,8 +28,7 @@ public class ServerDetailFinder {
 
         if (config.getServerFactory() instanceof SimpleServerFactory) {
             return fetchSimpleServerDetail(environment, server);
-        }
-        else {
+        } else {
             return fetchStandardServerDetails(environment, server);
         }
     }
@@ -40,12 +39,12 @@ public class ServerDetailFinder {
         Map<String, Integer> appConnectorDetails = extractPortDetailsByConnectorType(server, DROPWIZARD_CONNECTOR_APPLICATION);
 
         return new ServerDetail(
-                environment.getName(),
-                environment.getAdminContext().getContextPath(),
-                appConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
-                appConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL),
-                adminConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
-                adminConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL));
+            environment.getName(),
+            environment.getAdminContext().getContextPath(),
+            appConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
+            appConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL),
+            adminConnectorDetails.get(DROPWIZARD_PROTOCOL_HTTP),
+            adminConnectorDetails.get(DROPWIZARD_PROTOCOL_SSL));
     }
 
     public static ServerDetail fetchSimpleServerDetail(Environment environment, Server server) {
@@ -53,12 +52,12 @@ public class ServerDetailFinder {
             if (connector instanceof ServerConnector) {
                 ServerConnector serverConnector = (ServerConnector) connector;
                 return new ServerDetail(
-                        environment.getName(),
-                        environment.getAdminContext().getContextPath(),
-                        serverConnector.getLocalPort(),
-                        null,
-                        serverConnector.getLocalPort(),
-                        null);
+                    environment.getName(),
+                    environment.getAdminContext().getContextPath(),
+                    serverConnector.getLocalPort(),
+                    null,
+                    serverConnector.getLocalPort(),
+                    null);
             }
         }
         return new ServerDetail(environment.getName(), environment.getAdminContext().getContextPath(), null, null, null, null);
@@ -66,15 +65,15 @@ public class ServerDetailFinder {
 
     private static Map<String, Integer> extractPortDetailsByConnectorType(Server server, String connectorType) {
         return Arrays.stream(server.getConnectors())
-                .filter(connector -> {
-                    ServerConnector serverConnector = (ServerConnector) connector;
+            .filter(connector -> {
+                ServerConnector serverConnector = (ServerConnector) connector;
 
-                    return serverConnector.getName().equals(connectorType) &&
-                            (serverConnector.getDefaultProtocol().equals(DROPWIZARD_PROTOCOL_SSL) ||
-                                    serverConnector.getDefaultProtocol().contains(DROPWIZARD_PROTOCOL_HTTP));
-                })
-                .map(connector -> (ServerConnector) connector)
-                .collect(Collectors.toMap(ServerConnector::getDefaultProtocol, ServerConnector::getLocalPort));
+                return serverConnector.getName().equals(connectorType) &&
+                    (serverConnector.getDefaultProtocol().equals(DROPWIZARD_PROTOCOL_SSL) ||
+                        serverConnector.getDefaultProtocol().contains(DROPWIZARD_PROTOCOL_HTTP));
+            })
+            .map(connector -> (ServerConnector) connector)
+            .collect(Collectors.toMap(ServerConnector::getDefaultProtocol, ServerConnector::getLocalPort));
     }
 
     public static class ServerDetail {
@@ -106,35 +105,6 @@ public class ServerDetailFinder {
             this.serverHttpsPort = serverHttpsPort;
             this.adminHttpPort = adminHttpPort;
             this.adminHttpsPort = adminHttpsPort;
-        }
-
-        public String toLogOutputString() {
-
-            StringBuilder sb = new StringBuilder("Logging server details...\n\n");
-            sb.append("======================================================================================\n");
-            sb.append("| ").append(applicationName).append(" started successfully with the following useful URLs: \n");
-            sb.append("| ------------------------------------------------------------------------------------ \n");
-
-            if (serverHttpPort != null) {
-                appendUrlLog(sb, "| Server HTTP base URL  ", generateApplicationBaseUrl(false));
-            }
-
-            if (serverHttpsPort != null) {
-                appendUrlLog(sb, "| Server HTTPS base URL ", generateApplicationBaseUrl(true));
-            }
-
-            if (adminHttpPort != null) {
-                appendUrlLog(sb, "| Admin HTTP Url        ", generateAdminUrl(false));
-                appendUrlLog(sb, "| Healthcheck HTTP URL  ", generateHealthcheckUrl(false));
-            }
-
-            if (adminHttpsPort != null) {
-                appendUrlLog(sb, "| Admin HTTPS Url       ", generateAdminUrl(true));
-                appendUrlLog(sb, "| Healthcheck HTTPS URL ", generateHealthcheckUrl(true));
-            }
-
-            sb.append("======================================================================================\n");
-            return sb.toString();
         }
 
         public String generateApplicationBaseUrl(boolean isSsl) {
@@ -179,10 +149,6 @@ public class ServerDetailFinder {
 
         public Integer getAdminHttpsPort() {
             return adminHttpsPort;
-        }
-
-        private void appendUrlLog(StringBuilder sb, String description, String url) {
-            sb.append(description).append(" - ").append(url).append("\n");
         }
     }
 }

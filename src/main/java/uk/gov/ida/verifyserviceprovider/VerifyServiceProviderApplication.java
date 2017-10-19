@@ -17,9 +17,10 @@ import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
-import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
-import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
+import uk.gov.ida.verifyserviceprovider.utils.HealthCheckTableFormatter;
 import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
+import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder.ServerDetail;
+import uk.gov.ida.verifyserviceprovider.utils.UsefullApplicationUrlsTableFormatter;
 
 import java.util.Arrays;
 
@@ -87,11 +88,14 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         }
     }
 
-    private ServerLifecycleListener createServerLifecycleListener(VerifyServiceProviderConfiguration config, Environment environment) {
-
+    private ServerLifecycleListener createServerLifecycleListener(
+        VerifyServiceProviderConfiguration config,
+        Environment environment
+    ) {
         return server -> {
-            ServerDetailFinder.ServerDetail serverDetail = ServerDetailFinder.fetchServerDetails(server, config, environment);
-            LOGGER.info(serverDetail.toLogOutputString());
+            ServerDetail serverDetail = ServerDetailFinder.fetchServerDetails(server, config, environment);
+            LOGGER.info(UsefullApplicationUrlsTableFormatter.format(serverDetail));
+            LOGGER.info(HealthCheckTableFormatter.format(environment.healthChecks()));
         };
     }
 }
