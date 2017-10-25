@@ -6,7 +6,6 @@ import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
-import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.slf4j.Logger;
@@ -17,9 +16,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
-import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
-import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
-import uk.gov.ida.verifyserviceprovider.utils.ServerDetailFinder;
+import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
 
 import java.util.Arrays;
 
@@ -76,7 +73,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
 
-        environment.lifecycle().addServerLifecycleListener(createServerLifecycleListener(configuration, environment));
+        environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }
 
     private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
@@ -85,13 +82,5 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         } else {
             return new ResourceConfigurationSourceProvider();
         }
-    }
-
-    private ServerLifecycleListener createServerLifecycleListener(VerifyServiceProviderConfiguration config, Environment environment) {
-
-        return server -> {
-            ServerDetailFinder.ServerDetail serverDetail = ServerDetailFinder.fetchServerDetails(server, config, environment);
-            LOGGER.info(serverDetail.toLogOutputString());
-        };
     }
 }
