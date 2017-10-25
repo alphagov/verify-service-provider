@@ -14,7 +14,7 @@ public class HealthCheckTableFormatter {
     public static String format(HealthCheckRegistry healthCheckRegistry) {
         return StringTableFormatter.format(
             100,
-            "Healthcheck statistics:",
+            "Healthcheck status:",
             extractHealthCheckData(healthCheckRegistry)
         );
     }
