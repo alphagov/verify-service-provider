@@ -73,7 +73,7 @@ There are prebuilt clients for the following languages and frameworks:
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
 
 See [the swagger documentation](
-https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+https://github.com/alphagov/verify-service-provider/blob/master/docs/api/verify-service-provider-api.swagger.yml
 ) for details of the API.
 
 ## Advanced Configuration
