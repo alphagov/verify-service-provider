@@ -1,24 +1,28 @@
-Verify Service Provider
-=======================
+# Verify Service Provider
 
-Verify Service Provider is a Service that provides support for the communication
-between Verify Hub and a Relying Party.
+GOV.UK Verify uses SAML (Security Assertion Markup Language) to securely exchange information about identities. A Relying Party can use Verify Service Provider to handle all SAML communication to and from the Verify Hub.
 
-Please refer to the [techinical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) to understand how services can technically integrate with Verify.
+Using Verify Service Provider will make it easier to:
+* connect multiple services with GOV.UK Verify - you only need one instance of Verify Service Provider
+* handle certificate rotations - you can host multiple certificates at a time
 
-Setup
------
+You will need to host Verify Service Provider on your own infrastructure.
+
+Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about connecting to GOV.UK Verify.
+
+## Setup
 
 ### Download
 
-Release versions of the Verify Service Provider are available upon request from idasupport+onboarding@digital.cabinet-office.gov.uk
+[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider. 
 
 ### Configure
 
-The easiest way to configure the application is to use environment variables.
-See [Advanced Configuration](#advanced-configuration) for more options.
+To configure Verify Service Provider you can either:
+* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
+* define environment variables
 
-The following Environment Variables can be defined:
+To define environment variables use:
 
 ```
 #!/usr/bin/env sh
@@ -37,68 +41,63 @@ export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded
 ./bin/verify-service-provider
 ```
 
-#### Generating keys for testing
+As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.1.0/docs/manual/configuration.html).
 
-If you have [openssl](https://www.openssl.org) installed you can generate a private key in the correct format with:
+### Supporting multiple services connected to GOV.UK Verify
 
+You can use a single instance of Verify Service Provider with multiple different services. To do this, you must include a list of all possible service entity IDs in your configuration.
+
+There are 2 ways to include service entity IDs:
+* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
+* add more than one item in the JSON array for the `SERVICE_ENTITY_IDS` environment variable
+
+### Generate keys for testing
+
+In order to generate keys for testing, we recommend using [OpenSSL](https://www.openssl.org).
+
+You can generate a private key by:
+1. generating an RSA key in PEM format
+2. converting the key to base64 encoded PKCS8
+
+Generate an RSA key in PEM format with:
 ```
-# Generate an RSA key in PEM format
 openssl genrsa -des3 -passout pass:x 2048 | openssl rsa -passin pass:x -out key-name.pem
+```
 
-# Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print the key to standard out.
+Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print the key to STDOUT with:
+```
 openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openssl base64 -A; echo
 ```
 
 ### Run
 
+To run the application, export your environment variables and start the application with:
+
 ```
-# Export your Environment Variables, then start the application with:
 ./bin/verify-service-provider
 ```
 
 The application will write logs to STDOUT.
 
-You can check that the application is running by calling the healthcheck path:
+You can check the application is running by calling the healthcheck endpoint with:
+
 ```
 curl localhost:{$PORT}/admin/healthcheck
 ```
 
-
 ## Usage
 
-There are prebuilt clients for the following languages and frameworks:
+GOV.UK Verify provides prebuilt clients for the following languages and frameworks:
 
 |             Language / Framework               |                            Client Library                      |
 |------------------------------------------------|----------------------------------------------------------------|
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
 
-See [the swagger documentation](
-https://github.com/alphagov/verify-service-provider/blob/master/docs/api/verify-service-provider-api.swagger.yml
-) for details of the API.
+See [the API reference](https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml) for full details of the API.
 
-## Advanced Configuration
+## Development
 
-Yaml based configuration provides more fine grained controls over the application. For example, you are able to configure HTTPS endpoints.
-
-See the reference configuration file available at [verify-service-provider.yml](
-https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml
-)
-
-Verify Service Provider is a Dropwizard application and thus supports all configuration options
-provided by Dropwizard: http://www.dropwizard.io/1.1.0/docs/manual/configuration.html
-
-## Multi Tenancy
-
-A single instance of the Verify Service Provider can be used with multiple different services.
-To do so, a list of all the possible service entity ids must be included in the configuration.
-
-This can be done by either in a yaml configuration file (see above) or by putting more than one
-item in the JSON array for the SERVICE_ENTITY_IDS environment variable.
-
-Development
------------
-
-If you want to make changes to the `verify-service-provider` itself, fork the repository then:
+If you want to make changes to `verify-service-provider` itself, fork the repository then:
 
 __Test__
 ```
@@ -115,14 +114,15 @@ __Build a distribution__
 ./gradlew distZip
 ```
 
-The distribution zip can be found at `build/distributions`.
+You can find the distribution zip at `build/distributions`.
 
-See `docs/development` for useful information for development on the service provider, including
-how to run against a local compliance tool and some advanced configuration options.
+See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of Verify Service Provider, including how to run the application against a local compliance tool and see advanced configuration options.
 
-## Responsible Disclosure
+## Support and raising issues
 
-If you think you have discovered a security issue in this code please email disclosure@digital.cabinet-office.gov.uk with details.
+If you think you have discovered a security issue in this code please email [disclosure@digital.cabinet-office.gov.uk](mailto:disclosure@digital.cabinet-office.gov.uk) with details.
 
-For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the github issue tracker.
+For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the GitHub issue tracker.
 
+## Licensing
+[MIT License](https://github.com/alphagov/verify-service-provider/blob/master/LICENSE)
