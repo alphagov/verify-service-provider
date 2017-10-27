@@ -14,7 +14,7 @@ Using Verify Service Provider is just one part of connecting to GOV.UK Verify. R
 
 ### Download
 
-Verify Service Provider is not available over the internet. Contact [idasupport+onboarding@digital.cabinet-office.gov.uk](mailto:idasupport+onboarding@digital.cabinet-office.gov.uk) for a release version.
+[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider. 
 
 ### Configure
 
