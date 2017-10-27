@@ -1,6 +1,8 @@
 Release notes
 =============
 
+### Next
+
 ### 0.3.0
 
 * Fix the expected names of user account creation attributes to match the names the MSA produces
