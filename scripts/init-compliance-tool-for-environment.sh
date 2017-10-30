@@ -49,6 +49,7 @@ curl https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/service
     "DATE_OF_BIRTH_VERIFIED",
     "CURRENT_ADDRESS",
     "CURRENT_ADDRESS_VERIFIED",
+    "ADDRESS_HISTORY",
     "CYCLE_3"
   ]
 }
