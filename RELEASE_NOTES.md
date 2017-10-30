@@ -3,6 +3,13 @@ Release notes
 
 ### Next
 
+* Add support for the Address History user account creation attribute
+* Add ENVIRONMENT configuration option to replace hubSsoLocation and metadataUrl.
+* Send version number to hub
+* Support multitenancy
+* Improve documentation
+* Improve healthcheck logging
+
 ### 0.3.0
 
 * Fix the expected names of user account creation attributes to match the names the MSA produces
