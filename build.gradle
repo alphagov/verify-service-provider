@@ -58,8 +58,7 @@ sourceSets {
     }
 }
 
-def build_number = System.getenv('BUILD_NUMBER') != null ? System.getenv('BUILD_NUMBER') : 'SNAPSHOT'
-version = "$version_number-" + build_number
+version = "$version_number"
 
 distributions {
     main {
