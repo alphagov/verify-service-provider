@@ -52,6 +52,7 @@ public class UserAccountCreationResponseAcceptanceTest {
             "DATE_OF_BIRTH_VERIFIED",
             "CURRENT_ADDRESS",
             "CURRENT_ADDRESS_VERIFIED",
+            "ADDRESS_HISTORY",
             "CYCLE_3");
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -71,6 +72,7 @@ public class UserAccountCreationResponseAcceptanceTest {
                 "DATE_OF_BIRTH_VERIFIED",
                 "CURRENT_ADDRESS",
                 "CURRENT_ADDRESS_VERIFIED",
+                "ADDRESS_HISTORY",
                 "CYCLE_3");
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 

@@ -105,6 +105,36 @@ public class AttributeTranslationServiceTests {
     }
 
     @Test
+    public void shouldReturnAddressHistoryAttribute() {
+        Attribute addressHistoryAttribute = new AddressAttributeBuilder_1_1()
+            .addAddress(new AddressAttributeValueBuilder_1_1()
+                .addLines(Arrays.asList("10 Whitechapel High St", "London"))
+                .withPostcode("E1 8DX")
+                .withFrom(DateTime.parse("2017-07-03"))
+                .withTo(DateTime.parse("2017-07-30"))
+                .withVerified(true)
+                .build())
+            .addAddress(new AddressAttributeValueBuilder_1_1()
+                .addLines(Arrays.asList("42 Old Road", "London"))
+                .withPostcode("W1 0AA")
+                .withFrom(DateTime.parse("2015-01-01"))
+                .withTo(DateTime.parse("2017-07-03"))
+                .withVerified(true)
+                .build())
+            .buildPreviousAddress();
+        addressHistoryAttribute.setName("addresshistory");
+
+        AttributeStatement attributeStatement = anAttributeStatement()
+            .addAttribute(addressHistoryAttribute)
+            .build();
+
+        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+
+        assertThat(result.getAddressHistory()).isNotNull();
+        assertThat(result.getAddressHistory().size()).isEqualTo(2);
+    }
+
+    @Test
     public void shouldIncludeEmptyAttributes() {
         AttributeStatement attributeStatement = anAttributeStatement()
             .addAttribute(new SimpleStringAttributeBuilder()
