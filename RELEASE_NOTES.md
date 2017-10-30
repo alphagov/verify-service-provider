@@ -10,6 +10,21 @@ Release notes
 * Improve documentation
 * Improve healthcheck logging
 
+#### Configuration Changes:
+When using environment variables:
+* Replace SERVICE_ENTITY_ID with SERVICE_ENTITY_IDS, which is a JSON string array containing the entity id of the service (or services) using the Verify Service Provider (e.g. '["http://entity-id"]')
+* Remove HUB_METADATA_URL and HUB_SSO_LOCATION
+* Add VERIFY_ENVIRONMENT, specifying the environment of the Verify Hub to run against. Valid values are PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL.
+
+When using a yaml file:
+* Replace serviceEntityId with serviceEntityIds, which is a list containing the entity id (or ids) as above
+* Remove hubSsoLocation and verifyHubMetadata
+* Add verifyHubConfiguration as below. This will contain an environment option specifying which hub environment to use, removing the need to specify the hubSsoLocation or metadata url.
+```
+verifyHubConfiguration:
+  environment: \\ PRODUCTION, INTEGRATION or COMPLIANCE_TOOL
+```
+
 ### 0.3.0
 
 * Fix the expected names of user account creation attributes to match the names the MSA produces
