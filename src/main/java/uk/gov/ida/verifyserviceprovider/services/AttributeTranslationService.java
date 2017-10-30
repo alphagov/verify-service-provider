@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -28,8 +29,9 @@ public class AttributeTranslationService {
         VerifiableAttribute<String> verifiableSurname = getVerifiableStringAttribute(statementAttributes, "surname", "surname_verified");
         VerifiableAttribute<LocalDate> verifiableDob = getVerifiableDateAttribute(statementAttributes, "dateofbirth", "dateofbirth_verified");
         VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "currentaddress", "currentaddress_verified");
+        Optional<List<VerifiableAttribute<Address>>> addressHistory = getVerifiableAddressListAttribute(statementAttributes, "addresshistory");
         Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "cycle_3");
-        return new Attributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, cycle3.orElse(null));
+        return new Attributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, addressHistory.orElse(null), cycle3.orElse(null));
     }
 
     private static VerifiableAttribute<String> getVerifiableStringAttribute(List<Attribute> statementAttributes, String attributeName, String attributeVerifiedName) {
@@ -48,6 +50,15 @@ public class AttributeTranslationService {
         final Optional<Address> attributeValue = getAddressAttributeValue(statementAttributes, attributeName);
         final Optional<Boolean> attributeVerified = getBooleanAttributeValue(statementAttributes, attributeVerifiedName);
         return VerifiableAttribute.fromOptionals(attributeValue, attributeVerified);
+    }
+
+    private static Optional<List<VerifiableAttribute<Address>>> getVerifiableAddressListAttribute(List<Attribute> statementAttributes, String attributeName) {
+        final Optional<Attribute> attribute = getAttribute(statementAttributes, attributeName);
+        return attribute.map(
+            attr -> attr.getAttributeValues().stream().map(
+                val -> toVerifiableAddress((AddressImpl) val)
+            ).collect(Collectors.toList())
+        );
     }
 
     private static Optional<Attribute> getAttribute(List<Attribute> attributes, String name) {
@@ -95,6 +106,10 @@ public class AttributeTranslationService {
             convertToJavaLocalDate(address.getFrom()),
             convertToJavaLocalDate(address.getTo())
         );
+    }
+
+    private static VerifiableAttribute<Address> toVerifiableAddress(AddressImpl address) {
+        return new VerifiableAttribute<>(toAddress(address), address.getVerified());
     }
 
     private static String getValueOrNull(StringValueSamlObject attributeValue) {
