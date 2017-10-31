@@ -9,13 +9,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
-import org.opensaml.saml.saml2.core.impl.OneTimeUseBuilder;
-import org.opensaml.saml.saml2.core.impl.ProxyRestrictionBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -26,7 +20,6 @@ import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.ConditionsBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
@@ -36,13 +29,11 @@ import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import java.security.PrivateKey;
 import java.util.Collections;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.joda.time.DateTimeZone.UTC;
-import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.ida.saml.core.extensions.IdaAuthnContext.LEVEL_1_AUTHN_CTX;
 import static uk.gov.ida.saml.core.extensions.IdaAuthnContext.LEVEL_2_AUTHN_CTX;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
@@ -117,13 +108,13 @@ public class AssertionTranslatorTest {
     @Test
     public void shouldAllowHigherLevelOfAssuranceThanRequested() throws Exception {
         TranslatedResponseBody result = translator.translate(ImmutableList.of(
-                anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
+            anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_1, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedResponseBody(
-                SUCCESS_MATCH,
-                "some-pid",
-                LEVEL_2,
-                null
+            SUCCESS_MATCH,
+            "some-pid",
+            LEVEL_2,
+            null
         ));
     }
 
@@ -132,7 +123,7 @@ public class AssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        translator.translate(Collections.emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        translator.translate(emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -154,7 +145,7 @@ public class AssertionTranslatorTest {
                 anAssertion().buildUnencrypted()
             ),
             IN_RESPONSE_TO,
-                LEVEL_2,
+            LEVEL_2,
             VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
@@ -188,252 +179,6 @@ public class AssertionTranslatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationDataNotBeforeIsAfterTheCurrentTime() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        DateTime notBefore = DateTime.now().plusYears(50);
-        expectedException.expectMessage("Assertion is not valid before " + notBefore.withZone(UTC).toString(dateHourMinuteSecond()));
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData().withNotBefore(notBefore).build()
-        ).build();
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(subjectConfirmation)
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNotOnOrAfterIsBeforeNow() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion is not valid on or after ");
-
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData().withNotOnOrAfter(DateTime.now().minusYears(50)).build()
-        ).build();
-
-        Assertion assertion = aSignedAssertion()
-            .withSubject(
-                aSubject()
-                    .withSubjectConfirmation(subjectConfirmation)
-                    .build()
-            )
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAuthnInstantIsTooOld() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion AuthnInstant is too far in the past ");
-
-        Assertion assertion = aSignedAssertion()
-                .addAuthnStatement(anAuthnStatement()
-                        .withAuthnInstant(DateTime.now().minusMinutes(10))
-                        .build())
-                .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAuthnInstantIsInFuture() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("AuthnInstant is in the future ");
-
-        Assertion assertion = aSignedAssertion()
-                .addAuthnStatement(anAuthnStatement()
-                    .withAuthnInstant(DateTime.now().plusMinutes(10))
-                    .build())
-                .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenConditionsIsMissing() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Conditions is missing from the assertion.");
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(null)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNowIsBeforeConditionsNotBefore() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion is not valid before ");
-
-        Conditions conditionsElement = aConditions().build();
-        conditionsElement.setNotBefore(DateTime.now().plusYears(50));
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNowIsAfterConditionsNotOnOrAfter() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion is not valid on or after ");
-
-        Conditions conditionsElement = aConditions().build();
-        conditionsElement.setNotOnOrAfter(DateTime.now().minusYears(50));
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenIssueInstantIsTooOld() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion IssueInstant is too far in the past ");
-
-        Assertion assertion = aSignedAssertion()
-                .withIssueInstant(DateTime.now().minusMinutes(10))
-                .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenIssueInstantIsInTheFuture() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Assertion IssueInstant is in the future ");
-
-        Assertion assertion = aSignedAssertion()
-                .withIssueInstant(DateTime.now().plusMinutes(1))
-                .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenConditionsContainsProxyRestriction() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Conditions should not contain proxy restriction element.");
-
-
-        Conditions conditionsElement = aConditions().build();
-        conditionsElement.getConditions().add(new ProxyRestrictionBuilder().buildObject());
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenConditionsContainsOneTimeUse() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Conditions should not contain one time use element.");
-
-        Conditions conditionsElement = aConditions().build();
-        conditionsElement.getConditions().add(new OneTimeUseBuilder().buildObject());
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAudienceRestrictionMissing() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one audience restriction is expected.");
-
-        Conditions conditionsElement = aConditions().withoutDefaultAudienceRestriction().build();
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenMultipleAudiencesInAudienceRestriction() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one audience is expected.");
-
-        AudienceRestriction audienceRestriction = anAudienceRestriction().build();
-        audienceRestriction.getAudiences().add(new AudienceBuilder().buildObject());
-        audienceRestriction.getAudiences().add(new AudienceBuilder().buildObject());
-
-        Conditions conditionsElement = aConditions()
-            .withoutDefaultAudienceRestriction()
-            .addAudienceRestriction(audienceRestriction)
-            .build();
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAudienceRestrictionDoesNotMatchEntityId() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Audience must match entity ID. Expected " + VERIFY_SERVICE_PROVIDER_ENTITY_ID + " but was some-entity-id");
-
-        Conditions conditionsElement = aConditions()
-            .withoutDefaultAudienceRestriction()
-            .addAudienceRestriction(
-                anAudienceRestriction()
-                    .withAudienceId("some-entity-id")
-                    .build())
-            .build();
-
-        Assertion assertion = aSignedAssertion()
-            .withConditions(conditionsElement)
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAuthnStatementsIsEmpty() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one authn statement is expected.");
-
-        Assertion assertion = aSignedAssertion()
-            .buildUnencrypted();
-        assertion.getAuthnStatements().clear();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenMultipleAuthnStatementsPresent() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one authn statement is expected.");
-
-        Assertion assertion = aSignedAssertion()
-            .addAuthnStatement(anAuthnStatement().build())
-            .addAuthnStatement(anAuthnStatement().build())
-            .buildUnencrypted();
-
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
     public void shouldThrowExceptionWhenLevelOfAssuranceNotPresent() {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Expected a level of assurance.");
@@ -464,17 +209,6 @@ public class AssertionTranslatorTest {
             .buildUnencrypted();
 
         translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-    }
-
-    @Test
-    public void shouldThrowExceptionWithLowerLevelOfAssuranceThanRequested() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Expected Level of Assurance to be at least LEVEL_2, but was LEVEL_1");
-
-        Assertion assertion = anAssertionWith("some-pid", LEVEL_1_AUTHN_CTX).buildUnencrypted();
-
-        LevelOfAssurance expectedLevelOfAssurance = LevelOfAssurance.LEVEL_2;
-        translator.translate(ImmutableList.of(assertion), IN_RESPONSE_TO, expectedLevelOfAssurance, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     private AssertionBuilder aSignedAssertion() {

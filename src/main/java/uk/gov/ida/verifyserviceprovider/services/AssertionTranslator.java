@@ -10,6 +10,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -22,76 +23,62 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class AssertionTranslator {
-    private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
-    private final InstantValidator instantValidator;
-    private final SubjectValidator subjectValidator;
-    private final ConditionsValidator conditionsValidator;
 
-    public AssertionTranslator(SamlAssertionsSignatureValidator assertionsSignatureValidator,
-                               InstantValidator instantValidator,
-                               SubjectValidator subjectValidator,
-                               ConditionsValidator conditionsValidator) {
+    private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
+    private final AssertionValidator assertionValidator;
+
+    public AssertionTranslator(
+        SamlAssertionsSignatureValidator assertionsSignatureValidator,
+        AssertionValidator assertionValidator
+    ) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
-        this.instantValidator = instantValidator;
-        this.subjectValidator = subjectValidator;
-        this.conditionsValidator = conditionsValidator;
+        this.assertionValidator = assertionValidator;
     }
 
-    public TranslatedResponseBody translate(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        Assertion assertion = getAssertion(assertions);
+    public TranslatedResponseBody translate(
+        List<Assertion> assertions,
+        String expectedInResponseTo,
+        LevelOfAssurance expectedLevelOfAssurance,
+        String entityId
+    ) {
+        validateAssertions(assertions);
+        Assertion assertion = assertions.get(0);
 
-        instantValidator.validate(assertion.getIssueInstant(), "Assertion IssueInstant");
-
-        subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        String nameID = assertion.getSubject().getNameID().getValue();
-
-        conditionsValidator.validate(assertion.getConditions(), entityId);
-
+        assertionValidator.validate(assertion, expectedInResponseTo, entityId);
         assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
-        AuthnStatement authnStatement = getAuthnStatement(assertion);
+        AuthnStatement authnStatement = assertion.getAuthnStatements().get(0);
 
-        instantValidator.validate(authnStatement.getAuthnInstant(), "Assertion AuthnInstant");
+        LevelOfAssurance levelOfAssurance = extractLevelOfAssurance(authnStatement);
+        LevelOfAssuranceValidator levelOfAssuranceValidator = new LevelOfAssuranceValidator();
+        levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
 
-        LevelOfAssurance levelOfAssurance = getLevelOfAssurance(authnStatement);
-        LevelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
-
+        String nameID = assertion.getSubject().getNameID().getValue();
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
-        if (attributeStatements.isEmpty()) {
-            return new TranslatedResponseBody(
-                SUCCESS_MATCH,
-                nameID,
-                levelOfAssurance,
-                null
-            );
-        } else {
-            // Assume it is user account creation
+        if (isUserAccountCreation(attributeStatements)) {
             return new TranslatedResponseBody(
                 ACCOUNT_CREATION,
                 nameID,
                 levelOfAssurance,
                 AttributeTranslationService.translateAttributes(attributeStatements.get(0))
             );
+
         }
+
+        return new TranslatedResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
     }
 
-
-    private AuthnStatement getAuthnStatement(Assertion assertion) {
-        List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
-        if (authnStatements == null || authnStatements.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one authn statement is expected.");
-        }
-        return authnStatements.get(0);
+    public boolean isUserAccountCreation(List<AttributeStatement> attributeStatements) {
+        return !attributeStatements.isEmpty();
     }
 
-    private Assertion getAssertion(List<Assertion> assertions) {
-        if (assertions == null || assertions.isEmpty() || assertions.size() > 1) {
+    private void validateAssertions(List<Assertion> assertions) {
+        if (assertions == null || assertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one assertion is expected.");
         }
-        return assertions.get(0);
     }
 
-    private LevelOfAssurance getLevelOfAssurance(AuthnStatement authnStatement) {
+    private LevelOfAssurance extractLevelOfAssurance(AuthnStatement authnStatement) {
         String levelOfAssuranceString = ofNullable(authnStatement.getAuthnContext())
             .map(AuthnContext::getAuthnContextClassRef)
             .map(AuthnContextClassRef::getAuthnContextClassRef)

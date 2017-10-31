@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.services;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
@@ -31,7 +32,8 @@ public class ResponseService {
         AssertionDecrypter assertionDecrypter,
         AssertionTranslator assertionTranslator,
         SamlResponseSignatureValidator responseSignatureValidator,
-        InstantValidator instantValidator) {
+        InstantValidator instantValidator
+    ) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionTranslator = assertionTranslator;
@@ -39,7 +41,12 @@ public class ResponseService {
         this.instantValidator = instantValidator;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(String decodedSamlResponse, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
+    public TranslatedResponseBody convertTranslatedResponseBody(
+        String decodedSamlResponse,
+        String expectedInResponseTo,
+        LevelOfAssurance expectedLevelOfAssurance,
+        String entityId
+    ) {
         Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
 
         ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
@@ -67,7 +74,7 @@ public class ResponseService {
 
     private TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
-                .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
+            .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
         String subStatus = statusCode.getStatusCode().getValue();
 
         switch (subStatus) {
