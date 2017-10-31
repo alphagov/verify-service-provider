@@ -22,15 +22,15 @@ public class InstantValidator {
         Duration age = new Duration(instant, DateTime.now());
         if (age.isLongerThan(MAXIMUM_INSTANT_AGE)) {
             throw new SamlResponseValidationException(String.format("%s is too far in the past %s",
-                    instantName,
-                    PeriodFormat.getDefault().print(age.toPeriod()))
+                instantName,
+                PeriodFormat.getDefault().print(age.toPeriod()))
             );
         }
 
-        if (dateTimeComparator.isDefinitelyAfterNow(instant)) {
+        if (dateTimeComparator.isAfterNow(instant)) {
             throw new SamlResponseValidationException(String.format("%s is in the future %s",
-                    instantName,
-                    instant.withZone(UTC).toString(dateHourMinuteSecond()))
+                instantName,
+                instant.withZone(UTC).toString(dateHourMinuteSecond()))
             );
         }
     }

@@ -24,6 +24,8 @@ import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValida
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
@@ -90,16 +92,24 @@ public class ResponseFactory {
         );
     }
 
-    public AssertionTranslator createAssertionTranslator(MetadataResolver msaMetadataResolver, DateTimeComparator dateTimeComparator)
-            throws ComponentInitializationException {
+    public AssertionTranslator createAssertionTranslator(
+        MetadataResolver msaMetadataResolver,
+        DateTimeComparator dateTimeComparator
+    ) throws ComponentInitializationException {
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(msaMetadataResolver);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
-        return new AssertionTranslator(
-            new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
+
+        SamlAssertionsSignatureValidator assertionsSignatureValidator = new SamlAssertionsSignatureValidator(samlMessageSignatureValidator);
+        AssertionValidator assertionValidator = new AssertionValidator(
             new InstantValidator(dateTimeComparator),
             new SubjectValidator(timeRestrictionValidator),
-            new ConditionsValidator(timeRestrictionValidator)
+            new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
+        );
+
+        return new AssertionTranslator(
+            assertionsSignatureValidator,
+            assertionValidator
         );
     }
 
