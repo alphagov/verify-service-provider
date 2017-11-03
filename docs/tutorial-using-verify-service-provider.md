@@ -47,6 +47,8 @@ Example call:
 <summary>
 Example response:
 </summary>
+    
+    
 ```
 < HTTP/1.1 200 OK
 < Content-Type: application/json
@@ -57,6 +59,8 @@ Example response:
     "ssoLocation": "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"
 }
 ```
+
+
 </details>
 
 <br>The response contains:
@@ -91,9 +95,9 @@ The HTML form should include:
 * page styling to display if JavaScript is disabled - to prompt users to turn on JavaScript. This should look like your service
 
 <details>
-<summary>
-Example [XHTML form from passport-verify](https://github.com/alphagov/passport-verify/blob/master/lib/saml-form.ts):
+    <summary>Example <a href="https://github.com/alphagov/passport-verify/blob/master/lib/saml-form.ts">HTML form from passport-verify</a>:
 </summary>
+
 
 ```
     <form class='passport-verify-saml-form' method='post' action='${escape(ssoLocation)}'>
@@ -154,6 +158,8 @@ The call must contain:
 <summary>
 Example call:
 </summary>
+    
+    
 ```
 > POST /translate-response HTTP/1.1
 > Content-Type: application/json
@@ -164,6 +170,8 @@ Example call:
   "levelOfAssurance" : "LEVEL_2"
 }
 ```
+
+
 </details>
 
 Example successful match response:
