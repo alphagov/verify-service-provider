@@ -3,6 +3,8 @@ Release notes
 
 ### Next
 
+### 0.4.0
+
 * Add support for the Address History user account creation attribute
 * Add ENVIRONMENT configuration option to replace hubSsoLocation and metadataUrl.
 * Send version number to hub
