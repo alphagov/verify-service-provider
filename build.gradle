@@ -21,7 +21,7 @@ project.ext {
 dependencies {
     compile(
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
-        'org.json:json:20170516',
+        'org.json:json:20171018',
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
@@ -33,12 +33,12 @@ dependencies {
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:2.7.22',
+        'org.mockito:mockito-core:2.11.0',
         "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-$samlMetaDataBindingVersion",
         "uk.gov.ida:common-test-utils:2.0.0-31",
-        "org.jsoup:jsoup:1.10.3",
+        "org.jsoup:jsoup:1.11.1",
     )
-    testCompile('com.github.tomakehurst:wiremock:2.5.1'){ transitive = false }
+    testCompile('com.github.tomakehurst:wiremock:2.10.1'){ transitive = false }
 }
 
 sourceSets {
