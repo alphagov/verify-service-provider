@@ -5,6 +5,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import uk.gov.ida.saml.security.PublicKeyFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderMetadataConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
@@ -36,8 +37,8 @@ public class VerifyServiceProviderFactory {
         this.environment = environment;
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(
-            configuration.getSamlPrimaryEncryptionKey(),
-            configuration.getSamlSecondaryEncryptionKey());
+            configuration.getPrimaryEncryptionKey(),
+            configuration.getSecondaryEncryptionKey());
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
         this.manifestReader = new ManifestReader();
@@ -53,7 +54,7 @@ public class VerifyServiceProviderFactory {
     public MetadataHealthCheck getMsaMetadataHealthCheck() {
         return new MetadataHealthCheck(
             getMsaMetadataResolver(),
-            configuration.getMsaMetadata().getExpectedEntityId()
+            configuration.getMatchingServiceAdapter().getEntityId()
         );
     }
 
@@ -67,7 +68,7 @@ public class VerifyServiceProviderFactory {
 
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
             configuration.getHubSsoLocation(),
-            configuration.getSamlSigningKey(),
+            configuration.getSigningKey(),
             manifestReader,
             encrypterFactory
         );
@@ -113,7 +114,7 @@ public class VerifyServiceProviderFactory {
             synchronized (this) {
                 resolver = msaMetadataResolver;
                 if (resolver == null) {
-                    msaMetadataResolver = resolver = metadataResolverFactory.createMetadataResolverWithoutSignatureValidation(environment, configuration.getMsaMetadata());
+                    msaMetadataResolver = resolver = metadataResolverFactory.createMetadataResolverWithoutSignatureValidation(environment, configuration.getMatchingServiceAdapter());
                 }
             }
         }

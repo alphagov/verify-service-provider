@@ -31,23 +31,23 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @NotNull
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
-    private PrivateKey samlSigningKey;
+    private PrivateKey signingKey;
 
     @JsonProperty
     @NotNull
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
-    private PrivateKey samlPrimaryEncryptionKey;
+    private PrivateKey primaryEncryptionKey;
 
     @JsonProperty
     @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
-    private PrivateKey samlSecondaryEncryptionKey;
+    private PrivateKey secondaryEncryptionKey;
 
     @JsonProperty
     @NotNull
     @Valid
-    private MsaMetadataConfiguration msaMetadata;
+    private MatchingServiceAdapterConfiguration matchingServiceAdapter;
 
     @JsonProperty
     @NotNull
@@ -62,20 +62,20 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return verifyHubConfiguration.getHubSsoLocation();
     }
 
-    public PrivateKey getSamlSigningKey() {
-        return samlSigningKey;
+    public PrivateKey getSigningKey() {
+        return signingKey;
     }
 
-    public PrivateKey getSamlPrimaryEncryptionKey() {
-        return samlPrimaryEncryptionKey;
+    public PrivateKey getPrimaryEncryptionKey() {
+        return primaryEncryptionKey;
     }
 
-    public PrivateKey getSamlSecondaryEncryptionKey() {
-        return samlSecondaryEncryptionKey;
+    public PrivateKey getSecondaryEncryptionKey() {
+        return secondaryEncryptionKey;
     }
 
-    public MsaMetadataConfiguration getMsaMetadata() {
-        return msaMetadata;
+    public MatchingServiceAdapterConfiguration getMatchingServiceAdapter() {
+        return matchingServiceAdapter;
     }
 
     public HubMetadataConfiguration getVerifyHubMetadata() {

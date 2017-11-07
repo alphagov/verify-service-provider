@@ -15,28 +15,28 @@ import static io.dropwizard.util.Duration.seconds;
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
 
-public class MsaMetadataConfiguration implements VerifyServiceProviderMetadataConfiguration {
+public class MatchingServiceAdapterConfiguration implements VerifyServiceProviderMetadataConfiguration {
 
-    private final URI uri;
+    private final URI metadataUri;
     private final Long minRefreshDelay;
     private final Long maxRefreshDelay;
-    private final String expectedEntityId;
+    private final String entityId;
     private final JerseyClientConfiguration jerseyClientConfiguration;
     private final String jerseyClientName;
 
     @JsonCreator
-    public MsaMetadataConfiguration(
-        @JsonProperty("uri") URI uri,
+    public MatchingServiceAdapterConfiguration(
+        @JsonProperty("metadataUri") URI metadataUri,
         @JsonProperty("minRefreshDelay") Long minRefreshDelay,
         @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
-        @JsonProperty("expectedEntityId") String expectedEntityId,
+        @JsonProperty("entityId") String entityId,
         @JsonProperty("jerseyClientConfiguration") JerseyClientConfiguration jerseyClientConfiguration,
         @JsonProperty("jerseyClientName") String jerseyClientName
     ) {
-        this.uri = uri;
+        this.metadataUri = metadataUri;
         this.minRefreshDelay = ofNullable(minRefreshDelay).orElse(60000L);
         this.maxRefreshDelay = ofNullable(maxRefreshDelay).orElse(600000L);
-        this.expectedEntityId = expectedEntityId;
+        this.entityId = entityId;
         this.jerseyClientConfiguration = ofNullable(jerseyClientConfiguration).orElse(createClient());
         this.jerseyClientName = ofNullable(jerseyClientName).orElse(MSA_JERSEY_CLIENT_NAME);
     }
@@ -51,11 +51,21 @@ public class MsaMetadataConfiguration implements VerifyServiceProviderMetadataCo
         throw new NotImplementedException("MSA metadata is not signed, so no trust store available");
     }
 
-    @NotNull
-    @Valid
     @Override
     public URI getUri() {
-        return uri;
+        return metadataUri;
+    }
+
+    @NotNull
+    @Valid
+    public URI getMetadataUri() {
+        return metadataUri;
+    }
+
+    @NotNull
+    @Valid
+    public String getEntityId() {
+        return entityId;
     }
 
     @NotNull
@@ -72,11 +82,9 @@ public class MsaMetadataConfiguration implements VerifyServiceProviderMetadataCo
         return maxRefreshDelay;
     }
 
-    @NotNull
-    @Valid
     @Override
     public String getExpectedEntityId() {
-        return expectedEntityId;
+        return entityId;
     }
 
     @NotNull

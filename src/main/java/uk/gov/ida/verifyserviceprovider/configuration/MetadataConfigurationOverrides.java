@@ -9,10 +9,10 @@ import java.net.URI;
 public class MetadataConfigurationOverrides {
     private String trustStorePath;
     private String trustStorePassword;
-    private URI uri;
+    private URI metadataUri;
     private Long minRefreshDelay;
     private Long maxRefreshDelay;
-    private String expectedEntityId;
+    private String entityId;
     private JerseyClientConfiguration jerseyClientConfiguration;
     private String jerseyClientName;
 
@@ -20,19 +20,19 @@ public class MetadataConfigurationOverrides {
     public MetadataConfigurationOverrides(
         @JsonProperty("trustStorePath") String trustStorePath,
         @JsonProperty("trustStorePassword") String trustStorePassword,
-        @JsonProperty("uri") URI uri,
+        @JsonProperty("metadataUri") URI metadataUri,
         @JsonProperty("minRefreshDelay") Long minRefreshDelay,
         @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
-        @JsonProperty("expectedEntityId") String expectedEntityId,
+        @JsonProperty("entityId") String entityId,
         @JsonProperty("jerseyClientConfiguration") JerseyClientConfiguration jerseyClientConfiguration,
         @JsonProperty("jerseyClientName") String jerseyClientName
     ) {
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
-        this.uri = uri;
+        this.metadataUri = metadataUri;
         this.minRefreshDelay = minRefreshDelay;
         this.maxRefreshDelay = maxRefreshDelay;
-        this.expectedEntityId = expectedEntityId;
+        this.entityId = entityId;
         this.jerseyClientConfiguration = jerseyClientConfiguration;
         this.jerseyClientName = jerseyClientName;
     }
@@ -47,8 +47,8 @@ public class MetadataConfigurationOverrides {
         return trustStorePassword;
     }
 
-    public URI getUri() {
-        return uri;
+    public URI getMetadataUri() {
+        return metadataUri;
     }
 
     public Long getMinRefreshDelay() {
@@ -59,8 +59,8 @@ public class MetadataConfigurationOverrides {
         return maxRefreshDelay;
     }
 
-    public String getExpectedEntityId() {
-        return expectedEntityId;
+    public String getEntityId() {
+        return entityId;
     }
 
     public JerseyClientConfiguration getJerseyClientConfiguration() {
