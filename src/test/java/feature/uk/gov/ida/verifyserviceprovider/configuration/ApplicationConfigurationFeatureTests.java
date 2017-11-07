@@ -38,8 +38,8 @@ public class ApplicationConfigurationFeatureTests {
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStorePath", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStorePassword", keyStoreResource.getPassword())
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", keyStoreResource.getAbsolutePath()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword())
         );
     }
 

@@ -54,12 +54,11 @@ public class MsaMetadataFeatureTest {
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", hubServer.port())),
-            config("verifyHubConfiguration.metadata.trustStorePath", ResourceHelpers.resourceFilePath("verify-production-truststore.ts")),
             config("msaMetadata.uri", () -> String.format("http://localhost:%s/matching-service/metadata", wireMockServer.port())),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            config("verifyHubConfiguration.metadata.trustStorePath", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStorePassword", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
         );
         IdaSamlBootstrap.bootstrap();
         wireMockServer.start();

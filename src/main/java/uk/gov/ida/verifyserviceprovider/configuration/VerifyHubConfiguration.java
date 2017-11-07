@@ -16,13 +16,15 @@ public class VerifyHubConfiguration {
     public VerifyHubConfiguration(
         @JsonProperty("environment") HubEnvironment hubEnvironment,
         @JsonProperty("ssoLocation") URI hubSsoLocation,
-        @JsonProperty("metadata") MetadataConfigurationOverrides hubMetadataOverrides
+        @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
     ) {
-        if (hubMetadataOverrides == null) {
-            hubMetadataOverrides = new MetadataConfigurationOverrides();
-        }
         this.hubSsoLocation = ofNullable(hubSsoLocation).orElse(hubEnvironment.getSsoLocation());
-        this.hubMetadataConfiguration = new HubMetadataConfiguration(hubEnvironment, hubMetadataOverrides);
+        this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElse(createHubMetadataConfigurationWithDefaults());
+        this.hubMetadataConfiguration.setEnvironment(hubEnvironment);
+    }
+
+    private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
+        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null);
     }
 
     public URI getHubSsoLocation() {

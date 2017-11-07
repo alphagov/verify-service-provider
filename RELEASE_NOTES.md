@@ -3,6 +3,18 @@ Release notes
 
 ### Next
 
+* Change trust store configuration schema to match MSA
+
+#### Configuration Changes:
+* If using a custom file-based trust store configuration, replace: 
+```diff
+- trustStorePath: /path/to/file
+- trustStorePassword: foobar
+
++ trustStore:
++   path: /path/to/file
++   password: foobar
+```
 ### 0.4.0
 
 * Add support for the Address History user account creation attribute

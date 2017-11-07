@@ -60,12 +60,11 @@ public class HubMetadataFeatureTest {
             VerifyServiceProviderApplication.class,
             resourceFilePath("verify-service-provider.yml"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
-            config("verifyHubConfiguration.metadata.trustStorePath", "verify-production-truststore.ts"),
             config("msaMetadata.uri", msaServer::getUri),
-            config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            config("verifyHubConfiguration.metadata.trustStorePath", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStorePassword", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
+            config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
         );
 
         IdaSamlBootstrap.bootstrap();
