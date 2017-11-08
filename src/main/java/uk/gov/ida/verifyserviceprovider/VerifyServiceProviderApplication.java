@@ -21,7 +21,8 @@ import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
-    private VerifyServiceProviderApplication() {
+    @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
+    public VerifyServiceProviderApplication() {
     }
 
     public static void main(String[] args) throws Exception {
