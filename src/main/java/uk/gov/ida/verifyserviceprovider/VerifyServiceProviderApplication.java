@@ -24,19 +24,14 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VerifyServiceProviderApplication.class);
 
-    private boolean fileSystemConfig;
-
-    private VerifyServiceProviderApplication(boolean fileSystemConfig) {
-        this.fileSystemConfig = fileSystemConfig;
-    }
-
     public VerifyServiceProviderApplication() {
-        this(true);
     }
 
     public static void main(String[] args) throws Exception {
         if (Arrays.asList(args).isEmpty()) {
-            new VerifyServiceProviderApplication(false).run("server", "verify-service-provider-env.yml");
+            String jarPath = VerifyServiceProviderApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            String configFilePath = jarPath.replaceFirst("/lib/verify-service-provider-.*\\.jar", "/verify-service-provider.yml");
+            new VerifyServiceProviderApplication().run("server", configFilePath);
         } else {
             new VerifyServiceProviderApplication().run(args);
         }
@@ -46,7 +41,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     public void initialize(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
         // Enable variable substitution with environment variables
         bootstrap.setConfigurationSourceProvider(
-            new SubstitutingSourceProvider(getFileConfigurationSourceProvider(bootstrap),
+            new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
                 new EnvironmentVariableSubstitutor(false)
             )
         );
@@ -74,13 +69,5 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
 
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
-    }
-
-    private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
-        if (fileSystemConfig) {
-            return bootstrap.getConfigurationSourceProvider();
-        } else {
-            return new ResourceConfigurationSourceProvider();
-        }
     }
 }
