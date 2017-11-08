@@ -14,42 +14,33 @@ Using Verify Service Provider is just one part of connecting to GOV.UK Verify. R
 
 ### Download
 
-[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider. 
+[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider.
 
 ### Configure
 
-To configure Verify Service Provider you can either:
-* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
-* define environment variables
+Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
+called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
 
-To define environment variables use:
+By default the following environment variables are supported:
 
 ```
-#!/usr/bin/env sh
+VERIFY_ENVIRONMENT            # The environment of the Verify Hub to run against - PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL
 
-export SERVICE_ENTITY_IDS=... # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'.
-export PORT=... # The TCP port where the application will listen for HTTP traffic
-export LOG_LEVEL=... # The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR) (default: INFO)
-export MSA_ENTITY_ID=... # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
-export MSA_METADATA_URL=... # The URL to the Matching Service Adapter's SAML metadata.
-export VERIFY_ENVIRONMENT=... # The environment of the Verify Hub to run against - PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL
-export SAML_SIGNING_KEY=... # A base64 encoded RSA private key that is used for signing the request to Verify
-export SAML_PRIMARY_ENCRYPTION_KEY=... # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
-export SAML_SECONDARY_ENCRYPTION_KEY=... # (Optional) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that will be used during certificate rotation events (see "Generating keys for testing")
+SERVICE_ENTITY_IDS            # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'
+                              # If you have multiple services using a single Verify Service Provider you should provide all of their entity IDs in this array.
+MSA_ENTITY_ID                 # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
+MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML metadata.
 
-# Run the application with the above variables set
-./bin/verify-service-provider
+SAML_SIGNING_KEY              # A base64 encoded RSA private key that is used for signing the request to Verify
+SAML_PRIMARY_ENCRYPTION_KEY   # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
+SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that
+                              # will be used during certificate rotation events (see "Generating keys for testing")
+
+PORT                          # (Optional - default 50400) The TCP port where the application will listen for HTTP traffic
+LOG_LEVEL                     # (Optional - default INFO) The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR)
 ```
 
 As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.1.0/docs/manual/configuration.html).
-
-### Supporting multiple services connected to GOV.UK Verify
-
-You can use a single instance of Verify Service Provider with multiple different services. To do this, you must include a list of all possible service entity IDs in your configuration.
-
-There are 2 ways to include service entity IDs:
-* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
-* add more than one item in the JSON array for the `SERVICE_ENTITY_IDS` environment variable
 
 ### Generate keys for testing
 
@@ -74,7 +65,7 @@ openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openss
 To run the application, export your environment variables and start the application with:
 
 ```
-./bin/verify-service-provider
+./bin/verify-service-provider server verify-service-provider.yml
 ```
 
 The application will write logs to STDOUT.

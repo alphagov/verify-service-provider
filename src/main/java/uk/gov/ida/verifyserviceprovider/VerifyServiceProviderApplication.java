@@ -2,9 +2,7 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import io.dropwizard.Application;
-import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
-import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -17,26 +15,19 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
+import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
 import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerifyServiceProviderApplication.class);
-
-    private boolean fileSystemConfig;
-
-    private VerifyServiceProviderApplication(boolean fileSystemConfig) {
-        this.fileSystemConfig = fileSystemConfig;
-    }
-
-    public VerifyServiceProviderApplication() {
-        this(true);
+    private VerifyServiceProviderApplication() {
     }
 
     public static void main(String[] args) throws Exception {
         if (Arrays.asList(args).isEmpty()) {
-            new VerifyServiceProviderApplication(false).run("server", "verify-service-provider-env.yml");
+            String configFilePath = ConfigurationFileFinder.getConfigurationFilePath();
+            new VerifyServiceProviderApplication().run("server", configFilePath);
         } else {
             new VerifyServiceProviderApplication().run(args);
         }
@@ -46,7 +37,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     public void initialize(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
         // Enable variable substitution with environment variables
         bootstrap.setConfigurationSourceProvider(
-            new SubstitutingSourceProvider(getFileConfigurationSourceProvider(bootstrap),
+            new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
                 new EnvironmentVariableSubstitutor(false)
             )
         );
@@ -74,13 +65,5 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
 
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
-    }
-
-    private ConfigurationSourceProvider getFileConfigurationSourceProvider(Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
-        if (fileSystemConfig) {
-            return bootstrap.getConfigurationSourceProvider();
-        } else {
-            return new ResourceConfigurationSourceProvider();
-        }
     }
 }

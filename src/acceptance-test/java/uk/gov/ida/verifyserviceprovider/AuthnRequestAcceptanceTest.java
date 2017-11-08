@@ -38,7 +38,7 @@ public class AuthnRequestAcceptanceTest {
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardTestSupport<>(
         VerifyServiceProviderApplication.class,
-        resourceFilePath("verify-service-provider.yml"),
+        "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
@@ -48,7 +48,7 @@ public class AuthnRequestAcceptanceTest {
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
         VerifyServiceProviderApplication.class,
-        resourceFilePath("verify-service-provider.yml"),
+        "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
