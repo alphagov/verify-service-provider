@@ -9,8 +9,8 @@ public class ConfigurationFileFinder {
         String applicationClassPath =
             VerifyServiceProviderApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String configFilePath = applicationClassPath
-            .replaceFirst("lib/verify-service-provider-.*\\.jar", "verify-service-provider.yml")
-            .replaceFirst("build/classes/main/", "verify-service-provider.yml");
+            .replaceFirst("lib/verify-service-provider-.*\\.jar$", "verify-service-provider.yml")
+            .replaceFirst("build/classes/main/$", "verify-service-provider.yml");
 
         if (new File(configFilePath).exists()) {
             return configFilePath;

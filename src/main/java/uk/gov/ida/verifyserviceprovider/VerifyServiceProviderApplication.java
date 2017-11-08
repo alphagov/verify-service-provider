@@ -2,9 +2,7 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import io.dropwizard.Application;
-import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
-import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -19,14 +17,11 @@ import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
 import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
-import java.io.File;
 import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerifyServiceProviderApplication.class);
-
-    public VerifyServiceProviderApplication() {
+    private VerifyServiceProviderApplication() {
     }
 
     public static void main(String[] args) throws Exception {
