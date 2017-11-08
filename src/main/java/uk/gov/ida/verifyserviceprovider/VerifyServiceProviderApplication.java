@@ -17,7 +17,9 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
+import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
@@ -29,8 +31,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     public static void main(String[] args) throws Exception {
         if (Arrays.asList(args).isEmpty()) {
-            String jarPath = VerifyServiceProviderApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            String configFilePath = jarPath.replaceFirst("/lib/verify-service-provider-.*\\.jar", "/verify-service-provider.yml");
+            String configFilePath = ConfigurationFileFinder.getConfigurationFilePath();
             new VerifyServiceProviderApplication().run("server", configFilePath);
         } else {
             new VerifyServiceProviderApplication().run(args);

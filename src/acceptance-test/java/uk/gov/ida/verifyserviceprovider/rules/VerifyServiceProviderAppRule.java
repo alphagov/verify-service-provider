@@ -16,7 +16,7 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider.yml"),
+            "verify-service-provider.yml",
             ConfigOverride.config("serviceEntityIds", serviceEntityIdOverride),
             ConfigOverride.config("server.connector.port", String.valueOf(0)),
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),

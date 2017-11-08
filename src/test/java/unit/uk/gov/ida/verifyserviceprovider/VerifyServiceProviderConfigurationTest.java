@@ -37,7 +37,7 @@ public class VerifyServiceProviderConfigurationTest {
                 new FileConfigurationSourceProvider(),
                 new EnvironmentVariableSubstitutor(false)
             ),
-            resourceFilePath("verify-service-provider.yml")
+            "verify-service-provider.yml"
         );
     }
 

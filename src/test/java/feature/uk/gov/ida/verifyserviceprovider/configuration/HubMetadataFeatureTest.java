@@ -58,7 +58,7 @@ public class HubMetadataFeatureTest {
         verifyHubKeystoreResource.create();
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
-            resourceFilePath("verify-service-provider.yml"),
+            "verify-service-provider.yml",
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
             config("verifyHubConfiguration.metadata.trustStorePath", "verify-production-truststore.ts"),
             config("msaMetadata.uri", msaServer::getUri),

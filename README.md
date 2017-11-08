@@ -19,12 +19,12 @@ Using Verify Service Provider is just one part of connecting to GOV.UK Verify. R
 ### Configure
 
 To configure Verify Service Provider you can either:
-* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
+* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 * define environment variables
 
 #### To use a yaml configuration file:
 
-Create a config file for your application by amending the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml).
+Create a config file for your application by amending the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml).
 This file will be in the root of the Verify Service Provider directory once unzipped.
 
 If you do not rename this file, you can run the application using ```./bin/verify-service-provider```
@@ -57,7 +57,7 @@ As Verify Service Provider is a Dropwizard application, you can also configure i
 You can use a single instance of Verify Service Provider with multiple different services. To do this, you must include a list of all possible service entity IDs in your configuration.
 
 There are 2 ways to include service entity IDs:
-* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/configuration/verify-service-provider.yml)
+* amend the [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 * add more than one item in the JSON array for the `SERVICE_ENTITY_IDS` environment variable
 
 ### Generate keys for testing
@@ -124,8 +124,6 @@ __Build a distribution__
 ```
 
 You can find the distribution zip at `build/distributions`.
-
-To run or debug Verify Service Provider from an IDE, you will need to either delegate the run action to gradle or set a run configuration which uses the arguments ```server configuration/verify-service-provider.yml``` to provide the configuration file.
 
 See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of Verify Service Provider, including how to run the application against a local compliance tool and see advanced configuration options.
 
