@@ -18,7 +18,7 @@ This tutorial explains how to:
 To be able to follow this tutorial you must:
 * have Java 8
 * [set up and configure Verify Service Provider](https://github.com/alphagov/verify-service-provider/blob/master/README.md)
-* have a working [Matching Service Adapter running](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
+* have a working [Matching Service Adapter](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
 
 Your installation of Verify Service Provider must also pass its health check.
 
