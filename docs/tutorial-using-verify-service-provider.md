@@ -97,7 +97,7 @@ The HTML form should include:
 
 <details>
 <summary>
-Example <a href="https://github.com/alphagov/passport-verify/blob/master/lib/saml-form.ts">HTML form from passport-verify</a>
+Example HTML form from passport-verify
 </summary>
 
 
