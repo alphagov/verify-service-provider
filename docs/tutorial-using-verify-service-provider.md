@@ -13,7 +13,7 @@ This tutorial explains how to:
 * deal with returning users
 * approach troubleshooting and get help
 
-## Pre-requisites
+## Prerequisites
 
 To be able to follow this tutorial you must:
 * have Java 8
