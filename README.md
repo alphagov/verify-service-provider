@@ -16,7 +16,7 @@ Using Verify Service Provider is just one part of connecting to GOV.UK Verify. R
 
 To download and use Verify Service Provider you must:
 * have Java 8
-* have a working [Matching Service Adapter running](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
+* have a working [Matching Service Adapter](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
 
 ### Download
 
