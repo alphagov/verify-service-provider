@@ -1,5 +1,11 @@
 package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
+import certificates.values.CACertificates;
+import keystore.KeyStoreResource;
+import keystore.KeyStoreRule;
+import keystore.builders.KeyStoreResourceBuilder;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.HubMetadataConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
@@ -11,6 +17,15 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
 public class VerifyHubConfigurationFeatureTests {
+
+    private static final KeyStoreResource keyStore = KeyStoreResourceBuilder.aKeyStoreResource()
+            .withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+
+    @Before
+    public void setUp() {
+        keyStore.create();
+    }
+
     @Test
     public void shouldSetExpectedDefaultsForComplianceToolEnvironmentIfNoOverridesGiven() throws Exception {
         String config = "{\"environment\": \"COMPLIANCE_TOOL\"}";
@@ -21,8 +36,7 @@ public class VerifyHubConfigurationFeatureTests {
         assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO");
         assertThat(metadataConfiguration.getUri().toString()).isEqualTo("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation");
         assertThat(metadataConfiguration.getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
-        assertThat(metadataConfiguration.getTrustStorePassword()).startsWith("bj76");
-        assertThat(metadataConfiguration.getTrustStorePath()).endsWith(TEST_VERIFY_TRUSTSTORE_NAME);
+        assertThat(metadataConfiguration.getTrustStore().containsAlias("idaca")).isTrue();
         assertThat(metadataConfiguration.getJerseyClientConfiguration()).isNotNull();
         assertThat(metadataConfiguration.getJerseyClientName()).isEqualTo(HUB_JERSEY_CLIENT_NAME);
         assertThat(metadataConfiguration.getMinRefreshDelay()).isEqualTo(60000);
@@ -39,8 +53,7 @@ public class VerifyHubConfigurationFeatureTests {
         assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("https://www.integration.signin.service.gov.uk/SAML2/SSO");
         assertThat(metadataConfiguration.getUri().toString()).isEqualTo("https://www.integration.signin.service.gov.uk/SAML2/metadata/federation");
         assertThat(metadataConfiguration.getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
-        assertThat(metadataConfiguration.getTrustStorePassword()).startsWith("bj76");
-        assertThat(metadataConfiguration.getTrustStorePath()).endsWith(TEST_VERIFY_TRUSTSTORE_NAME);
+        assertThat(metadataConfiguration.getTrustStore().containsAlias("idaca")).isTrue();
         assertThat(metadataConfiguration.getJerseyClientConfiguration()).isNotNull();
         assertThat(metadataConfiguration.getJerseyClientName()).isEqualTo(HUB_JERSEY_CLIENT_NAME);
         assertThat(metadataConfiguration.getMinRefreshDelay()).isEqualTo(60000);
@@ -57,8 +70,7 @@ public class VerifyHubConfigurationFeatureTests {
         assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("https://www.signin.service.gov.uk/SAML2/SSO");
         assertThat(metadataConfiguration.getUri().toString()).isEqualTo("https://www.signin.service.gov.uk/SAML2/metadata/federation");
         assertThat(metadataConfiguration.getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
-        assertThat(metadataConfiguration.getTrustStorePassword()).startsWith("bj76");
-        assertThat(metadataConfiguration.getTrustStorePath()).endsWith(PRODUCTION_VERIFY_TRUSTSTORE_NAME);
+        assertThat(metadataConfiguration.getTrustStore().containsAlias("idaca")).isTrue();
         assertThat(metadataConfiguration.getJerseyClientConfiguration()).isNotNull();
         assertThat(metadataConfiguration.getJerseyClientName()).isEqualTo(HUB_JERSEY_CLIENT_NAME);
         assertThat(metadataConfiguration.getMinRefreshDelay()).isEqualTo(60000);
@@ -83,12 +95,14 @@ public class VerifyHubConfigurationFeatureTests {
         String config = "{" +
             "\"environment\": \"PRODUCTION\"," +
             "\"metadata\": {" +
-            "\"trustStorePath\": \"some-trust-store-path\"" +
-            "}}";
+            "\"trustStore\": {" +
+            "\"path\": \"" + keyStore.getAbsolutePath() + "\"," +
+            "\"password\": \"" + keyStore.getPassword() + "\"" +
+            "}}}";
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
-        assertThat(actualConfiguration.getHubMetadataConfiguration().getTrustStorePath()).isEqualTo("some-trust-store-path");
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getTrustStore().containsAlias("rootCA")).isTrue();
     }
 
     @Test

@@ -1,147 +1,66 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Throwables;
 import io.dropwizard.client.JerseyClientConfiguration;
-import io.dropwizard.client.ssl.TlsConfiguration;
+import io.dropwizard.servlets.assets.ResourceNotFoundException;
+import uk.gov.ida.saml.metadata.EncodedTrustStoreConfiguration;
+import uk.gov.ida.saml.metadata.KeyStoreLoader;
+import uk.gov.ida.saml.metadata.MetadataConfiguration;
+import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
+import uk.gov.ida.saml.metadata.exception.EmptyTrustStoreException;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 
-import static io.dropwizard.util.Duration.minutes;
-import static io.dropwizard.util.Duration.seconds;
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 
-public class HubMetadataConfiguration implements VerifyServiceProviderMetadataConfiguration {
-    /**
-     * Note: our trust stores do not contain private keys,
-     * so this password does not need to be managed securely.
-     *
-     * This password MUST NOT be used for anything sensitive, since it is open source.
-     */
-    private String DEFAULT_TRUST_STORE_PASSWORD = "bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh";
+public class HubMetadataConfiguration extends MetadataConfiguration {
 
-    private final String trustStorePath;
-    private final String trustStorePassword;
-    private final URI uri;
-    private final Long minRefreshDelay;
-    private final Long maxRefreshDelay;
-    private final String expectedEntityId;
-    private final JerseyClientConfiguration jerseyClientConfiguration;
-    private final String jerseyClientName;
-    private final boolean shouldLoadTrustStoreFromResources;
+    private HubEnvironment environment;
+    private final TrustStoreConfiguration trustStoreConfiguration;
 
-    public HubMetadataConfiguration(HubEnvironment environment, MetadataConfigurationOverrides overrides) {
-        this.trustStorePath = ofNullable(overrides.getTrustStorePath()).orElseGet(() -> generateTrustStorePath(environment));
-        this.trustStorePassword = ofNullable(overrides.getTrustStorePassword()).orElse(DEFAULT_TRUST_STORE_PASSWORD);
-        this.uri = ofNullable(overrides.getUri()).orElse(environment.getMetadataUri());
-        this.minRefreshDelay = ofNullable(overrides.getMinRefreshDelay()).orElse(60000L);
-        this.maxRefreshDelay = ofNullable(overrides.getMaxRefreshDelay()).orElse(600000L);
-        this.expectedEntityId = ofNullable(overrides.getExpectedEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
-        this.jerseyClientConfiguration = ofNullable(overrides.getJerseyClientConfiguration()).orElse(createClient());
-        this.jerseyClientName = ofNullable(overrides.getJerseyClientName()).orElse(HUB_JERSEY_CLIENT_NAME);
-        this.shouldLoadTrustStoreFromResources = (overrides.getTrustStorePath() == null);
+    @JsonCreator
+    public HubMetadataConfiguration(
+            @JsonProperty("uri") @JsonAlias({"url"}) URI uri,
+            @JsonProperty("minRefreshDelay") Long minRefreshDelay,
+            @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
+            @JsonProperty("expectedEntityId") String expectedEntityId,
+            @JsonProperty("client") JerseyClientConfiguration client,
+            @JsonProperty("jerseyClientName") String jerseyClientName,
+            @JsonProperty("hubFederationId") String hubFederationId,
+            @JsonProperty("trustStore") TrustStoreConfiguration trustStoreConfiguration) {
+        super(uri, minRefreshDelay, maxRefreshDelay, expectedEntityId, client,
+                ofNullable(jerseyClientName).orElse(HUB_JERSEY_CLIENT_NAME), hubFederationId);
+        this.trustStoreConfiguration = trustStoreConfiguration;
     }
 
-    @NotNull
-    @Valid
-    @Override
-    public String getTrustStorePath() {
-        return trustStorePath;
+    public void setEnvironment(HubEnvironment environment) {
+        this.environment = environment;
     }
 
-    @NotNull
-    @Valid
-    @Override
-    public String getTrustStorePassword() {
-        return trustStorePassword;
-    }
-
-    @NotNull
-    @Valid
     @Override
     public URI getUri() {
-        return uri;
+        return ofNullable(super.getUri()).orElse(environment.getMetadataUri());
     }
 
-    @NotNull
-    @Valid
-    @Override
-    public Long getMinRefreshDelay() {
-        return minRefreshDelay;
-    }
-
-    @NotNull
-    @Valid
-    @Override
-    public Long getMaxRefreshDelay() {
-        return maxRefreshDelay;
-    }
-
-    @NotNull
-    @Valid
     @Override
     public String getExpectedEntityId() {
-        return expectedEntityId;
+        return ofNullable(super.getExpectedEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
     }
 
-    @NotNull
-    @Valid
     @Override
-    public JerseyClientConfiguration getJerseyClientConfiguration() {
-        return jerseyClientConfiguration;
-    }
-
-    @NotNull
-    @Valid
-    @Override
-    public String getJerseyClientName() {
-        return jerseyClientName;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean shouldLoadTrustStoreFromResources() {
-        return shouldLoadTrustStoreFromResources;
-    }
-
-    private static JerseyClientConfiguration createClient() {
-        return new JerseyClientConfiguration() {{
-            setTimeout(seconds(2));
-            setTimeToLive(minutes(10));
-            setCookiesEnabled(false);
-            setConnectionTimeout(seconds(1));
-            setRetries(3);
-            setKeepAlive(seconds(60));
-            setChunkedEncodingEnabled(false);
-            setValidateAfterInactivityPeriod(seconds(5));
-            TlsConfiguration tlsConfiguration = new TlsConfiguration() {{
-                setProtocol("TLSv1.2");
-                setVerifyHostname(true);
-                setTrustSelfSignedCertificates(false);
-            }};
-            setTlsConfiguration(tlsConfiguration);
-        }};
-    }
-
-    private static String generateTrustStorePath(HubEnvironment hubEnvironment) {
-        String trustStoreName;
-        switch (hubEnvironment) {
-            case PRODUCTION:
-                trustStoreName = PRODUCTION_VERIFY_TRUSTSTORE_NAME;
-                break;
-            case INTEGRATION:
-            case COMPLIANCE_TOOL:
-                trustStoreName = TEST_VERIFY_TRUSTSTORE_NAME;
-                break;
-            default:
-                throw new RuntimeException("No trust store configured for Hub Environment: " + hubEnvironment.name());
-        }
-
-        return trustStoreName;
+    public KeyStore getTrustStore() {
+        return validateTruststore(ofNullable(trustStoreConfiguration)
+                .orElseGet(() -> new DefaultHubTrustStoreConfiguration(environment)).getTrustStore());
     }
 
     private static String generateExpectedEntityId(HubEnvironment hubEnvironment) {
@@ -157,5 +76,18 @@ public class HubMetadataConfiguration implements VerifyServiceProviderMetadataCo
         }
 
         return expectedEntityId;
+    }
+
+    private KeyStore validateTruststore(KeyStore trustStore) {
+        int trustStoreSize;
+        try {
+            trustStoreSize = trustStore.size();
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        }
+        if (trustStoreSize == 0) {
+            throw new EmptyTrustStoreException();
+        }
+        return trustStore;
     }
 }

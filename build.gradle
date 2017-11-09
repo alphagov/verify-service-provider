@@ -13,7 +13,7 @@ repositories {
 project.ext {
     version_number = '0.4.0'
     openSamlVersion = '3.3.0'
-    samlMetaDataBindingVersion = '47'
+    samlMetaDataBindingVersion = '58'
     samlExtensionsVersion = "$openSamlVersion-1.2a-33"
     dropwizardVersion = '1.2.0'
 }

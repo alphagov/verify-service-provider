@@ -65,12 +65,6 @@ public class VerifyServiceProviderConfigurationTest {
         factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
     }
 
-    @Test
-    public void shouldNotAllowEmptyMsaMetadataExpectedEntityId() throws Exception {
-        expectedException.expectMessage("msaMetadata.expectedEntityId may not be null");
-        factory.build(new StringConfigurationSourceProvider("msaMetadata: \n uri: https://some-url.com"), "");
-    }
-
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {
 
         private String configuration;
