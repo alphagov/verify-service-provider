@@ -13,12 +13,14 @@ This tutorial explains how to:
 * deal with returning users
 * approach troubleshooting and get help
 
-## Pre-requisites
+## Prerequisites
 
-To be able to follow this tutorial:
-* you must [set up and configure Verify Service Provider](https://github.com/alphagov/verify-service-provider/blob/master/README.md)
-* you must have a working Matching Service Adapter running(LINK TO MSA DOCS)
-* your installation of Verify Service Provider must pass its health check(INFO NEEDED)
+To be able to follow this tutorial you must:
+* have Java 8
+* [set up and configure Verify Service Provider](https://github.com/alphagov/verify-service-provider/blob/master/README.md)
+* have a working [Matching Service Adapter](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
+
+Your installation of Verify Service Provider must also pass its health check.
 
 ## Generate a SAML request (AuthnRequest)
 
