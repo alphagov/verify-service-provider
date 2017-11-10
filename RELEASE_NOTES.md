@@ -4,6 +4,7 @@ Release notes
 ### Next
 
 * Change trust store configuration schema to match MSA
+* Make the banner that prints on startup less wide
 
 #### Configuration Changes:
 * If using a custom file-based trust store configuration, replace: 
