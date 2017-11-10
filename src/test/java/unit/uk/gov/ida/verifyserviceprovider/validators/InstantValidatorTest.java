@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.validators;
+package unit.uk.gov.ida.verifyserviceprovider.validators;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;

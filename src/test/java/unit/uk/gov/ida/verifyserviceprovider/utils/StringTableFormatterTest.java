@@ -1,7 +1,8 @@
-package uk.gov.ida.verifyserviceprovider.utils;
+package unit.uk.gov.ida.verifyserviceprovider.utils;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.utils.StringTableFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

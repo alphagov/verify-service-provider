@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.validators;
+package unit.uk.gov.ida.verifyserviceprovider.validators;
 
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
@@ -12,6 +12,9 @@ import org.opensaml.saml.saml2.core.OneTimeUse;
 import org.opensaml.saml.saml2.core.ProxyRestriction;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.util.List;
 

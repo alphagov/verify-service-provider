@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.validators;
+package unit.uk.gov.ida.verifyserviceprovider.validators;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -11,6 +11,7 @@ import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 
 import java.util.List;
 
