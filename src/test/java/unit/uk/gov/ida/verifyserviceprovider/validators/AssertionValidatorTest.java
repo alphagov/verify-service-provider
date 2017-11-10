@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.validators;
+package unit.uk.gov.ida.verifyserviceprovider.validators;
 
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
@@ -13,6 +13,10 @@ import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
+import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.Collections;
 
