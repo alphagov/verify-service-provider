@@ -23,14 +23,29 @@ verifyHubConfiguration:
   metadata:
     uri: ... # The location of hub metadata, e.g. https://www.integration.signin.service.gov.uk/SAML2/metadata/federation
     expectedEntityId: ... # i.e. of hub (e.g. https://signin.service.gov.uk)
-    trustStore:
-      path: ...
-      password: ...
+    trustStore: # See below
     minRefreshDelay: ...
     maxRefreshDelay: ...
     jerseyClientConfiguration: ...
     jerseyClientName: ...
 ```
+
+There are two options for trust store configuration if it is provided.
+```
+trustStore:
+  type: file # Optional, as this is the default
+  path: ... # Path to file
+  password: ...
+```
+or
+```
+trustStore:
+  type: encoded
+  store: ... # Base 64 encoded trust store
+  password: ...
+```
+
+`path` and `password` or `type: encoded`, `store`, and `password` are all required to be specified if `trustStore` is specified.
 
 `environment` is, as always, required to be specified, and must be one of PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL.
 Other values are all optional overrides, and will default to values based on the chosen environment. Values need only
