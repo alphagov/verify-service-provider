@@ -1,0 +1,46 @@
+# This config file is intended for use in development, when running the Verify
+# Service Provider as part of a locally running federation. It includes usages
+# of advanced configuration options which should not be necessary for relying
+# parties who are running against compliance tool, or the hub integration or
+# live environments.
+
+server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${VSP_PORT:-50400}
+
+logging:
+  level: ${LOG_LEVEL:-INFO}
+  appenders:
+    - type: console
+    - type: file
+      currentLogFilename: logs/verify-service-provider.log
+      archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
+
+clockSkew: ${CLOCK_SKEW:-PT5s}
+
+serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
+
+verifyHubConfiguration:
+  environment: ${VERIFY_ENVIRONMENT:-COMPLIANCE_TOOL}
+  ssoLocation: ${FRONTEND_URI}/SAML2/SSO
+  metadata:
+    trustStore:
+      type: encoded
+      store: ${METADATA_TRUST_STORE}
+      password: marshmallow
+    uri: ${METADATA_URL}
+    expectedEntityId: https://dev-hub.local
+
+msaMetadata:
+  uri: http://localhost:${TEST_RP_MSA_PORT}/matching-service/SAML2/metadata
+  expectedEntityId: ${IDA_TESTRP_MSA_ENTITYID:-"http://dev-rp-ms.local/SAML2/MD"}
+
+samlSigningKey: ${SAML_SIGNING_KEY:-}
+
+samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
+
+samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}

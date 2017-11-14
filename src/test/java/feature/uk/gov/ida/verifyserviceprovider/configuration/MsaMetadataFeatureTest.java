@@ -3,9 +3,9 @@ package feature.uk.gov.ida.verifyserviceprovider.configuration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
+import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
-import io.dropwizard.testing.ResourceHelpers;
 import keystore.KeyStoreResource;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +18,7 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -25,12 +26,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
@@ -43,6 +45,7 @@ public class MsaMetadataFeatureTest {
     public static MockVerifyHubServer hubServer = new MockVerifyHubServer();
 
     private DropwizardTestSupport<VerifyServiceProviderConfiguration> applicationTestSupport;
+    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
     @Before
     public void setUp() {
@@ -60,6 +63,16 @@ public class MsaMetadataFeatureTest {
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
             config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
         );
+
+        environmentHelper.setEnv(new HashMap<String, String>() {{
+            put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
+            put("MSA_METADATA_URL", "some-msa-metadata-url");
+            put("MSA_ENTITY_ID", "some-msa-entity-id");
+            put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
+            put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
+            put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
+        }});
+
         IdaSamlBootstrap.bootstrap();
         wireMockServer.start();
         hubServer.serveDefaultMetadata();

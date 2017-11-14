@@ -105,6 +105,7 @@ __Startup__
 ```
 ./startup.sh
 ```
+You will need to either have environment variables set as above, or have edited the main configuration file (`verify-service-provider.yml`), or to pass an argument to this script for the application to start. Available arguments are `local-fed` for running against a locally running federation (see [verify local startup](https://github.com/alphagov/verify-local-startup)) or `vsp-only` for using default values to run against compliance tool on the reference environment. 
 
 __Build a distribution__
 ```

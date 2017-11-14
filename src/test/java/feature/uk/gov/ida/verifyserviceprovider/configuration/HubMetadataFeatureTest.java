@@ -31,12 +31,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
@@ -59,12 +60,16 @@ public class HubMetadataFeatureTest {
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
+            config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
             config("msaMetadata.uri", msaServer::getUri),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
+            config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
+            config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
         );
 
         IdaSamlBootstrap.bootstrap();

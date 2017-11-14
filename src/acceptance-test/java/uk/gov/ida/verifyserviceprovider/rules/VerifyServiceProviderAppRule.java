@@ -7,7 +7,6 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 
@@ -28,7 +27,8 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
                 IdaSamlBootstrap.bootstrap();
                 msaServer.serveDefaultMetadata();
                 return msaServer.getUri();
-            })
+            }),
+            ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID)
         );
     }
 

@@ -4,10 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.DropwizardTestSupport;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -15,17 +12,15 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Arrays;
 
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
 
@@ -43,7 +38,10 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
-        ConfigOverride.config("serviceEntityIds", SINGLE_ENTITY_ID)
+        ConfigOverride.config("serviceEntityIds", SINGLE_ENTITY_ID),
+        ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
+        ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
     );
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
@@ -53,7 +51,10 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
-        ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2))
+        ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2)),
+        ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
+        ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
     );
 
 
