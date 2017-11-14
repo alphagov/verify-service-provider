@@ -2,7 +2,6 @@ package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
-import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
 import keystore.KeyStoreResource;
@@ -24,7 +23,6 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -52,7 +50,6 @@ public class HubMetadataFeatureTest {
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
     private DropwizardTestSupport<VerifyServiceProviderConfiguration> applicationTestSupport;
-    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
     @Before
     public void setUp() {
@@ -69,17 +66,11 @@ public class HubMetadataFeatureTest {
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
+            config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
+            config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
         );
-
-        environmentHelper.setEnv(new HashMap<String, String>() {{
-            put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
-            put("MSA_METADATA_URL", "some-msa-metadata-url");
-            put("MSA_ENTITY_ID", "some-msa-entity-id");
-            put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
-            put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
-            put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
-        }});
 
         IdaSamlBootstrap.bootstrap();
         wireMockServer.start();
@@ -89,7 +80,6 @@ public class HubMetadataFeatureTest {
     @After
     public void tearDown() {
         applicationTestSupport.after();
-        environmentHelper.cleanEnv();
         wireMockServer.stop();
     }
 
