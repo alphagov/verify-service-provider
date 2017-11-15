@@ -9,8 +9,8 @@ To access Verify Service Provider, you must [download your own version](https://
 The Verify team provides a client library for Node.js with the passport.js framework. If you would like to request a different client library, contact [idasupport+onboarding@digital.cabinet-office.gov.uk](mailto:idasupport+onboarding@digital.cabinet-office.gov.uk)].
 
 See also:
-* [Installing and configuring Verify Service Provider](https://github.com/alphagov/verify-service-provider/blob/master/README.md)
-* How to securely exchange information using Verify Service Provider (tutorial)(ADD LINK)
+* [Installing and configuring Verify Service Provider](/README.md)
+* [Tutorial: How to securely exchange information using Verify Service Provider](/docs/tutorial-using-verify-service-provider.md)
 
 ## Generate a SAML authentication request
 
