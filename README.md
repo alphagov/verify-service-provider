@@ -10,6 +10,10 @@ You will need to host Verify Service Provider on your own infrastructure.
 
 Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about connecting to GOV.UK Verify.
 
+See also:
+* [API reference](docs/api/api-reference)
+* [Tutorial: How to securely exchange information using Verify Service Provider](docs/tutorial-using-verify-service-provider)
+
 ## Setup
 
 ### Prerequisites
