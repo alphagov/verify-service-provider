@@ -14,7 +14,7 @@ project.ext {
     version_number = '0.4.0'
     openSamlVersion = '3.3.0'
     samlMetaDataBindingVersion = '58'
-    samlExtensionsVersion = "$openSamlVersion-1.2a-33"
+    samlExtensionsVersion = "$openSamlVersion-1.2a-34"
     dropwizardVersion = '1.2.0'
 }
 
@@ -25,20 +25,20 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$openSamlVersion-$samlMetaDataBindingVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
-        "uk.gov.ida:saml-serializers:$openSamlVersion-24",
-        "uk.gov.ida:saml-security:$openSamlVersion-46",
+        "uk.gov.ida:saml-serializers:$openSamlVersion-26",
+        "uk.gov.ida:saml-security:$openSamlVersion-49",
         "uk.gov.ida:ida-saml-extensions:$samlExtensionsVersion"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:2.11.0',
+        'org.mockito:mockito-core:2.12.0',
         "uk.gov.ida:saml-metadata-bindings-test:$openSamlVersion-$samlMetaDataBindingVersion",
-        "uk.gov.ida:common-test-utils:2.0.0-31",
+        "uk.gov.ida:common-test-utils:2.0.0-38",
         "org.jsoup:jsoup:1.11.1",
     )
-    testCompile('com.github.tomakehurst:wiremock:2.10.1'){ transitive = false }
+    testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
 
 sourceSets {
