@@ -3,6 +3,9 @@ Release notes
 
 ### Next
 
+### 1.0.0
+[View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)
+
 * Change trust store configuration schema to match MSA
 * Make the banner that prints on startup less wide
 
