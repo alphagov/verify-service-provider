@@ -14,7 +14,7 @@ project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.3.0'
     samlMetaDataBindingVersion = '58'
-    samlExtensionsVersion = "$openSamlVersion-1.2a-34"
+    samlExtensionsVersion = "$openSamlVersion-1.2a-41"
     dropwizardVersion = '1.2.0'
 }
 
