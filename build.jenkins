@@ -14,11 +14,10 @@ pipeline {
             agent {
               docker {
                 image 'govukverify/java8:PR-5.6'
-                reuseNode true
               }
             }
             steps {
-                sh './gradlew clean test testAcceptance distZip'
+                sh './gradlew clean test testAcceptance'
             }
         }
 
@@ -26,7 +25,6 @@ pipeline {
             agent {
               docker {
                 image 'govukverify/java8:PR-5.6'
-                reuseNode true
               }
             }
             steps {
