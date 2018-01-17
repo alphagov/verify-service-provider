@@ -1,0 +1,39 @@
+pipeline {
+
+    agent none
+
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 20, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10',
+                                  artifactNumToKeepStr: '1'))
+    }
+
+    stages {
+        stage('Test') {
+            agent {
+              docker {
+                image 'govukverify/java8:PR-5.6'
+                reuseNode true
+              }
+            }
+            steps {
+                sh './gradlew clean test testAcceptance distZip'
+            }
+        }
+
+        stage('Build') {
+            agent {
+              docker {
+                image 'govukverify/java8:PR-5.6'
+                reuseNode true
+              }
+            }
+            steps {
+                sh './gradlew clean distZip'
+            }
+        }
+
+    }
+}
+
