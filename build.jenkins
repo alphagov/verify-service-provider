@@ -13,7 +13,7 @@ pipeline {
         stage('Test') {
             agent {
               docker {
-                image 'govukverify/java8:PR-5.6'
+                image 'govukverify/java8:latest'
               }
             }
             steps {
@@ -24,7 +24,7 @@ pipeline {
         stage('Build') {
             agent {
               docker {
-                image 'govukverify/java8:PR-5.6'
+                image 'govukverify/java8:latest'
               }
             }
             steps {
