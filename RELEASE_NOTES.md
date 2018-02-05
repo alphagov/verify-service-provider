@@ -2,6 +2,7 @@ Release notes
 =============
 
 ### Next
+* Change metadata configuration property name from `client` to `jerseyClientConfiguration`
 
 ### 1.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)
