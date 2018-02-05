@@ -11,7 +11,6 @@ import org.opensaml.saml.saml2.core.Extensions;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.credential.BasicCredential;
-import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -20,11 +19,13 @@ import uk.gov.ida.saml.core.extensions.versioning.Version;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.security.DecrypterFactory;
+import uk.gov.ida.shared.utils.manifest.ManifestReader;
+import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
-import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
+import java.io.IOException;
 import java.net.URI;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -101,8 +102,8 @@ public class AuthnRequestFactoryTest {
     }
 
     @Test
-    public void shouldAddApplicationVersionInExtension() throws DecryptionException {
-        when(manifestReader.getVersion()).thenReturn("some-version");
+    public void shouldAddApplicationVersionInExtension() throws Exception {
+        when(manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version")).thenReturn("some-version");
 
         AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
@@ -117,10 +118,10 @@ public class AuthnRequestFactoryTest {
     }
 
     @Test
-    public void shouldGetVersionNumberFromManifestReader() {
+    public void shouldGetVersionNumberFromManifestReader() throws IOException {
         factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
-        verify(manifestReader, times(1)).getVersion();
+        verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
     }
 
     private BasicCredential createBasicCredential() {
