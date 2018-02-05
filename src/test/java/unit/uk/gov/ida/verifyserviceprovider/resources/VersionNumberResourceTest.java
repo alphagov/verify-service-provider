@@ -3,17 +3,16 @@ package unit.uk.gov.ida.verifyserviceprovider.resources;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.shared.utils.manifest.ManifestReader;
+import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
-import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
 import javax.ws.rs.core.Response;
-import java.util.Optional;
-import java.util.jar.Attributes;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -28,10 +27,10 @@ public class VersionNumberResourceTest {
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
-            .addProvider(JerseyViolationExceptionMapper.class)
-            .addProvider(JsonProcessingExceptionMapper.class)
-            .addResource(new VersionNumberResource(manifestReader))
-            .build();
+        .addProvider(JerseyViolationExceptionMapper.class)
+        .addProvider(JsonProcessingExceptionMapper.class)
+        .addResource(new VersionNumberResource(manifestReader))
+        .build();
 
     @Before
     public void bootStrapOpenSaml() {
@@ -40,24 +39,24 @@ public class VersionNumberResourceTest {
     }
 
     @Test
-    public void returnsAnOKResponseWithVersionNumber() {
+    public void returnsAnOKResponseWithVersionNumber() throws IOException {
         String versionNumber = "1.2.0";
-        when(manifestReader.getVersion()).thenReturn(versionNumber);
+        when(manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version")).thenReturn(versionNumber);
 
         Response response = resources.target("/version-number").request().get();
 
-        verify(manifestReader, times(1)).getVersion();
+        verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(response.readEntity(String.class)).isEqualTo(versionNumber);
     }
 
     @Test
-    public void returns500WhenManifestReaderThrowsException() {
-        doThrow(new RuntimeException("exception")).when(manifestReader).getVersion();
+    public void returns500WhenManifestReaderThrowsException() throws IOException {
+        doThrow(new RuntimeException("exception")).when(manifestReader).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
 
         Response response = resources.target("/version-number").request().get();
 
-        verify(manifestReader, times(1)).getVersion();
+        verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 }

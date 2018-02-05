@@ -19,6 +19,8 @@ import org.opensaml.xmlsec.encryption.support.EncryptionException;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.extensions.versioning.Version;
 import uk.gov.ida.saml.core.extensions.versioning.VersionImpl;
 import uk.gov.ida.saml.core.extensions.versioning.application.ApplicationVersion;
@@ -26,10 +28,12 @@ import uk.gov.ida.saml.core.extensions.versioning.application.ApplicationVersion
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SignatureFactory;
+import uk.gov.ida.shared.utils.manifest.ManifestReader;
+import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
-import uk.gov.ida.verifyserviceprovider.utils.ManifestReader;
 
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -39,6 +43,8 @@ import java.util.UUID;
 import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivateKey;
 
 public class AuthnRequestFactory {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AuthnRequestFactory.class);
 
     private final URI destination;
     private final PrivateKey signingKey;
@@ -100,7 +106,15 @@ public class AuthnRequestFactory {
 
     private Version createApplicationVersion() {
         ApplicationVersion applicationVersion = new ApplicationVersionImpl();
-        applicationVersion.setValue(manifestReader.getVersion());
+
+        String applicationManifestVersion = "UNKNOWN_VERSION";
+        try {
+            applicationManifestVersion = manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
+        } catch (IOException e) {
+            LOG.error("Failed to read version number from the manifest", e);
+        }
+
+        applicationVersion.setValue(applicationManifestVersion);
         Version version = new VersionImpl() {{
             setApplicationVersion(applicationVersion);
         }};
