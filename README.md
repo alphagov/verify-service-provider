@@ -1,4 +1,4 @@
-# Verify Service Provider
+# Verify Service Provider testing
 
 GOV.UK Verify uses SAML (Security Assertion Markup Language) to securely exchange information about identities. A Relying Party can use Verify Service Provider to generate and translate SAML communication to and from the Verify Hub.
 
