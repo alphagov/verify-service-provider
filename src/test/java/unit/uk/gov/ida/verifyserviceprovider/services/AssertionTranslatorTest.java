@@ -12,6 +12,7 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
+import org.opensaml.security.crypto.KeySupport;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -26,9 +27,12 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.Collections;
+import java.util.List;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +71,9 @@ public class AssertionTranslatorTest {
     @Before
     public void setUp() throws Exception {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
-        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
+        KeyPair keyPair = new KeyPair(KeySupport.derivePublicKey(privateKey), privateKey);
+        List<KeyPair> keyPairs = asList(keyPair, keyPair);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
 
         EntityDescriptor entityDescriptor = anEntityDescriptor()
             .withIdpSsoDescriptor(anIdpSsoDescriptor()

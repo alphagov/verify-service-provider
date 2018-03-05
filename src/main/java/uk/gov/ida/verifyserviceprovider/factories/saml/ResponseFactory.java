@@ -33,12 +33,7 @@ import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivateKey;
 
 public class ResponseFactory {
 
@@ -50,12 +45,10 @@ public class ResponseFactory {
     private static final EncryptionAlgorithmValidator encryptionAlgorithmValidator = new EncryptionAlgorithmValidator();
     private static final DecrypterFactory decrypterFactory = new DecrypterFactory();
 
-    private final PrivateKey samlPrimaryEncryptionKey;
-    private final PrivateKey samlSecondaryEncryptionKey;
+    private List<KeyPair> encryptionKeyPairs;
 
-    public ResponseFactory(PrivateKey samlPrimaryEncryptionKey, PrivateKey samlSecondaryEncryptionKey) {
-        this.samlPrimaryEncryptionKey = samlPrimaryEncryptionKey;
-        this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
+    public ResponseFactory(List<KeyPair> encryptionKeyPairs) {
+        this.encryptionKeyPairs = encryptionKeyPairs;
     }
 
     public static StringToOpenSamlObjectTransformer<Response> createStringToResponseTransformer() {
@@ -133,13 +126,6 @@ public class ResponseFactory {
     }
 
     private IdaKeyStore createEncryptionKeyStore() {
-        KeyPair primaryEncryptionKeyPair = new KeyPair(publicKeyFromPrivateKey(samlPrimaryEncryptionKey), samlPrimaryEncryptionKey);
-        List<KeyPair> encryptionKeyPairs;
-        if (samlSecondaryEncryptionKey == null) {
-            encryptionKeyPairs = singletonList(primaryEncryptionKeyPair);
-        } else {
-            encryptionKeyPairs = asList(primaryEncryptionKeyPair, new KeyPair(publicKeyFromPrivateKey(samlSecondaryEncryptionKey), samlSecondaryEncryptionKey));
-        }
         return new IdaKeyStore(null, encryptionKeyPairs);
     }
 }

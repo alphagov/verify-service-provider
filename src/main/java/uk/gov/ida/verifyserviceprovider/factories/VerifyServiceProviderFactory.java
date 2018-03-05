@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.factories;
 import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.security.crypto.KeySupport;
 import uk.gov.ida.saml.security.PublicKeyFactory;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
@@ -15,6 +16,14 @@ import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public class VerifyServiceProviderFactory {
 
@@ -32,15 +41,25 @@ public class VerifyServiceProviderFactory {
     public VerifyServiceProviderFactory(
         VerifyServiceProviderConfiguration configuration,
         Environment environment
-    ) {
+    ) throws KeyException {
         this.environment = environment;
         this.configuration = configuration;
-        this.responseFactory = new ResponseFactory(
-            configuration.getSamlPrimaryEncryptionKey(),
-            configuration.getSamlSecondaryEncryptionKey());
+        this.responseFactory = new ResponseFactory(getDecryptionKeyPairs(configuration.getSamlPrimaryEncryptionKey(), configuration.getSamlSecondaryEncryptionKey()));
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
         this.manifestReader = new ManifestReader();
+    }
+
+    private List<KeyPair> getDecryptionKeyPairs(PrivateKey primary, PrivateKey secondary) throws KeyException {
+        if (secondary == null) {
+            return singletonList(createKeyPair(primary));
+        } else {
+            return asList(createKeyPair(primary), createKeyPair(secondary));
+        }
+    }
+
+    private KeyPair createKeyPair(PrivateKey key) throws KeyException {
+        return new KeyPair(KeySupport.derivePublicKey(key), key);
     }
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
@@ -65,11 +84,12 @@ public class VerifyServiceProviderFactory {
         );
         EncrypterFactory encrypterFactory = new EncrypterFactory(metadataPublicKeyExtractor);
 
+        PrivateKey signingKey = configuration.getSamlSigningKey();
+
         AuthnRequestFactory authnRequestFactory = new AuthnRequestFactory(
-            configuration.getHubSsoLocation(),
-            configuration.getSamlSigningKey(),
-            manifestReader,
-            encrypterFactory
+                configuration.getHubSsoLocation(),
+                createKeyPair(signingKey),
+                manifestReader, encrypterFactory
         );
 
         return new GenerateAuthnRequestResource(
