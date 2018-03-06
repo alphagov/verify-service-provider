@@ -16,6 +16,7 @@ import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
+import org.opensaml.security.crypto.KeySupport;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
@@ -43,9 +44,13 @@ import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
+import java.security.KeyException;
+import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.util.List;
 
 import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -93,15 +98,17 @@ public class ResponseServiceTest {
     private Credential testRpSigningCredential;
 
     @Before
-    public void setUp() throws ComponentInitializationException {
+    public void setUp() throws ComponentInitializationException, KeyException {
         // Note: the private key and the encrypting credential need to be from the same keypair
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
+        KeyPair keyPair = new KeyPair(KeySupport.derivePublicKey(privateKey), privateKey);
+        List<KeyPair>  keyPairs = asList(keyPair, keyPair);
         encryptionCredentialFactory = new TestCredentialFactory(TEST_RP_PUBLIC_ENCRYPTION_CERT, TEST_RP_PRIVATE_ENCRYPTION_KEY);
         testRpSigningCredential = new TestCredentialFactory(TEST_RP_PUBLIC_SIGNING_CERT, TEST_RP_PRIVATE_SIGNING_KEY).getSigningCredential();
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(privateKey, privateKey);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 

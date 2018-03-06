@@ -11,7 +11,9 @@ import org.opensaml.saml.saml2.core.Extensions;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.credential.BasicCredential;
+import org.opensaml.security.crypto.KeySupport;
 import uk.gov.ida.common.shared.security.PrivateKeyFactory;
+import uk.gov.ida.common.shared.security.PrivateKeyStore;
 import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -27,6 +29,8 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyException;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -50,7 +54,7 @@ public class AuthnRequestFactoryTest {
     private static AuthnRequestFactory factory;
 
     @Before
-    public void setUp() {
+    public void setUp() throws KeyException {
         IdaSamlBootstrap.bootstrap();
         reset(manifestReader);
 
@@ -58,16 +62,18 @@ public class AuthnRequestFactoryTest {
         encrypter = new uk.gov.ida.saml.security.EncrypterFactory().createEncrypter(basicCredential);
         decrypter = new DecrypterFactory().createDecrypter(ImmutableList.of(basicCredential));
         when(encrypterFactory.createEncrypter()).thenReturn(encrypter);
+        PrivateKeyStore privateKeyStore = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP);
+        KeyPair keyPair = new KeyPair(KeySupport.derivePublicKey(privateKeyStore.getSigningPrivateKey()), privateKeyStore.getSigningPrivateKey());
         factory = new AuthnRequestFactory(
             DESTINATION,
-            new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getSigningPrivateKey(),
+            keyPair,
             manifestReader,
             encrypterFactory
         );
     }
 
     @Test
-    public void containsCorrectAttributes() {
+    public void containsCorrectAttributes() throws KeyException {
         AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
         assertThat(authnRequest.getID()).isNotEmpty();
@@ -118,7 +124,7 @@ public class AuthnRequestFactoryTest {
     }
 
     @Test
-    public void shouldGetVersionNumberFromManifestReader() throws IOException {
+    public void shouldGetVersionNumberFromManifestReader() throws IOException, KeyException {
         factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
         verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");

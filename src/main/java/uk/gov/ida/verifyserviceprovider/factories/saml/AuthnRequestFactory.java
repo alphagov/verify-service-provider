@@ -36,31 +36,28 @@ import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.UUID;
-
-import static uk.gov.ida.verifyserviceprovider.utils.Crypto.publicKeyFromPrivateKey;
 
 public class AuthnRequestFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthnRequestFactory.class);
 
     private final URI destination;
-    private final PrivateKey signingKey;
     private final ManifestReader manifestReader;
     private final EncrypterFactory encrypterFactory;
+    private KeyPair signingKeyPair;
 
     public AuthnRequestFactory(
-        URI destination,
-        PrivateKey signingKey,
-        ManifestReader manifestReader,
-        EncrypterFactory encrypterFactory
+            URI destination,
+            KeyPair signingKeyPair,
+            ManifestReader manifestReader,
+            EncrypterFactory encrypterFactory
     ) {
         this.destination = destination;
-        this.signingKey = signingKey;
         this.manifestReader = manifestReader;
         this.encrypterFactory = encrypterFactory;
+        this.signingKeyPair = signingKeyPair;
     }
 
     public AuthnRequest build(LevelOfAssurance levelOfAssurance, String serviceEntityId) {
@@ -122,7 +119,6 @@ public class AuthnRequestFactory {
     }
 
     private Signature createSignature() {
-        KeyPair signingKeyPair = new KeyPair(publicKeyFromPrivateKey(signingKey), signingKey);
         IdaKeyStore keyStore = new IdaKeyStore(signingKeyPair, Collections.emptyList());
         IdaKeyStoreCredentialRetriever keyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
         SignatureRSASHA256 signatureAlgorithm = new SignatureRSASHA256();
