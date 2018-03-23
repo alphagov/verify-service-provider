@@ -37,8 +37,12 @@ We will remove the verify-service-provider-env.yml file from src/main/resources
 The application will default to the verify-service-provider.yml
 file that's included in the .zip if no command line arguments are provided.
 
-If the application is started without command line arguments it will WARN that it should
-be started with `server path/to/config`.
+If the application is started without command line arguments specifying a yml file
+AND no environment variables have been set, startup should error gracefully and tell
+the user that the configuration fields have not been specified for example:
+
+"ERROR - no configuration fields found, either set environment variables or specify
+a configuration file using command line arguments ```server <path/to/verify-service-provider.yml>```"
 
 We will establish the path to verify-service-provider.yml by asking java for the
 path to the .jar file containing the Application class and looking in the parent
