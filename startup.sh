@@ -7,7 +7,9 @@ case $1 in
     'local-fed')
         CONFIG_FILE=./local-running/local-config.yml
         if test -e local.env; then
+            set -a
             source local.env
+            set +a
         else
             printf "$(tput setaf 1)No local environment found. Use verify-local-startup or openssl to generate a local.env file\n$(tput sgr0)"
         fi
