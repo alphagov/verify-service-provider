@@ -6,9 +6,8 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
@@ -21,8 +20,13 @@ import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
+    private MetadataResolverBundle<VerifyServiceProviderConfiguration> hubMetadataBundle;
+    private MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle;
+
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
+        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
+        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -44,6 +48,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         );
         IdaSamlBootstrap.bootstrap();
         bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
+        bootstrap.addBundle(hubMetadataBundle);
+        bootstrap.addBundle(msaMetadataBundle);
     }
 
     @Override
@@ -53,7 +59,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
-        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, environment);
+        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, hubMetadataBundle, msaMetadataBundle);
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());

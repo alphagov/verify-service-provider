@@ -1,19 +1,21 @@
 package uk.gov.ida.verifyserviceprovider.factories;
 
 import org.opensaml.saml.saml2.encryption.Encrypter;
-import org.opensaml.security.credential.BasicCredential;
-import uk.gov.ida.verifyserviceprovider.metadata.MetadataPublicKeyExtractor;
+import org.opensaml.security.credential.Credential;
+import uk.gov.ida.saml.security.EncryptionCredentialResolver;
 
 public class EncrypterFactory extends uk.gov.ida.saml.security.EncrypterFactory {
 
-    private final MetadataPublicKeyExtractor metadataPublicKeyExtractor;
+    private EncryptionCredentialResolver encryptionCredentialResolver;
+    private String hubEntityId;
 
-    public EncrypterFactory(MetadataPublicKeyExtractor metadataPublicKeyExtractor) {
-        this.metadataPublicKeyExtractor = metadataPublicKeyExtractor;
+    public EncrypterFactory(EncryptionCredentialResolver encryptionCredentialResolver, String hubEntityId) {
+        this.encryptionCredentialResolver = encryptionCredentialResolver;
+        this.hubEntityId = hubEntityId;
     }
 
     public Encrypter createEncrypter() {
-        BasicCredential credential = new BasicCredential(metadataPublicKeyExtractor.getEncryptionPublicKey());
+        Credential credential = encryptionCredentialResolver.getEncryptingCredential(hubEntityId);
         return super.createEncrypter(credential);
     }
 }

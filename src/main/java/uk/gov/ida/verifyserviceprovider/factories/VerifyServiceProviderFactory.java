@@ -1,16 +1,18 @@
 package uk.gov.ida.verifyserviceprovider.factories;
 
-import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
+import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.security.crypto.KeySupport;
-import uk.gov.ida.saml.security.PublicKeyFactory;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
+import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
-import uk.gov.ida.verifyserviceprovider.metadata.MetadataPublicKeyExtractor;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
@@ -27,26 +29,25 @@ import static java.util.Collections.singletonList;
 
 public class VerifyServiceProviderFactory {
 
-    private final DropwizardMetadataResolverFactory metadataResolverFactory = new DropwizardMetadataResolverFactory();
-    private final Environment environment;
     private final VerifyServiceProviderConfiguration configuration;
     private final ResponseFactory responseFactory;
 
-    private volatile MetadataResolver hubMetadataResolver;
-    private volatile MetadataResolver msaMetadataResolver;
     private final DateTimeComparator dateTimeComparator;
     private final EntityIdService entityIdService;
+    private MetadataResolverBundle verifyMetadataBundler;
+    private MetadataResolverBundle msaMetadataBundle;
     private final ManifestReader manifestReader;
 
     public VerifyServiceProviderFactory(
-        VerifyServiceProviderConfiguration configuration,
-        Environment environment
-    ) throws KeyException {
-        this.environment = environment;
+            VerifyServiceProviderConfiguration configuration,
+            MetadataResolverBundle verifyMetadataBundler,
+            MetadataResolverBundle msaMetadataBundle) throws KeyException {
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(getDecryptionKeyPairs(configuration.getSamlPrimaryEncryptionKey(), configuration.getSamlSecondaryEncryptionKey()));
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
+        this.verifyMetadataBundler = verifyMetadataBundler;
+        this.msaMetadataBundle = msaMetadataBundle;
         this.manifestReader = new ManifestReader();
     }
 
@@ -64,7 +65,7 @@ public class VerifyServiceProviderFactory {
 
     public MetadataHealthCheck getHubMetadataHealthCheck() {
         return new MetadataHealthCheck(
-            getHubMetadataResolver(),
+                getHubMetadataResolver(),
             configuration.getVerifyHubMetadata().getExpectedEntityId()
         );
     }
@@ -77,12 +78,9 @@ public class VerifyServiceProviderFactory {
     }
 
     public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws Exception {
-        MetadataPublicKeyExtractor metadataPublicKeyExtractor = new MetadataPublicKeyExtractor(
-            configuration.getVerifyHubMetadata().getExpectedEntityId(),
-            getHubMetadataResolver(),
-            new PublicKeyFactory()
-        );
-        EncrypterFactory encrypterFactory = new EncrypterFactory(metadataPublicKeyExtractor);
+        MetadataCredentialResolver metadataCredentialResolver = getHubMetadataCredentialResolver();
+        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver = new MetadataBackedEncryptionCredentialResolver(metadataCredentialResolver, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        EncrypterFactory encrypterFactory = new EncrypterFactory(encryptionCredentialResolver, configuration.getVerifyHubMetadata().getExpectedEntityId());
 
         PrivateKey signingKey = configuration.getSamlSigningKey();
 
@@ -102,8 +100,8 @@ public class VerifyServiceProviderFactory {
     public TranslateSamlResponseResource getTranslateSamlResponseResource() throws ComponentInitializationException {
         return new TranslateSamlResponseResource(
             responseFactory.createResponseService(
-                getHubMetadataResolver(),
-                responseFactory.createAssertionTranslator(getMsaMetadataResolver(), dateTimeComparator),
+                getHubSignatureTrustEngine(),
+                responseFactory.createAssertionTranslator(getMsaSignatureTrustEngine(), dateTimeComparator),
                 dateTimeComparator
             ),
             entityIdService
@@ -115,28 +113,22 @@ public class VerifyServiceProviderFactory {
     }
 
     private MetadataResolver getHubMetadataResolver() {
-        MetadataResolver resolver = hubMetadataResolver;
-        if (resolver == null) {
-            synchronized (this) {
-                resolver = hubMetadataResolver;
-                if (resolver == null) {
-                    hubMetadataResolver = resolver = metadataResolverFactory.createMetadataResolver(environment, configuration.getVerifyHubMetadata());
-                }
-            }
-        }
-        return resolver;
+        return verifyMetadataBundler.getMetadataResolver();
+    }
+
+    private ExplicitKeySignatureTrustEngine getHubSignatureTrustEngine() {
+        return verifyMetadataBundler.getSignatureTrustEngine();
+    }
+
+    private MetadataCredentialResolver getHubMetadataCredentialResolver() {
+        return verifyMetadataBundler.getMetadataCredentialResolver();
     }
 
     private MetadataResolver getMsaMetadataResolver() {
-        MetadataResolver resolver = msaMetadataResolver;
-        if (resolver == null) {
-            synchronized (this) {
-                resolver = msaMetadataResolver;
-                if (resolver == null) {
-                    msaMetadataResolver = resolver = metadataResolverFactory.createMetadataResolverWithoutSignatureValidation(environment, configuration.getMsaMetadata());
-                }
-            }
-        }
-        return resolver;
+        return msaMetadataBundle.getMetadataResolver();
+    }
+
+    private ExplicitKeySignatureTrustEngine getMsaSignatureTrustEngine() {
+        return msaMetadataBundle.getSignatureTrustEngine();
     }
 }
