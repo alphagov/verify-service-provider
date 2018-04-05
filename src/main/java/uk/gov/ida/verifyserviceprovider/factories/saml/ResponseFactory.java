@@ -5,6 +5,7 @@ import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.PredicateRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
+import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
@@ -61,10 +62,10 @@ public class ResponseFactory {
     }
 
     public AssertionDecrypter createAssertionDecrypter() {
+        List<Credential> decryptingCredentials = new IdaKeyStoreCredentialRetriever(createEncryptionKeyStore()).getDecryptingCredentials();
         return new AssertionDecrypter(
-            new IdaKeyStoreCredentialRetriever(createEncryptionKeyStore()),
             encryptionAlgorithmValidator,
-            decrypterFactory
+            decrypterFactory.createDecrypter(decryptingCredentials)
         );
     }
 
