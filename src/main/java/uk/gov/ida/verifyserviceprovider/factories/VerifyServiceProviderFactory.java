@@ -1,6 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.factories;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
@@ -97,7 +96,7 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateSamlResponseResource getTranslateSamlResponseResource() throws ComponentInitializationException {
+    public TranslateSamlResponseResource getTranslateSamlResponseResource() {
         return new TranslateSamlResponseResource(
             responseFactory.createResponseService(
                 getHubSignatureTrustEngine(),
