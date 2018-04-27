@@ -67,7 +67,7 @@ public class AssertionTranslatorTest {
 
     private Credential createMSSigningCredential() {
         Credential signingCredential = new TestCredentialFactory(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY).getSigningCredential();
-        BasicCredential.class.cast(signingCredential).setEntityId(TestEntityIds.TEST_RP_MS);
+        ((BasicCredential) signingCredential).setEntityId(TestEntityIds.TEST_RP_MS);
         return signingCredential;
     }
 
