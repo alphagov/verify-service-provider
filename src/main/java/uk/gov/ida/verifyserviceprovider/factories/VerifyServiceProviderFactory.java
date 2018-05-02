@@ -33,8 +33,8 @@ public class VerifyServiceProviderFactory {
 
     private final DateTimeComparator dateTimeComparator;
     private final EntityIdService entityIdService;
-    private MetadataResolverBundle verifyMetadataBundler;
-    private MetadataResolverBundle msaMetadataBundle;
+    private final MetadataResolverBundle verifyMetadataBundler;
+    private final MetadataResolverBundle msaMetadataBundle;
     private final ManifestReader manifestReader;
 
     public VerifyServiceProviderFactory(
@@ -114,7 +114,6 @@ public class VerifyServiceProviderFactory {
     private MetadataResolver getHubMetadataResolver() {
         return verifyMetadataBundler.getMetadataResolver();
     }
-
     private ExplicitKeySignatureTrustEngine getHubSignatureTrustEngine() {
         return verifyMetadataBundler.getSignatureTrustEngine();
     }
