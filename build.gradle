@@ -14,7 +14,7 @@ project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.3.0'
     verifyCommonUtils = '2.0.0-326'
-    samlLibsVersion = "$openSamlVersion-104"
+    samlLibVersion = "$openSamlVersion-107"
     dropwizardVersion = '1.2.0'
 }
 
@@ -23,20 +23,20 @@ dependencies {
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
         'org.json:json:20171018',
         "org.opensaml:opensaml-core:$openSamlVersion",
-        "uk.gov.ida:saml-metadata-bindings:$samlLibsVersion",
-        "uk.gov.ida:common-utils:$verifyCommonUtils",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
-        "uk.gov.ida:saml-serializers:$samlLibsVersion",
-        "uk.gov.ida:saml-security:$samlLibsVersion",
-        "uk.gov.ida:saml-extensions:$samlLibsVersion",
-        "uk.gov.ida:saml-utils:$samlLibsVersion"
+        "uk.gov.ida:saml-metadata-bindings:$samlLibVersion",
+        "uk.gov.ida:common-utils:$verifyCommonUtils",
+        "uk.gov.ida:saml-serializers:$samlLibVersion",
+        "uk.gov.ida:saml-security:$samlLibVersion",
+        "uk.gov.ida:saml-extensions:$samlLibVersion"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
         'org.mockito:mockito-core:2.12.0',
-        "uk.gov.ida:saml-metadata-bindings-test:$samlLibsVersion",
+        "uk.gov.ida:saml-metadata-bindings-test:$samlLibVersion",
+        "uk.gov.ida:saml-utils:$samlLibVersion",
         "uk.gov.ida:common-test-utils:2.0.0-38",
         "org.jsoup:jsoup:1.11.1",
     )

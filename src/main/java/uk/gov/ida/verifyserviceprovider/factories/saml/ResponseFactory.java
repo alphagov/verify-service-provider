@@ -1,12 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.factories.saml;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
-import org.opensaml.saml.metadata.resolver.impl.PredicateRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Response;
-import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.security.credential.Credential;
-import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
@@ -70,12 +65,12 @@ public class ResponseFactory {
     }
 
     public ResponseService createResponseService(
-        MetadataResolver hubMetadataResolver,
+        ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
         AssertionTranslator assertionTranslator,
         DateTimeComparator dateTimeComparator
-    ) throws ComponentInitializationException {
+    ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(hubMetadataResolver);
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
         return new ResponseService(
             createStringToResponseTransformer(),
@@ -87,10 +82,10 @@ public class ResponseFactory {
     }
 
     public AssertionTranslator createAssertionTranslator(
-        MetadataResolver msaMetadataResolver,
+        ExplicitKeySignatureTrustEngine signatureTrustEngine,
         DateTimeComparator dateTimeComparator
-    ) throws ComponentInitializationException {
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = getMetadataBackedSignatureValidator(msaMetadataResolver);
+    ) {
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -107,23 +102,8 @@ public class ResponseFactory {
         );
     }
 
-    private MetadataBackedSignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver) throws ComponentInitializationException {
-        MetadataCredentialResolver metadataCredentialResolver = getMetadataCredentialResolver(metadataResolver);
-        ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(
-            metadataCredentialResolver,
-            DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver()
-        );
+    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {
         return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
-    }
-
-    private MetadataCredentialResolver getMetadataCredentialResolver(MetadataResolver metadataResolver) throws ComponentInitializationException {
-        PredicateRoleDescriptorResolver predicateRoleDescriptorResolver = new PredicateRoleDescriptorResolver(metadataResolver);
-        predicateRoleDescriptorResolver.initialize();
-        MetadataCredentialResolver metadataCredentialResolver = new MetadataCredentialResolver();
-        metadataCredentialResolver.setRoleDescriptorResolver(predicateRoleDescriptorResolver);
-        metadataCredentialResolver.setKeyInfoCredentialResolver(DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
-        metadataCredentialResolver.initialize();
-        return metadataCredentialResolver;
     }
 
     private IdaKeyStore createEncryptionKeyStore() {

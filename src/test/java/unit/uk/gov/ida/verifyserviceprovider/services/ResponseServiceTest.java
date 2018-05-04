@@ -18,6 +18,7 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.security.crypto.KeySupport;
 import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
@@ -28,6 +29,7 @@ import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.ResponseBuilder;
 import uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
+import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -119,8 +121,10 @@ public class ResponseServiceTest {
         AssertionValidator assertionValidator = new AssertionValidator(instantValidator, subjectValidator, conditionsValidator);
         AssertionTranslator assertionTranslator = new AssertionTranslator(samlAssertionsSignatureValidator, assertionValidator);
 
+        ExplicitKeySignatureTrustEngine signatureTrustEngine = new MetadataSignatureTrustEngineFactory().createSignatureTrustEngine(hubMetadataResolver);
+
         responseService = responseFactory.createResponseService(
-            hubMetadataResolver,
+            signatureTrustEngine,
             assertionTranslator,
             dateTimeComparator
         );

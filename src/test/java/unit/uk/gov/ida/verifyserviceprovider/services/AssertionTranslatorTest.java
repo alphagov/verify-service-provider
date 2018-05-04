@@ -7,18 +7,22 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.security.credential.BasicCredential;
 import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.impl.CollectionCredentialResolver;
 import org.opensaml.security.crypto.KeySupport;
+import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.ConditionsBuilder;
+import uk.gov.ida.saml.core.test.builders.IssuerBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
@@ -35,9 +39,6 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.extensions.IdaAuthnContext.LEVEL_2_AUTHN_CTX;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
@@ -53,9 +54,6 @@ import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
-import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
-import static uk.gov.ida.saml.core.test.builders.metadata.IdpSsoDescriptorBuilder.anIdpSsoDescriptor;
-import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
@@ -65,8 +63,13 @@ public class AssertionTranslatorTest {
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
     private AssertionTranslator translator;
-    private Credential testRpMsaSigningCredential =
-        new TestCredentialFactory(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY).getSigningCredential();
+    private Credential testRpMsaSigningCredential = createMSSigningCredential();
+
+    private Credential createMSSigningCredential() {
+        Credential signingCredential = new TestCredentialFactory(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY).getSigningCredential();
+        ((BasicCredential) signingCredential).setEntityId(TestEntityIds.TEST_RP_MS);
+        return signingCredential;
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -75,19 +78,12 @@ public class AssertionTranslatorTest {
         List<KeyPair> keyPairs = asList(keyPair, keyPair);
         ResponseFactory responseFactory = new ResponseFactory(keyPairs);
 
-        EntityDescriptor entityDescriptor = anEntityDescriptor()
-            .withIdpSsoDescriptor(anIdpSsoDescriptor()
-                .addKeyDescriptor(aKeyDescriptor()
-                    .withX509ForSigning(TEST_RP_MS_PUBLIC_SIGNING_CERT)
-                    .build())
-                .build())
-            .build();
+        CollectionCredentialResolver resolver = new CollectionCredentialResolver(asList(testRpMsaSigningCredential));
+        ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(resolver, DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
 
-        MetadataResolver msaMetadataResolver = mock(MetadataResolver.class);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
-        when(msaMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        translator = responseFactory.createAssertionTranslator(msaMetadataResolver, dateTimeComparator);
+        translator = responseFactory.createAssertionTranslator(explicitKeySignatureTrustEngine, dateTimeComparator);
     }
 
     @Rule
@@ -218,7 +214,10 @@ public class AssertionTranslatorTest {
     }
 
     private AssertionBuilder aSignedAssertion() {
+        Issuer issuer = IssuerBuilder.anIssuer().build();
+        issuer.setValue(TestEntityIds.TEST_RP_MS);
         return anAssertion()
+                .withIssuer(issuer)
             .withSubject(aValidSubject().build())
             .withConditions(aValidConditions().build())
             .withSignature(aSignature()
