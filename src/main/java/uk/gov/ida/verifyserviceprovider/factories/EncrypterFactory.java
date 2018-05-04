@@ -6,8 +6,8 @@ import uk.gov.ida.saml.security.EncryptionCredentialResolver;
 
 public class EncrypterFactory extends uk.gov.ida.saml.security.EncrypterFactory {
 
-    private EncryptionCredentialResolver encryptionCredentialResolver;
-    private String hubEntityId;
+    private final EncryptionCredentialResolver encryptionCredentialResolver;
+    private final String hubEntityId;
 
     public EncrypterFactory(EncryptionCredentialResolver encryptionCredentialResolver, String hubEntityId) {
         this.encryptionCredentialResolver = encryptionCredentialResolver;
