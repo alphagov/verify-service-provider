@@ -60,6 +60,7 @@ public class HubMetadataFeatureTest {
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
+            config("server.connector.port", "0"),
             config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
             config("msaMetadata.uri", msaServer::getUri),
