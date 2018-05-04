@@ -56,6 +56,7 @@ public class MsaMetadataFeatureTest {
         this.applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
+            config("server.connector.port", "0"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", hubServer.port())),
             config("msaMetadata.uri", () -> String.format("http://localhost:%s/matching-service/metadata", wireMockServer.port())),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
