@@ -7,14 +7,21 @@ apply plugin: 'application'
 apply plugin: 'idea'
 
 repositories {
+    if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+        logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
+        maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+        jcenter()
+    }
+    else {
         maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    }
 }
 
 project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.3.0'
-    verifyCommonUtils = '2.0.0-326'
-    samlLibVersion = "$openSamlVersion-107"
+    verifyCommonUtils = '2.0.0-336'
+    samlLibVersion = "$openSamlVersion-147"
     dropwizardVersion = '1.2.0'
 }
 
@@ -37,7 +44,7 @@ dependencies {
         'org.mockito:mockito-core:2.12.0',
         "uk.gov.ida:saml-metadata-bindings-test:$samlLibVersion",
         "uk.gov.ida:saml-utils:$samlLibVersion",
-        "uk.gov.ida:common-test-utils:2.0.0-38",
+        "uk.gov.ida:common-test-utils:2.0.0-43",
         "org.jsoup:jsoup:1.11.1",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
