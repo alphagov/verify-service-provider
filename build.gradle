@@ -23,6 +23,7 @@ project.ext {
     verifyCommonUtils = '2.0.0-336'
     samlLibVersion = "$openSamlVersion-147"
     dropwizardVersion = '1.2.0'
+    jaxbapiVersion = '2.2.9'
 }
 
 dependencies {
@@ -46,12 +47,16 @@ dependencies {
         "uk.gov.ida:saml-utils:$samlLibVersion",
         "uk.gov.ida:common-test-utils:2.0.0-43",
         "org.jsoup:jsoup:1.11.1",
+        "javax.xml.bind:jaxb-api:$jaxbapiVersion",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
 
 sourceSets {
     acceptanceTest {
+        dependencies {
+            "javax.xml.bind:jaxb-api:$jaxbapiVersion"
+        }
         java {
             srcDir 'src/acceptance-test/java'
         }
