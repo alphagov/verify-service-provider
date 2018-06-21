@@ -53,6 +53,20 @@ dependencies {
 }
 
 sourceSets {
+    java9 {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            java {
+                srcDir 'src/main/java9'
+            }
+        }
+    }
+    java10 {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+            java {
+                srcDir 'src/main/java10'
+            }
+        }
+    }
     acceptanceTest {
         dependencies {
             "javax.xml.bind:jaxb-api:$jaxbapiVersion"
@@ -69,6 +83,24 @@ sourceSets {
     }
 }
 
+compileJava {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
+compileJava9Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '9'])
+    }
+}
+
+compileJava10Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+        options.compilerArgs.addAll(['--release', '10'])
+    }
+}
+
 version = "$version_number"
 
 distributions {
@@ -82,10 +114,19 @@ distributions {
 }
 
 jar {
+    into('META-INF/versions/9') {
+        from sourceSets.java9.output
+    }
+    into('META-INF/versions/10') {
+        from sourceSets.java10.output
+    }
     manifest {
         attributes(
                 "Version": version
         )
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            attributes.put("Multi-Release", "true")
+        }
     }
 }
 
