@@ -3,7 +3,7 @@ applications:
   - name: verify-service-provider-dev
     buildpack: java_buildpack
     env:
-      CLOCK_SKEW: PT5s
+      CLOCK_SKEW: PT30s
       SERVICE_ENTITY_IDS: '["http://verify-service-provider-dev-service"]'
       VERIFY_ENVIRONMENT: COMPLIANCE_TOOL
       MSA_ENTITY_ID: https://verify-service-provider-stub-msa
