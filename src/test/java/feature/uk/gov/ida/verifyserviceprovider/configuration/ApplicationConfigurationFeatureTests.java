@@ -15,7 +15,6 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 
 import java.util.HashMap;
 
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.apache.xml.security.utils.Base64.decode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +60,7 @@ public class ApplicationConfigurationFeatureTests {
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
-            put("CLOCK_SKEW", "PT5s");
+            put("CLOCK_SKEW", "PT30s");
         }});
 
         application.getTestSupport().before();
@@ -79,7 +78,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
-        assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(5));
+        assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(30));
     }
 
     @Test
@@ -94,7 +93,7 @@ public class ApplicationConfigurationFeatureTests {
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
-            put("CLOCK_SKEW", "PT5s");
+            put("CLOCK_SKEW", "PT30s");
         }});
 
         application.getTestSupport().before();
@@ -112,6 +111,6 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
-        assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(5));
+        assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(30));
     }
 }

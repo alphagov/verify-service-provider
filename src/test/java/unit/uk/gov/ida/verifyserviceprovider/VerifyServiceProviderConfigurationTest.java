@@ -52,7 +52,7 @@ public class VerifyServiceProviderConfigurationTest {
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
-            put("CLOCK_SKEW", "PT5s");
+            put("CLOCK_SKEW", "PT30s");
         }});
 
         factory.build(
