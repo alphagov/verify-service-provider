@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider;
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import io.dropwizard.jersey.errors.ErrorMessage;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -33,9 +34,16 @@ public class TranslateResponseMultiTenantedSetupAcceptanceTest {
     @ClassRule
     public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer, String.format("%s,%s", configuredEntityIdOne, configuredEntityIdTwo));
 
-    private static Client client = application.client();
-    private static ComplianceToolService complianceTool = new ComplianceToolService(client);
-    private static GenerateRequestService generateRequestService = new GenerateRequestService(client);
+    private static Client client;
+    private static ComplianceToolService complianceTool;
+    private static GenerateRequestService generateRequestService;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        client = application.client();
+        complianceTool = new ComplianceToolService(client);
+        generateRequestService = new GenerateRequestService(client);
+    }
 
     @Test
     public void shouldHandleASuccessMatchResponseForCorrectProvidedEntityId() {

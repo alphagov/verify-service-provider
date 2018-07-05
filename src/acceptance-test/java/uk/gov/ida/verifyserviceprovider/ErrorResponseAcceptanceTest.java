@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider;
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -30,9 +31,16 @@ public class ErrorResponseAcceptanceTest {
     @ClassRule
     public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
 
-    private static Client client = application.client();
-    private static ComplianceToolService complianceTool = new ComplianceToolService(client);
-    private static GenerateRequestService generateRequestService = new GenerateRequestService(client);
+    private static Client client;
+    private static ComplianceToolService complianceTool;
+    private static GenerateRequestService generateRequestService;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        client = application.client();
+        complianceTool = new ComplianceToolService(client);
+        generateRequestService = new GenerateRequestService(client);
+    }
 
     @Before
     public void setUp() {

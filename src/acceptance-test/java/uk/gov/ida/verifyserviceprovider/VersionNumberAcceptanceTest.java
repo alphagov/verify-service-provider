@@ -1,9 +1,9 @@
 package uk.gov.ida.verifyserviceprovider;
 
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 
 import javax.ws.rs.client.Client;
@@ -19,7 +19,12 @@ public class VersionNumberAcceptanceTest {
     @ClassRule
     public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
 
-    private static Client client = application.client();
+    private static Client client;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        client = application.client();
+    }
 
     @Test
     public void shouldRespondWithVersionNumber() {

@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider;
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -33,9 +34,16 @@ public class SecondaryEncryptionKeyAcceptanceTest {
     @ClassRule
     public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer, TEST_RP_MS_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
 
-    private static Client client = application.client();
-    private static ComplianceToolService complianceTool = new ComplianceToolService(client);
-    private static GenerateRequestService generateRequestService = new GenerateRequestService(client);
+    private static Client client;
+    private static ComplianceToolService complianceTool;
+    private static GenerateRequestService generateRequestService;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        client = application.client();
+        complianceTool = new ComplianceToolService(client);
+        generateRequestService = new GenerateRequestService(client);
+    }
 
     @Before
     public void setUp() {
