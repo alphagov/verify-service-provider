@@ -52,7 +52,7 @@ PORT                          # (Optional - default 50400) The TCP port where th
 LOG_LEVEL                     # (Optional - default INFO) The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR)
 ```
 
-As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.1.0/docs/manual/configuration.html).
+As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
 
 ### Generate keys for testing
 
