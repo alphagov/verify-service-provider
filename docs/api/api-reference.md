@@ -6,7 +6,7 @@ This is the API documentation for Verify Service Provider. With the API you can:
 
 To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
 
-The Verify team provides a client library for Node.js with the passport.js framework. If you would like to request a different client library, contact [idasupport+onboarding@digital.cabinet-office.gov.uk](mailto:idasupport+onboarding@digital.cabinet-office.gov.uk)].
+The Verify team provides a client library for Node.js with the passport.js framework. If you would like to request a different client library, contact [idasupport+onboarding@digital.cabinet-office.gov.uk](mailto:idasupport+onboarding@digital.cabinet-office.gov.uk).
 
 See also:
 * [Installing and configuring Verify Service Provider](/README.md)
@@ -20,13 +20,20 @@ See the [Verify Service Provider tutorial](ADD LINK) for more information.
 
 Path: `POST /generate-request`
 
-Example call:
+<details>
+<summary>
+Example call
+</summary>
+
 ```
 > POST /generate-request HTTP/1.1
 > Content-Type: application/json
 >
 > { "levelOfAssurance": "LEVEL_2" }
 ```
+
+</details>
+
 
 HTTP response codes:
 
@@ -45,7 +52,11 @@ See the [Verify Service Provider tutorial](docs/tutorial-using-verify-service-pr
 
 Path: `POST /translate-response`
 
-Example call:
+<details>
+<summary>
+Example call
+</summary>
+
 ```
 > POST /generate-request HTTP/1.1
 > Content-Type: application/json
@@ -56,6 +67,9 @@ Example call:
 >  "levelOfAssurance": "LEVEL_2"
 > }
 ```
+
+</details>
+
 
 HTTP response codes:
 
