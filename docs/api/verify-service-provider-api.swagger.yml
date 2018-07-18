@@ -229,6 +229,15 @@ definitions:
             $ref: '#/definitions/Address'
           verified:
             type: boolean
+      addressHistory:
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              $ref: '#/definitions/Address'
+            verified:
+              type: boolean
       cycle3:
         type: string
   Address:
