@@ -35,6 +35,8 @@ serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
 # Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
 verifyHubConfiguration:
   environment: ${VERIFY_ENVIRONMENT:-}
+  metadata:
+    expectedEntityId: https://local.signin.service.gov.uk
 
 # Location of Matching Service Metadata
 # Verify Service Provider consumes the metadata and uses

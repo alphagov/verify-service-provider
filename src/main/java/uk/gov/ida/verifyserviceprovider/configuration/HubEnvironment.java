@@ -15,8 +15,12 @@ public enum HubEnvironment {
         URI.create("https://www.integration.signin.service.gov.uk/SAML2/metadata/federation")
     ),
     COMPLIANCE_TOOL(
-        URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"),
-        URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation")
+            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"),
+            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation")
+    ),
+    COMPLIANCE_TOOL_LOCAL(
+            URI.create("http://localhost:50270/SAML2/SSO"),
+            URI.create("http://localhost:55000/compliance-tool-local/metadata.xml")
     );
 
     private URI ssoLocation;
