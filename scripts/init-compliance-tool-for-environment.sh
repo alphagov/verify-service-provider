@@ -19,7 +19,7 @@ case $1 in
 		ASSERTION_CONSUMER_SERVICE_URL="http://localhost:3200/verify/response"
     COMPLIANCE_TOOL_INIT_URL="http://localhost:50270/service-test-data"
     MATCHING_SERVICE_ENTITY_ID="http://www.test-rp-ms.gov.uk/SAML2/MD"
-    MATCHING_SERVICE_SIGNING_KEY=`cat ../test-keys-and-certs/msa-signing-key.pem`
+    MATCHING_SERVICE_SIGNING_KEY=`cat ../../ida-hub-acceptance-tests/keys/test_rp_msa_signing.pk8 | base64`
 		;;
     'local-service-using-remote-compliance')
     echo "configuring remote compliance tool running on reference for Relying Party running on localhost:3200"
@@ -27,7 +27,7 @@ case $1 in
     ASSERTION_CONSUMER_SERVICE_URL="http://localhost:3200/verify/response"
     COMPLIANCE_TOOL_INIT_URL="https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/service-test-data"
     MATCHING_SERVICE_ENTITY_ID="https://verify-service-provider-stub-msa"
-    MATCHING_SERVICE_SIGNING_KEY=`cat ../test-keys-and-certs/msa-signing-key.pem`
+    MATCHING_SERVICE_SIGNING_KEY=`cat ../../ida-hub-acceptance-tests/keys/test_rp_msa_signing.pk8 | base64`
     ;;
   	'dev')
 		echo "configuring remote compliance tool running on reference for Relying Party running on dev (on PaaS)"
