@@ -34,6 +34,7 @@ public class DefaultHubTrustStoreConfiguration extends TrustStoreConfiguration {
                 break;
             case INTEGRATION:
             case COMPLIANCE_TOOL:
+            case COMPLIANCE_TOOL_LOCAL:
                 trustStoreName = TEST_VERIFY_TRUSTSTORE_NAME;
                 break;
             default:
