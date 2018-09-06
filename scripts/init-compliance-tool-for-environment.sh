@@ -2,18 +2,22 @@
 set -e
 
 if [ ! $# -eq 3 ] ; then
-	echo "this script requires the environment and a persistentId to be passed in as arguments, along with either the '--matching' flag or the name of a file containing matching dataset json. e.g."
-	echo "$ ./init-compliance-tool.sh <environment> <persistentId> --matching"
+	echo "For a matching journey this script must include the environment, the --matching flag and a PID"
+	echo "For example: $ ./init-compliance-tool-for-environment.sh <environment> --matching <persistentId>"
+	echo "For a non-matching journey this script must include the environment, the --nonmatching flag and the filepath to the matching dataset json"
+	echo "For example: $ ./init-compliance-tool-for-environment.sh <environment> --nonmatching filepath/to/matching-dataset-for-rp.json"
 	echo "please try again, currently allowed environments are 'local' and 'dev'"
 	exit 1
 fi
 
-echo "setting persistentID as $2"
-PID=$2
-
 COMPLIANCE_TOOL_INIT_URL_SLUG="relying-party-service-test-run"
-if [ ${3-""} == "--matching" ] ; then
+if [ ${2-""} == "--matching" ] ; then
   COMPLIANCE_TOOL_INIT_URL_SLUG="service-test-data"
+	echo "setting persistentID as $3"
+	PID=$3
+elif [ ${2-""} =~ "--nonmatching" ] ; then
+  echo "You must specify --matching or --nonmatching"
+	exit 1
 fi
 
 case $1 in
@@ -38,7 +42,7 @@ case $1 in
 		exit 1
 esac
 
-if [ ${3-""} == "--matching" ] ; then
+if [ ${2-""} == "--matching" ] ; then
 	curl $COMPLIANCE_TOOL_INIT_URL --data @- --header 'Content-Type: application/json' <<EOJSON
 	{
 	  "serviceEntityId":"$SERVICE_ENTITY_ID",
@@ -72,7 +76,6 @@ else
 	  "assertionConsumerServiceUrl":"$ASSERTION_CONSUMER_SERVICE_URL",
 	  "signingCertificate": "MIIC0jCCAboCCQDx9/z+IdVV6DANBgkqhkiG9w0BAQsFADAqMSgwJgYDVQQDEx9WZXJpZnkgU2VydmljZSBQcm92aWRlciBTaWduaW5nMCAXDTE3MDgxMDE1NTUwN1oYDzIxMTcwNzE3MTU1NTA3WjAqMSgwJgYDVQQDEx9WZXJpZnkgU2VydmljZSBQcm92aWRlciBTaWduaW5nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvSaDKeyxVC+llVxgvifUGfBi0BQF24Un7Js/mtLt6DSfTtiNtLwkbJLb/Y1hEZtZee5jz5WpE+N3fGL3CFF1wy+ezVPOSEMcP5AJ376dJ4QkMglaDVNE49QHxM58dLdRdbSY/CwGTcyR8ZDOHC6scdgdPjDoM3EhyA79EaNycalxLQv9m01YgAjCzaE+afvO51l8A6wxDoadMZG68Paz9k4PmJyg/zcv3VrsvTL5wMs9qX1UW1F7YQLTEEVLkS04oGIsxWEFhtTDv2Vsif7W2NJLqTjoKrTLKHn7N+aEMGMskJVc7gFFm0EwTKkIt/PrE1BXW7f9iNMvBs39PnkkyQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQC47LMMcGr2QXtJlyQsKZGX4SsSzdpVr/1Y5V1soeeRO39jKiYH12z1lh+8OlHF/NcbawEAKZnqkYS0Ka1mE5uKlDmwZ5GtCPYSmD/UVu54zdfrEMhsh7jTM0iong69wx8SfEat7XCt999EFEcIj4OC31X93JX6O0nNx17lzJP+W0jMX8GJSlFeNIYX2r8F83PimC9et949KyEBP0vakqp65Fg1bO9NNlIB17jR4C4OypLD+5gDxshMq9xngqithCNqPpByuS7mmJ+9S/zAIPHhyyYkoHfvLGmc0N6QSqEfUs16RRTLCquumitvUNZxs2Gvqm/RDRfVqviqNRKxlpWe",
 	  "encryptionCertificate": "MIIC2DCCAcACCQCJmzLC9XOdwzANBgkqhkiG9w0BAQsFADAtMSswKQYDVQQDEyJWZXJpZnkgU2VydmljZSBQcm92aWRlciBFbmNyeXB0aW9uMCAXDTE3MDgxMDE1NTgwNFoYDzIxMTcwNzE3MTU1ODA0WjAtMSswKQYDVQQDEyJWZXJpZnkgU2VydmljZSBQcm92aWRlciBFbmNyeXB0aW9uMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwCshPm6j+SBjC6i4kSdlFH0H8pLEOe/8gvrUStN0fCsO7fatgyIoXMOQwtTkuAW9cBL0PYPkKBfpFakZmMyZZPvakqH+QrhAaCFVa0uJmlQ4DEVzuURF0wbkz4XZqOoyomLQATtv9zpb2cHfTCS87ejIQ0/wOCHdiJOCPBcgxGjAL8ztEEuAAypgpTrROoThtxTh4FqdOeqiS03NAZcxi7rMbQ8O20tE4MUIkBmFU2yB+UgW33bOSa1in5MwEdvFT4buP8R+rEZ4cD3+K1TeDpT4ssYCCdo4UC/W9+uSIiTOL1UtmBV8kAnUvDg4LNBe5mJ9M1zZvQlXrgCLNd/noQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBEsWIcTeU0OlN2bjKVwtfsB5Eb3Mri/wsYc17Rv0rHSyeudiGphlmHYzPvFBz0dMO6YKjEOrX5a6tkN+PQE9otcjBmY4Ice+LlrJ4Vmu1dsG60S/e5lZCYE2BOY0Jpdjk4aJQeMOfyDrJUmjUWzmx+U1IdK6uuatS7+iJdR/z1FwZt+aEqaO+oVxFuBU32z+x/B/l3c5IqIuZePaYcWBFaCQzPAig9EXO3nNwcwRiDWd11nhWshVr5pTMRgSqLXMl/j4RLvr4FYg3sV5MqRqxNBjW5hl64UNfIzmD794yO8Spqgn4BZouOMCZ7Zo+GE/fcZVLhDwRMU3qgmHZBS8jk",
-	  "expectedPID":"$PID",
 	  "matchingDatasetJson":\$jsonFromFile
 	}
 EOJSON
