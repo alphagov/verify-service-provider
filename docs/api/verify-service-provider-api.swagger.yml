@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: 'This is a description of the API for the Verify Service Provider.'
-  version: 0.3.0
+  version: "0.4.0"
   title: Verify Service Provider
 basePath: /
 tags:
@@ -164,6 +164,8 @@ definitions:
     enum:
       - LEVEL_1
       - LEVEL_2
+      - LEVEL_3
+      - LEVEL_4
   EntityId:
     description: >-
       The Entity Id for the service interacting with the Verify Service Provider.
@@ -177,6 +179,8 @@ definitions:
     enum:
       - LEVEL_1
       - LEVEL_2
+      - LEVEL_3
+      - LEVEL_4
   Scenario:
     type: string
     enum:
@@ -186,20 +190,21 @@ definitions:
       - CANCELLATION
       - AUTHENTICATION_FAILED
       - REQUEST_ERROR
+      - IDENTITY_VERIFIED
   Attributes:
     description: >-
-      An optional object containing attributes.
-      If user-account-creation is enabled in the Relying Party  Service, and no
-      match was possible, these attributes are used to create a new account.
+      An object containing attributes. Mandatory in the non-matching journey; optional in prior versions.<br>
+      For matching journey,
+      If user-account-creation is enabled in the Relying PartyService, and no
+      match was possible, these attributes are used to create a new account.<br>
+      For non-matching journey, these attributes are those specified by the RP as being required for their service and can potentially include the full matching dataset.
     type: object
     properties:
       firstName:
         type: object
         properties:
           value:
-            type: string
-          verified:
-            type: boolean
+            $ref: '#/definitions/PersonalName'
       middleName:
         type: object
         properties:
@@ -207,6 +212,13 @@ definitions:
             type: string
           verified:
             type: boolean
+      middleNames:
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              $ref: '#/definitions/PersonalName'
       surname:
         type: object
         properties:
@@ -214,6 +226,13 @@ definitions:
             type: string
           verified:
             type: boolean
+      surnames:
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              $ref: '#/definitions/PersonalName'
       dateOfBirth:
         type: object
         properties:
@@ -222,6 +241,12 @@ definitions:
             type: string
           verified:
             type: boolean
+      gender:
+        type: string
+        enum:
+          - FEMALE
+          - MALE
+          - NOT_SPECIFIED
       address:
         type: object
         properties:
@@ -230,6 +255,15 @@ definitions:
           verified:
             type: boolean
       addressHistory:
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              $ref: '#/definitions/Address'
+            verified:
+              type: boolean
+      addresses:
         type: array
         items:
           type: object
@@ -255,12 +289,35 @@ definitions:
         type: string
       uprn:
         type: string
-      fromDate:
-        description: Format yyyy-MM-dd
+      fromDate§§:
+        description: Format date-time
         type: string
       toDate:
-        description: Format yyyy-MM-dd
+        description: Format date-time
         type: string
+      from:
+        description: Format date-time
+        type: string
+      to:
+        description: Format date-time
+        type: string
+  PersonalName:
+    description: >-
+      An object describing a forename, middlename or surname
+    type: object
+    properties:
+      value:
+        type: string
+      nonLatinScriptValue:
+        type: string
+      verified:
+        type: boolean
+      from:
+        type: string
+        format: date-time
+      to:
+        type: string
+        format: date-time
   ErrorMessage:
     type: object
     required:
