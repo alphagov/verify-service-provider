@@ -289,11 +289,11 @@ definitions:
         type: string
       uprn:
         type: string
-      fromDate§§:
-        description: Format date-time
+      fromDate:
+        description: Format yyyy-MM-dd
         type: string
       toDate:
-        description: Format date-time
+        description: Format yyyy-MM-dd
         type: string
       from:
         description: Format date-time
