@@ -26,7 +26,7 @@ import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisa
 
 public class AuthnRequestAcceptanceTest {
 
-    private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static String COMPLIANCE_TOOL_HOST = "http://localhost:50270";
     private static String SINGLE_ENTITY_ID = "http://default-entity-id";
     private static String MULTI_ENTITY_ID_1 = "http://service-entity-id-one";
     private static String MULTI_ENTITY_ID_2 = "http://service-entity-id-two";

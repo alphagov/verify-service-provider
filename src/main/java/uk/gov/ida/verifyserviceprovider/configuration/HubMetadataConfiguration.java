@@ -3,25 +3,17 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Throwables;
 import io.dropwizard.client.JerseyClientConfiguration;
-import io.dropwizard.servlets.assets.ResourceNotFoundException;
-import uk.gov.ida.saml.metadata.EncodedTrustStoreConfiguration;
-import uk.gov.ida.saml.metadata.KeyStoreLoader;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.exception.EmptyTrustStoreException;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 
 public class HubMetadataConfiguration extends MetadataConfiguration {
 
@@ -70,6 +62,9 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
             case INTEGRATION:
             case COMPLIANCE_TOOL:
                 expectedEntityId = "https://signin.service.gov.uk";
+                break;
+            case COMPLIANCE_TOOL_LOCAL:
+                expectedEntityId = "https://local.signin.service.gov.uk";
                 break;
             default:
                 throw new RuntimeException("No entity ID configured for Hub Environment: " + hubEnvironment.name());
