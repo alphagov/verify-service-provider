@@ -36,7 +36,7 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
-import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -119,13 +119,13 @@ public class ResponseServiceTest {
         SubjectValidator subjectValidator = new SubjectValidator(timeRestrictionValidator);
         ConditionsValidator conditionsValidator = new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator());
         AssertionValidator assertionValidator = new AssertionValidator(instantValidator, subjectValidator, conditionsValidator);
-        AssertionTranslator assertionTranslator = new AssertionTranslator(samlAssertionsSignatureValidator, assertionValidator);
+        MatchingAssertionService matchingAssertionService = new MatchingAssertionService(samlAssertionsSignatureValidator, assertionValidator);
 
         ExplicitKeySignatureTrustEngine signatureTrustEngine = new MetadataSignatureTrustEngineFactory().createSignatureTrustEngine(hubMetadataResolver);
 
         responseService = responseFactory.createResponseService(
             signatureTrustEngine,
-            assertionTranslator,
+            matchingAssertionService,
             dateTimeComparator
         );
     }

@@ -30,7 +30,6 @@ public class TranslateNonMatchingSamlResponseResourceTest {
 
     private static ResponseService responseService = mock(ResponseService.class);
     private static EntityIdService entityIdService = mock(EntityIdService.class);
-    private static final String defaultEntityId = "http://default-entity-id";
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -39,11 +38,6 @@ public class TranslateNonMatchingSamlResponseResourceTest {
             .addProvider(InvalidEntityIdExceptionMapper.class)
             .addResource(new TranslateNonMatchingSamlResponseResource(responseService, entityIdService))
             .build();
-
-    @Before
-    public void mockEntityIdService() {
-        when(entityIdService.getEntityId(any(TranslateSamlResponseBody.class))).thenReturn(defaultEntityId);
-    }
 
     @After
     public void setup() {
