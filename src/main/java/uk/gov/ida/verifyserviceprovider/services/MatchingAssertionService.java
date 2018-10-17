@@ -23,7 +23,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class MatchingAssertionService implements AssertionService {
+public class MatchingAssertionService extends AssertionService                                                                                                                                                                                                  {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final AssertionValidator assertionValidator;
