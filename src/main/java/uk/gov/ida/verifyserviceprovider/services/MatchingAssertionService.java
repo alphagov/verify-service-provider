@@ -5,29 +5,30 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.AuthnContext;
 import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
-import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
-import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
-import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class AssertionTranslator {
+public class MatchingAssertionService implements AssertionService {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final AssertionValidator assertionValidator;
 
-    public AssertionTranslator(
+    public MatchingAssertionService(
         SamlAssertionsSignatureValidator assertionsSignatureValidator,
         AssertionValidator assertionValidator
     ) {
@@ -35,7 +36,7 @@ public class AssertionTranslator {
         this.assertionValidator = assertionValidator;
     }
 
-    public TranslatedResponseBody translate(
+    public TranslatedResponseBody translateSuccessResponse(
         List<Assertion> assertions,
         String expectedInResponseTo,
         LevelOfAssurance expectedLevelOfAssurance,
@@ -68,7 +69,26 @@ public class AssertionTranslator {
         return new TranslatedResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
     }
 
-    public boolean isUserAccountCreation(List<AttributeStatement> attributeStatements) {
+    public TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode) {
+        Optional.ofNullable(statusCode.getStatusCode())
+                .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
+        String subStatus = statusCode.getStatusCode().getValue();
+
+        switch (subStatus) {
+            case SamlStatusCode.NO_MATCH:
+                return new TranslatedResponseBody(Scenario.NO_MATCH, null, null, null);
+            case StatusCode.REQUESTER:
+                return new TranslatedResponseBody(Scenario.REQUEST_ERROR, null, null, null);
+            case StatusCode.NO_AUTHN_CONTEXT:
+                return new TranslatedResponseBody(Scenario.CANCELLATION, null, null, null);
+            case StatusCode.AUTHN_FAILED:
+                return new TranslatedResponseBody(Scenario.AUTHENTICATION_FAILED, null, null, null);
+            default:
+                throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
+        }
+    }
+
+    private boolean isUserAccountCreation(List<AttributeStatement> attributeStatements) {
         return !attributeStatements.isEmpty();
     }
 

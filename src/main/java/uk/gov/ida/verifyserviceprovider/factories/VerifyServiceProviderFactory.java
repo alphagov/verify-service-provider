@@ -13,6 +13,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
@@ -100,10 +101,21 @@ public class VerifyServiceProviderFactory {
         return new TranslateSamlResponseResource(
             responseFactory.createResponseService(
                 getHubSignatureTrustEngine(),
-                responseFactory.createAssertionTranslator(getMsaSignatureTrustEngine(), dateTimeComparator),
+                responseFactory.createMatchingAssertionService(getMsaSignatureTrustEngine(), dateTimeComparator),
                 dateTimeComparator
             ),
             entityIdService
+        );
+    }
+
+    public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+        return new TranslateNonMatchingSamlResponseResource(
+                responseFactory.createResponseService(
+                        getHubSignatureTrustEngine(),
+                        responseFactory.createNonMatchingAssertionService(),
+                        dateTimeComparator
+                ),
+                entityIdService
         );
     }
 

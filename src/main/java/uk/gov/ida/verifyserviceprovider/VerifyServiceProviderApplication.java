@@ -67,6 +67,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
+        environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
+
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());

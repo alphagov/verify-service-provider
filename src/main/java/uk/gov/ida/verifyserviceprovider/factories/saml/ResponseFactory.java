@@ -17,7 +17,9 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.AssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -66,7 +68,7 @@ public class ResponseFactory {
 
     public ResponseService createResponseService(
         ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-        AssertionTranslator assertionTranslator,
+        AssertionService assertionService,
         DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -75,13 +77,13 @@ public class ResponseFactory {
         return new ResponseService(
             createStringToResponseTransformer(),
             assertionDecrypter,
-            assertionTranslator,
+            assertionService,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
             new InstantValidator(dateTimeComparator)
         );
     }
 
-    public AssertionTranslator createAssertionTranslator(
+    public MatchingAssertionService createMatchingAssertionService(
         ExplicitKeySignatureTrustEngine signatureTrustEngine,
         DateTimeComparator dateTimeComparator
     ) {
@@ -96,10 +98,14 @@ public class ResponseFactory {
             new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new AssertionTranslator(
+        return new MatchingAssertionService(
             assertionsSignatureValidator,
             assertionValidator
         );
+    }
+
+    public NonMatchingAssertionService createNonMatchingAssertionService() {
+        return new NonMatchingAssertionService();
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {
