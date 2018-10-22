@@ -25,35 +25,33 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
 public class MatchingAssertionService extends AssertionService                                                                                                                                                                                                  {
 
-    private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
-    private final AssertionValidator assertionValidator;
 
     public MatchingAssertionService(
         SamlAssertionsSignatureValidator assertionsSignatureValidator,
         AssertionValidator assertionValidator
     ) {
-        this.assertionsSignatureValidator = assertionsSignatureValidator;
-        this.assertionValidator = assertionValidator;
+        super(assertionsSignatureValidator,assertionValidator);
+
     }
 
     public TranslatedResponseBody translateSuccessResponse(
-        List<Assertion> assertions,
-        String expectedInResponseTo,
-        LevelOfAssurance expectedLevelOfAssurance,
-        String entityId
+            List<Assertion> assertions,
+            String expectedInResponseTo,
+            LevelOfAssurance expectedLevelOfAssurance,
+            String entityId
     ) {
-        validateAssertions(assertions);
+        //  1. check saml has assertions
+        checkSamlhasAssertions(assertions);
+        //  2. validate assertions
         Assertion assertion = assertions.get(0);
-
         assertionValidator.validate(assertion, expectedInResponseTo, entityId);
         assertionsSignatureValidator.validate(assertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
-
+        //  3. validate levelOfAssurance
         AuthnStatement authnStatement = assertion.getAuthnStatements().get(0);
-
         LevelOfAssurance levelOfAssurance = extractLevelOfAssurance(authnStatement);
         LevelOfAssuranceValidator levelOfAssuranceValidator = new LevelOfAssuranceValidator();
         levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
-
+        //  4. translateAssertions
         String nameID = assertion.getSubject().getNameID().getValue();
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
         if (isUserAccountCreation(attributeStatements)) {
@@ -65,8 +63,8 @@ public class MatchingAssertionService extends AssertionService                  
             );
 
         }
-
         return new TranslatedResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
+
     }
 
     public TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode) {
@@ -92,7 +90,7 @@ public class MatchingAssertionService extends AssertionService                  
         return !attributeStatements.isEmpty();
     }
 
-    private void validateAssertions(List<Assertion> assertions) {
+    private void checkSamlhasAssertions(List<Assertion> assertions) {
         if (assertions == null || assertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one assertion is expected.");
         }

@@ -3,6 +3,8 @@ package uk.gov.ida.verifyserviceprovider.services;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.StatusCode;
+import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 //import uk.gov.ida.saml.core.
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -18,12 +20,32 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 
 public abstract class AssertionService {
+    protected final AssertionValidator assertionValidator;
 
-   /* protected final InstantValidator instantValidator;
-    protected final SubjectValidator subjectValidator;
-    protected final ConditionsValidator conditionsValidator;
-    //private final SamlAssertionsSignatureValidator hubSignatureValidator;
-   //private final AssertionAttributeStatementValidator attributeStatementValidator; */
+    protected SamlAssertionsSignatureValidator assertionsSignatureValidator;
+
+    protected  AssertionAttributeStatementValidator attributeStatementValidator;
+
+
+    public AssertionService(AssertionValidator assertionValidator,
+                            SamlAssertionsSignatureValidator hubSignatureValidator
+                            ) {
+
+        this(hubSignatureValidator,assertionValidator);
+
+
+        this.attributeStatementValidator = new AssertionAttributeStatementValidator();
+    }
+
+    public AssertionService(SamlAssertionsSignatureValidator assertionsSignatureValidator,
+                            AssertionValidator assertionValidator)
+    {
+        this.assertionsSignatureValidator = assertionsSignatureValidator;
+
+        this.assertionValidator = assertionValidator;
+
+        this.attributeStatementValidator = new AssertionAttributeStatementValidator();
+    }
 
     protected abstract TranslatedResponseBody translateSuccessResponse(
             List<Assertion> assertions,
@@ -34,10 +56,9 @@ public abstract class AssertionService {
 
     protected abstract TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode);
 
-    protected void validateHubAssertion(Assertion assertion,
-                                        //String expectedInResponseTo,
-                                        String hubEntityId,
-                                        QName role) {
+    public void validateIdPAssertion(Assertion assertion,
+                                     String expectedInResponseTo,
+                                     QName role) {
 
         if (assertion.getIssueInstant() == null) {
             throw new SamlResponseValidationException("Assertion IssueInstant is missing.");
@@ -59,8 +80,9 @@ public abstract class AssertionService {
             throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " declared an illegal Version attribute value.");
         }
 
-        /**hubSignatureValidator.validate(singletonList(assertion), role);
-        subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        attributeStatementValidator.validate(assertion);*/
+        assertionsSignatureValidator.validate(singletonList(assertion), role);
+        assertionValidator.getSubjectValidator().validate(assertion.getSubject(), expectedInResponseTo);
+        attributeStatementValidator.validate(assertion);
     }
+
 }

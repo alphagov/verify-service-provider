@@ -104,8 +104,20 @@ public class ResponseFactory {
         );
     }
 
-    public NonMatchingAssertionService createNonMatchingAssertionService() {
-        return new NonMatchingAssertionService();
+    public NonMatchingAssertionService createNonMatchingAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                                         DateTimeComparator dateTimeComparator) {
+
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
+        SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
+
+        SamlAssertionsSignatureValidator assertionsSignatureValidator = new SamlAssertionsSignatureValidator(samlMessageSignatureValidator);
+        AssertionValidator assertionValidator = new AssertionValidator(
+                new InstantValidator(dateTimeComparator),
+                new SubjectValidator(timeRestrictionValidator),
+                new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
+        );
+        return new NonMatchingAssertionService(assertionsSignatureValidator, assertionValidator);
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {

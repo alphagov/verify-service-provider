@@ -23,6 +23,18 @@ public class AssertionValidator {
         this.conditionsValidator = conditionsValidator;
     }
 
+    public InstantValidator getInstantValidator() {
+        return instantValidator;
+    }
+
+    public SubjectValidator getSubjectValidator() {
+        return subjectValidator;
+    }
+
+    public ConditionsValidator getConditionsValidator() {
+        return conditionsValidator;
+    }
+
     public void validate(Assertion assertion, String expectedInResponseTo, String entityId) {
         instantValidator.validate(assertion.getIssueInstant(), "Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);

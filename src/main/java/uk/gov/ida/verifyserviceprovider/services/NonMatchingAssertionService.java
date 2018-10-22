@@ -3,9 +3,11 @@ package uk.gov.ida.verifyserviceprovider.services;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -15,19 +17,23 @@ import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidation
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 
 public class NonMatchingAssertionService extends AssertionService {
+
     private enum AssertionType {AUTHN_ASSERTION, MDS_ASSERTION}
 
-    public NonMatchingAssertionService() {
+    public NonMatchingAssertionService(SamlAssertionsSignatureValidator assertionsSignatureValidator,
+                                       AssertionValidator assertionValidator){
 
+        super(assertionsSignatureValidator,assertionValidator);
     }
 
     @Override
     public TranslatedResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        validateAssertions(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
+        validate(assertions, expectedInResponseTo, expectedLevelOfAssurance);
         return translateAssertions(assertions);
     }
 
-    private void validateAssertions(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String hubEntityId) {
+
+    public void validate(List<Assertion> assertions, String requestId, LevelOfAssurance expectedLevelOfAssurance) {
 
         Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
                 .collect(Collectors.groupingBy(this::classifyAssertion));
@@ -45,10 +51,9 @@ public class NonMatchingAssertionService extends AssertionService {
         Assertion authnAssertion = authnAssertions.get(0);
         Assertion mdsAssertion = mdsAssertions.get(0);
 
-        validateHubAssertion(authnAssertion, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
-        //validateHubAssertion(mdsAssertion, requestId, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        validateIdPAssertion(authnAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        validateIdPAssertion(mdsAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
-        //assertionMap.getOrDefault(AssertionType.CYCLE_3_ASSERTION, emptyList()).forEach(a -> validateCycle3Assertion(a, requestId, hubEntityId));
 
         if (!mdsAssertion.getIssuer().getValue().equals(authnAssertion.getIssuer().getValue())) {
             throw new SamlResponseValidationException(MISMATCHED_ISSUERS);
@@ -58,7 +63,7 @@ public class NonMatchingAssertionService extends AssertionService {
             throw new SamlResponseValidationException(MISMATCHED_PIDS);
         }
     }
-    private AssertionType classifyAssertion(Assertion assertion) {
+    private AssertionType classifyAssertion (Assertion assertion) {
         if (!assertion.getAuthnStatements().isEmpty()) {
             return AssertionType.AUTHN_ASSERTION;
         }

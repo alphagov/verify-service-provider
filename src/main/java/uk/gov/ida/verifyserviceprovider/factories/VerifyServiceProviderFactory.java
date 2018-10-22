@@ -112,7 +112,7 @@ public class VerifyServiceProviderFactory {
         return new TranslateNonMatchingSamlResponseResource(
                 responseFactory.createResponseService(
                         getHubSignatureTrustEngine(),
-                        responseFactory.createNonMatchingAssertionService(),
+                        responseFactory.createNonMatchingAssertionService(getMsaSignatureTrustEngine(), dateTimeComparator),
                         dateTimeComparator
                 ),
                 entityIdService
