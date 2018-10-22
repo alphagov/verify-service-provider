@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" ID="_f4bd7032b194693cfa97796263bfb248" IssueInstant="2018-10-22T16:54:06.581Z" Version="2.0">
+  <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://ida-stub-idp-joint.cloudapps.digital/stub-country/ServiceMetadata</saml2:Issuer>
+  <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <ds:Reference URI="#_f4bd7032b194693cfa97796263bfb248">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <ds:DigestValue>WrbUTqq4wB7x/RsllIdn/h6LI6VYTH+Biyfgmkc+nqU=</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>
+MtTYyDjO5OTLFGeCpyQqqUCj6vbhTZjv0bePVm85/QDmG5BDB56RVEd3hjY0pGOfdydfFyQM5iSj
+SgQvS7TSq56UTCmg0GooH9tfGUArjeTbkdRMOeC3pezksDhzYoQOH6r8UM4E7Y8NfCsCrXG8YUkR
+36CJ9LyWWUeDSmubShZ0TLPllab8JSOerRERBlIv168sOnllxf82Ck4L7WZrn6XFpgIhuYeY0Q3d
+KrFdvF1D/itBauTE4NgTeHCkKApVfrCnADRUKP6fK+X5AzS9WNjlDSbkCtVgZUXwdC2XinGv3A4N
+ssoqUll+QEY+kN5VWeisxXmQwzXfFCNSYeFj9R7uM2D5UYH/Bs7fY/PPi45GXl03AnJveqqZTr6N
+EYXLaBxOm+4HceGstXDN+o5refDgrzCXk7Lt+JTn/Zm03S5Rh9h9YJ9EwhKjTWVJ4WaQuEZH28Hf
+yPRtJ2ONNbCgx9ndThMjNmChGBtAu0Gcp1T7qSlQd+pVsrjUteGZsPdYBaAgJF5OwBSxIF87Qls5
+7i772AVGBzkTqbgx9Ygg4+DWLuOEaFsPeP/kLDwhnoP8A89zM5TglZDjyyjYo6dqNhU3oF8GhQkl
+WmzUkYxsllIewY/UuLZ/1UBETIh0hB0hI9ray6LCbAPrKQx7LhQtNz7sFAL2P+C2KbgECrJi5I8=
+</ds:SignatureValue>
+  </ds:Signature>
+  <saml2:Subject>
+    <saml2:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">UK/EU/9eb0809b-5ed4-44d8-85f2-4a186f444d9e</saml2:NameID>
+    <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+      <saml2:SubjectConfirmationData InResponseTo="_fd22d20f-8972-4f30-a5ab-e7237d91e4fd" NotOnOrAfter="2018-10-22T16:59:06.581Z" Recipient="https://www.joint.signin.service.gov.uk:443/SAML2/SSO/EidasResponse/POST"/>
+    </saml2:SubjectConfirmation>
+  </saml2:Subject>
+  <saml2:Conditions NotBefore="2018-10-22T16:54:06.581Z" NotOnOrAfter="2018-10-22T16:59:06.581Z">
+    <saml2:AudienceRestriction>
+      <saml2:Audience>https://hub-connector-eidas-joint.cloudapps.digital/metadata.xml</saml2:Audience>
+    </saml2:AudienceRestriction>
+  </saml2:Conditions>
+  <saml2:AuthnStatement AuthnInstant="2018-10-22T16:54:06.581Z">
+    <saml2:AuthnContext>
+      <saml2:AuthnContextClassRef>http://eidas.europa.eu/LoA/substantial</saml2:AuthnContextClassRef>
+    </saml2:AuthnContext>
+  </saml2:AuthnStatement>
+  <saml2:AttributeStatement>
+    <saml2:Attribute FriendlyName="FirstName" Name="http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+      <saml2:AttributeValue xmlns:eidas-natural="http://eidas.europa.eu/attributes/naturalperson" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="eidas-natural:CurrentGivenNameType">Jack</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="FamilyName" Name="http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+      <saml2:AttributeValue xmlns:eidas-natural="http://eidas.europa.eu/attributes/naturalperson" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="eidas-natural:CurrentFamilyNameType">Griffin</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="DateOfBirth" Name="http://eidas.europa.eu/attributes/naturalperson/DateOfBirth" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+      <saml2:AttributeValue xmlns:eidas-natural="http://eidas.europa.eu/attributes/naturalperson" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="eidas-natural:DateOfBirthType">1983-06-21</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="PersonIdentifier" Name="http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+      <saml2:AttributeValue xmlns:eidas-natural="http://eidas.europa.eu/attributes/naturalperson" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="eidas-natural:PersonIdentifierType">8826379b-744e-4176-aaa2-7dfa480425bb</saml2:AttributeValue>
+    </saml2:Attribute>
+  </saml2:AttributeStatement>
+</saml2:Assertion>

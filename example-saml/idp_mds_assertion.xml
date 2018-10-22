@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="_8d497d26-7593-4399-a5ac-219c064d5f48" IssueInstant="2018-10-22T16:41:57.453Z" Version="2.0" xsi:type="saml2:AssertionType">
+  <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://stub_idp.acme.org/post-office-test-rp/SSO/POST</saml2:Issuer>
+  <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <ds:Reference URI="#_8d497d26-7593-4399-a5ac-219c064d5f48">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <ds:DigestValue>9r13FBWOBwU/auGbco1krXcxUHK6quzlACxnaZBcwJo=</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>
+Q+SOV0pItpI0OVdakOTyJ5jzJi+oLGVPpoVNv9Kf0bO/mh/ZRlOwMnhLqTNNgRjIl6jf1itRgfOg
+6Hr+Y+qiTqIHoicXS5C/a4ts4GrCz1W2b/F4FSc1NtPIxPay4Mof2q3eAn6IXKoUYpO1tuBBS1On
+ru1KU8/gQd2SxepyE63lnr2lGvvxK5YNIFydtP9rmMew1Fwfx5tjxW8p96bRFH0qO+hWMtt3RneP
+z8RGoK3pi4DjW/IqYPLeDQBXieKmxBwJR8FJkre9XtB+UXN6vgErBtSKZHtiGnp9XiSo4lYScDsW
+i4uPnZslrpSS3LcFxHWyr2mwHriK2LlnYjbm+w==
+</ds:SignatureValue>
+  </ds:Signature>
+  <saml2:Subject xsi:type="saml2:SubjectType">
+    <saml2:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">399666cb-215c-471d-8608-16db50db7f8a</saml2:NameID>
+    <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer" xsi:type="saml2:SubjectConfirmationType">
+      <saml2:SubjectConfirmationData InResponseTo="_f5390dcc-6866-4f32-8669-c9bffd396b93" NotOnOrAfter="2018-10-22T17:41:57.453Z" Recipient="https://signin.service.gov.uk" xsi:type="saml2:SubjectConfirmationDataType"/>
+    </saml2:SubjectConfirmation>
+  </saml2:Subject>
+  <saml2:AttributeStatement xsi:type="saml2:AttributeStatementType">
+    <saml2:Attribute FriendlyName="Firstname" Name="MDS_firstname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Language="en-GB" ida:Verified="true" xsi:type="ida:PersonNameType">Jack</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Middlename(s)" Name="MDS_middlename" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Language="en-GB" ida:Verified="true" xsi:type="ida:PersonNameType">Cornelius</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Surname" Name="MDS_surname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Language="en-GB" ida:Verified="true" xsi:type="ida:PersonNameType">Bauer</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Gender" Name="MDS_gender" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Verified="true" xsi:type="ida:GenderType">Male</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Date of Birth" Name="MDS_dateofbirth" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Verified="true" xsi:type="ida:DateType">1984-02-29</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Current Address" Name="MDS_currentaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:Verified="true" xsi:type="ida:AddressType">
+        <ida:Line>1 Two St</ida:Line>
+        <ida:PostCode>1A 2BC</ida:PostCode>
+      </saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="Previous Address" Name="MDS_previousaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xsi:type="saml2:AttributeType">
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:From="2007-09-27" ida:To="2007-09-28" ida:Verified="true" xsi:type="ida:AddressType">
+        <ida:Line>221b Baker St.</ida:Line>
+        <ida:PostCode>W4 1SH</ida:PostCode>
+      </saml2:AttributeValue>
+      <saml2:AttributeValue xmlns:ida="http://www.cabinetoffice.gov.uk/resource-library/ida/attributes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ida:From="2006-09-29" ida:To="2006-09-08" ida:Verified="false" xsi:type="ida:AddressType">
+        <ida:Line>1 Goose Lane</ida:Line>
+        <ida:PostCode>M1 2FG</ida:PostCode>
+      </saml2:AttributeValue>
+    </saml2:Attribute>
+  </saml2:AttributeStatement>
+</saml2:Assertion>
