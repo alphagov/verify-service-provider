@@ -6,7 +6,6 @@ import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
-//import uk.gov.ida.saml.core.
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -20,22 +19,13 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 
 public abstract class AssertionService {
-    protected final AssertionValidator assertionValidator;
 
-    protected SamlAssertionsSignatureValidator assertionsSignatureValidator;
+    final AssertionValidator assertionValidator;
 
-    protected  AssertionAttributeStatementValidator attributeStatementValidator;
+    final SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
+    private final AssertionAttributeStatementValidator attributeStatementValidator;
 
-    public AssertionService(AssertionValidator assertionValidator,
-                            SamlAssertionsSignatureValidator hubSignatureValidator
-                            ) {
-
-        this(hubSignatureValidator,assertionValidator);
-
-
-        this.attributeStatementValidator = new AssertionAttributeStatementValidator();
-    }
 
     public AssertionService(SamlAssertionsSignatureValidator assertionsSignatureValidator,
                             AssertionValidator assertionValidator)
