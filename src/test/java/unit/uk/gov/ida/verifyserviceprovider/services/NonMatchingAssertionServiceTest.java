@@ -20,6 +20,7 @@ import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 
+import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
@@ -78,6 +79,8 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private SamlAssertionsSignatureValidator hubSignatureValidator;
 
+    @Mock
+    private AssertionAttributeStatementValidator attributeStatementValidator;
 
     @Mock
     private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
@@ -93,12 +96,12 @@ public class NonMatchingAssertionServiceTest {
 
         assertionValidator = new AssertionValidator(instantValidator,subjectValidator,conditionsValidator);
 
-        nonMatchingAssertionService = new NonMatchingAssertionService(hubSignatureValidator,
-                assertionValidator
+        nonMatchingAssertionService = new NonMatchingAssertionService(
+                hubSignatureValidator,
+                subjectValidator,
+                attributeStatementValidator
         );
-        doNothing().when(assertionValidator.getInstantValidator()).validate(any(), any());
-        doNothing().when(assertionValidator.getSubjectValidator()).validate(any(), any());
-        doNothing().when(assertionValidator.getConditionsValidator()).validate(any(), any());
+        doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
 
         DateTimeFreezer.freezeTime();
@@ -198,7 +201,7 @@ public class NonMatchingAssertionServiceTest {
 
         nonMatchingAssertionService.validate(assertions,"requestId", LevelOfAssurance.LEVEL_1);
 
-        verify(assertionValidator.getSubjectValidator(), times(2)).validate(any(), any());
+        verify(subjectValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
     }
 

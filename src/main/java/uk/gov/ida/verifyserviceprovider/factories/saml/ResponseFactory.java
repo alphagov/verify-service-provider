@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.factories.saml;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
@@ -99,8 +100,8 @@ public class ResponseFactory {
         );
 
         return new MatchingAssertionService(
-            assertionsSignatureValidator,
-            assertionValidator
+            assertionValidator,
+            assertionsSignatureValidator
         );
     }
 
@@ -117,7 +118,14 @@ public class ResponseFactory {
                 new SubjectValidator(timeRestrictionValidator),
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
-        return new NonMatchingAssertionService(assertionsSignatureValidator, assertionValidator);
+        AssertionAttributeStatementValidator attributeStatementValidator = new AssertionAttributeStatementValidator();
+
+        return new NonMatchingAssertionService(
+                assertionsSignatureValidator,
+                new SubjectValidator(timeRestrictionValidator),
+                new AssertionAttributeStatementValidator()
+        );
+
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {

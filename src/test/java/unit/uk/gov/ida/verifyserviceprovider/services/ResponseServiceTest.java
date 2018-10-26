@@ -119,7 +119,7 @@ public class ResponseServiceTest {
         SubjectValidator subjectValidator = new SubjectValidator(timeRestrictionValidator);
         ConditionsValidator conditionsValidator = new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator());
         AssertionValidator assertionValidator = new AssertionValidator(instantValidator, subjectValidator, conditionsValidator);
-        MatchingAssertionService matchingAssertionService = new MatchingAssertionService(samlAssertionsSignatureValidator, assertionValidator);
+        MatchingAssertionService matchingAssertionService = new MatchingAssertionService(assertionValidator, samlAssertionsSignatureValidator);
 
         ExplicitKeySignatureTrustEngine signatureTrustEngine = new MetadataSignatureTrustEngineFactory().createSignatureTrustEngine(hubMetadataResolver);
 

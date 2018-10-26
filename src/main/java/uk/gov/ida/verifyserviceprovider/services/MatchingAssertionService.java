@@ -23,16 +23,17 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class MatchingAssertionService extends AssertionService                                                                                                                                                                                                  {
+public class MatchingAssertionService implements AssertionService {
 
 
-    public MatchingAssertionService(
-        SamlAssertionsSignatureValidator assertionsSignatureValidator,
-        AssertionValidator assertionValidator
-    ) {
-        super(assertionsSignatureValidator,assertionValidator);
+    private AssertionValidator assertionValidator;
+    private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
+    public MatchingAssertionService( AssertionValidator assertionValidator, SamlAssertionsSignatureValidator assertionsSignatureValidator ) {
+        this.assertionValidator = assertionValidator;
+        this.assertionsSignatureValidator = assertionsSignatureValidator;
     }
+
 
     public TranslatedResponseBody translateSuccessResponse(
             List<Assertion> assertions,
