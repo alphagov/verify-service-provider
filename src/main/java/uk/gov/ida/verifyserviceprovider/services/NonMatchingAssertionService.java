@@ -65,8 +65,8 @@ public class NonMatchingAssertionService implements AssertionService {
         Assertion authnAssertion = authnAssertions.get(0);
         Assertion mdsAssertion = mdsAssertions.get(0);
 
-        validateIdPAssertion(authnAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
-        validateIdPAssertion(mdsAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        validateIdpAssertion(authnAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        validateIdpAssertion(mdsAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
 
         if (!mdsAssertion.getIssuer().getValue().equals(authnAssertion.getIssuer().getValue())) {
@@ -78,7 +78,7 @@ public class NonMatchingAssertionService implements AssertionService {
         }
     }
 
-    public void validateIdPAssertion( Assertion assertion,
+    public void validateIdpAssertion( Assertion assertion,
                                       String expectedInResponseTo,
                                       QName role ) {
 

@@ -82,9 +82,6 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private AssertionAttributeStatementValidator attributeStatementValidator;
 
-    @Mock
-    private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
-
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -113,84 +110,84 @@ public class NonMatchingAssertionServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfIssueInstantMissingWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfIssueInstantMissingWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setIssueInstant(null);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion IssueInstant is missing.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfAssertionIdIsMissingWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfAssertionIdIsMissingWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setID(null);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion Id is missing or blank.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfAssertionIdIsBlankWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfAssertionIdIsBlankWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setID("");
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion Id is missing or blank.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfIssuerMissingWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfIssuerMissingWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setIssuer(null);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfIssuerValueMissingWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfIssuerValueMissingWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setIssuer(anIssuer().withIssuerId(null).build());
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfIssuerValueIsBlankWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfIssuerValueIsBlankWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setIssuer(anIssuer().withIssuerId("").build());
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
-    public void shouldThrowExceptionIfMissingAssertionVersionWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfMissingAssertionVersionWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setVersion(null);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion with id mds-assertion has missing Version.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
 
     @Test
-    public void shouldThrowExceptionIfAssertionVersionInvalidWhenValidatingIdPAssertion() {
+    public void shouldThrowExceptionIfAssertionVersionInvalidWhenValidatingIdpAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setVersion(SAMLVersion.VERSION_10);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion with id mds-assertion declared an illegal Version attribute value.");
-        nonMatchingAssertionService.validateIdPAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        nonMatchingAssertionService.validateIdpAssertion(assertion, "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
