@@ -1,0 +1,292 @@
+openapi: 3.0.0
+servers:
+  - url: /
+info:
+  description: This is a description of the API for the Verify Service Provider.
+  version: "2.0.0"
+  title: Verify Service Provider
+tags:
+  - name: Verify Service Provider API
+paths:
+  /generate-request:
+    post:
+      tags:
+        - Verify Service Provider API
+      description: Generate a SAML Authentication Request (AuthnRequest).
+      responses:
+        '200':
+          description:
+            Contains an object with a valid SAML Authentication request that can be consumed by the Verify service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestResponseBody'
+        '422':
+          description:
+            An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            errorMessage:
+              examples:
+                response:
+                  value:
+                    code: 422
+                    message: Some error message
+        '500':
+          description: An error due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            errorMessage:
+              examples:
+                response:
+                  value:
+                    code: 500
+                    message: Some error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestGenerationBody'
+        required: true
+  /translate-response:
+    post:
+      tags:
+        - Verify Service Provider API
+      description: Consumes a SAML Response received from the Verify service and returns JSON.
+      responses:
+        '200':
+          description: Contains the details of the SAML response, translated into JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslatedResponseBody'
+        '400':
+          description: An error due to a problem with translating the Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            errorMessage:
+              examples:
+                response:
+                  value:
+                    code: 400
+                    message: Some error message
+        '422':
+          description: An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            errorMessage:
+              examples:
+                response:
+                  value:
+                    code: 422
+                    message: Some error message
+        '500':
+          description: An error due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            errorMessage:
+              examples:
+                response:
+                  value:
+                    code: 500
+                    message: Some error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslateSamlResponseBody'
+        description: An object containing the SAML response returned by the Verify service.
+        required: true
+components:
+  schemas:
+    RequestGenerationBody:
+      type: object
+      properties:
+        levelOfAssurance:
+          $ref: '#/components/schemas/RequiredLevelOfAssurance'
+        entityId:
+          $ref: '#/components/schemas/EntityId'
+    RequestResponseBody:
+      type: object
+      required:
+        - samlRequest
+        - requestId
+        - ssoLocation
+      properties:
+        samlRequest:
+          description: SAML Authn Request as a base64 string.
+          type: string
+          format: byte
+        requestId:
+          description: A token that identifies the Authn Request. This is used later to verify that the Authn Request and SAML Response have passed through the same browser.
+          type: string
+          format: byte
+        ssoLocation:
+          description: The url for Verify Hub SSO. The entrypoint for SAML authentication flow.
+          type: string
+          format: url
+    TranslateSamlResponseBody:
+      type: object
+      required:
+        - samlResponse
+        - requestId
+        - levelOfAssurance
+      properties:
+        samlResponse:
+          description: A SAML Response as a base64 string.
+          type: string
+          format: byte
+        requestId:
+          description:  A token that was generated for the original SAML Authn Request. This is used to verify that the Authn Request and SAML Response have passed  through the same browser.
+          type: string
+          format: byte
+        levelOfAssurance:
+          $ref: '#/components/schemas/RequiredLevelOfAssurance'
+        entityId:
+          $ref: '#/components/schemas/EntityId'
+    TranslatedResponseBody:
+      type: object
+      required:
+        - scenario
+        - pid
+        - attributes
+      properties:
+        scenario:
+          $ref: '#/components/schemas/Scenario'
+        pid:
+          description: A unique identifier that can identify a user against an internal record.
+          type: string
+          format: byte
+        levelOfAssurance:
+          $ref: '#/components/schemas/ReceivedLevelOfAssurance'
+        attributes:
+            $ref: '#/components/schemas/Attributes'
+    RequiredLevelOfAssurance:
+      description: The minimum level of assurance required by the Relying Party Service.
+      type: string
+      enum:
+        - LEVEL_1
+        - LEVEL_2
+        - LEVEL_3
+        - LEVEL_4
+    EntityId:
+      description: The Entity Id for the service interacting with the Verify Service Provider. This is required if the Verify Service Provider is set up for multi-tenanted use, otherwise it is optional. The value, if provided, must be one of those listed in the configuration for the Verify Service Provider.
+      type: string
+    ReceivedLevelOfAssurance:
+      description: Level of assurance the user was authenticated with.
+      type: string
+      enum:
+        - LEVEL_1
+        - LEVEL_2
+        - LEVEL_3
+        - LEVEL_4
+    Scenario:
+      $ref: '#/components/schemas/Scenarios'
+    Attributes:
+      description: An object containing a pre-agreed subset of the attributes passed to the VSP from the chosen IDP via the hub.
+      type: object
+      properties:
+        firstName:
+          type: object
+          properties:
+            value:
+              $ref: '#/components/schemas/PersonalName'
+            verified:
+              type: boolean
+        middleNames:
+          type: object
+          properties:
+            value:
+              $ref: '#/components/schemas/PersonalName'
+            verified:
+              type: boolean
+        surnames:
+          type: object
+          properties:
+            value:
+              $ref: '#/components/schemas/PersonalName'
+            verified:
+              type: boolean
+        dateOfBirth:
+          type: object
+          properties:
+            value:
+              description: Format yyyy-MM-dd
+              type: string
+            verified:
+              type: boolean
+        gender:
+          type: string
+          enum:
+            - FEMALE
+            - MALE
+            - NOT_SPECIFIED
+        addresses:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                $ref: '#/components/schemas/Address'
+              verified:
+                type: boolean
+    Address:
+      description: An object describing the address fields of a user
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+        postCode:
+          type: string
+        internationalPostCode:
+          type: string
+        uprn:
+          type: string
+        fromDate:
+          description: Format yyyy-MM-dd
+          type: string
+        toDate:
+          description: Format yyyy-MM-dd
+          type: string
+    PersonalName:
+      description: An object describing a forename, middlename or surname
+      type: object
+      properties:
+        value:
+          type: string
+        nonLatinScriptValue:
+          type: string
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+    Scenarios:
+      enum:
+        - IDENTITY_VERIFIED
+        - CANCELLATION
+        - AUTHENTICATION_FAILED
+        - REQUEST_ERROR
+    ErrorMessage:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+        message:
+          type: string
