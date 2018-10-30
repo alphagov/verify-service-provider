@@ -2,10 +2,17 @@ package uk.gov.ida.verifyserviceprovider.services;
 
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import uk.gov.ida.saml.core.domain.AuthnContext;
+import uk.gov.ida.saml.core.domain.MatchingDataset;
+import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
+import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.domain.AssertionData;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -20,22 +27,26 @@ import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 
-public class NonMatchingAssertionService implements AssertionService {
+public class NonMatchingAssertionService implements AssertionService, AssertionDataTranslator {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final SubjectValidator subjectValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
+    private final AuthnContextFactory authnContextFactory;
+    private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
             SubjectValidator subjectValidator,
-            AssertionAttributeStatementValidator attributeStatementValidator ) {
-
-
+            AssertionAttributeStatementValidator attributeStatementValidator,
+            AuthnContextFactory authnContextFactory,
+            MatchingDatasetUnmarshaller matchingDatasetUnmarshaller
+    ) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
-
         this.attributeStatementValidator = attributeStatementValidator;
+        this.authnContextFactory = authnContextFactory;
+        this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
     }
 
     @Override
@@ -45,7 +56,7 @@ public class NonMatchingAssertionService implements AssertionService {
     }
 
 
-    public void validate( List<Assertion> assertions, String requestId, LevelOfAssurance expectedLevelOfAssurance ) {
+    public void validate(List<Assertion> assertions, String requestId, LevelOfAssurance expectedLevelOfAssurance ) {
 
         Map<AssertionClassifier.AssertionType, List<Assertion>> assertionMap = assertions.stream()
                 .collect(Collectors.groupingBy(AssertionClassifier::classifyAssertion));
@@ -112,5 +123,19 @@ public class NonMatchingAssertionService implements AssertionService {
     @Override
     public TranslatedResponseBody translateNonSuccessResponse( StatusCode statusCode ) {
         return null;
+    }
+
+    @Override
+    public AssertionData translate(List<Assertion> assertions ) {
+        Map<AssertionClassifier.AssertionType, List<Assertion>> assertionMap = assertions.stream()
+                .collect(Collectors.groupingBy(AssertionClassifier::classifyAssertion));
+
+        AuthnStatement authnStatement = assertionMap.get(AssertionClassifier.AssertionType.AUTHN_ASSERTION).get(0).getAuthnStatements().get(0);
+        String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
+        Assertion mdsAssertion = assertionMap.get(AssertionClassifier.AssertionType.MDS_ASSERTION).get(0);
+
+        return new AssertionData(mdsAssertion.getIssuer().getValue(),
+                authnContextFactory.authnContextForLevelOfAssurance(levelOfAssurance),
+                matchingDatasetUnmarshaller.fromAssertion(mdsAssertion));
     }
 }
