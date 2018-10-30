@@ -22,8 +22,6 @@ import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidation
 
 public class NonMatchingAssertionService implements AssertionService {
 
-    private enum AssertionType {AUTHN_ASSERTION, MDS_ASSERTION}
-
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final SubjectValidator subjectValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
@@ -49,15 +47,15 @@ public class NonMatchingAssertionService implements AssertionService {
 
     public void validate( List<Assertion> assertions, String requestId, LevelOfAssurance expectedLevelOfAssurance ) {
 
-        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
-                .collect(Collectors.groupingBy(this::classifyAssertion));
+        Map<AssertionClassifier.AssertionType, List<Assertion>> assertionMap = assertions.stream()
+                .collect(Collectors.groupingBy(AssertionClassifier::classifyAssertion));
 
-        List<Assertion> authnAssertions = assertionMap.get(AssertionType.AUTHN_ASSERTION);
+        List<Assertion> authnAssertions = assertionMap.get(AssertionClassifier.AssertionType.AUTHN_ASSERTION);
         if (authnAssertions == null || authnAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one authn statement is expected.");
         }
 
-        List<Assertion> mdsAssertions = assertionMap.get(AssertionType.MDS_ASSERTION);
+        List<Assertion> mdsAssertions = assertionMap.get(AssertionClassifier.AssertionType.MDS_ASSERTION);
         if (mdsAssertions == null || mdsAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one matching dataset assertion is expected.");
         }
@@ -105,14 +103,6 @@ public class NonMatchingAssertionService implements AssertionService {
         assertionsSignatureValidator.validate(singletonList(assertion), role);
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         attributeStatementValidator.validate(assertion);
-    }
-
-    private AssertionType classifyAssertion( Assertion assertion ) {
-        if (!assertion.getAuthnStatements().isEmpty()) {
-            return AssertionType.AUTHN_ASSERTION;
-        } else {
-            return AssertionType.MDS_ASSERTION;
-        }
     }
 
     private TranslatedResponseBody translateAssertions( List<Assertion> assertions ) {
