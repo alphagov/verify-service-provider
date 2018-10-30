@@ -24,6 +24,8 @@ project.ext {
     samlLibVersion = "$openSamlVersion-152"
     dropwizardVersion = '1.3.5'
     jaxbapiVersion = '2.2.9'
+    hub_saml="$openSamlVersion-15606"
+
 }
 
 dependencies {
@@ -36,7 +38,8 @@ dependencies {
         "uk.gov.ida:common-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-serializers:$samlLibVersion",
         "uk.gov.ida:saml-security:$samlLibVersion",
-        "uk.gov.ida:saml-extensions:$samlLibVersion"
+        "uk.gov.ida:saml-extensions:$samlLibVersion",
+        "uk.gov.ida:hub-saml:$hub_saml"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
@@ -48,6 +51,7 @@ dependencies {
         "uk.gov.ida:common-test-utils:2.0.0-44",
         "org.jsoup:jsoup:1.11.1",
         "javax.xml.bind:jaxb-api:$jaxbapiVersion",
+        "uk.gov.ida:hub-saml-test-utils:$hub_saml",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }

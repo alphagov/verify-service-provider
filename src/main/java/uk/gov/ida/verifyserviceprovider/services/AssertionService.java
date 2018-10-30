@@ -10,11 +10,12 @@ import java.util.List;
 public interface AssertionService {
 
     TranslatedResponseBody translateSuccessResponse(
-        List<Assertion> assertions,
-        String expectedInResponseTo,
-        LevelOfAssurance expectedLevelOfAssurance,
-        String entityId
+            List<Assertion> assertions,
+            String expectedInResponseTo,
+            LevelOfAssurance expectedLevelOfAssurance,
+            String entityId
     );
 
-    TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode);
+    TranslatedResponseBody translateNonSuccessResponse( StatusCode statusCode);
+
 }

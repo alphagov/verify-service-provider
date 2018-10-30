@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.factories.saml;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
@@ -51,41 +52,41 @@ public class ResponseFactory {
 
     public static StringToOpenSamlObjectTransformer<Response> createStringToResponseTransformer() {
         return new StringToOpenSamlObjectTransformer<>(
-            notNullSamlStringValidator,
-            base64StringDecoder,
-            responseSizeValidator,
-            responseOpenSamlXMLObjectUnmarshaller
+                notNullSamlStringValidator,
+                base64StringDecoder,
+                responseSizeValidator,
+                responseOpenSamlXMLObjectUnmarshaller
         );
     }
 
     public AssertionDecrypter createAssertionDecrypter() {
         List<Credential> decryptingCredentials = new IdaKeyStoreCredentialRetriever(createEncryptionKeyStore()).getDecryptingCredentials();
         return new AssertionDecrypter(
-            encryptionAlgorithmValidator,
-            decrypterFactory.createDecrypter(decryptingCredentials)
+                encryptionAlgorithmValidator,
+                decrypterFactory.createDecrypter(decryptingCredentials)
         );
     }
 
     public ResponseService createResponseService(
-        ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-        AssertionService assertionService,
-        DateTimeComparator dateTimeComparator
+            ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
+            AssertionService assertionService,
+            DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
         return new ResponseService(
-            createStringToResponseTransformer(),
-            assertionDecrypter,
-            assertionService,
-            new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-            new InstantValidator(dateTimeComparator)
+                createStringToResponseTransformer(),
+                assertionDecrypter,
+                assertionService,
+                new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
+                new InstantValidator(dateTimeComparator)
         );
     }
 
     public MatchingAssertionService createMatchingAssertionService(
-        ExplicitKeySignatureTrustEngine signatureTrustEngine,
-        DateTimeComparator dateTimeComparator
+            ExplicitKeySignatureTrustEngine signatureTrustEngine,
+            DateTimeComparator dateTimeComparator
     ) {
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
@@ -93,22 +94,34 @@ public class ResponseFactory {
 
         SamlAssertionsSignatureValidator assertionsSignatureValidator = new SamlAssertionsSignatureValidator(samlMessageSignatureValidator);
         AssertionValidator assertionValidator = new AssertionValidator(
-            new InstantValidator(dateTimeComparator),
-            new SubjectValidator(timeRestrictionValidator),
-            new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
+                new InstantValidator(dateTimeComparator),
+                new SubjectValidator(timeRestrictionValidator),
+                new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
         return new MatchingAssertionService(
-            assertionsSignatureValidator,
-            assertionValidator
+                assertionValidator,
+                assertionsSignatureValidator
         );
     }
 
-    public NonMatchingAssertionService createNonMatchingAssertionService() {
-        return new NonMatchingAssertionService();
+    public NonMatchingAssertionService createNonMatchingAssertionService( ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                                          DateTimeComparator dateTimeComparator ) {
+
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
+        SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
+
+
+        return new NonMatchingAssertionService(
+                new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
+                new SubjectValidator(timeRestrictionValidator),
+                new AssertionAttributeStatementValidator()
+        );
+
     }
 
-    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {
+    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
         return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
     }
 
