@@ -19,7 +19,6 @@ import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
-import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
@@ -29,10 +28,8 @@ import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 import uk.gov.ida.verifyserviceprovider.domain.AssertionData;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
-import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
-import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
-import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.Arrays;
@@ -40,7 +37,6 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -48,11 +44,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.ida.saml.core.domain.AuthnContext.LEVEL_2;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
-import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.aCycle3DatasetAssertion;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
@@ -72,13 +66,7 @@ public class NonMatchingAssertionServiceTest {
     private NonMatchingAssertionService nonMatchingAssertionService;
 
     @Mock
-    private InstantValidator instantValidator;
-
-    @Mock
     private SubjectValidator subjectValidator;
-
-    @Mock
-    private ConditionsValidator conditionsValidator;
 
     @Mock
     private SamlAssertionsSignatureValidator hubSignatureValidator;
@@ -91,6 +79,9 @@ public class NonMatchingAssertionServiceTest {
 
     @Mock
     private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
+
+    @Mock
+    private AssertionClassifier assertionClassifier;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -105,11 +96,12 @@ public class NonMatchingAssertionServiceTest {
                 subjectValidator,
                 attributeStatementValidator,
                 authnContextFactory,
-                verifyMatchingDatasetUnmarshaller
+                verifyMatchingDatasetUnmarshaller,
+                assertionClassifier
         );
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
-
+        when(assertionClassifier.classifyAssertion(any())).thenCallRealMethod();
         DateTimeFreezer.freezeTime();
     }
 

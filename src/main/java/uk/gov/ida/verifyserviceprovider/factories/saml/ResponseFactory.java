@@ -21,6 +21,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
@@ -121,8 +122,8 @@ public class ResponseFactory {
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
                 new AuthnContextFactory(),
-                new VerifyMatchingDatasetUnmarshaller(new AddressFactory())
-        );
+                new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
+                new AssertionClassifier());
 
     }
 
