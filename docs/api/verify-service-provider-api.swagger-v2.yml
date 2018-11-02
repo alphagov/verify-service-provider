@@ -196,7 +196,7 @@ components:
       description: An object containing a pre-agreed subset of the attributes passed to the VSP from the chosen IDP via the hub.
       type: object
       properties:
-        firstName:
+        firstNames:
           type: object
           properties:
             value:
