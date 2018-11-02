@@ -5,12 +5,10 @@ import uk.gov.ida.saml.core.domain.MatchingDataset;
 
 public class AssertionData {
 
-    private String matchingDatasetIssuer;
     private AuthnContext levelOfAssurance;
     private MatchingDataset matchingDataset;
 
-    public AssertionData(String matchingDatasetIssuer, AuthnContext levelOfAssurance, MatchingDataset matchingDataset) {
-        this.matchingDatasetIssuer = matchingDatasetIssuer;
+    public AssertionData(AuthnContext levelOfAssurance, MatchingDataset matchingDataset) {
         this.levelOfAssurance = levelOfAssurance;
         this.matchingDataset = matchingDataset;
     }
@@ -21,10 +19,6 @@ public class AssertionData {
 
     public AuthnContext getLevelOfAssurance() {
         return levelOfAssurance;
-    }
-
-    public String getMatchingDatasetIssuer() {
-        return matchingDatasetIssuer;
     }
 
 }

@@ -15,6 +15,8 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 
+import uk.gov.ida.saml.core.domain.AuthnContext;
+import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
@@ -37,6 +39,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -80,8 +83,6 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
 
-    @Mock
-    private AssertionClassifier assertionClassifier;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -97,11 +98,12 @@ public class NonMatchingAssertionServiceTest {
                 attributeStatementValidator,
                 authnContextFactory,
                 verifyMatchingDatasetUnmarshaller,
-                assertionClassifier
+                new AssertionClassifier()
         );
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
-        when(assertionClassifier.classifyAssertion(any())).thenCallRealMethod();
+
+
         DateTimeFreezer.freezeTime();
     }
 
@@ -209,7 +211,8 @@ public class NonMatchingAssertionServiceTest {
         Assertion mdsAssertion2 = aMatchingDatasetAssertion("requestId").buildUnencrypted();
         List<Assertion> assertions = Arrays.asList(mdsAssertion1, mdsAssertion2);
 
-        exception.expect(NullPointerException.class);
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("No authn assertion found.");
         nonMatchingAssertionService.translate(assertions);
     }
 
@@ -219,7 +222,8 @@ public class NonMatchingAssertionServiceTest {
         Assertion authnAssertion2 = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
         List<Assertion> assertions = Arrays.asList(authnAssertion1, authnAssertion2);
 
-        exception.expect(NullPointerException.class);
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("No matchingDataset assertion found");
         nonMatchingAssertionService.translate(assertions);
     }
 
@@ -229,9 +233,10 @@ public class NonMatchingAssertionServiceTest {
         Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
         List<Assertion> assertions = Arrays.asList(authnAssertion, mdsAssertion);
 
+        when(authnContextFactory.authnContextForLevelOfAssurance(IdaAuthnContext.LEVEL_2_AUTHN_CTX)).thenReturn(AuthnContext.LEVEL_2);
         AssertionData assertionData = nonMatchingAssertionService.translate(assertions);
 
-        verify(authnContextFactory, times(1)).authnContextForLevelOfAssurance(IdaAuthnContext.LEVEL_2_AUTHN_CTX);
+        assertThat(assertionData.getLevelOfAssurance()).isEqualTo(AuthnContext.LEVEL_2);
     }
 
     @Test
@@ -240,9 +245,11 @@ public class NonMatchingAssertionServiceTest {
         Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
         List<Assertion> assertions = Arrays.asList(authnAssertion, mdsAssertion);
 
+        MatchingDataset matchingDataset = mock(MatchingDataset.class);
+        when(verifyMatchingDatasetUnmarshaller.fromAssertion(any())).thenReturn(matchingDataset);
         AssertionData assertionData = nonMatchingAssertionService.translate(assertions);
 
-        verify(verifyMatchingDatasetUnmarshaller, times(1)).fromAssertion(mdsAssertion);
+        assertThat(assertionData.getMatchingDataset()).isEqualTo(matchingDataset);
     }
 
 
