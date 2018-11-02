@@ -231,6 +231,7 @@ components:
             - FEMALE
             - MALE
             - NOT_SPECIFIED
+            - OTHER
         addresses:
           type: array
           items:
