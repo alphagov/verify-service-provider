@@ -3,6 +3,9 @@ package uk.gov.ida.verifyserviceprovider.factories.saml;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.core.domain.AddressFactory;
+import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
+import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
@@ -18,6 +21,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
@@ -116,8 +120,10 @@ public class ResponseFactory {
         return new NonMatchingAssertionService(
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
                 new SubjectValidator(timeRestrictionValidator),
-                new AssertionAttributeStatementValidator()
-        );
+                new AssertionAttributeStatementValidator(),
+                new AuthnContextFactory(),
+                new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
+                new AssertionClassifier());
 
     }
 
