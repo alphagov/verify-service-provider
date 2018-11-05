@@ -158,13 +158,11 @@ components:
       type: object
       required:
         - scenario
-        - pid
-        - attributes
       properties:
         scenario:
           $ref: '#/components/schemas/Scenario'
         pid:
-          description: A unique identifier that can identify a user against an internal record.
+          description: A unique identifier that can identify a user against an internal record. Required if 'Scenario'=='IDENTITY_VERIFIED'
           type: string
           format: byte
         levelOfAssurance:
@@ -193,7 +191,7 @@ components:
     Scenario:
       $ref: '#/components/schemas/Scenarios'
     Attributes:
-      description: An object containing a pre-agreed subset of the attributes passed to the VSP from the chosen IDP via the hub.
+      description: An object containing a pre-agreed subset of the attributes passed to the VSP from the chosen IDP via the hub. Required if 'Scenario'=='IDENTITY_VERIFIED'
       type: object
       properties:
         firstNames:
