@@ -47,10 +47,11 @@ public class TranslateNonMatchingSamlResponseResource {
                 entityId
             );
 
-            LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
+            // TODO - Trello-uEQRKisw: Reinstate logging when convertTranslatedResponseBody returns an object
+            /*LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
                     entityId,
                     translateSamlResponseBody.getRequestId(),
-                    translatedResponseBody.getScenario()));
+                    translatedResponseBody.getScenario()));*/
 
             return Response.ok(translatedResponseBody).build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {

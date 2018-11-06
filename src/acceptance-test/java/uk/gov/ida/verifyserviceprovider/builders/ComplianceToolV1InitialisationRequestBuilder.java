@@ -11,7 +11,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVAT
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 
-public class ComplianceToolInitialisationRequestBuilder {
+public class ComplianceToolV1InitialisationRequestBuilder {
 
     private String serviceEntityId = "http://verify-service-provider";
     private String assertionConsumerServiceUrl = "http://verify-service-provider/response";
@@ -22,8 +22,8 @@ public class ComplianceToolInitialisationRequestBuilder {
     private String matchingServiceSigningPrivateKey = TEST_RP_MS_PRIVATE_SIGNING_KEY;
     private List<String> userAccountCreationAttributes = emptyList();
 
-    public static ComplianceToolInitialisationRequestBuilder aComplianceToolInitialisationRequest() {
-        return new ComplianceToolInitialisationRequestBuilder();
+    public static ComplianceToolV1InitialisationRequestBuilder aComplianceToolV1InitialisationRequest() {
+        return new ComplianceToolV1InitialisationRequestBuilder();
     }
 
     public Entity build() {
@@ -42,32 +42,32 @@ public class ComplianceToolInitialisationRequestBuilder {
         return Entity.json(map);
     }
 
-    public ComplianceToolInitialisationRequestBuilder withEntityId(String entityId) {
+    public ComplianceToolV1InitialisationRequestBuilder withEntityId(String entityId) {
         this.serviceEntityId = entityId;
         return this;
     }
 
-    public ComplianceToolInitialisationRequestBuilder withEncryptionCertificate(String encryptionCertificate) {
+    public ComplianceToolV1InitialisationRequestBuilder withEncryptionCertificate(String encryptionCertificate) {
         this.encryptionCertificate = encryptionCertificate;
         return this;
     }
 
-    public ComplianceToolInitialisationRequestBuilder withExpectedPid(String expectedPid) {
+    public ComplianceToolV1InitialisationRequestBuilder withExpectedPid(String expectedPid) {
         this.expectedPID = expectedPid;
         return this;
     }
 
-    public ComplianceToolInitialisationRequestBuilder withUserAccountCreationAttributes(List<String> userAccountCreationAttributes) {
+    public ComplianceToolV1InitialisationRequestBuilder withUserAccountCreationAttributes(List<String> userAccountCreationAttributes) {
         this.userAccountCreationAttributes = userAccountCreationAttributes;
         return this;
     }
 
-    public ComplianceToolInitialisationRequestBuilder withMatchingServiceSigningPrivateKey(String privateKey) {
+    public ComplianceToolV1InitialisationRequestBuilder withMatchingServiceSigningPrivateKey(String privateKey) {
         this.matchingServiceSigningPrivateKey = privateKey;
         return this;
     }
 
-    public ComplianceToolInitialisationRequestBuilder withMatchingServiceEntityId(String matchingServiceEntityId) {
+    public ComplianceToolV1InitialisationRequestBuilder withMatchingServiceEntityId(String matchingServiceEntityId) {
         this.matchingServiceEntityId = matchingServiceEntityId;
         return this;
     }
