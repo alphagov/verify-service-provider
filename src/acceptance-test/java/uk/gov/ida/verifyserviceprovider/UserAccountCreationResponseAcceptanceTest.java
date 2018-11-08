@@ -25,7 +25,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
-import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
@@ -137,7 +137,7 @@ public class UserAccountCreationResponseAcceptanceTest {
 
     private Response getResponse(LevelOfAssurance levelOfAssurance, String... attributes) {
         complianceTool.initialiseWith(
-            aComplianceToolInitialisationRequest()
+            aComplianceToolV1InitialisationRequest()
                 .withMatchingServiceSigningPrivateKey(TEST_RP_MS_PRIVATE_SIGNING_KEY)
                 .withMatchingServiceEntityId(MockMsaServer.MSA_ENTITY_ID)
                 .withEncryptionCertificate(TEST_RP_PUBLIC_ENCRYPTION_CERT)

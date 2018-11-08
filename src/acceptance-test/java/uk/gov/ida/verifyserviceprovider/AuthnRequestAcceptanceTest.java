@@ -22,7 +22,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
-import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 
 public class AuthnRequestAcceptanceTest {
 
@@ -155,7 +155,7 @@ public class AuthnRequestAcceptanceTest {
     }
 
     private void setupComplianceToolWithEntityId(Client client, String entityId) throws Exception {
-        Entity initializationRequest = aComplianceToolInitialisationRequest().withEntityId(entityId).build();
+        Entity initializationRequest = aComplianceToolV1InitialisationRequest().withEntityId(entityId).build();
 
         Response complianceToolResponse = client
             .target(URI.create(String.format("%s/%s", COMPLIANCE_TOOL_HOST, "service-test-data")))

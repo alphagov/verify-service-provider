@@ -14,7 +14,8 @@ import java.net.URI;
 import static javax.ws.rs.client.Entity.form;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolInitialisationRequestBuilder.aComplianceToolInitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
+import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV2InitialisationRequestBuilder.aComplianceToolV2InitialisationRequest;
 
 public class ComplianceToolService {
 
@@ -30,6 +31,10 @@ public class ComplianceToolService {
     public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID = 7;
     public static final int ACCOUNT_CREATION_LOA1_ID = 8;
     public static final int BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID = 9;
+    public static final int VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID = 10;
+    public static final int NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID = 11;
+    public static final int AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID = 13;
+    public static final int FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID = 14;
 
     private final Client client;
 
@@ -47,13 +52,30 @@ public class ComplianceToolService {
         assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());
     }
 
+    public void initialiseV2With(Entity initialisationRequest) {
+        Response complianceToolResponse = client
+                .target(URI.create(HOST + "/relying-party-service-test-run"))
+                .request()
+                .buildPost(initialisationRequest)
+                .invoke();
+
+        assertThat(complianceToolResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    }
+
     public void initialiseWithDefaults() {
         initialiseWithPid("default-expected-pid");
     }
 
+    public void initialiseWithDefaultsForV2() {
+        initialiseV2With(
+                aComplianceToolV2InitialisationRequest()
+                .build()
+        );
+    }
+
     public void initialiseWithPid(String pid) {
         initialiseWith(
-            aComplianceToolInitialisationRequest()
+            aComplianceToolV1InitialisationRequest()
                 .withExpectedPid(pid)
                 .build()
         );
@@ -61,7 +83,7 @@ public class ComplianceToolService {
 
     public void initialiseWithEntityIdAndPid(String entityId, String pid) {
         initialiseWith(
-            aComplianceToolInitialisationRequest()
+            aComplianceToolV1InitialisationRequest()
                 .withEntityId(entityId)
                 .withExpectedPid(pid)
                 .build()
@@ -117,4 +139,5 @@ public class ComplianceToolService {
             .getElementsByAttributeValue("name", "SAMLResponse");
         return responseElements.get(0).val();
     }
+
 }
