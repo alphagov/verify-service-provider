@@ -6,22 +6,31 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
-import org.junit.After;
+import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivateKey;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
-import static org.hamcrest.core.StringContains.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+
 
 public class VerifyServiceProviderConfigurationTest {
 
@@ -34,11 +43,6 @@ public class VerifyServiceProviderConfigurationTest {
         "dw."
     );
     private EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
-    @After
-    public void after() {
-        environmentHelper.cleanEnv();
-    }
 
     @Test
     public void shouldNotComplainWhenConfiguredCorrectly() throws Exception {
@@ -62,16 +66,74 @@ public class VerifyServiceProviderConfigurationTest {
             ),
             "verify-service-provider.yml"
         );
+        environmentHelper.cleanEnv();
     }
 
     @Test
+    public void shouldReturnHashingEntityIdWhenItIsDefined() {
+
+        VerifyServiceProviderConfiguration verifyServiceProviderConfiguration = aVerifyServiceProviderConfiguration(
+                Arrays.asList("http://some-service-entity-id","http://some-service-entity-id2"),
+                "provided-hashing-entity-id"
+        );
+
+        assertThat(verifyServiceProviderConfiguration.getHashingEntityId()).isEqualTo("provided-hashing-entity-id");
+    }
+
+
+    @Test
+    public void shouldUseServiceEntityIdForHashingWhenHashingEntityIdNotSpecified(){
+
+        VerifyServiceProviderConfiguration verifyServiceProviderConfiguration = aVerifyServiceProviderConfiguration(
+                Collections.singletonList("http://some-service-entity-id"),
+                null
+        );
+
+        assertThat(verifyServiceProviderConfiguration.getHashingEntityId()).isEqualTo("http://some-service-entity-id");
+    }
+
+    @Test
+    public void shouldReturnHashingEntityIdWhenOneServiceEntityIdIsProvided() {
+
+        VerifyServiceProviderConfiguration verifyServiceProviderConfiguration = aVerifyServiceProviderConfiguration(
+                Collections.singletonList("http://some-service-entity-id"),
+                "provided-hashing-entity-id"
+        );
+
+        assertThat(verifyServiceProviderConfiguration.getHashingEntityId()).isEqualTo("provided-hashing-entity-id");
+    }
+
+    @Test
+    public void shouldThrowNoHashingEntityIdIsProvidedErrorWhenMultipleServiceEntityIdsAreProvided() {
+
+        VerifyServiceProviderConfiguration verifyServiceProviderConfiguration = aVerifyServiceProviderConfiguration(
+                Arrays.asList("http://some-service-entity-id", "http://some-service-entity-id2"),
+                null
+        );
+
+        expectedException.expect(NoHashingEntityIdIsProvidedError.class);
+        expectedException.expectMessage("No HashingEntityId is provided");
+
+        verifyServiceProviderConfiguration.getHashingEntityId();
+    }
+
+    private VerifyServiceProviderConfiguration aVerifyServiceProviderConfiguration(List<String> serviceEntityIds, String hashingEntityId) {
+        return new VerifyServiceProviderConfiguration(
+                serviceEntityIds,
+                hashingEntityId,
+                mock(VerifyHubConfiguration.class),
+                mock(PrivateKey.class),
+                mock(PrivateKey.class),
+                mock(PrivateKey.class),
+                mock(MsaMetadataConfiguration.class),
+                new Duration(1000L)
+        );
+    }
+
+
+    @Test
     public void shouldNotAllowNullValues() throws Exception {
-        expectedException.expectMessage(containsString("server may not be null"));
-        expectedException.expectMessage(containsString("serviceEntityIds may not be null"));
-        expectedException.expectMessage(containsString("samlSigningKey may not be null"));
-        expectedException.expectMessage(containsString("samlPrimaryEncryptionKey may not be null"));
-        expectedException.expectMessage(containsString("verifyHubConfiguration may not be null"));
-        expectedException.expectMessage(containsString("msaMetadata may not be null"));
+        expectedException.expectMessage("server may not be null");
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }
