@@ -28,6 +28,7 @@ public class AuthnRequestAcceptanceTest {
 
     private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
     private static String SINGLE_ENTITY_ID = "http://default-entity-id";
+    private static String HASHING_ENTITY_ID = "http://default-entity-id";
     private static String MULTI_ENTITY_ID_1 = "http://service-entity-id-one";
     private static String MULTI_ENTITY_ID_2 = "http://service-entity-id-two";
 
@@ -39,6 +40,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", SINGLE_ENTITY_ID),
+        ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
         ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
@@ -52,6 +54,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2)),
+        ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
         ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)

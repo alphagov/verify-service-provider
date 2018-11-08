@@ -14,6 +14,7 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import javax.xml.namespace.QName;
@@ -25,6 +26,7 @@ import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 
+
 public class NonMatchingAssertionService implements AssertionService {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
@@ -33,6 +35,7 @@ public class NonMatchingAssertionService implements AssertionService {
     private final AuthnContextFactory authnContextFactory;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final AssertionClassifier assertionClassifierService;
+    private final UserIdHashFactory userIdHashFactory;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
@@ -40,13 +43,17 @@ public class NonMatchingAssertionService implements AssertionService {
             AssertionAttributeStatementValidator attributeStatementValidator,
             AuthnContextFactory authnContextFactory,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            AssertionClassifier assertionClassifierService) {
+            AssertionClassifier assertionClassifierService,
+            UserIdHashFactory userIdHashFactory) {
+
+
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
         this.attributeStatementValidator = attributeStatementValidator;
         this.authnContextFactory = authnContextFactory;
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
         this.assertionClassifierService = assertionClassifierService;
+        this.userIdHashFactory = userIdHashFactory;
     }
 
     @Override
