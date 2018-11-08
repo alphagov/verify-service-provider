@@ -198,46 +198,22 @@ public class NonMatchingAssertionServiceTest {
 
     @Test
     public void shouldNotThrowExceptionsWhenAssertionsAreValid() {
-        List<Assertion> assertions = asList(
-                aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted(),
-                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted());
+        Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
+        Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
 
-        nonMatchingAssertionService.validate(assertions,"requestId", LevelOfAssurance.LEVEL_1);
+        nonMatchingAssertionService.validate(authnAssertion, mdsAssertion,"requestId", LevelOfAssurance.LEVEL_1);
 
         verify(subjectValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
     }
 
     @Test
-    public void shouldThrowExceptionWhenNoAuthnAssertionProvided() {
-        Assertion mdsAssertion1 = aMatchingDatasetAssertion("requestId").buildUnencrypted();
-        Assertion mdsAssertion2 = aMatchingDatasetAssertion("requestId").buildUnencrypted();
-        List<Assertion> assertions = Arrays.asList(mdsAssertion1, mdsAssertion2);
-
-        exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("No authn assertion found.");
-        nonMatchingAssertionService.translate(assertions);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNoMatchingDatasetAssertionProvided() {
-        Assertion authnAssertion1 = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
-        Assertion authnAssertion2 = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
-        List<Assertion> assertions = Arrays.asList(authnAssertion1, authnAssertion2);
-
-        exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("No matchingDataset assertion found");
-        nonMatchingAssertionService.translate(assertions);
-    }
-
-    @Test
     public void shouldCorrectlyExtractLevelOfAssurance() {
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
         Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
-        List<Assertion> assertions = Arrays.asList(authnAssertion, mdsAssertion);
 
         when(authnContextFactory.authnContextForLevelOfAssurance(IdaAuthnContext.LEVEL_2_AUTHN_CTX)).thenReturn(AuthnContext.LEVEL_2);
-        AssertionData assertionData = nonMatchingAssertionService.translate(assertions);
+        AssertionData assertionData = nonMatchingAssertionService.translate(authnAssertion, mdsAssertion);
 
         assertThat(assertionData.getLevelOfAssurance()).isEqualTo(AuthnContext.LEVEL_2);
     }
@@ -246,11 +222,10 @@ public class NonMatchingAssertionServiceTest {
     public void shouldUseTheMatchingDatasetUnmarshallerToExtractMDS() {
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
         Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
-        List<Assertion> assertions = Arrays.asList(authnAssertion, mdsAssertion);
 
         MatchingDataset matchingDataset = mock(MatchingDataset.class);
         when(verifyMatchingDatasetUnmarshaller.fromAssertion(any())).thenReturn(matchingDataset);
-        AssertionData assertionData = nonMatchingAssertionService.translate(assertions);
+        AssertionData assertionData = nonMatchingAssertionService.translate(authnAssertion, mdsAssertion);
 
         assertThat(assertionData.getMatchingDataset()).isEqualTo(matchingDataset);
     }

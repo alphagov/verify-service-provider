@@ -18,6 +18,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import javax.xml.namespace.QName;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,29 +59,14 @@ public class NonMatchingAssertionService implements AssertionService {
 
     @Override
     public TranslatedResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        validate(assertions, expectedInResponseTo, expectedLevelOfAssurance);
+        Assertion authnAssertion = getAuthnAssertion(assertions);
+        Assertion mdsAssertion = getMatchingDatasetAssertion(assertions);
+        validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance);
         return null;
     }
 
 
-    public void validate(List<Assertion> assertions, String requestId, LevelOfAssurance expectedLevelOfAssurance) {
-
-        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
-                .collect(Collectors.groupingBy(assertionClassifierService::classifyAssertion));
-
-        List<Assertion> authnAssertions = assertionMap.get(AssertionType.AUTHN_ASSERTION);
-        if (authnAssertions == null || authnAssertions.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one authn statement is expected.");
-        }
-
-        List<Assertion> mdsAssertions = assertionMap.get(AssertionType.MDS_ASSERTION);
-        if (mdsAssertions == null || mdsAssertions.size() != 1) {
-            throw new SamlResponseValidationException("Exactly one matching dataset assertion is expected.");
-        }
-
-        Assertion authnAssertion = authnAssertions.get(0);
-        Assertion mdsAssertion = mdsAssertions.get(0);
-
+    public void validate(Assertion authnAssertion, Assertion mdsAssertion, String requestId, LevelOfAssurance expectedLevelOfAssurance) {
         validateIdpAssertion(authnAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         validateIdpAssertion(mdsAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
@@ -129,23 +115,52 @@ public class NonMatchingAssertionService implements AssertionService {
         return null;
     }
 
-    public AssertionData translate(List<Assertion> assertions) {
-        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
-                .collect(Collectors.groupingBy(assertionClassifierService::classifyAssertion));
-
-        List<Assertion> authnAssertions = assertionMap.get(AssertionType.AUTHN_ASSERTION);
-        List<Assertion> mdsAssertions = assertionMap.get(AssertionType.MDS_ASSERTION);
-
-        if (authnAssertions == null) throw new SamlResponseValidationException("No authn assertion found.");
-        if (mdsAssertions == null) throw new SamlResponseValidationException("No matchingDataset assertion found");
-
-        AuthnStatement authnStatement = authnAssertions.get(0).getAuthnStatements().get(0);
-        String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
-        Assertion mdsAssertion = mdsAssertions.get(0);
+    public AssertionData translate(Assertion authnAssertion, Assertion mdsAssertion) {
+        AuthnStatement authnStatement = authnAssertion.getAuthnStatements().get(0);
+        String levelOfAssurance = extractLevelOfAssuranceStringFrom(authnAssertion);
 
         return new AssertionData(
                 authnContextFactory.authnContextForLevelOfAssurance(levelOfAssurance),
                 matchingDatasetUnmarshaller.fromAssertion(mdsAssertion)
         );
+    }
+
+    private Assertion getAuthnAssertion(Collection<Assertion> assertions) {
+        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
+            .collect(Collectors.groupingBy(assertionClassifierService::classifyAssertion));
+
+        List<Assertion> authnAssertions = assertionMap.get(AssertionType.AUTHN_ASSERTION);
+        if (authnAssertions == null || authnAssertions.size() != 1) {
+            throw new SamlResponseValidationException("Exactly one authn statement is expected.");
+        }
+
+        return authnAssertions.get(0);
+    }
+
+    private Assertion getMatchingDatasetAssertion(Collection<Assertion> assertions) {
+        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
+            .collect(Collectors.groupingBy(assertionClassifierService::classifyAssertion));
+
+        List<Assertion> mdsAssertions = assertionMap.get(AssertionType.MDS_ASSERTION);
+        if (mdsAssertions == null || mdsAssertions.size() != 1) {
+            throw new SamlResponseValidationException("Exactly one matching dataset assertion is expected.");
+        }
+
+        return mdsAssertions.get(0);
+    }
+
+    private LevelOfAssurance extractLevelOfAssuranceFrom(Assertion authnAssertion) {
+        String levelOfAssuranceString = extractLevelOfAssuranceStringFrom(authnAssertion);
+
+        try {
+            return LevelOfAssurance.fromSamlValue(levelOfAssuranceString);
+        } catch (Exception ex) {
+            throw new SamlResponseValidationException(String.format("Level of assurance '%s' is not supported.", levelOfAssuranceString));
+        }
+    }
+
+    private String extractLevelOfAssuranceStringFrom(Assertion authnAssertion) {
+        AuthnStatement authnStatement = authnAssertion.getAuthnStatements().get(0);
+        return authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
     }
 }
