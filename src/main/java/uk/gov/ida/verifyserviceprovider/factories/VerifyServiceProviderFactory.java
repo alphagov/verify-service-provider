@@ -97,9 +97,9 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateSamlResponseResource getTranslateSamlResponseResource() {
+    public TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
         return new TranslateSamlResponseResource(
-            responseFactory.createResponseService(
+            responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
                 responseFactory.createMatchingAssertionService(getMsaSignatureTrustEngine(), dateTimeComparator),
                 dateTimeComparator
@@ -110,7 +110,7 @@ public class VerifyServiceProviderFactory {
 
     public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
         return new TranslateNonMatchingSamlResponseResource(
-                responseFactory.createResponseService(
+                responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         responseFactory.createNonMatchingAssertionService(
                                 getHubSignatureTrustEngine(),

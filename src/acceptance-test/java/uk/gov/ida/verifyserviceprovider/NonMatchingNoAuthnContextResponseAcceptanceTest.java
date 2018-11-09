@@ -5,8 +5,11 @@ import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -48,6 +51,7 @@ public class NonMatchingNoAuthnContextResponseAcceptanceTest {
         complianceTool.initialiseWithDefaultsForV2();
     }
 
+    @Ignore
     @Test
     public void shouldRespondWithSuccessWhenNoAuthnContext() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
@@ -63,9 +67,9 @@ public class NonMatchingNoAuthnContextResponseAcceptanceTest {
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+        TranslatedNonMatchingResponseBody responseContent = response.readEntity(TranslatedNonMatchingResponseBody.class);
 
-        // TODO - Trello-uEQRKisw: Add asserts when response contains a JSON object
-        /*assertThat(response.readEntity(TranslatedResponseBody.class).getScenario()).isEqualTo(Scenario.CANCELLATION);*/
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
     }
 }

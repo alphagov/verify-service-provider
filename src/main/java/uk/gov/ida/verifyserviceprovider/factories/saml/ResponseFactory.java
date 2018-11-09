@@ -21,6 +21,9 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
@@ -71,18 +74,35 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService createResponseService(
+    public ResponseService<TranslatedResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService assertionService,
+            AssertionService<TranslatedResponseBody> matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
-        return new ResponseService(
+        return new ResponseService<>(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
-                assertionService,
+                matchingAssertionService,
+                new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
+                new InstantValidator(dateTimeComparator)
+        );
+    }
+
+    public ResponseService<TranslatedNonMatchingResponseBody> createNonMatchingResponseService(
+            ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
+            AssertionService<TranslatedNonMatchingResponseBody> nonMatchingAssertionService,
+            DateTimeComparator dateTimeComparator
+    ) {
+        AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
+
+        return new ResponseService<>(
+                createStringToResponseTransformer(),
+                assertionDecrypter,
+                nonMatchingAssertionService,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator)
         );
@@ -125,7 +145,9 @@ public class ResponseFactory {
                 new AuthnContextFactory(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new UserIdHashFactory(hashingEntityId));
+                new UserIdHashFactory(hashingEntityId),
+                new MatchingDatasetToNonMatchingAttributesMapper()
+            );
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {

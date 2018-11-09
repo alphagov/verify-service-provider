@@ -27,7 +27,9 @@ import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 import uk.gov.ida.verifyserviceprovider.domain.AssertionData;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
@@ -101,8 +103,9 @@ public class NonMatchingAssertionServiceTest {
                 authnContextFactory,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                userIdHashFactory);
-
+                userIdHashFactory,
+                new MatchingDatasetToNonMatchingAttributesMapper()
+        );
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
 
@@ -210,24 +213,11 @@ public class NonMatchingAssertionServiceTest {
     @Test
     public void shouldCorrectlyExtractLevelOfAssurance() {
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
-        Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
 
         when(authnContextFactory.authnContextForLevelOfAssurance(IdaAuthnContext.LEVEL_2_AUTHN_CTX)).thenReturn(AuthnContext.LEVEL_2);
-        AssertionData assertionData = nonMatchingAssertionService.translate(authnAssertion, mdsAssertion);
+        LevelOfAssurance loa = nonMatchingAssertionService.extractLevelOfAssuranceFrom(authnAssertion);
 
-        assertThat(assertionData.getLevelOfAssurance()).isEqualTo(AuthnContext.LEVEL_2);
-    }
-
-    @Test
-    public void shouldUseTheMatchingDatasetUnmarshallerToExtractMDS() {
-        Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
-        Assertion mdsAssertion = aMatchingDatasetAssertion("requestId").buildUnencrypted();
-
-        MatchingDataset matchingDataset = mock(MatchingDataset.class);
-        when(verifyMatchingDatasetUnmarshaller.fromAssertion(any())).thenReturn(matchingDataset);
-        AssertionData assertionData = nonMatchingAssertionService.translate(authnAssertion, mdsAssertion);
-
-        assertThat(assertionData.getMatchingDataset()).isEqualTo(matchingDataset);
+        assertThat(loa).isEqualTo(LevelOfAssurance.LEVEL_2);
     }
 
 

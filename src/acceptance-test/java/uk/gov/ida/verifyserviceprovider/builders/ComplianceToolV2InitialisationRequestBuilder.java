@@ -1,10 +1,12 @@
 package uk.gov.ida.verifyserviceprovider.builders;
 
+import uk.gov.ida.verifyserviceprovider.domain.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.domain.V2MatchingDataset;
 
 import javax.ws.rs.client.Entity;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -18,14 +20,13 @@ public class ComplianceToolV2InitialisationRequestBuilder {
     private String assertionConsumerServiceUrl = "http://verify-service-provider/response";
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
-    private String expectedPID = "default-expected-pid";
     private V2MatchingDataset matchingDataset = new V2MatchingDataset(
             new MatchingAttribute("Bob", true, LocalDateTime.now().minusDays(30), LocalDateTime.now()),
             null,
             singletonList(new MatchingAttribute("Smith", true, LocalDateTime.now().minusDays(30), LocalDateTime.now())),
             new MatchingAttribute("NOT_SPECIFIED", true, LocalDateTime.now().minusDays(30), LocalDateTime.now()),
             null,
-            singletonList(new MatchingAttribute("123 Road Street", true, LocalDateTime.now().minusDays(30), LocalDateTime.now())),
+            singletonList(new MatchingAddress(true, LocalDateTime.now().minusDays(30), LocalDateTime.now(), "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
             UUID.randomUUID().toString()
     );
 
@@ -41,9 +42,20 @@ public class ComplianceToolV2InitialisationRequestBuilder {
         map.put("signingCertificate", signingCertificate);
         map.put("encryptionCertificate", encryptionCertificate);
         map.put("matchingDatasetJson", matchingDataset);
-        map.put("expectedPID", expectedPID);
-        map.put("useSimpleProfile", false);
 
         return Entity.json(map);
+    }
+
+    public ComplianceToolV2InitialisationRequestBuilder withExpectedPid(String expectedPid) {
+        this.matchingDataset.setPersisentId(expectedPid);
+        return this;
+    }
+
+    /**
+     * Note: this will override the expectedPid.
+     */
+    public ComplianceToolV2InitialisationRequestBuilder withMatchingDataSet(V2MatchingDataset matchingDataset) {
+        this.matchingDataset = matchingDataset;
+        return this;
     }
 }
