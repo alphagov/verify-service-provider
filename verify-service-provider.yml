@@ -29,6 +29,8 @@ serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
 # To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
 # '["service-one-entity-id", "service-two-entity-id"]'
 
+hashingEntityId: ${HASHING_ENTITY_ID:-}
+
 # Verify Hub Environment. This tells the service provider where the Verify Hub
 # authentication flow begins and where to find the hub metadata the Verify Service
 # Provider consumes to identify the hub.

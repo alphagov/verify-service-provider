@@ -17,6 +17,7 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
             ConfigOverride.config("serviceEntityIds", serviceEntityIdOverride),
+            ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
             ConfigOverride.config("server.connector.port", String.valueOf(0)),
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),

@@ -1,9 +1,11 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import org.joda.time.Duration;
+import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -15,47 +17,48 @@ import java.util.List;
 public class VerifyServiceProviderConfiguration extends Configuration {
 
     public static final String NOT_EMPTY_MESSAGE = "may not be empty";
-
-    @JsonProperty
-    @NotNull
-    @Size(min = 1, message = NOT_EMPTY_MESSAGE)
-    @Valid
     private List<String> serviceEntityIds;
-
-    @JsonProperty
-    @NotNull
-    @Valid
+    private String hashingEntityId;
     private VerifyHubConfiguration verifyHubConfiguration;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSigningKey;
-
-    @JsonProperty
-    @NotNull
-    @Valid
-    @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlPrimaryEncryptionKey;
-
-    @JsonProperty
-    @Valid
-    @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlSecondaryEncryptionKey;
-
-    @JsonProperty
-    @NotNull
-    @Valid
     private MsaMetadataConfiguration msaMetadata;
-
-    @JsonProperty
-    @NotNull
-    @Valid
     private Duration clockSkew;
+
+    @JsonCreator
+    public VerifyServiceProviderConfiguration(
+        @JsonProperty("serviceEntityIds") @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid List<String> serviceEntityIds,
+        @JsonProperty("hashingEntityId") @Valid String hashingEntityId,
+        @JsonProperty("verifyHubConfiguration") @NotNull @Valid VerifyHubConfiguration verifyHubConfiguration,
+        @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
+        @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
+        @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
+        @JsonProperty("msaMetadata") @NotNull @Valid MsaMetadataConfiguration msaMetadata,
+        @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew
+    ) {
+        this.serviceEntityIds = serviceEntityIds;
+        this.hashingEntityId = hashingEntityId;
+        this.verifyHubConfiguration = verifyHubConfiguration;
+        this.samlSigningKey = samlSigningKey;
+        this.samlPrimaryEncryptionKey = samlPrimaryEncryptionKey;
+        this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
+        this.msaMetadata = msaMetadata;
+        this.clockSkew = clockSkew;
+    }
 
     public List<String> getServiceEntityIds() {
         return serviceEntityIds;
+    }
+
+    public String getHashingEntityId() {
+        if(hashingEntityId != null) {
+            return hashingEntityId;
+        }
+        if (getServiceEntityIds().size() == 1) {
+            return getServiceEntityIds().get(0);
+        }
+        throw new NoHashingEntityIdIsProvidedError("No HashingEntityId is provided");
     }
 
     public URI getHubSsoLocation() {

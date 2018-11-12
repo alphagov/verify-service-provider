@@ -14,7 +14,6 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
@@ -22,7 +21,6 @@ import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
-
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
@@ -32,14 +30,15 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Lists.emptyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -83,6 +82,9 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
 
+    @Mock
+    private UserIdHashFactory userIdHashFactory;
+
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -98,8 +100,9 @@ public class NonMatchingAssertionServiceTest {
                 attributeStatementValidator,
                 authnContextFactory,
                 verifyMatchingDatasetUnmarshaller,
-                new AssertionClassifier()
-        );
+                new AssertionClassifier(),
+                userIdHashFactory);
+
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
 

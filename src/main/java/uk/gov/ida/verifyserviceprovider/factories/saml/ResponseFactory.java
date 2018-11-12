@@ -110,7 +110,8 @@ public class ResponseFactory {
     }
 
     public NonMatchingAssertionService createNonMatchingAssertionService( ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                                          DateTimeComparator dateTimeComparator ) {
+                                                                          DateTimeComparator dateTimeComparator,
+                                                                          String hashingEntityId) {
 
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
@@ -123,8 +124,8 @@ public class ResponseFactory {
                 new AssertionAttributeStatementValidator(),
                 new AuthnContextFactory(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
-                new AssertionClassifier());
-
+                new AssertionClassifier(),
+                new UserIdHashFactory(hashingEntityId));
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
