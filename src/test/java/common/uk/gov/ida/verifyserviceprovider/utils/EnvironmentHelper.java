@@ -27,6 +27,10 @@ public class EnvironmentHelper {
         }
     }
 
+    public void put(String key, String value) throws NoSuchFieldException, IllegalAccessException {
+        getWritableEnvironmentMap().put(key, value);
+    }
+
     private static Map<String, String> getWritableEnvironmentMap() throws NoSuchFieldException, IllegalAccessException {
         Map<String, String> env = System.getenv();
         Class<?> cl = env.getClass();

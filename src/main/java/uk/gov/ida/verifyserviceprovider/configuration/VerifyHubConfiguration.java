@@ -18,13 +18,8 @@ public class VerifyHubConfiguration {
         @JsonProperty("ssoLocation") URI hubSsoLocation,
         @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
     ) {
-        this.hubSsoLocation = ofNullable(hubSsoLocation).orElse(hubEnvironment.getSsoLocation());
-        this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElse(createHubMetadataConfigurationWithDefaults());
-        this.hubMetadataConfiguration.setEnvironment(hubEnvironment);
-    }
-
-    private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
-        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null);
+        this.hubSsoLocation = ofNullable(hubSsoLocation).orElseGet(() -> hubEnvironment.getSsoLocation());
+        this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElseGet(() -> hubEnvironment.getMetadataConfiguration());
     }
 
     public URI getHubSsoLocation() {

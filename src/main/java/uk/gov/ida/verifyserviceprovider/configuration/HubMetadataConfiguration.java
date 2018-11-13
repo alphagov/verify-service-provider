@@ -25,7 +25,6 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 
 public class HubMetadataConfiguration extends MetadataConfiguration {
 
-    private HubEnvironment environment;
     private final TrustStoreConfiguration trustStoreConfiguration;
 
     @JsonCreator
@@ -43,51 +42,12 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
         this.trustStoreConfiguration = trustStoreConfiguration;
     }
 
-    public void setEnvironment(HubEnvironment environment) {
-        this.environment = environment;
-    }
-
-    @Override
-    public URI getUri() {
-        return ofNullable(super.getUri()).orElse(environment.getMetadataUri());
-    }
-
-    @Override
-    public String getExpectedEntityId() {
-        return ofNullable(super.getExpectedEntityId()).orElseGet(() -> generateExpectedEntityId(environment));
+    public HubMetadataConfiguration(URI uri, String expectedEntityId, TrustStoreConfiguration trustStoreConfiguration) {
+        this(uri, null, null, expectedEntityId, null, null, null, trustStoreConfiguration);
     }
 
     @Override
     public KeyStore getTrustStore() {
-        return validateTruststore(ofNullable(trustStoreConfiguration)
-                .orElseGet(() -> new DefaultHubTrustStoreConfiguration(environment)).getTrustStore());
-    }
-
-    private static String generateExpectedEntityId(HubEnvironment hubEnvironment) {
-        String expectedEntityId;
-        switch (hubEnvironment) {
-            case PRODUCTION:
-            case INTEGRATION:
-            case COMPLIANCE_TOOL:
-                expectedEntityId = "https://signin.service.gov.uk";
-                break;
-            default:
-                throw new RuntimeException("No entity ID configured for Hub Environment: " + hubEnvironment.name());
-        }
-
-        return expectedEntityId;
-    }
-
-    private KeyStore validateTruststore(KeyStore trustStore) {
-        int trustStoreSize;
-        try {
-            trustStoreSize = trustStore.size();
-        } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
-        }
-        if (trustStoreSize == 0) {
-            throw new EmptyTrustStoreException();
-        }
-        return trustStore;
+        return trustStoreConfiguration.getTrustStore();
     }
 }
