@@ -142,10 +142,8 @@ public class ResponseFactory {
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
-                new AuthnContextFactory(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new UserIdHashFactory(hashingEntityId),
                 new MatchingDatasetToNonMatchingAttributesMapper()
             );
     }

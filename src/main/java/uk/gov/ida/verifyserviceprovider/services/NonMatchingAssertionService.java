@@ -5,11 +5,11 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.domain.AssertionData;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
@@ -35,29 +35,23 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final SubjectValidator subjectValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
-    private final AuthnContextFactory authnContextFactory;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final AssertionClassifier assertionClassifierService;
-    private final UserIdHashFactory userIdHashFactory;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
             SubjectValidator subjectValidator,
             AssertionAttributeStatementValidator attributeStatementValidator,
-            AuthnContextFactory authnContextFactory,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
-            UserIdHashFactory userIdHashFactory,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper
     ) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
         this.attributeStatementValidator = attributeStatementValidator;
-        this.authnContextFactory = authnContextFactory;
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
         this.assertionClassifierService = assertionClassifierService;
-        this.userIdHashFactory = userIdHashFactory;
         this.mdsMapper = mdsMapper;
     }
 
@@ -71,7 +65,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
 
         String nameID = mdsAssertion.getSubject().getNameID().getValue();
         LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(authnAssertion);
-        NonMatchingAttributes attributes = translateAttributes(authnAssertion, mdsAssertion);
+        NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
     }
@@ -127,15 +121,10 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     }
 
 
-    public NonMatchingAttributes translateAttributes(Assertion authnAssertion, Assertion mdsAssertion) {
-        String levelOfAssurance = extractLevelOfAssuranceStringFrom(authnAssertion);
+    public NonMatchingAttributes translateAttributes(Assertion mdsAssertion) {
+        MatchingDataset matchingDataset = matchingDatasetUnmarshaller.fromAssertion(mdsAssertion);
 
-        AssertionData assertionData = new AssertionData(
-                authnContextFactory.authnContextForLevelOfAssurance(levelOfAssurance),
-                matchingDatasetUnmarshaller.fromAssertion(mdsAssertion)
-        );
-
-        return mdsMapper.mapToNonMatchingAttributes(assertionData.getMatchingDataset());
+        return mdsMapper.mapToNonMatchingAttributes(matchingDataset);
     }
 
 
