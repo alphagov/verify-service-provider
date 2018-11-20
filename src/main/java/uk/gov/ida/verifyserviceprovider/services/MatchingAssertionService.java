@@ -23,7 +23,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class MatchingAssertionService implements AssertionService {
+public class MatchingAssertionService implements AssertionService<TranslatedResponseBody> {
 
 
     private AssertionValidator assertionValidator;
@@ -35,6 +35,7 @@ public class MatchingAssertionService implements AssertionService {
     }
 
 
+    @Override
     public TranslatedResponseBody translateSuccessResponse(
             List<Assertion> assertions,
             String expectedInResponseTo,
@@ -68,6 +69,7 @@ public class MatchingAssertionService implements AssertionService {
 
     }
 
+    @Override
     public TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
                 .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));

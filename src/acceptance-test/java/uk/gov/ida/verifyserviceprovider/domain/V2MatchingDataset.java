@@ -16,7 +16,7 @@ public class V2MatchingDataset {
     @JsonProperty
     private MatchingAttribute dateOfBirth;
     @JsonProperty
-    private List<MatchingAttribute> addresses;
+    private List<MatchingAddress> addresses;
     @JsonProperty
     private String persistentId;
 
@@ -25,7 +25,7 @@ public class V2MatchingDataset {
                              List<MatchingAttribute> surnames,
                              MatchingAttribute gender,
                              MatchingAttribute dateOfBirth,
-                             List<MatchingAttribute> addresses,
+                             List<MatchingAddress> addresses,
                              String persistentId) {
         this.firstName = firstName;
         this.middleNames = middleNames;
@@ -34,5 +34,9 @@ public class V2MatchingDataset {
         this.dateOfBirth = dateOfBirth;
         this.addresses = addresses;
         this.persistentId = persistentId;
+    }
+
+    public void setPersisentId(String persisentId) {
+        this.persistentId = persisentId;
     }
 }

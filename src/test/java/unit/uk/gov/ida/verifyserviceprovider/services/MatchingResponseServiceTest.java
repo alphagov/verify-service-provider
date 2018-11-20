@@ -36,7 +36,9 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
+import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -84,11 +86,11 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.NO_MATCH;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.REQUEST_ERROR;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class ResponseServiceTest {
+public class MatchingResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
-    private ResponseService responseService;
+    private ResponseService<TranslatedResponseBody> responseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
 
@@ -123,7 +125,7 @@ public class ResponseServiceTest {
 
         ExplicitKeySignatureTrustEngine signatureTrustEngine = new MetadataSignatureTrustEngineFactory().createSignatureTrustEngine(hubMetadataResolver);
 
-        responseService = responseFactory.createResponseService(
+        responseService = responseFactory.createMatchingResponseService(
             signatureTrustEngine,
             matchingAssertionService,
             dateTimeComparator

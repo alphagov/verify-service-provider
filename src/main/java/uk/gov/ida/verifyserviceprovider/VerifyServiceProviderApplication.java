@@ -66,7 +66,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
-        environment.jersey().register(factory.getTranslateSamlResponseResource());
+        environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
         environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
 
 

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import uk.gov.ida.verifyserviceprovider.domain.V2MatchingDataset;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -77,6 +78,22 @@ public class ComplianceToolService {
         initialiseWith(
             aComplianceToolV1InitialisationRequest()
                 .withExpectedPid(pid)
+                .build()
+        );
+    }
+
+    public void initialiseWithPidForV2(String expectedPid) {
+        initialiseV2With(
+            aComplianceToolV2InitialisationRequest()
+                .withExpectedPid(expectedPid)
+                .build()
+        );
+    }
+
+    public void initialiseWithMatchingDatasetForV2(V2MatchingDataset matchingDataset) {
+        initialiseV2With(
+            aComplianceToolV2InitialisationRequest()
+                .withMatchingDataSet(matchingDataset)
                 .build()
         );
     }

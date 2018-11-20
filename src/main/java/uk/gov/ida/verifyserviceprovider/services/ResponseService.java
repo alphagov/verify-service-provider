@@ -9,24 +9,23 @@ import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import java.util.List;
 
-public class ResponseService {
+public class ResponseService<T> {
 
     private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
-    private final AssertionService assertionService;
+    private final AssertionService<T> assertionService;
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
 
     public ResponseService(
         StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
         AssertionDecrypter assertionDecrypter,
-        AssertionService assertionService,
+        AssertionService<T> assertionService,
         SamlResponseSignatureValidator responseSignatureValidator,
         InstantValidator instantValidator
     ) {
@@ -37,7 +36,7 @@ public class ResponseService {
         this.instantValidator = instantValidator;
     }
 
-    public TranslatedResponseBody convertTranslatedResponseBody(
+    public T convertTranslatedResponseBody(
         String decodedSamlResponse,
         String expectedInResponseTo,
         LevelOfAssurance expectedLevelOfAssurance,
@@ -67,6 +66,5 @@ public class ResponseService {
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
         }
     }
-
 
 }

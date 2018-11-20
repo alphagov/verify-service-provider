@@ -3,8 +3,8 @@ package uk.gov.ida.verifyserviceprovider.resources;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
@@ -26,12 +26,12 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TranslateNonMatchingSamlResponseResource {
 
-    private final ResponseService responseService;
+    private final ResponseService<TranslatedNonMatchingResponseBody> responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateNonMatchingSamlResponseResource.class);
     private final EntityIdService entityIdService;
 
 
-    public TranslateNonMatchingSamlResponseResource(ResponseService responseService, EntityIdService entityIdService) {
+    public TranslateNonMatchingSamlResponseResource(ResponseService<TranslatedNonMatchingResponseBody> responseService, EntityIdService entityIdService) {
         this.responseService = responseService;
         this.entityIdService = entityIdService;
     }
@@ -40,18 +40,17 @@ public class TranslateNonMatchingSamlResponseResource {
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         String entityId = entityIdService.getEntityId(translateSamlResponseBody);
         try {
-            TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
+            TranslatedNonMatchingResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),
                 translateSamlResponseBody.getRequestId(),
                 translateSamlResponseBody.getLevelOfAssurance(),
                 entityId
             );
 
-            // TODO - Trello-uEQRKisw: Reinstate logging when convertTranslatedResponseBody returns an object
-            /*LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
+            LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
                     entityId,
                     translateSamlResponseBody.getRequestId(),
-                    translatedResponseBody.getScenario()));*/
+                    translatedResponseBody.getScenario()));
 
             return Response.ok(translatedResponseBody).build();
         } catch (SamlResponseValidationException | SamlTransformationErrorException e) {

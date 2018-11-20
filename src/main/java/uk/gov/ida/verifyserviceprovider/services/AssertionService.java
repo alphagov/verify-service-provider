@@ -7,15 +7,15 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
 import java.util.List;
 
-public interface AssertionService {
+public interface AssertionService<T> {
 
-    TranslatedResponseBody translateSuccessResponse(
+    T translateSuccessResponse(
             List<Assertion> assertions,
             String expectedInResponseTo,
             LevelOfAssurance expectedLevelOfAssurance,
             String entityId
     );
 
-    TranslatedResponseBody translateNonSuccessResponse( StatusCode statusCode);
+    T translateNonSuccessResponse( StatusCode statusCode);
 
 }

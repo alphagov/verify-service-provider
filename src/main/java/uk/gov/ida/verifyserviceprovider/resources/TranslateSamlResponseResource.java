@@ -26,12 +26,12 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TranslateSamlResponseResource {
 
-    private final ResponseService responseService;
+    private final ResponseService<TranslatedResponseBody> responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
     private final EntityIdService entityIdService;
 
 
-    public TranslateSamlResponseResource(ResponseService responseService, EntityIdService entityIdService) {
+    public TranslateSamlResponseResource(ResponseService<TranslatedResponseBody> responseService, EntityIdService entityIdService) {
         this.responseService = responseService;
         this.entityIdService = entityIdService;
     }
