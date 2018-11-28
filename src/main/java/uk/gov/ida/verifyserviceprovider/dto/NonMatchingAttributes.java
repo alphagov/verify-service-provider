@@ -1,33 +1,36 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections.CollectionUtils;
 import uk.gov.ida.saml.core.domain.Gender;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NonMatchingAttributes {
 
-    private final Optional<NonMatchingVerifiableAttribute<String>> firstName;
+    @JsonProperty("firstName")
+    private final NonMatchingVerifiableAttribute<String> firstName;
+    @JsonProperty("middleNames")
     private final List<NonMatchingVerifiableAttribute<String>> middleNames;
+    @JsonProperty("surnames")
     private final List<NonMatchingVerifiableAttribute<String>> surnames;
-    private final Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth;
-    private final Optional<Gender> gender;
+    @JsonProperty("dateOfBirth")
+    private final NonMatchingVerifiableAttribute<LocalDate> dateOfBirth;
+    @JsonProperty("gender")
+    private final Gender gender;
+    @JsonProperty("addresses")
     private final List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses;
 
-    @JsonCreator
+
     public NonMatchingAttributes(
-            @JsonProperty("firstName") Optional<NonMatchingVerifiableAttribute<String>> firstName,
-            @JsonProperty("middleNames") List<NonMatchingVerifiableAttribute<String>> middleNames,
-            @JsonProperty("surnames") List<NonMatchingVerifiableAttribute<String>> surnames,
-            @JsonProperty("dateOfBirth") Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth,
-            @JsonProperty("gender") Optional<Gender> gender,
-            @JsonProperty("address") List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses
+            NonMatchingVerifiableAttribute<String> firstName,
+            List<NonMatchingVerifiableAttribute<String>> middleNames,
+            List<NonMatchingVerifiableAttribute<String>> surnames,
+            NonMatchingVerifiableAttribute<LocalDate> dateOfBirth,
+            Gender gender,
+            List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses
     ) {
         this.firstName = firstName;
         this.middleNames = middleNames;
@@ -37,7 +40,7 @@ public class NonMatchingAttributes {
         this.addresses = addresses;
     }
 
-    public Optional<NonMatchingVerifiableAttribute<String>> getFirstName() {
+    public NonMatchingVerifiableAttribute<String> getFirstName() {
         return firstName;
     }
 
@@ -49,11 +52,11 @@ public class NonMatchingAttributes {
         return surnames;
     }
 
-    public Optional<NonMatchingVerifiableAttribute<LocalDate>> getDateOfBirth() {
+    public NonMatchingVerifiableAttribute<LocalDate> getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public Optional<Gender> getGender() {
+    public Gender getGender() {
         return gender;
     }
 

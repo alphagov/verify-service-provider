@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class V2MatchingDataset {

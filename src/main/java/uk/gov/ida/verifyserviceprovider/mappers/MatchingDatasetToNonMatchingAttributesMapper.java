@@ -8,7 +8,6 @@ import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,11 +22,11 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
             .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
             .findFirst();
 
-        Optional<NonMatchingVerifiableAttribute<String>> firstName = firstNameValue.map(this::mapToNonMatchingVerifiableAttribute);
+        NonMatchingVerifiableAttribute<String> firstName = firstNameValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
         List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
         List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
-        Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute);
-        Optional<Gender> gender = matchingDataset.getGender().map(SimpleMdsValue::getValue);
+        NonMatchingVerifiableAttribute<LocalDate> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
+        Gender gender = matchingDataset.getGender().map(SimpleMdsValue::getValue).orElse(null);
         List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses = mapAddresses(matchingDataset.getAddresses());
 
         return new NonMatchingAttributes(
@@ -41,8 +40,13 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     }
 
     private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
-        Optional<LocalDateTime> from = Optional.of(convertJodaDateTimeToJavaLocalDateTime(simpleMdsValueOptional.getFrom()));
-        Optional<LocalDateTime> to = Optional.of(convertJodaDateTimeToJavaLocalDateTime(simpleMdsValueOptional.getTo()));
+        LocalDateTime from = Optional.ofNullable(simpleMdsValueOptional.getFrom())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .orElse(null);
+
+        LocalDateTime to = Optional.ofNullable(simpleMdsValueOptional.getTo())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .orElse(null);
 
         return new NonMatchingVerifiableAttribute<>(
             simpleMdsValueOptional.getValue(),
@@ -62,8 +66,13 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
                 input.getInternationalPostCode().orElse("")
             );
 
-            Optional<LocalDateTime> from = Optional.ofNullable(input.getFrom()).map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime);
-            Optional<LocalDateTime> to = input.getTo().map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime);
+            LocalDateTime from = Optional.ofNullable(input.getFrom())
+                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                    .orElse(null);
+
+            LocalDateTime to = input.getTo()
+                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                    .orElse(null);
 
             NonMatchingVerifiableAttribute<NonMatchingAddress> addressAttribute = new NonMatchingVerifiableAttribute<>(
                 transformedAddress,
