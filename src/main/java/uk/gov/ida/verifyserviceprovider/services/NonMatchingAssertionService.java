@@ -2,11 +2,12 @@ package uk.gov.ida.verifyserviceprovider.services;
 
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AuthnContext;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
-import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
@@ -16,7 +17,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
-import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
+import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import javax.xml.namespace.QName;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
@@ -38,6 +40,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final AssertionClassifier assertionClassifierService;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
+    private final LevelOfAssuranceValidator levelOfAssuranceValidator;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
@@ -45,7 +48,8 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
             AssertionAttributeStatementValidator attributeStatementValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper
+            MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
+            LevelOfAssuranceValidator levelOfAssuranceValidator
     ) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
@@ -53,6 +57,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
         this.assertionClassifierService = assertionClassifierService;
         this.mdsMapper = mdsMapper;
+        this.levelOfAssuranceValidator = levelOfAssuranceValidator;
     }
 
 
@@ -61,10 +66,12 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
         Assertion authnAssertion = getAuthnAssertion(assertions);
         Assertion mdsAssertion = getMatchingDatasetAssertion(assertions);
 
-        validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance);
+        LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(authnAssertion);
+
+        validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance, levelOfAssurance);
 
         String nameID = mdsAssertion.getSubject().getNameID().getValue();
-        LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(authnAssertion);
+
         NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
@@ -76,11 +83,12 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     }
 
 
-    public void validate(Assertion authnAssertion, Assertion mdsAssertion, String requestId, LevelOfAssurance expectedLevelOfAssurance) {
+    public void validate(Assertion authnAssertion, Assertion mdsAssertion, String requestId, LevelOfAssurance expectedLevelOfAssurance, LevelOfAssurance levelOfAssurance) {
 
         validateIdpAssertion(authnAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         validateIdpAssertion(mdsAssertion, requestId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
+        levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
 
         if (!mdsAssertion.getIssuer().getValue().equals(authnAssertion.getIssuer().getValue())) {
             throw new SamlResponseValidationException(MISMATCHED_ISSUERS);
@@ -164,6 +172,9 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
 
     private String extractLevelOfAssuranceStringFrom(Assertion authnAssertion) {
         AuthnStatement authnStatement = authnAssertion.getAuthnStatements().get(0);
-        return authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
+        return ofNullable(authnStatement.getAuthnContext())
+                .map(AuthnContext::getAuthnContextClassRef)
+                .map(AuthnContextClassRef::getAuthnContextClassRef)
+                .orElseThrow(() -> new SamlResponseValidationException("Expected a level of assurance."));
     }
 }

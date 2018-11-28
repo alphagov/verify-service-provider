@@ -1,5 +1,6 @@
 package unit.uk.gov.ida.verifyserviceprovider.services;
 
+import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +28,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
@@ -55,9 +57,10 @@ import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
+import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
+import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class NonMatchingAssertionServiceTest {
-
 
     private NonMatchingAssertionService nonMatchingAssertionService;
 
@@ -72,6 +75,9 @@ public class NonMatchingAssertionServiceTest {
 
     @Mock
     private VerifyMatchingDatasetUnmarshaller verifyMatchingDatasetUnmarshaller;
+
+    @Mock
+    private LevelOfAssuranceValidator levelOfAssuranceValidator;
 
 
     @Rule
@@ -88,7 +94,8 @@ public class NonMatchingAssertionServiceTest {
                 attributeStatementValidator,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper()
+                new MatchingDatasetToNonMatchingAttributesMapper(),
+                levelOfAssuranceValidator
         );
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
@@ -188,10 +195,11 @@ public class NonMatchingAssertionServiceTest {
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
         Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
 
-        nonMatchingAssertionService.validate(authnAssertion, mdsAssertion,"requestId", LevelOfAssurance.LEVEL_1);
+        nonMatchingAssertionService.validate(authnAssertion, mdsAssertion,"requestId", LevelOfAssurance.LEVEL_1, LEVEL_2);
 
         verify(subjectValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
+        verify(levelOfAssuranceValidator, times(1)).validate(LEVEL_2, LEVEL_1);
     }
 
     @Test
@@ -201,6 +209,28 @@ public class NonMatchingAssertionServiceTest {
         LevelOfAssurance loa = nonMatchingAssertionService.extractLevelOfAssuranceFrom(authnAssertion);
 
         assertThat(loa).isEqualTo(LevelOfAssurance.LEVEL_2);
+    }
+
+
+    @Test
+    public void shouldThrowExceptionWhenLevelOfAssuranceNotPresent() {
+        Assertion authnAssertion = anAuthnStatementAssertion(null, "requestId").buildUnencrypted();
+        Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Expected a level of assurance.");
+        nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
+    }
+
+
+    @Test
+    public void shouldThrowExceptionWithUnknownLevelOfAssurance() throws Exception {
+        Assertion authnAssertion = anAuthnStatementAssertion("unknown", "requestId").buildUnencrypted();
+        Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Level of assurance 'unknown' is not supported.");
+        nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
     }
 
 

@@ -2,6 +2,7 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
@@ -65,7 +67,7 @@ public class NonMatchingAcceptanceTest {
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+            "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client
@@ -111,7 +113,7 @@ public class NonMatchingAcceptanceTest {
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+            "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client
@@ -196,6 +198,31 @@ public class NonMatchingAcceptanceTest {
         assertThat(attributes.isNull("dateOfBirth")).isTrue();
         assertThat(attributes.getString("gender")).isEqualTo("NOT_SPECIFIED");
         checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfLoAReturnedByIdpIsTooLow () {
+        String expectedPid = "some-expected-pid";
+
+        complianceTool.initialiseWithPidForV2(expectedPid);
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
+        ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
+        assertThat(errorMessage.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorMessage.getMessage()).isEqualTo("Expected Level of Assurance to be at least LEVEL_2, but was LEVEL_1");
     }
 
     private void checkMdsValueOfAttribute(
