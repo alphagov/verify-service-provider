@@ -51,7 +51,6 @@ public class NonMatchingNoAuthnContextResponseAcceptanceTest {
         complianceTool.initialiseWithDefaultsForV2();
     }
 
-    @Ignore
     @Test
     public void shouldRespondWithSuccessWhenNoAuthnContext() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());

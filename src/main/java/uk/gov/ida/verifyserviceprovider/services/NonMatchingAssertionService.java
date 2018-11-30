@@ -6,12 +6,14 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
+import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
@@ -23,6 +25,7 @@ import javax.xml.namespace.QName;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
@@ -72,7 +75,20 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
 
     @Override
     public TranslatedNonMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
-        return null;
+        Optional.ofNullable(statusCode.getStatusCode())
+            .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
+        String subStatus = statusCode.getStatusCode().getValue();
+
+        switch (subStatus) {
+            case StatusCode.REQUESTER:
+                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.REQUEST_ERROR, null, null, null);
+            case StatusCode.NO_AUTHN_CONTEXT:
+                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.CANCELLATION, null, null, null);
+            case StatusCode.AUTHN_FAILED:
+                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.AUTHENTICATION_FAILED, null, null, null);
+            default:
+                throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
+        }
     }
 
 

@@ -51,7 +51,6 @@ public class NonMatchingAuthnFailedResponseAcceptanceTest {
         complianceTool.initialiseWithDefaultsForV2();
     }
 
-    @Ignore
     @Test
     public void shouldRespondWithSuccessWhenAuthnFailed() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
