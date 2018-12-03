@@ -4,7 +4,6 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.domain.AddressFactory;
-import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
@@ -34,6 +33,7 @@ import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
+import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
@@ -144,7 +144,8 @@ public class ResponseFactory {
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper()
+                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new LevelOfAssuranceValidator()
             );
     }
 

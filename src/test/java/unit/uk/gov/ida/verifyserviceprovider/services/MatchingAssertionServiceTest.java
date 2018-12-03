@@ -99,7 +99,7 @@ public class MatchingAssertionServiceTest {
     }
 
     @Test
-    public void shouldtranslateValidAssertion() {
+    public void shouldTranslateValidAssertion() {
         TranslatedResponseBody result = matchingAssertionService.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
