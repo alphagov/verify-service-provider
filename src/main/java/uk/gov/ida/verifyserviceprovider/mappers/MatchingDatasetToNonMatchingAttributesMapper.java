@@ -27,7 +27,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
         List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
         Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute);
-        Optional<Gender> gender = matchingDataset.getGender().map(SimpleMdsValue::getValue);
+        Optional<NonMatchingVerifiableAttribute<Gender>> gender = matchingDataset.getGender().map(this::mapToNonMatchingVerifiableAttribute);
         List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses = mapAddresses(matchingDataset.getAddresses());
 
         return new NonMatchingAttributes(

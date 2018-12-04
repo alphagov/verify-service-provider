@@ -17,7 +17,7 @@ public class NonMatchingAttributes {
     private final List<NonMatchingVerifiableAttribute<String>> middleNames;
     private final List<NonMatchingVerifiableAttribute<String>> surnames;
     private final Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth;
-    private final Optional<Gender> gender;
+    private final Optional<NonMatchingVerifiableAttribute<Gender>> gender;
     private final List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses;
 
     @JsonCreator
@@ -26,7 +26,7 @@ public class NonMatchingAttributes {
             @JsonProperty("middleNames") List<NonMatchingVerifiableAttribute<String>> middleNames,
             @JsonProperty("surnames") List<NonMatchingVerifiableAttribute<String>> surnames,
             @JsonProperty("dateOfBirth") Optional<NonMatchingVerifiableAttribute<LocalDate>> dateOfBirth,
-            @JsonProperty("gender") Optional<Gender> gender,
+            @JsonProperty("gender") Optional<NonMatchingVerifiableAttribute<Gender>> gender,
             @JsonProperty("address") List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses
     ) {
         this.firstName = firstName;
@@ -53,7 +53,7 @@ public class NonMatchingAttributes {
         return dateOfBirth;
     }
 
-    public Optional<Gender> getGender() {
+    public Optional<NonMatchingVerifiableAttribute<Gender>> getGender() {
         return gender;
     }
 

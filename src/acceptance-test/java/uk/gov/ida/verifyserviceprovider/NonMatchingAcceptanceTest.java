@@ -138,8 +138,7 @@ public class NonMatchingAcceptanceTest {
         checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
         checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
         checkMdsValueOfAttribute("dateOfBirth", "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
-        // FIXME: We should be outputting the 'verified' value for gender when one is supplied.
-        assertThat(attributes.getString("gender")).isEqualTo("NOT_SPECIFIED");
+        checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
         checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
     }
 
