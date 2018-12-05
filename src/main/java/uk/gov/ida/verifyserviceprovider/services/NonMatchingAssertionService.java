@@ -16,6 +16,7 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static uk.gov.ida.saml.core.domain.AuthnContext.*;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
@@ -43,6 +45,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     private final AssertionClassifier assertionClassifierService;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
+    private UserIdHashFactory userIdHashFactory;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
@@ -51,8 +54,8 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
-            LevelOfAssuranceValidator levelOfAssuranceValidator
-    ) {
+            LevelOfAssuranceValidator levelOfAssuranceValidator,
+            UserIdHashFactory userIdHashFactory) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
         this.attributeStatementValidator = attributeStatementValidator;
@@ -60,6 +63,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
         this.assertionClassifierService = assertionClassifierService;
         this.mdsMapper = mdsMapper;
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
+        this.userIdHashFactory = userIdHashFactory;
     }
 
 
@@ -72,11 +76,23 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
 
         validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance, levelOfAssurance);
 
+        AuthnStatement authnStatement = authnAssertion.getAuthnStatements().get(0);
         String nameID = mdsAssertion.getSubject().getNameID().getValue();
+        String issuerId =  authnAssertion.getIssuer().getValue();
+
+        String hashId = userIdHashFactory.hashId(
+                issuerId,
+                nameID,
+                Optional.of(
+                        authnStatement.getAuthnContext().equals(LEVEL_1) ? LEVEL_1 :
+                                authnStatement.getAuthnContext().equals(LEVEL_2) ? LEVEL_2 :
+                                        authnStatement.getAuthnContext().equals(LEVEL_3) ? LEVEL_3 :
+                                                authnStatement.getAuthnContext().equals(LEVEL_4) ? LEVEL_4 : LEVEL_X)
+        );
 
         NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
 
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
+        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }
 
     @Override

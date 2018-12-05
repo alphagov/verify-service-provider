@@ -101,7 +101,7 @@ public class MatchingAssertionService implements AssertionService<TranslatedResp
 
     private LevelOfAssurance extractLevelOfAssurance(AuthnStatement authnStatement) {
         String levelOfAssuranceString = ofNullable(authnStatement.getAuthnContext())
-            .map(AuthnContext::getAuthnContextClassRef)
+                .map(AuthnContext::getAuthnContextClassRef)
             .map(AuthnContextClassRef::getAuthnContextClassRef)
             .orElseThrow(() -> new SamlResponseValidationException("Expected a level of assurance."));
 

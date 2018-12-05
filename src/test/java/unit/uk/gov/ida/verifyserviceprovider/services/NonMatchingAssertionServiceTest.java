@@ -7,14 +7,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opensaml.saml.common.SAMLVersion;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.Attribute;
-import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
@@ -25,6 +25,7 @@ import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
@@ -32,10 +33,12 @@ import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
-
+import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.emptyList;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -79,6 +82,11 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private LevelOfAssuranceValidator levelOfAssuranceValidator;
 
+    @Mock
+    private UserIdHashFactory userIdHashFactory;
+
+    @Mock
+    private MatchingDatasetToNonMatchingAttributesMapper matchingDatasetToNonMatchingAttributesMapper;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -94,9 +102,10 @@ public class NonMatchingAssertionServiceTest {
                 attributeStatementValidator,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                levelOfAssuranceValidator
-        );
+                matchingDatasetToNonMatchingAttributesMapper,
+                levelOfAssuranceValidator,
+                userIdHashFactory);
+
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
 
@@ -233,6 +242,22 @@ public class NonMatchingAssertionServiceTest {
         nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
     }
 
+    @Test
+    public void shouldPerformHashing() {
+        ArgumentCaptor<UserIdHashFactory> argument = ArgumentCaptor.forClass(UserIdHashFactory.class);
+        Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
+        Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+
+        final String issuerId = authnAssertion.getIssuer().getValue();
+        final String nameId = authnAssertion.getSubject().getNameID().getValue();
+        when(userIdHashFactory.hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2))).thenReturn("klkjjjljjljj");
+
+        nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
+
+        verify(userIdHashFactory, times(1)).hashId(anyString(),anyString(),any());
+
+
+    }
 
     public static AssertionBuilder aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, String requestId) {
         return anAssertion()
