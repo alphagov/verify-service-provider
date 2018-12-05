@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAttribute;
@@ -16,7 +15,6 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
@@ -24,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -143,7 +140,6 @@ public class NonMatchingAcceptanceTest {
         checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
     }
 
-    @Ignore  // The translation code isn't correctly handling null from/to dates yet.
     @Test
     public void shouldCorrectlyHandleEmptyValuesInMatchingDataset() {
         String expectedPid = "some-expected-pid";
@@ -153,14 +149,15 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime standardFromDate = LocalDateTime.parse(standardFromDateString);
         LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
 
+
         V2MatchingDataset matchingDataset = new V2MatchingDataset(
-            new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
-            null,
-            singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
-            new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
-            null,
-            singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
-            expectedPid
+                new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
+                null,
+                singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
+                new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
+                null,
+                singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+                expectedPid
         );
 
         complianceTool.initialiseWithMatchingDatasetForV2(matchingDataset);
@@ -186,8 +183,7 @@ public class NonMatchingAcceptanceTest {
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "dateOfBirth", "gender", "addresses");
-
+        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "gender", "addresses");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");

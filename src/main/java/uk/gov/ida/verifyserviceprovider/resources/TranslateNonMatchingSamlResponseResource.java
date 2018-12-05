@@ -8,7 +8,6 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -18,7 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Path("/translate-non-matching-response")
