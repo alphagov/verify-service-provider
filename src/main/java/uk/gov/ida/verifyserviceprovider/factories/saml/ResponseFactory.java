@@ -145,7 +145,8 @@ public class ResponseFactory {
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
-                new LevelOfAssuranceValidator()
+                new LevelOfAssuranceValidator(),
+                new UserIdHashFactory(hashingEntityId)
             );
     }
 

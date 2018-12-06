@@ -58,7 +58,7 @@ public class NonMatchingAcceptanceTest {
     public void shouldRespondWithIdentityVerifiedWhenVerificationSucceeds() {
         String expectedPid = "some-expected-pid";
 
-        complianceTool.initialiseWithPidForV2(expectedPid);
+        complianceTool.initialiseWithDefaultsForV2();
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
@@ -77,7 +77,6 @@ public class NonMatchingAcceptanceTest {
 
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
-        assertThat(jsonResponse.getString("pid")).isEqualTo(expectedPid);
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
     }
 
@@ -178,7 +177,6 @@ public class NonMatchingAcceptanceTest {
 
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
-        assertThat(jsonResponse.getString("pid")).isEqualTo(expectedPid);
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
