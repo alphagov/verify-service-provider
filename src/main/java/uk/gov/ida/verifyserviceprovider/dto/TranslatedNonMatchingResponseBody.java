@@ -8,11 +8,11 @@ public class TranslatedNonMatchingResponseBody {
     @JsonProperty("scenario")
     private final NonMatchingScenario scenario;
     @JsonProperty("pid")
-    private final String pid;
+    protected final String pid;
     @JsonProperty("levelOfAssurance")
-    private final LevelOfAssurance levelOfAssurance;
+    protected final LevelOfAssurance levelOfAssurance;
     @JsonProperty("attributes")
-    private final NonMatchingAttributes attributes;
+    protected final NonMatchingAttributes attributes;
 
     public TranslatedNonMatchingResponseBody(
             NonMatchingScenario scenario,
@@ -28,18 +28,6 @@ public class TranslatedNonMatchingResponseBody {
 
     public NonMatchingScenario getScenario() {
         return scenario;
-    }
-
-    public String getPid() {
-        return pid;
-    }
-
-    public LevelOfAssurance getLevelOfAssurance() {
-        return levelOfAssurance;
-    }
-
-    public Optional<NonMatchingAttributes> getAttributes() {
-        return Optional.ofNullable(attributes);
     }
 
     @Override
