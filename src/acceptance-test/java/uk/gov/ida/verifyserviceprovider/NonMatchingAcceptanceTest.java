@@ -166,7 +166,7 @@ public class NonMatchingAcceptanceTest {
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+            "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client

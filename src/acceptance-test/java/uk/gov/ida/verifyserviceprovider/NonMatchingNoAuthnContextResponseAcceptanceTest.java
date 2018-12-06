@@ -5,11 +5,10 @@ import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -66,7 +65,7 @@ public class NonMatchingNoAuthnContextResponseAcceptanceTest {
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
-        TranslatedNonMatchingResponseBody responseContent = response.readEntity(TranslatedNonMatchingResponseBody.class);
+        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
