@@ -67,7 +67,13 @@ public class MsaMetadataFeatureTest {
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
+            config("europeanIdentity.enabled", "false"),
+            config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+            config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
+            config("europeanIdentity.aggregatedMetadata.trustStore.password", verifyHubKeystoreResource.getPassword())
         );
 
         environmentHelper.setEnv(new HashMap<String, String>() {{

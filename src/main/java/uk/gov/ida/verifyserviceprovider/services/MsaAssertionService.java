@@ -27,10 +27,14 @@ public class MsaAssertionService implements AssertionService<TranslatedResponseB
 
 
     private AssertionValidator assertionValidator;
+    private LevelOfAssuranceValidator levelOfAssuranceValidator;
     private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
-    public MsaAssertionService(AssertionValidator assertionValidator, SamlAssertionsSignatureValidator assertionsSignatureValidator ) {
+    public MsaAssertionService(AssertionValidator assertionValidator,
+                               LevelOfAssuranceValidator levelOfAssuranceValidator,
+                               SamlAssertionsSignatureValidator assertionsSignatureValidator) {
         this.assertionValidator = assertionValidator;
+        this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
     }
 
@@ -51,7 +55,6 @@ public class MsaAssertionService implements AssertionService<TranslatedResponseB
         //  3. validate levelOfAssurance
         AuthnStatement authnStatement = assertion.getAuthnStatements().get(0);
         LevelOfAssurance levelOfAssurance = extractLevelOfAssurance(authnStatement);
-        LevelOfAssuranceValidator levelOfAssuranceValidator = new LevelOfAssuranceValidator();
         levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
         //  4. translateAssertions
         String nameID = assertion.getSubject().getNameID().getValue();

@@ -259,7 +259,7 @@ public class IdpAssertionServiceTest {
         when(userIdHashFactory.hashId(eq(issuerId), eq(nameId), eq(Optional.of(AuthnContext.LEVEL_2))))
                 .thenReturn(expectedHashed);
 
-        TranslatedNonMatchingResponseBody responseBody = nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
+        TranslatedNonMatchingResponseBody responseBody = idpAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
 
         verify(userIdHashFactory, times(1)).hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2));
         assertThat(responseBody.toString()).contains(expectedNonMatchingResponseBody.getPid());

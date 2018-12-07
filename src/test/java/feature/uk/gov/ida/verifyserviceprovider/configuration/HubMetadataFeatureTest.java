@@ -74,7 +74,13 @@ public class HubMetadataFeatureTest {
             config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
             config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
             config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
-            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+            config("europeanIdentity.enabled", "false"),
+            config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+            config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
+            config("europeanIdentity.aggregatedMetadata.trustStore.password", verifyHubKeystoreResource.getPassword())
         );
     }
 

@@ -38,7 +38,13 @@ public class ApplicationConfigurationFeatureTests {
             "verify-service-provider.yml",
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword())
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword()),
+            ConfigOverride.config("europeanIdentity.enabled", "false"),
+            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", keyStoreResource.getAbsolutePath()),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", keyStoreResource.getPassword())
         );
     }
 

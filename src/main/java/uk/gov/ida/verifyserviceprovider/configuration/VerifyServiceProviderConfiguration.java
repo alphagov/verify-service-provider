@@ -25,6 +25,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private PrivateKey samlSecondaryEncryptionKey;
     private MsaMetadataConfiguration msaMetadata;
     private Duration clockSkew;
+    private EuropeanIdentityConfiguration europeanIdentity;
 
     @JsonCreator
     public VerifyServiceProviderConfiguration(
@@ -35,7 +36,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
         @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
         @JsonProperty("msaMetadata") @NotNull @Valid MsaMetadataConfiguration msaMetadata,
-        @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew
+        @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
+        @JsonProperty("europeanIdentity") @Valid EuropeanIdentityConfiguration europeanIdentity
     ) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
@@ -45,6 +47,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
         this.msaMetadata = msaMetadata;
         this.clockSkew = clockSkew;
+        this.europeanIdentity = europeanIdentity;
     }
 
     public List<String> getServiceEntityIds() {
@@ -87,5 +90,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public Duration getClockSkew() {
         return clockSkew;
+    }
+
+    public EuropeanIdentityConfiguration getEuropeanIdentity() {
+        return europeanIdentity;
     }
 }

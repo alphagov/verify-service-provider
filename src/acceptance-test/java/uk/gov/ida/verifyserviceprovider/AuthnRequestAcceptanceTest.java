@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.DropwizardTestSupport;
+import keystore.KeyStoreResource;
 import org.json.JSONObject;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
@@ -19,9 +20,12 @@ import java.net.URI;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
+import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 
 public class AuthnRequestAcceptanceTest {
@@ -31,6 +35,13 @@ public class AuthnRequestAcceptanceTest {
     private static String HASHING_ENTITY_ID = "http://default-entity-id";
     private static String MULTI_ENTITY_ID_1 = "http://service-entity-id-one";
     private static String MULTI_ENTITY_ID_2 = "http://service-entity-id-two";
+
+    private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
+        .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
+        .build();
+    static {
+        KEY_STORE_RESOURCE.create();
+    }
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardTestSupport<>(
         VerifyServiceProviderApplication.class,
@@ -43,7 +54,13 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+        ConfigOverride.config("europeanIdentity.enabled", "false"),
+        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
     public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
@@ -57,7 +74,13 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+        ConfigOverride.config("europeanIdentity.enabled", "false"),
+        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
 

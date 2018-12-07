@@ -10,6 +10,7 @@ import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
@@ -57,6 +58,12 @@ public class VerifyServiceProviderConfigurationTest {
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("CLOCK_SKEW", "PT30s");
+            put("EUROPEAN_IDENTITY_ENABLED", "false");
+            put("HUB_CONNECTOR_ENTITY_ID", "etc");
+            put("TRUST_ANCHOR_URI", "etc");
+            put("METADATA_SOURCE_URI", "etc");
+            put("TRUSTSTORE_PATH", "etc");
+            put("TRUSTSTORE_PASSWORD", "etc");
         }});
 
         factory.build(
@@ -126,7 +133,8 @@ public class VerifyServiceProviderConfigurationTest {
                 mock(PrivateKey.class),
                 mock(PrivateKey.class),
                 mock(MsaMetadataConfiguration.class),
-                new Duration(1000L)
+                new Duration(1000L),
+                mock(EuropeanIdentityConfiguration.class)
         );
     }
 

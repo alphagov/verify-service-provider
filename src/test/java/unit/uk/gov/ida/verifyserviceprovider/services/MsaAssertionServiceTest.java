@@ -31,6 +31,7 @@ import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
+import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
@@ -87,7 +88,7 @@ public class MsaAssertionServiceTest {
 
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
 
-        msaAssertionService = responseFactory.createMsaAssertionService(explicitKeySignatureTrustEngine, dateTimeComparator);
+        msaAssertionService = responseFactory.createMsaAssertionService(explicitKeySignatureTrustEngine, new SignatureValidatorFactory(), dateTimeComparator);
     }
 
     @Rule
