@@ -23,13 +23,13 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class MatchingAssertionService implements AssertionService<TranslatedResponseBody> {
+public class MsaAssertionService implements AssertionService<TranslatedResponseBody> {
 
 
     private AssertionValidator assertionValidator;
     private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
-    public MatchingAssertionService( AssertionValidator assertionValidator, SamlAssertionsSignatureValidator assertionsSignatureValidator ) {
+    public MsaAssertionService(AssertionValidator assertionValidator, SamlAssertionsSignatureValidator assertionsSignatureValidator ) {
         this.assertionValidator = assertionValidator;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
     }

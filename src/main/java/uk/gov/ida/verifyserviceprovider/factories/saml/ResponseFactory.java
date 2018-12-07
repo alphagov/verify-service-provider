@@ -25,8 +25,8 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -108,7 +108,7 @@ public class ResponseFactory {
         );
     }
 
-    public MatchingAssertionService createMatchingAssertionService(
+    public MsaAssertionService createMsaAssertionService(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
             DateTimeComparator dateTimeComparator
     ) {
@@ -123,22 +123,22 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new MatchingAssertionService(
+        return new MsaAssertionService(
                 assertionValidator,
                 assertionsSignatureValidator
         );
     }
 
-    public NonMatchingAssertionService createNonMatchingAssertionService( ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                                          DateTimeComparator dateTimeComparator,
-                                                                          String hashingEntityId) {
+    public IdpAssertionService createIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                         DateTimeComparator dateTimeComparator,
+                                                         String hashingEntityId) {
 
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
         SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
 
-        return new NonMatchingAssertionService(
+        return new IdpAssertionService(
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
