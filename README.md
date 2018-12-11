@@ -21,7 +21,7 @@ See also:
 ### Prerequisites
 
 To download and use Verify Service Provider you must:
-* have Java 8
+* have Java 8 or above
 * have a working [Matching Service Adapter](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
 
 ### Download
