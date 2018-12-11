@@ -10,11 +10,11 @@ Using Verify Service Provider will make it easier to:
 
 You will need to host Verify Service Provider on your own infrastructure.
 
-Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about connecting to GOV.UK Verify.
+Using Verify Service Provider is the main part of connecting to GOV.UK Verify. Refer to the [technical documentation](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about using the Verify Service Provider and connecting to GOV.UK Verify.
 
 See also:
 * [API reference](/docs/api/api-reference.md)
-* [Tutorial: How to securely exchange information using Verify Service Provider](/docs/tutorial-using-verify-service-provider.md)
+* [Using the VSP](techdocs)
 
 ## Setup
 
