@@ -26,7 +26,7 @@ To download and use Verify Service Provider you must:
 
 ### Download
 
-[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider.
+[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of the Verify Service Provider.
 
 ### Configure
 
@@ -40,9 +40,7 @@ VERIFY_ENVIRONMENT            # The environment of the Verify Hub to run against
 
 SERVICE_ENTITY_IDS            # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'
                               # If you have multiple services using a single Verify Service Provider you should provide all of their entity IDs in this array.
-MSA_ENTITY_ID                 # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
-MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML metadata.
-
+                              
 SAML_SIGNING_KEY              # A base64 encoded RSA private key that is used for signing the request to Verify
 SAML_PRIMARY_ENCRYPTION_KEY   # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
 SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that
@@ -50,6 +48,13 @@ SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 en
 
 PORT                          # (Optional - default 50400) The TCP port where the application will listen for HTTP traffic
 LOG_LEVEL                     # (Optional - default INFO) The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR)
+```
+
+If you are using the legacy version involving a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter), two additional environment variables apply:
+
+```
+MSA_ENTITY_ID                 # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
+MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML metadata.
 ```
 
 As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
@@ -111,7 +116,7 @@ __Startup__
 ```
 ./startup.sh
 ```
-You will need to either have environment variables set as above, or have edited the main configuration file (`verify-service-provider.yml`), or to pass an argument to this script for the application to start. Available arguments are `local-fed` for running against a locally running federation (see [verify local startup](https://github.com/alphagov/verify-local-startup)) or `vsp-only` for using default values to run against compliance tool on the reference environment. 
+You will need to either have environment variables set as above, or have edited the main configuration file (`verify-service-provider.yml`), or to pass an argument to this script for the application to start. Available arguments are `local-fed` for running against a locally running federation (see [verify local startup](https://github.com/alphagov/verify-local-startup)) or `vsp-only` for using default values to run against compliance tool on the reference environment.
 
 __Build a distribution__
 ```
