@@ -8,13 +8,13 @@ import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.dto.AttributesV2;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -45,7 +45,7 @@ public class IdpAssertionService extends AssertionServiceV2 {
             AssertionAttributeStatementValidator attributeStatementValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
+            MatchingDatasetToAttributesMapper mdsMapper,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
             UserIdHashFactory userIdHashFactory
     ) {
@@ -74,7 +74,7 @@ public class IdpAssertionService extends AssertionServiceV2 {
 
         String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
 
-        NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
+        AttributesV2 attributes = translateAttributes(mdsAssertion);
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }

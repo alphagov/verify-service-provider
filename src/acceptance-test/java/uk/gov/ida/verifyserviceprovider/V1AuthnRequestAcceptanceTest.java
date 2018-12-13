@@ -29,7 +29,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 
-public class AuthnRequestAcceptanceTest {
+public class V1AuthnRequestAcceptanceTest {
 
     private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
     private static String SINGLE_ENTITY_ID = "http://default-entity-id";

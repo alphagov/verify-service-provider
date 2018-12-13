@@ -22,14 +22,14 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Path("/translate-non-matching-response")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TranslateNonMatchingSamlResponseResource {
+public class TranslateSamlResponseV2Resource {
 
     private final ResponseService<TranslatedNonMatchingResponseBody> responseService;
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateNonMatchingSamlResponseResource.class);
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseV2Resource.class);
     private final EntityIdService entityIdService;
 
 
-    public TranslateNonMatchingSamlResponseResource(ResponseService<TranslatedNonMatchingResponseBody> responseService, EntityIdService entityIdService) {
+    public TranslateSamlResponseV2Resource(ResponseService<TranslatedNonMatchingResponseBody> responseService, EntityIdService entityIdService) {
         this.responseService = responseService;
         this.entityIdService = entityIdService;
     }

@@ -6,9 +6,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -20,16 +20,19 @@ import java.util.Map;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID;
 
-public class NoAuthnContextResponseAcceptanceTest {
+public class V2AuthnFailedResponseAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
+    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
+            .withMockMsaServer(msaServer)
+            .build();
 
     private static Client client;
     private static ComplianceToolService complianceTool;
@@ -44,25 +47,27 @@ public class NoAuthnContextResponseAcceptanceTest {
 
     @Before
     public void setUp() {
-        complianceTool.initialiseWithDefaults();
+        complianceTool.initialiseWithDefaultsForV2();
     }
 
     @Test
-    public void shouldRespondWithSuccessWhenNoAuthnContext() {
+    public void shouldRespondWithSuccessWhenAuthnFailed() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_ID),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
             "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
+        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class).getScenario()).isEqualTo(Scenario.CANCELLATION);
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
     }
 }

@@ -5,12 +5,12 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
+import uk.gov.ida.verifyserviceprovider.dto.AttributesV2;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -33,7 +33,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
     public EidasAssertionService(
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
+            MatchingDatasetToAttributesMapper mdsMapper,
             InstantValidator instantValidator,
             ConditionsValidator conditionsValidator,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
@@ -63,7 +63,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
 
         String nameID = getNameIdFrom(countryAssertion);
 
-        NonMatchingAttributes attributes = translateAttributes(countryAssertion);
+        AttributesV2 attributes = translateAttributes(countryAssertion);
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
     }

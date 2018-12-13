@@ -8,29 +8,29 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class NonMatchingAttributes {
+public class AttributesV2 {
 
     @JsonProperty("firstName")
-    private final NonMatchingVerifiableAttribute<String> firstName;
+    private final VerifiableAttributeV2<String> firstName;
     @JsonProperty("middleNames")
-    private final List<NonMatchingVerifiableAttribute<String>> middleNames;
+    private final List<VerifiableAttributeV2<String>> middleNames;
     @JsonProperty("surnames")
-    private final List<NonMatchingVerifiableAttribute<String>> surnames;
+    private final List<VerifiableAttributeV2<String>> surnames;
     @JsonProperty("dateOfBirth")
-    private final NonMatchingVerifiableAttribute<LocalDate> dateOfBirth;
+    private final VerifiableAttributeV2<LocalDate> dateOfBirth;
     @JsonProperty("gender")
-    private final NonMatchingVerifiableAttribute<Gender> gender;
+    private final VerifiableAttributeV2<Gender> gender;
     @JsonProperty("addresses")
-    private final List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses;
+    private final List<VerifiableAttributeV2<AddressV2>> addresses;
 
 
-    public NonMatchingAttributes(
-            NonMatchingVerifiableAttribute<String> firstName,
-            List<NonMatchingVerifiableAttribute<String>> middleNames,
-            List<NonMatchingVerifiableAttribute<String>> surnames,
-            NonMatchingVerifiableAttribute<LocalDate> dateOfBirth,
-            NonMatchingVerifiableAttribute<Gender> gender,
-            List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses
+    public AttributesV2(
+            VerifiableAttributeV2<String> firstName,
+            List<VerifiableAttributeV2<String>> middleNames,
+            List<VerifiableAttributeV2<String>> surnames,
+            VerifiableAttributeV2<LocalDate> dateOfBirth,
+            VerifiableAttributeV2<Gender> gender,
+            List<VerifiableAttributeV2<AddressV2>> addresses
     ) {
         this.firstName = firstName;
         this.middleNames = middleNames;
@@ -40,27 +40,27 @@ public class NonMatchingAttributes {
         this.addresses = addresses;
     }
 
-    public NonMatchingVerifiableAttribute<String> getFirstName() {
+    public VerifiableAttributeV2<String> getFirstName() {
         return firstName;
     }
 
-    public List<NonMatchingVerifiableAttribute<String>> getMiddleNames() {
+    public List<VerifiableAttributeV2<String>> getMiddleNames() {
         return middleNames;
     }
 
-    public List<NonMatchingVerifiableAttribute<String>> getSurnames() {
+    public List<VerifiableAttributeV2<String>> getSurnames() {
         return surnames;
     }
 
-    public NonMatchingVerifiableAttribute<LocalDate> getDateOfBirth() {
+    public VerifiableAttributeV2<LocalDate> getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public NonMatchingVerifiableAttribute<Gender> getGender() {
+    public VerifiableAttributeV2<Gender> getGender() {
         return gender;
     }
 
-    public List<NonMatchingVerifiableAttribute<NonMatchingAddress>> getAddresses() {
+    public List<VerifiableAttributeV2<AddressV2>> getAddresses() {
         return addresses;
     }
 
@@ -69,7 +69,7 @@ public class NonMatchingAttributes {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NonMatchingAttributes that = (NonMatchingAttributes) o;
+        AttributesV2 that = (AttributesV2) o;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (middleNames != null ? !(that.middleNames != null && CollectionUtils.isEqualCollection(middleNames, that.middleNames)) : that.middleNames != null) return false;
         if (surnames != null ? !(that.surnames != null && CollectionUtils.isEqualCollection(surnames, that.surnames)) : that.surnames != null) return false;

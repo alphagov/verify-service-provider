@@ -6,9 +6,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -22,9 +22,9 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_NO_MATCH_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID;
 
-public class NoMatchAcceptanceTest {
+public class V2NoAuthnContextResponseAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
@@ -47,25 +47,27 @@ public class NoMatchAcceptanceTest {
 
     @Before
     public void setUp() {
-        complianceTool.initialiseWithDefaults();
+        complianceTool.initialiseWithDefaultsForV2();
     }
 
     @Test
-    public void shouldRespondWithSuccessWhenNoMatch() {
+    public void shouldRespondWithSuccessWhenNoAuthnContext() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_NO_MATCH_ID),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
             "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
+        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class).getScenario()).isEqualTo(Scenario.NO_MATCH);
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
     }
 }

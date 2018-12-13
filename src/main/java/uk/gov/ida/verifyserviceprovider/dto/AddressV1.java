@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Address {
+public class AddressV1 {
 
     private final List<String> lines;
     private final String postCode;
@@ -16,7 +16,7 @@ public class Address {
     private final LocalDate toDate;
 
     @JsonCreator
-    public Address(
+    public AddressV1(
         @JsonProperty("lines") List<String> lines,
         @JsonProperty("postCode") String postCode,
         @JsonProperty("internationalPostCode") String internationalPostCode,
@@ -61,7 +61,7 @@ public class Address {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Address address = (Address) o;
+        AddressV1 address = (AddressV1) o;
 
         if (lines != null ? !lines.equals(address.lines) : address.lines != null) return false;
         if (postCode != null ? !postCode.equals(address.postCode) : address.postCode != null) return false;

@@ -18,8 +18,8 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseV2Resource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseV1Resource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
@@ -96,8 +96,8 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
-        return new TranslateSamlResponseResource(
+    public TranslateSamlResponseV1Resource getTranslateMatchingSamlResponseResource() {
+        return new TranslateSamlResponseV1Resource(
             responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
                 responseFactory.createMsaAssertionService(getMsaSignatureTrustEngine(), new SignatureValidatorFactory(), dateTimeComparator),
@@ -107,7 +107,7 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+    public TranslateSamlResponseV2Resource getTranslateSamlResponseV2Resource() {
         IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
@@ -120,7 +120,7 @@ public class VerifyServiceProviderFactory {
                 getEidasMetadataResolverRepository()
         );
 
-        return new TranslateNonMatchingSamlResponseResource(
+        return new TranslateSamlResponseV2Resource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         new ClassifyingAssertionService(idpAssertionService, eidasAssertionService),

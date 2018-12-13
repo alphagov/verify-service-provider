@@ -5,31 +5,31 @@ import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
+import uk.gov.ida.verifyserviceprovider.dto.AddressV2;
+import uk.gov.ida.verifyserviceprovider.dto.AttributesV2;
+import uk.gov.ida.verifyserviceprovider.dto.VerifiableAttributeV2;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class MatchingDatasetToNonMatchingAttributesMapper {
+public class MatchingDatasetToAttributesMapper {
 
-    public NonMatchingAttributes mapToNonMatchingAttributes(MatchingDataset matchingDataset) {
+    public AttributesV2 mapToAttributesV2(MatchingDataset matchingDataset) {
         Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
         Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream()
-            .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
+            .map(MatchingDatasetToAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
             .findFirst();
 
-        NonMatchingVerifiableAttribute<String> firstName = firstNameValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
-        List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
-        List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
-        NonMatchingVerifiableAttribute<LocalDate> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
-        NonMatchingVerifiableAttribute<Gender> gender = matchingDataset.getGender().map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
-        List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses = mapAddresses(matchingDataset.getAddresses());
+        VerifiableAttributeV2<String> firstName = firstNameValue.map(this::mapToVerifiableAttributeV2).orElse(null);
+        List<VerifiableAttributeV2<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToVerifiableAttributeV2).collect(Collectors.toList());
+        List<VerifiableAttributeV2<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToVerifiableAttributeV2).collect(Collectors.toList());
+        VerifiableAttributeV2<LocalDate> dateOfBirth = birthDateValue.map(this::mapToVerifiableAttributeV2).orElse(null);
+        VerifiableAttributeV2<Gender> gender = matchingDataset.getGender().map(this::mapToVerifiableAttributeV2).orElse(null);
+        List<VerifiableAttributeV2<AddressV2>> addresses = mapAddresses(matchingDataset.getAddresses());
 
-        return new NonMatchingAttributes(
+        return new AttributesV2(
             firstName,
             middleNames,
             surnames,
@@ -39,16 +39,16 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         );
     }
 
-    private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
+    private <T> VerifiableAttributeV2<T> mapToVerifiableAttributeV2(SimpleMdsValue<T> simpleMdsValueOptional) {
         LocalDateTime from = Optional.ofNullable(simpleMdsValueOptional.getFrom())
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .map(MatchingDatasetToAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
                 .orElse(null);
 
         LocalDateTime to = Optional.ofNullable(simpleMdsValueOptional.getTo())
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .map(MatchingDatasetToAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
                 .orElse(null);
 
-        return new NonMatchingVerifiableAttribute<>(
+        return new VerifiableAttributeV2<>(
             simpleMdsValueOptional.getValue(),
             simpleMdsValueOptional.isVerified(),
             from,
@@ -56,25 +56,25 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         );
     }
 
-    private List<NonMatchingVerifiableAttribute<NonMatchingAddress>> mapAddresses(List<Address> addresses) {
-        List<NonMatchingVerifiableAttribute<NonMatchingAddress>> output = new java.util.ArrayList<>();
+    private List<VerifiableAttributeV2<AddressV2>> mapAddresses(List<Address> addresses) {
+        List<VerifiableAttributeV2<AddressV2>> output = new java.util.ArrayList<>();
 
         for (Address input : addresses) {
-            NonMatchingAddress transformedAddress = new NonMatchingAddress(
+            AddressV2 transformedAddress = new AddressV2(
                 input.getLines(),
                 input.getPostCode().orElse(""),
                 input.getInternationalPostCode().orElse("")
             );
 
             LocalDateTime from = Optional.ofNullable(input.getFrom())
-                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                    .map(MatchingDatasetToAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
                     .orElse(null);
 
             LocalDateTime to = input.getTo()
-                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                    .map(MatchingDatasetToAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
                     .orElse(null);
 
-            NonMatchingVerifiableAttribute<NonMatchingAddress> addressAttribute = new NonMatchingVerifiableAttribute<>(
+            VerifiableAttributeV2<AddressV2> addressAttribute = new VerifiableAttributeV2<>(
                 transformedAddress,
                 input.isVerified(),
                 from,

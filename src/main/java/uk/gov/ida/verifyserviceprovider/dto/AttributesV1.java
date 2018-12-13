@@ -11,24 +11,24 @@ import java.util.List;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Attributes {
+public class AttributesV1 {
 
-    private final VerifiableAttribute<String> firstName;
-    private final VerifiableAttribute<String>  middleName;
-    private final VerifiableAttribute<String>  surname;
-    private final VerifiableAttribute<LocalDate> dateOfBirth;
-    private final VerifiableAttribute<Address> address;
-    private final List<VerifiableAttribute<Address>> addressHistory;
+    private final VerifiableAttributeV1<String> firstName;
+    private final VerifiableAttributeV1<String>  middleName;
+    private final VerifiableAttributeV1<String>  surname;
+    private final VerifiableAttributeV1<LocalDate> dateOfBirth;
+    private final VerifiableAttributeV1<AddressV1> address;
+    private final List<VerifiableAttributeV1<AddressV1>> addressHistory;
     private final String cycle3;
 
     @JsonCreator
-    public Attributes(
-        @JsonProperty("firstName") VerifiableAttribute<String> firstName,
-        @JsonProperty("middleName") VerifiableAttribute<String> middleName,
-        @JsonProperty("surname") VerifiableAttribute<String> surname,
-        @JsonProperty("dateOfBirth") VerifiableAttribute<LocalDate> dateOfBirth,
-        @JsonProperty("address") VerifiableAttribute<Address> address,
-        @JsonProperty("addressHistory") List<VerifiableAttribute<Address>> addressHistory,
+    public AttributesV1(
+        @JsonProperty("firstName") VerifiableAttributeV1<String> firstName,
+        @JsonProperty("middleName") VerifiableAttributeV1<String> middleName,
+        @JsonProperty("surname") VerifiableAttributeV1<String> surname,
+        @JsonProperty("dateOfBirth") VerifiableAttributeV1<LocalDate> dateOfBirth,
+        @JsonProperty("address") VerifiableAttributeV1<AddressV1> address,
+        @JsonProperty("addressHistory") List<VerifiableAttributeV1<AddressV1>> addressHistory,
         @JsonProperty("cycle3") String cycle3
     ) {
         this.firstName = firstName;
@@ -40,27 +40,27 @@ public class Attributes {
         this.cycle3 = cycle3;
     }
 
-    public VerifiableAttribute<String> getFirstName() {
+    public VerifiableAttributeV1<String> getFirstName() {
         return firstName;
     }
 
-    public VerifiableAttribute<String> getMiddleName() {
+    public VerifiableAttributeV1<String> getMiddleName() {
         return middleName;
     }
 
-    public VerifiableAttribute<String> getSurname() {
+    public VerifiableAttributeV1<String> getSurname() {
         return surname;
     }
 
-    public VerifiableAttribute<LocalDate> getDateOfBirth() {
+    public VerifiableAttributeV1<LocalDate> getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public VerifiableAttribute<Address> getAddress() {
+    public VerifiableAttributeV1<AddressV1> getAddress() {
         return address;
     }
 
-    public List<VerifiableAttribute<Address>> getAddressHistory() {
+    public List<VerifiableAttributeV1<AddressV1>> getAddressHistory() {
         return addressHistory;
     }
 
@@ -73,7 +73,7 @@ public class Attributes {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Attributes that = (Attributes) o;
+        AttributesV1 that = (AttributesV1) o;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (middleName != null ? !middleName.equals(that.middleName) : that.middleName != null) return false;
         if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;

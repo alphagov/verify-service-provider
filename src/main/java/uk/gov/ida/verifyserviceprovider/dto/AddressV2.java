@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class NonMatchingAddress {
+public class AddressV2 {
 
     private final List<String> lines;
     private final String postCode;
     private final String internationalPostCode;
 
     @JsonCreator
-    public NonMatchingAddress(
+    public AddressV2(
         @JsonProperty("lines") List<String> lines,
         @JsonProperty("postCode") String postCode,
         @JsonProperty("internationalPostCode") String internationalPostCode
@@ -39,7 +39,7 @@ public class NonMatchingAddress {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NonMatchingAddress other = (NonMatchingAddress) o;
+        AddressV2 other = (AddressV2) o;
 
         if (lines != null ? !lines.equals(other.lines) : other.lines != null) return false;
         if (postCode != null ? !postCode.equals(other.postCode) : other.postCode != null) return false;

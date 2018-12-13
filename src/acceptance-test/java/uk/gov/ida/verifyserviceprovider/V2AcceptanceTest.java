@@ -8,9 +8,9 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.domain.MatchingAddress;
-import uk.gov.ida.verifyserviceprovider.domain.MatchingAttribute;
-import uk.gov.ida.verifyserviceprovider.domain.V2MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.domain.MatchingAddressV2;
+import uk.gov.ida.verifyserviceprovider.domain.MatchingAttributeV2;
+import uk.gov.ida.verifyserviceprovider.domain.MatchingDatasetV2;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
@@ -33,7 +33,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID;
 
-public class NonMatchingAcceptanceTest {
+public class V2AcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
@@ -92,13 +92,13 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime laterFromDate = LocalDateTime.parse(laterFromDateString);
         LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
 
-        V2MatchingDataset matchingDataset = new V2MatchingDataset(
-            new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
-            new MatchingAttribute("Montgomery", true, standardFromDate, standardToDate),
-            Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
-            new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
-            new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
-            singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+        MatchingDatasetV2 matchingDataset = new MatchingDatasetV2(
+            new MatchingAttributeV2("Bob", true, standardFromDate, standardToDate),
+            new MatchingAttributeV2("Montgomery", true, standardFromDate, standardToDate),
+            Arrays.asList(new MatchingAttributeV2("Smith", true, standardFromDate, standardToDate), new MatchingAttributeV2("Smythington", true, laterFromDate, laterToDate)),
+            new MatchingAttributeV2("NOT_SPECIFIED", true, standardFromDate, standardToDate),
+            new MatchingAttributeV2("1970-01-01", true, standardFromDate, standardToDate),
+            singletonList(new MatchingAddressV2(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
             expectedPid
         );
 
@@ -147,13 +147,13 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
 
 
-        V2MatchingDataset matchingDataset = new V2MatchingDataset(
-                new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
+        MatchingDatasetV2 matchingDataset = new MatchingDatasetV2(
+                new MatchingAttributeV2("Bob", true, standardFromDate, standardToDate),
                 null,
-                singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
-                new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
+                singletonList(new MatchingAttributeV2("Smith", true, standardFromDate, null)),
+                new MatchingAttributeV2("NOT_SPECIFIED", true, standardFromDate, standardToDate),
                 null,
-                singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+                singletonList(new MatchingAddressV2(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
                 expectedPid
         );
 

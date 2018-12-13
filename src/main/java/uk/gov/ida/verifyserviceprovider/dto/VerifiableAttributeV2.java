@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
-public class NonMatchingVerifiableAttribute<T> {
+public class VerifiableAttributeV2<T> {
 
     @JsonProperty("value")
     private final T value;
@@ -15,7 +15,7 @@ public class NonMatchingVerifiableAttribute<T> {
     @JsonProperty("to") @JsonInclude(JsonInclude.Include.NON_NULL)
     private final LocalDateTime to;
 
-    public NonMatchingVerifiableAttribute(
+    public VerifiableAttributeV2(
            T value,
            boolean verified,
            LocalDateTime from,
@@ -43,7 +43,7 @@ public class NonMatchingVerifiableAttribute<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NonMatchingVerifiableAttribute<?> that = (NonMatchingVerifiableAttribute<?>) o;
+        VerifiableAttributeV2<?> that = (VerifiableAttributeV2<?>) o;
 
         return isVerified() == that.isVerified() &&
                 getValue().equals(that.getValue()) &&
@@ -62,7 +62,7 @@ public class NonMatchingVerifiableAttribute<T> {
 
     @Override
     public String toString() {
-        return String.format("NonMatchingVerifiableAttribute{ value=%s, verified=%s, from=%s, to=%s }", value, verified, from, to);
+        return String.format("VerifiableAttributeV2{ value=%s, verified=%s, from=%s, to=%s }", value, verified, from, to);
     }
 
 }

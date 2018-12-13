@@ -32,7 +32,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA1_ID;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA2_ID;
 
-public class UserAccountCreationResponseAcceptanceTest {
+public class V1UserAccountCreationResponseAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();

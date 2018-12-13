@@ -11,11 +11,11 @@ import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.dto.AttributesV2;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
@@ -60,7 +60,7 @@ public class EidasAssertionServiceTest {
     private EidasMatchingDatasetUnmarshaller eidasMatchingDatasetUnmarshaller;
 
     @Mock
-    private MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
+    private MatchingDatasetToAttributesMapper mdsMapper;
 
     @Mock
     private InstantValidator instantValidator;
@@ -100,7 +100,7 @@ public class EidasAssertionServiceTest {
         when(metadataResolverRepository.getResolverEntityIds()).thenReturn(asList(STUB_COUNTRY_ONE));
         when(signatureValidatorFactory.getSignatureValidator(any())).thenReturn(Optional.of(samlAssertionsSignatureValidator));
         when(samlAssertionsSignatureValidator.validate(any(), any())).thenReturn(null);
-        when(mdsMapper.mapToNonMatchingAttributes(any())).thenReturn(mock(NonMatchingAttributes.class));
+        when(mdsMapper.mapToAttributesV2(any())).thenReturn(mock(AttributesV2.class));
     }
 
     @Test

@@ -12,7 +12,7 @@ public class TestTranslatedNonMatchingResponseBody extends TranslatedNonMatching
             @JsonProperty("scenario") NonMatchingScenario scenario,
             @JsonProperty("pid") String pid,
             @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
-            @JsonProperty("attributes") NonMatchingAttributes attributes
+            @JsonProperty("attributes") AttributesV2 attributes
     ) {
         super(scenario, pid, levelOfAssurance, attributes);
     }
@@ -29,7 +29,7 @@ public class TestTranslatedNonMatchingResponseBody extends TranslatedNonMatching
         return levelOfAssurance;
     }
 
-    public Optional<NonMatchingAttributes> getAttributes() {
+    public Optional<AttributesV2> getAttributes() {
         return Optional.ofNullable(attributes);
     }
 

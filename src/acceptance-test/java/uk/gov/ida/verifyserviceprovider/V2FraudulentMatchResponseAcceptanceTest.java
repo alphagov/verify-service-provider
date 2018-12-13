@@ -2,13 +2,12 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -18,13 +17,13 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static javax.ws.rs.client.Entity.json;
-import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID;
 
-public class NonMatchingAuthnFailedResponseAcceptanceTest {
+public class V2FraudulentMatchResponseAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
@@ -51,10 +50,10 @@ public class NonMatchingAuthnFailedResponseAcceptanceTest {
     }
 
     @Test
-    public void shouldRespondWithSuccessWhenAuthnFailed() {
+    public void shouldRespondWithErrorWhenFraudulentMatchResponse() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID),
             "requestId", requestResponseBody.getRequestId(),
             "levelOfAssurance", LEVEL_2.name()
         );
@@ -65,9 +64,10 @@ public class NonMatchingAuthnFailedResponseAcceptanceTest {
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
-        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+        ErrorMessage errorBody = response.readEntity(ErrorMessage.class);
 
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getMessage()).contains("SAML Validation Specification: Signature was not valid.");
     }
 }

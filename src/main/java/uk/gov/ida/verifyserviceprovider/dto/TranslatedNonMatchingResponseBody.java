@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Optional;
 
 public class TranslatedNonMatchingResponseBody {
 
@@ -12,13 +11,13 @@ public class TranslatedNonMatchingResponseBody {
     @JsonProperty("levelOfAssurance")
     protected final LevelOfAssurance levelOfAssurance;
     @JsonProperty("attributes")
-    protected final NonMatchingAttributes attributes;
+    protected final AttributesV2 attributes;
 
     public TranslatedNonMatchingResponseBody(
             NonMatchingScenario scenario,
             String pid,
             LevelOfAssurance levelOfAssurance,
-            NonMatchingAttributes attributes
+            AttributesV2 attributes
     ) {
         this.scenario = scenario;
         this.pid = pid;

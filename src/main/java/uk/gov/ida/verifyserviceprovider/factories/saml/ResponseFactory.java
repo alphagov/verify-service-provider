@@ -24,7 +24,7 @@ import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgori
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
@@ -80,7 +80,7 @@ public class ResponseFactory {
 
     public ResponseService<TranslatedResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService<TranslatedResponseBody> assertionServiceV1,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -89,7 +89,7 @@ public class ResponseFactory {
         return new ResponseService<>(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
-                matchingAssertionService,
+                assertionServiceV1,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator)
         );
@@ -146,7 +146,7 @@ public class ResponseFactory {
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new MatchingDatasetToAttributesMapper(),
                 new LevelOfAssuranceValidator(),
                 new UserIdHashFactory(hashingEntityId)
             );
@@ -162,7 +162,7 @@ public class ResponseFactory {
         return new EidasAssertionService(
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new MatchingDatasetToAttributesMapper(),
                 new InstantValidator(dateTimeComparator),
                 new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
                 new LevelOfAssuranceValidator(),

@@ -7,11 +7,11 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.AttributesV2;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.Optional;
@@ -22,13 +22,13 @@ public abstract class AssertionServiceV2 implements AssertionService<TranslatedN
 
     protected final SubjectValidator subjectValidator;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
-    private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
+    private final MatchingDatasetToAttributesMapper mdsMapper;
 
 
     public AssertionServiceV2(
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper
+            MatchingDatasetToAttributesMapper mdsMapper
     ) {
         this.subjectValidator = subjectValidator;
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
@@ -54,10 +54,10 @@ public abstract class AssertionServiceV2 implements AssertionService<TranslatedN
         }
     }
 
-    protected NonMatchingAttributes translateAttributes(Assertion mdsAssertion) {
+    protected AttributesV2 translateAttributes(Assertion mdsAssertion) {
         MatchingDataset matchingDataset = matchingDatasetUnmarshaller.fromAssertion(mdsAssertion);
 
-        return mdsMapper.mapToNonMatchingAttributes(matchingDataset);
+        return mdsMapper.mapToAttributesV2(matchingDataset);
     }
 
     protected String getNameIdFrom(Assertion assertion) {

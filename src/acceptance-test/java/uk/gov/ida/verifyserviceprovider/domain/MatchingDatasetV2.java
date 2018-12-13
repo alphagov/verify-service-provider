@@ -3,28 +3,28 @@ package uk.gov.ida.verifyserviceprovider.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-public class V2MatchingDataset {
+public class MatchingDatasetV2 {
     @JsonProperty
-    private MatchingAttribute firstName;
+    private MatchingAttributeV2 firstName;
     @JsonProperty
-    private MatchingAttribute middleNames;
+    private MatchingAttributeV2 middleNames;
     @JsonProperty
-    private List<MatchingAttribute> surnames;
+    private List <MatchingAttributeV2> surnames;
     @JsonProperty
-    private MatchingAttribute gender;
+    private MatchingAttributeV2 gender;
     @JsonProperty
-    private MatchingAttribute dateOfBirth;
+    private MatchingAttributeV2 dateOfBirth;
     @JsonProperty
-    private List<MatchingAddress> addresses;
+    private List<MatchingAddressV2> addresses;
     @JsonProperty
     private String persistentId;
 
-    public V2MatchingDataset(MatchingAttribute firstName,
-                             MatchingAttribute middleNames,
-                             List<MatchingAttribute> surnames,
-                             MatchingAttribute gender,
-                             MatchingAttribute dateOfBirth,
-                             List<MatchingAddress> addresses,
+    public MatchingDatasetV2(MatchingAttributeV2 firstName,
+                             MatchingAttributeV2 middleNames,
+                             List <MatchingAttributeV2> surnames,
+                             MatchingAttributeV2 gender,
+                             MatchingAttributeV2 dateOfBirth,
+                             List<MatchingAddressV2> addresses,
                              String persistentId) {
         this.firstName = firstName;
         this.middleNames = middleNames;

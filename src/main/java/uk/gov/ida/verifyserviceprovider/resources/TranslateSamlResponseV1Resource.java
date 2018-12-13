@@ -24,14 +24,14 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TranslateSamlResponseResource {
+public class TranslateSamlResponseV1Resource {
 
     private final ResponseService<TranslatedResponseBody> responseService;
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseV1Resource.class);
     private final EntityIdService entityIdService;
 
 
-    public TranslateSamlResponseResource(ResponseService<TranslatedResponseBody> responseService, EntityIdService entityIdService) {
+    public TranslateSamlResponseV1Resource(ResponseService<TranslatedResponseBody> responseService, EntityIdService entityIdService) {
         this.responseService = responseService;
         this.entityIdService = entityIdService;
     }

@@ -70,7 +70,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
-        environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
+        environment.jersey().register(factory.getTranslateSamlResponseV2Resource());
 
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }

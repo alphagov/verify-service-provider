@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MatchingAddress {
+public class MatchingAddressV2 {
 
     @JsonProperty
     private boolean verified;
@@ -24,7 +24,7 @@ public class MatchingAddress {
     @JsonProperty
     private Optional<String> uprn;
 
-    public MatchingAddress(
+    public MatchingAddressV2(
         final boolean verified,
         final LocalDateTime from,
         final LocalDateTime to,

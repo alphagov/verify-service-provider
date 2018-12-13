@@ -14,7 +14,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseV2Resource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TranslateNonMatchingSamlResponseResourceTest {
+public class TranslateSamlResponseV2ResourceTest {
 
     private static ResponseService responseService = mock(ResponseService.class);
     private static EntityIdService entityIdService = mock(EntityIdService.class);
@@ -44,7 +44,7 @@ public class TranslateNonMatchingSamlResponseResourceTest {
             .addProvider(JerseyViolationExceptionMapper.class)
             .addProvider(JsonProcessingExceptionMapper.class)
             .addProvider(InvalidEntityIdExceptionMapper.class)
-            .addResource(new TranslateNonMatchingSamlResponseResource(responseService, entityIdService))
+            .addResource(new TranslateSamlResponseV2Resource(responseService, entityIdService))
             .build();
 
     @Before

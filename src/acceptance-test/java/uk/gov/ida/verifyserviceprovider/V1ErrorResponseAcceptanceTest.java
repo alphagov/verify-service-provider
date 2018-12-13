@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.REQUESTER_ERROR_ID;
 
-public class ErrorResponseAcceptanceTest {
+public class V1ErrorResponseAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();

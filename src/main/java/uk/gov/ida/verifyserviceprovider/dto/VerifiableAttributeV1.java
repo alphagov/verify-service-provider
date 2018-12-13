@@ -7,21 +7,21 @@ import uk.gov.ida.verifyserviceprovider.exceptions.RequestedOnlyVerifiedExceptio
 
 import java.util.Optional;
 
-public class VerifiableAttribute<T> {
+public class VerifiableAttributeV1<T> {
 
     private final T value;
     private final boolean verified;
 
     @JsonCreator
-    public VerifiableAttribute(@JsonProperty("value") T value,
-                               @JsonProperty("verified") boolean verified) {
+    public VerifiableAttributeV1(@JsonProperty("value") T value,
+                                 @JsonProperty("verified") boolean verified) {
         this.value = value;
         this.verified = verified;
     }
 
-    public static <Y> VerifiableAttribute<Y> fromOptionals(Optional<Y> value, Optional<Boolean> verified) {
+    public static <Y> VerifiableAttributeV1<Y> fromOptionals(Optional<Y> value, Optional<Boolean> verified) {
         if (value.isPresent() && verified.isPresent()) {
-            return new VerifiableAttribute<>(value.get(), verified.get());
+            return new VerifiableAttributeV1<>(value.get(), verified.get());
         }
 
         if (!value.isPresent() && !verified.isPresent()) {
@@ -52,7 +52,7 @@ public class VerifiableAttribute<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        VerifiableAttribute<?> that = (VerifiableAttribute<?>) o;
+        VerifiableAttributeV1<?> that = (VerifiableAttributeV1<?>) o;
 
         return isVerified() == that.isVerified() && getValue().equals(that.getValue());
     }
@@ -66,6 +66,6 @@ public class VerifiableAttribute<T> {
 
     @Override
     public String toString() {
-        return String.format("VerifiableAttribute{ value=%s, verified=%s }", value, verified);
+        return String.format("VerifiableAttributeV1{ value=%s, verified=%s }", value, verified);
     }
 }

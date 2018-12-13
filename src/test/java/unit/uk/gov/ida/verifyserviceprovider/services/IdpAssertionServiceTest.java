@@ -29,7 +29,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBod
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -89,7 +89,7 @@ public class IdpAssertionServiceTest {
     private UserIdHashFactory userIdHashFactory;
 
     @Mock
-    private MatchingDatasetToNonMatchingAttributesMapper matchingDatasetToNonMatchingAttributesMapper;
+    private MatchingDatasetToAttributesMapper matchingDatasetToAttributesMapper;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -105,7 +105,7 @@ public class IdpAssertionServiceTest {
                 attributeStatementValidator,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                matchingDatasetToNonMatchingAttributesMapper,
+                matchingDatasetToAttributesMapper,
                 levelOfAssuranceValidator,
                 userIdHashFactory);
         doNothing().when(subjectValidator).validate(any(), any());

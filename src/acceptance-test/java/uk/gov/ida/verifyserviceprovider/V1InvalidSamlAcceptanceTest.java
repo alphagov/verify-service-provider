@@ -2,13 +2,12 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import io.dropwizard.jersey.errors.ErrorMessage;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -18,21 +17,18 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static javax.ws.rs.client.Entity.json;
-import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID;
 
-public class NonMatchingNoAuthnContextResponseAcceptanceTest {
+public class V1InvalidSamlAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
-            .withMockMsaServer(msaServer)
-            .build();
+    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
 
     private static Client client;
     private static ComplianceToolService complianceTool;
@@ -47,27 +43,28 @@ public class NonMatchingNoAuthnContextResponseAcceptanceTest {
 
     @Before
     public void setUp() {
-        complianceTool.initialiseWithDefaultsForV2();
+        complianceTool.initialiseWithDefaults();
     }
 
     @Test
-    public void shouldRespondWithSuccessWhenNoAuthnContext() {
+    public void shouldRespondWithErrorWhenAssertionSignedByHub() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID),
+            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_SUCCESSFUL_MATCH_WITH_ASSERTIONS_SIGNED_BY_HUB_ID),
             "requestId", requestResponseBody.getRequestId(),
             "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
 
-        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+        ErrorMessage errorBody = response.readEntity(ErrorMessage.class);
 
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getMessage()).contains("SAML Validation Specification: Signature was not valid.");
     }
 }
