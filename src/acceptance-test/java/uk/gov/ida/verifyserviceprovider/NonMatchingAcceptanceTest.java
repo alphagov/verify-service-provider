@@ -56,7 +56,6 @@ public class NonMatchingAcceptanceTest {
 
     @Test
     public void shouldRespondWithIdentityVerifiedWhenVerificationSucceeds() {
-        String expectedPid = "some-expected-pid";
 
         complianceTool.initialiseWithDefaultsForV2();
 
