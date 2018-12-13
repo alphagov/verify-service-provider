@@ -10,14 +10,14 @@ public class TranslatedResponseBody {
     private final Scenario scenario;
     private final String pid;
     private final LevelOfAssurance levelOfAssurance;
-    private final Attributes attributes;
+    private final AttributesV1 attributes;
 
     @JsonCreator
     public TranslatedResponseBody(
         @JsonProperty("scenario") Scenario scenario,
         @JsonProperty("pid") String pid,
         @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
-        @JsonProperty("attributes") Attributes attributes
+        @JsonProperty("attributes") AttributesV1 attributes
     ) {
         this.scenario = scenario;
         this.pid = pid;
@@ -37,7 +37,7 @@ public class TranslatedResponseBody {
         return levelOfAssurance;
     }
 
-    public Optional<Attributes> getAttributes() {
+    public Optional<AttributesV1> getAttributes() {
         return Optional.ofNullable(attributes);
     }
 

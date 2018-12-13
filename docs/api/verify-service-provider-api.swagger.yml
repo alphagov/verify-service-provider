@@ -157,7 +157,7 @@ definitions:
       levelOfAssurance:
         $ref: '#/definitions/ReceivedLevelOfAssurance'
       attributes:
-        $ref: '#/definitions/Attributes'
+        $ref: '#/definitions/AttributesV1'
   RequiredLevelOfAssurance:
     description: 'The minimum level of assurance required by the Relying Party Service.'
     type: string

@@ -22,11 +22,11 @@ import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgori
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.AssertionServiceV1;
+import uk.gov.ida.verifyserviceprovider.services.AssertionServiceV2;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -76,7 +76,7 @@ public class ResponseFactory {
 
     public ResponseService<TranslatedResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService<TranslatedResponseBody> assertionServiceV1,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -85,7 +85,7 @@ public class ResponseFactory {
         return new ResponseService<>(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
-                matchingAssertionService,
+                assertionServiceV1,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator)
         );
@@ -108,7 +108,7 @@ public class ResponseFactory {
         );
     }
 
-    public MatchingAssertionService createMatchingAssertionService(
+    public AssertionServiceV1 createAssertionServiceV1(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
             DateTimeComparator dateTimeComparator
     ) {
@@ -123,13 +123,13 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new MatchingAssertionService(
+        return new AssertionServiceV1(
                 assertionValidator,
                 assertionsSignatureValidator
         );
     }
 
-    public NonMatchingAssertionService createNonMatchingAssertionService( ExplicitKeySignatureTrustEngine signatureTrustEngine,
+    public AssertionServiceV2 createAssertionServiceV2( ExplicitKeySignatureTrustEngine signatureTrustEngine,
                                                                           DateTimeComparator dateTimeComparator,
                                                                           String hashingEntityId) {
 
@@ -138,13 +138,13 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
 
-        return new NonMatchingAssertionService(
+        return new AssertionServiceV2(
                 new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new MatchingDatasetToAttributesMapper(),
                 new LevelOfAssuranceValidator(),
                 new UserIdHashFactory(hashingEntityId)
             );

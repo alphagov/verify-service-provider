@@ -13,8 +13,8 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseV2Resource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseV1Resource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -97,22 +97,22 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
-        return new TranslateSamlResponseResource(
+    public TranslateSamlResponseV1Resource getTranslateMatchingSamlResponseResource() {
+        return new TranslateSamlResponseV1Resource(
             responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
-                responseFactory.createMatchingAssertionService(getMsaSignatureTrustEngine(), dateTimeComparator),
+                responseFactory.createAssertionServiceV1(getMsaSignatureTrustEngine(), dateTimeComparator),
                 dateTimeComparator
             ),
             entityIdService
         );
     }
 
-    public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
-        return new TranslateNonMatchingSamlResponseResource(
+    public TranslateSamlResponseV2Resource getTranslateSamlResponseV2Resource() {
+        return new TranslateSamlResponseV2Resource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
-                        responseFactory.createNonMatchingAssertionService(
+                        responseFactory.createAssertionServiceV2(
                                 getHubSignatureTrustEngine(),
                                 dateTimeComparator,
                                 configuration.getHashingEntityId()),
