@@ -12,7 +12,7 @@ public class VerifyServiceProviderAppRuleBuilder {
     }
 
     public VerifyServiceProviderAppRule build() {
-        return new VerifyServiceProviderAppRule(mockMsaServer);
+        return new VerifyServiceProviderAppRule();
     }
 
     public VerifyServiceProviderAppRuleBuilder withMockMsaServer(MockMsaServer mockMsaServer) {
