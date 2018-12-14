@@ -16,18 +16,18 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
-
 import javax.xml.namespace.QName;
+import java.util.stream.Collectors;
 import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
@@ -43,6 +43,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     private final AssertionClassifier assertionClassifierService;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
+    private UserIdHashFactory userIdHashFactory;
 
     public NonMatchingAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
@@ -51,8 +52,8 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
-            LevelOfAssuranceValidator levelOfAssuranceValidator
-    ) {
+            LevelOfAssuranceValidator levelOfAssuranceValidator,
+            UserIdHashFactory userIdHashFactory) {
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.subjectValidator = subjectValidator;
         this.attributeStatementValidator = attributeStatementValidator;
@@ -60,6 +61,7 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
         this.assertionClassifierService = assertionClassifierService;
         this.mdsMapper = mdsMapper;
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
+        this.userIdHashFactory = userIdHashFactory;
     }
 
 
@@ -73,10 +75,14 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
         validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance, levelOfAssurance);
 
         String nameID = mdsAssertion.getSubject().getNameID().getValue();
+        String issuerID = mdsAssertion.getIssuer().getValue();
+        String uri =  extractLevelOfAssuranceUri(authnAssertion);
+
+        String hashId = userIdHashFactory.hashId(issuerID, nameID, getAuthnContext(uri));
 
         NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
 
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
+        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }
 
     @Override
@@ -176,16 +182,22 @@ public class NonMatchingAssertionService implements AssertionService<TranslatedN
     }
 
     public LevelOfAssurance extractLevelOfAssuranceFrom(Assertion authnAssertion) {
-        String levelOfAssuranceString = extractLevelOfAssuranceStringFrom(authnAssertion);
+        String levelOfAssuranceUri = extractLevelOfAssuranceUri(authnAssertion);
 
         try {
-            return LevelOfAssurance.fromSamlValue(levelOfAssuranceString);
+            return LevelOfAssurance.fromSamlValue(levelOfAssuranceUri);
         } catch (Exception ex) {
-            throw new SamlResponseValidationException(String.format("Level of assurance '%s' is not supported.", levelOfAssuranceString));
+            throw new SamlResponseValidationException(String.format("Level of assurance '%s' is not supported.", levelOfAssuranceUri));
         }
     }
 
-    private String extractLevelOfAssuranceStringFrom(Assertion authnAssertion) {
+    private  Optional<uk.gov.ida.saml.core.domain.AuthnContext>  getAuthnContext(String uri) {
+        return Arrays.stream(uk.gov.ida.saml.core.domain.AuthnContext.values())
+                .filter(ctx -> uri.equals(ctx.getUri()))
+                .findFirst();
+    }
+
+    private String extractLevelOfAssuranceUri(Assertion authnAssertion) {
         AuthnStatement authnStatement = authnAssertion.getAuthnStatements().get(0);
         return ofNullable(authnStatement.getAuthnContext())
                 .map(AuthnContext::getAuthnContextClassRef)

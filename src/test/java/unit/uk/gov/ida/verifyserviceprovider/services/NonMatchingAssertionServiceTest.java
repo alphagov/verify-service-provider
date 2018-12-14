@@ -24,18 +24,24 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
-
+import uk.gov.ida.saml.core.domain.AuthnContext;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.emptyList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -79,6 +85,11 @@ public class NonMatchingAssertionServiceTest {
     @Mock
     private LevelOfAssuranceValidator levelOfAssuranceValidator;
 
+    @Mock
+    private UserIdHashFactory userIdHashFactory;
+
+    @Mock
+    private MatchingDatasetToNonMatchingAttributesMapper matchingDatasetToNonMatchingAttributesMapper;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -94,12 +105,11 @@ public class NonMatchingAssertionServiceTest {
                 attributeStatementValidator,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                levelOfAssuranceValidator
-        );
+                matchingDatasetToNonMatchingAttributesMapper,
+                levelOfAssuranceValidator,
+                userIdHashFactory);
         doNothing().when(subjectValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
-
 
         DateTimeFreezer.freezeTime();
     }
@@ -233,6 +243,27 @@ public class NonMatchingAssertionServiceTest {
         nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
     }
 
+    @Test
+    public void expectedHashContainedInResponseBodyWhenUserIdFactoryIsCalledOnce() {
+
+        String requestId = "requestId";
+        String expectedHashed = "a5fbea969c3837a712cbe9e188804796828f369106478e623a436fa07e8fd298";
+        TestTranslatedNonMatchingResponseBody expectedNonMatchingResponseBody = new TestTranslatedNonMatchingResponseBody(NonMatchingScenario.IDENTITY_VERIFIED, expectedHashed, LEVEL_2, null);
+
+        Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, requestId).buildUnencrypted();
+        Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), requestId).buildUnencrypted();
+
+        final String nameId = authnAssertion.getSubject().getNameID().getValue();
+        final String issuerId = authnAssertion.getIssuer().getValue();
+
+        when(userIdHashFactory.hashId(eq(issuerId), eq(nameId), eq(Optional.of(AuthnContext.LEVEL_2))))
+                .thenReturn(expectedHashed);
+
+        TranslatedNonMatchingResponseBody responseBody = nonMatchingAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
+
+        verify(userIdHashFactory, times(1)).hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2));
+        assertThat(responseBody.toString()).contains(expectedNonMatchingResponseBody.getPid());
+    }
 
     public static AssertionBuilder aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, String requestId) {
         return anAssertion()
