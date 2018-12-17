@@ -2,31 +2,26 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 
 import java.net.URI;
 
-import static java.util.Optional.ofNullable;
-
 public class VerifyHubConfiguration {
 
-    private URI hubSsoLocation;
-    private HubMetadataConfiguration hubMetadataConfiguration;
+    private final HubEnvironment hubEnvironment;
 
     @JsonCreator
     public VerifyHubConfiguration(
-        @JsonProperty("environment") HubEnvironment hubEnvironment,
-        @JsonProperty("ssoLocation") URI hubSsoLocation,
-        @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
+        @JsonProperty("environment") HubEnvironment hubEnvironment
     ) {
-        this.hubSsoLocation = ofNullable(hubSsoLocation).orElseGet(() -> hubEnvironment.getSsoLocation());
-        this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElseGet(() -> hubEnvironment.getMetadataConfiguration());
+        this.hubEnvironment = hubEnvironment;
     }
 
     public URI getHubSsoLocation() {
-        return hubSsoLocation;
+        return hubEnvironment.getSsoLocation();
     }
 
-    public HubMetadataConfiguration getHubMetadataConfiguration() {
-        return hubMetadataConfiguration;
+    public MetadataResolverConfiguration getHubMetadataConfiguration() {
+        return hubEnvironment;
     }
 }

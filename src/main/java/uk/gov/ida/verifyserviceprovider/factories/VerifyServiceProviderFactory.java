@@ -66,7 +66,7 @@ public class VerifyServiceProviderFactory {
     public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws Exception {
         MetadataCredentialResolver metadataCredentialResolver = getHubMetadataCredentialResolver();
         MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver = new MetadataBackedEncryptionCredentialResolver(metadataCredentialResolver, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
-        EncrypterFactory encrypterFactory = new EncrypterFactory(encryptionCredentialResolver, configuration.getVerifyHubMetadata().getExpectedEntityId());
+        EncrypterFactory encrypterFactory = new EncrypterFactory(encryptionCredentialResolver, configuration.getHubMetadataConfiguration().getExpectedEntityId());
 
         PrivateKey signingKey = configuration.getSamlSigningKey();
 

@@ -8,6 +8,7 @@ import keystore.KeyStoreResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestMD5;
 import org.opensaml.xmlsec.signature.Signature;
@@ -42,6 +43,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
+@Ignore("TODO: Implement CUSTOM environment")
 public class HubMetadataFeatureTest {
 
     private final String HEALTHCHECK_URL = "http://localhost:%d/admin/healthcheck";

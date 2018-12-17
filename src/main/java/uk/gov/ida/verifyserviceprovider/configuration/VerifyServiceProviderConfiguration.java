@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import org.joda.time.Duration;
+import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
 
 import javax.validation.Valid;
@@ -77,11 +78,11 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlSecondaryEncryptionKey;
     }
 
-    public MsaMetadataConfiguration getMsaMetadata() {
+    public MsaMetadataConfiguration getMsaMetadataConfiguration() {
         return msaMetadata;
     }
 
-    public HubMetadataConfiguration getVerifyHubMetadata() {
+    public MetadataResolverConfiguration getHubMetadataConfiguration() {
         return verifyHubConfiguration.getHubMetadataConfiguration();
     }
 

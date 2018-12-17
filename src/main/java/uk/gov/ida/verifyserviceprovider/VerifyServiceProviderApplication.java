@@ -25,8 +25,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
-        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
-        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
+        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getHubMetadataConfiguration));
+        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadataConfiguration), false);
     }
 
     public static void main(String[] args) throws Exception {
