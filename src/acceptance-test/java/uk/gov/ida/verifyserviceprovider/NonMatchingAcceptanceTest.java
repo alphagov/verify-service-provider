@@ -27,7 +27,6 @@ import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
@@ -39,9 +38,7 @@ import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO
 public class NonMatchingAcceptanceTest {
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
-            .build();
-
+    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule();
     private static Client client;
     private static ComplianceToolService complianceTool;
     private static GenerateRequestService generateRequestService;

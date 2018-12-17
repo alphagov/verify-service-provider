@@ -36,9 +36,15 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
             ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
             ConfigOverride.config("samlSecondaryEncryptionKey", secondaryEncryptionKey),
-            ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri")
+            ConfigOverride.config("europeanIdentity.enabled", "false"),
+            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
         );
     }
+
     public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,

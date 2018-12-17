@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
 import java.util.List;
+import java.util.Optional;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -45,7 +46,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSigningKey = samlSigningKey;
         this.samlPrimaryEncryptionKey = samlPrimaryEncryptionKey;
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
-        this.msaMetadata = msaMetadata;
+        this.msaMetadata = Optional.ofNullable(msaMetadata).orElseGet(() -> new MsaMetadataConfiguration(URI.create(""), 0L, 0L, "", null, "", ""));
         this.clockSkew = clockSkew;
         this.europeanIdentity = europeanIdentity;
     }

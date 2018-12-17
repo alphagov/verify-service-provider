@@ -38,13 +38,6 @@ hashingEntityId: ${HASHING_ENTITY_ID:-}
 verifyHubConfiguration:
   environment: ${VERIFY_ENVIRONMENT:-}
 
-# Location of Matching Service Metadata
-# Verify Service Provider consumes the metadata and uses
-# public certificates from it to identify the msa
-msaMetadata:
-  uri: ${MSA_METADATA_URL:-}
-  expectedEntityId: ${MSA_ENTITY_ID:-}
-
 # Private key that is used to sign an AuthnRequest
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 

@@ -20,7 +20,6 @@ import java.util.Map;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_NO_MATCH_ID;
 
@@ -28,11 +27,8 @@ public class NoMatchAcceptanceTest {
 
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
-
     @ClassRule
-    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
-            .withMockMsaServer(msaServer)
-            .build();
+    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
 
     private static Client client;
     private static ComplianceToolService complianceTool;
