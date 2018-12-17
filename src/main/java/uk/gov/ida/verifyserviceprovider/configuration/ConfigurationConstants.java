@@ -15,4 +15,14 @@ public interface ConfigurationConstants {
 
     String HUB_JERSEY_CLIENT_NAME = "VerifyHubMetadataClient";
     String MSA_JERSEY_CLIENT_NAME = "MsaMetadataClient";
+
+    interface EnvironmentVariables {
+        String HUB_SSO_URL = "HUB_SSO_URL";
+        String HUB_METADATA_URL = "HUB_METADATA_URL";
+        String HUB_EXPECTED_ENTITY_ID = "HUB_EXPECTED_ENTITY_ID";
+        String METADATA_TRUSTSTORE_PATH = "METADATA_TRUSTSTORE_PATH";
+        String HUB_TRUSTSTORE_PATH = "HUB_TRUSTSTORE_PATH";
+        String IDP_TRUSTSTORE_PATH = "IDP_TRUSTSTORE_PATH";
+        String TRUSTSTORE_PASSWORD = "TRUSTSTORE_PASSWORD";
+    }
 }

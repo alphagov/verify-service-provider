@@ -10,10 +10,20 @@ import org.junit.Test;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.IDP_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
+@Ignore(value = "TODO: Implement CUSTOM environment")
 public class VerifyHubConfigurationFeatureTests {
 
     private static final KeyStoreResource keyStore = KeyStoreResourceBuilder.aKeyStoreResource()
@@ -76,48 +86,57 @@ public class VerifyHubConfigurationFeatureTests {
         assertThat(metadataConfiguration.getMaxRefreshDelay()).isEqualTo(600000);
     }
 
-    @Ignore(value = "TODO: Implement CUSTOM environment")
     @Test
     public void shouldSetHubMetadataExpectedEntityIdToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
-        environmentHelper.put("HUB_EXPECTED_ENTITY_ID", "some-expected-entity-id");
+        setUpEnvironmentForCustom();
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
-        assertThat(actualConfiguration.getHubMetadataConfiguration().getExpectedEntityId()).isEqualTo("some-expected-entity-id");
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getExpectedEntityId()).isEqualTo("http://some-expected-entity-id");
     }
 
-    @Ignore(value = "TODO: Implement CUSTOM environment")
     @Test
     public void shouldSetHubMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
-        environmentHelper.put("HUB_METADATA_TRUSTSTORE_PATH", keyStore.getAbsolutePath());
-        environmentHelper.put("HUB_METADATA_TRUSTSTORE_PASSWORD", keyStore.getPassword());
+        setUpEnvironmentForCustom();
+        environmentHelper.put(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        environmentHelper.put(TRUSTSTORE_PASSWORD, keyStore.getPassword());
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
         assertThat(actualConfiguration.getHubMetadataConfiguration().getTrustStore().containsAlias("rootCA")).isTrue();
     }
 
-    @Ignore(value = "TODO: Implement CUSTOM environment")
     @Test
     public void shouldSetHubSsoLocationToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
-        environmentHelper.put("HUB_SSO_LOCATION", "http://some-hub-sso-location");
+        setUpEnvironmentForCustom();
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
-        assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("http://some-hub-sso-location");
+        assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("http://some-sso-url");
     }
 
-    @Ignore(value = "TODO: Implement CUSTOM environment")
     @Test
     public void shouldSetHubMetadataUriToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
-        environmentHelper.put("HUB_METADATA_URI", "http://some-metadata-location");
+        setUpEnvironmentForCustom();
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
-        assertThat(actualConfiguration.getHubMetadataConfiguration().getUri().toString()).isEqualTo("http://some-metadata-location");
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getUri().toString()).isEqualTo("http://some-metadata-url");
+    }
+
+    private void setUpEnvironmentForCustom() {
+        HashMap<String, String> env = new HashMap<>();
+        env.put(HUB_SSO_URL, "http://some-sso-url");
+        env.put(HUB_METADATA_URL, "http://some-metadata-url");
+        env.put(HUB_EXPECTED_ENTITY_ID, "http://some-expected-entity-id");
+        env.put(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        env.put(HUB_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        env.put(IDP_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        env.put(TRUSTSTORE_PASSWORD, keyStore.getPassword());
+        environmentHelper.setEnv(env);
     }
 }

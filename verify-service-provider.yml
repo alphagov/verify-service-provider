@@ -31,10 +31,9 @@ serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
 
 hashingEntityId: ${HASHING_ENTITY_ID:-}
 
-# Verify Hub Environment. This tells the service provider where the Verify Hub
-# authentication flow begins and where to find the hub metadata the Verify Service
-# Provider consumes to identify the hub.
-# Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
+# Verify Hub Environment. This tells the service provider which Verify Hub
+# environment to target.
+# Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION and CUSTOM
 verifyHubConfiguration:
   environment: ${VERIFY_ENVIRONMENT:-}
 

@@ -12,36 +12,59 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.DEFAULT_TRUST_STORE_PASSWORD;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.IDP_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PROD_METADATA_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_METADATA_TRUSTSTORE_NAME;
 
 public enum HubEnvironment implements MetadataResolverConfiguration {
     PRODUCTION(
-            URI.create("https://www.signin.service.gov.uk/SAML2/SSO"),
-            URI.create("https://www.signin.service.gov.uk/SAML2/metadata/federation"),
+            "https://www.signin.service.gov.uk/SAML2/SSO",
+            "https://www.signin.service.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             PROD_METADATA_TRUSTSTORE_NAME,
-            true),
+            DEFAULT_TRUST_STORE_PASSWORD,
+            true
+    ),
     INTEGRATION(
-            URI.create("https://www.integration.signin.service.gov.uk/SAML2/SSO"),
-            URI.create("https://www.integration.signin.service.gov.uk/SAML2/metadata/federation"),
+            "https://www.integration.signin.service.gov.uk/SAML2/SSO",
+            "https://www.integration.signin.service.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             TEST_METADATA_TRUSTSTORE_NAME,
-            true),
+            DEFAULT_TRUST_STORE_PASSWORD,
+            true
+    ),
     COMPLIANCE_TOOL(
-            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"),
-            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation"),
+            "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO",
+            "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             TEST_METADATA_TRUSTSTORE_NAME,
-            true);
+            DEFAULT_TRUST_STORE_PASSWORD,
+            true
+    ),
+    CUSTOM(
+            System.getenv().getOrDefault(HUB_SSO_URL, ""),
+            System.getenv().getOrDefault(HUB_METADATA_URL, ""),
+            System.getenv().getOrDefault(HUB_EXPECTED_ENTITY_ID, ""),
+            System.getenv().getOrDefault(METADATA_TRUSTSTORE_PATH, ""),
+            System.getenv().getOrDefault(TRUSTSTORE_PASSWORD, ""),
+            false
+    );
 
-    private URI ssoLocation;
-    private URI metadataUri;
+    private String ssoLocation;
+    private String metadataUri;
     private String expectedEntityId;
     private String metadataTrustStorePath;
+    private String trustStorePassword;
     private boolean loadTruststoreFromResources;
 
     @JsonCreator
@@ -55,20 +78,22 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             ));
     }
 
-    HubEnvironment(URI ssoLocation,
-                   URI metadataUri,
+    HubEnvironment(String ssoLocation,
+                   String metadataUri,
                    String expectedEntityId,
                    String metadataTrustStorePath,
+                   String trustStorePassword,
                    boolean loadTruststoreFromResources) {
         this.ssoLocation = ssoLocation;
         this.metadataUri = metadataUri;
         this.expectedEntityId = expectedEntityId;
         this.metadataTrustStorePath = metadataTrustStorePath;
+        this.trustStorePassword = trustStorePassword;
         this.loadTruststoreFromResources = loadTruststoreFromResources;
     }
 
     public URI getSsoLocation() {
-        return this.ssoLocation;
+        return URI.create(this.ssoLocation);
     }
 
     @Override
@@ -78,7 +103,7 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
 
     @Override
     public URI getUri() {
-        return metadataUri;
+        return URI.create(metadataUri);
     }
 
     @Override
@@ -117,7 +142,7 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
 
     private KeyStore loadTruststoreFromFile(String trustStore) {
         try {
-            return new KeyStoreLoader().load(new FileInputStream(trustStore), DEFAULT_TRUST_STORE_PASSWORD);
+            return new KeyStoreLoader().load(new FileInputStream(trustStore), trustStorePassword);
         } catch (FileNotFoundException e) {
             throw new TrustStoreLoadingException(trustStore);
         }
@@ -128,6 +153,6 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
         if (trustStoreStream == null) {
             throw new TrustStoreLoadingException(trustStore);
         }
-        return new KeyStoreLoader().load(trustStoreStream, DEFAULT_TRUST_STORE_PASSWORD);
+        return new KeyStoreLoader().load(trustStoreStream, trustStorePassword);
     }
 }
