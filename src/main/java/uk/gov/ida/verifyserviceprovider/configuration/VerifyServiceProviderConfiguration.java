@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.net.URI;
 import java.security.PrivateKey;
 import java.util.List;
+import java.util.Optional;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
@@ -34,7 +35,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
         @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
         @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-        @JsonProperty("msaMetadata") @NotNull @Valid MsaMetadataConfiguration msaMetadata,
+        @JsonProperty("msaMetadata") @Valid MsaMetadataConfiguration msaMetadata,
         @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew
     ) {
         this.serviceEntityIds = serviceEntityIds;
@@ -78,7 +79,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     }
 
     public MsaMetadataConfiguration getMsaMetadata() {
-        return msaMetadata;
+        return Optional.ofNullable(msaMetadata).orElseGet(this::getMsaMetadataConfigDefault);
     }
 
     public HubMetadataConfiguration getVerifyHubMetadata() {
@@ -87,5 +88,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public Duration getClockSkew() {
         return clockSkew;
+    }
+
+    private MsaMetadataConfiguration getMsaMetadataConfigDefault() {
+        return new MsaMetadataConfiguration(URI.create(""), 0l, 0l, "", null, "", "");
     }
 }

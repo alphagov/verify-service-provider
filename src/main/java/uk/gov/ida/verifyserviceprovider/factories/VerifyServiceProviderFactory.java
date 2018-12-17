@@ -1,6 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.factories;
 
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.security.crypto.KeySupport;
@@ -11,7 +10,6 @@ import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
-import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
@@ -23,7 +21,6 @@ import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.List;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -112,19 +109,12 @@ public class VerifyServiceProviderFactory {
         return new VersionNumberResource(manifestReader);
     }
 
-    private MetadataResolver getHubMetadataResolver() {
-        return verifyMetadataBundler.getMetadataResolver();
-    }
     private ExplicitKeySignatureTrustEngine getHubSignatureTrustEngine() {
         return verifyMetadataBundler.getSignatureTrustEngine();
     }
 
     private MetadataCredentialResolver getHubMetadataCredentialResolver() {
         return verifyMetadataBundler.getMetadataCredentialResolver();
-    }
-
-    private MetadataResolver getMsaMetadataResolver() {
-        return msaMetadataBundle.getMetadataResolver();
     }
 
     private ExplicitKeySignatureTrustEngine getMsaSignatureTrustEngine() {

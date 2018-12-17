@@ -72,8 +72,6 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
-        assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
-        assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getServiceEntityIds()).containsExactly("http://some-service-entity-id");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
@@ -87,8 +85,6 @@ public class ApplicationConfigurationFeatureTests {
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
-            put("MSA_METADATA_URL", "some-msa-metadata-url");
-            put("MSA_ENTITY_ID", "some-msa-entity-id");
             put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");
             put("HASHING_ENTITY_ID", "some-hashing-entity-id");
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
@@ -106,8 +102,6 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
-        assertThat(configuration.getMsaMetadata().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
-        assertThat(configuration.getMsaMetadata().getUri().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getServiceEntityIds()).containsExactly("http://some-service-entity-id", "http://some-other-service-entity-id");
         assertThat(configuration.getHashingEntityId()).isEqualTo("some-hashing-entity-id");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
