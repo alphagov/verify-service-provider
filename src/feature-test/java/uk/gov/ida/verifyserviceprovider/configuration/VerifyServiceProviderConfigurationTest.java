@@ -1,6 +1,5 @@
-package unit.uk.gov.ida.verifyserviceprovider;
+package uk.gov.ida.verifyserviceprovider.configuration;
 
-import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
@@ -9,10 +8,8 @@ import io.dropwizard.configuration.YamlConfigurationFactory;
 import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.ExpectedException;
-import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +32,9 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 public class VerifyServiceProviderConfigurationTest {
 
     @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    @Rule
     public final ExpectedException expectedException = ExpectedException.none();
     private final YamlConfigurationFactory factory = new YamlConfigurationFactory<>(
         VerifyServiceProviderConfiguration.class,
@@ -42,11 +42,10 @@ public class VerifyServiceProviderConfigurationTest {
         newObjectMapper(),
         "dw."
     );
-    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
     @Test
     public void shouldNotComplainWhenConfiguredCorrectly() throws Exception {
-        environmentHelper.setEnv(new HashMap<String, String>() {{
+        new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
@@ -57,7 +56,7 @@ public class VerifyServiceProviderConfigurationTest {
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("CLOCK_SKEW", "PT30s");
-        }});
+        }}.forEach(environmentVariables::set);
 
         factory.build(
             new SubstitutingSourceProvider(
@@ -66,7 +65,6 @@ public class VerifyServiceProviderConfigurationTest {
             ),
             "verify-service-provider.yml"
         );
-        environmentHelper.cleanEnv();
     }
 
     @Test

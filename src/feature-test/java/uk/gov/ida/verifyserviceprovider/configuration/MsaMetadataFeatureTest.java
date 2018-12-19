@@ -1,20 +1,18 @@
-package feature.uk.gov.ida.verifyserviceprovider.configuration;
+package uk.gov.ida.verifyserviceprovider.configuration;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
-import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
 import keystore.KeyStoreResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
@@ -37,18 +35,26 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_E
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 
-@Ignore("TODO: Implement CUSTOM environment")
 public class MsaMetadataFeatureTest {
 
     private final String HEALTHCHECK_URL = "http://localhost:%d/admin/healthcheck";
 
-    private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
+    @ClassRule
+    public static WireMockClassRule wireMockServer = new WireMockClassRule(wireMockConfig().dynamicPort());
+
     @ClassRule
     public static MockVerifyHubServer hubServer = new MockVerifyHubServer();
 
+    @ClassRule
+    public static EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
     private DropwizardTestSupport<VerifyServiceProviderConfiguration> applicationTestSupport;
-    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
     @Before
     public void setUp() {
@@ -64,22 +70,21 @@ public class MsaMetadataFeatureTest {
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
             config("server.connector.port", "0"),
-            config("verifyHubConfiguration.metadata.uri", format("http://localhost:%s/SAML2/metadata", hubServer.port())),
+            config("verifyHubConfiguration.environment", "CUSTOM"),
             config("msaMetadata.uri", getMsaMetadataUrl()),
-            config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
+            config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
         );
 
-        environmentHelper.setEnv(new HashMap<String, String>() {{
-            put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
-            put("MSA_METADATA_URL", "some-msa-metadata-url");
-            put("MSA_ENTITY_ID", "some-msa-entity-id");
-            put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]");
-            put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
-            put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
-        }});
+        new HashMap<String, String>() {{
+            put(HUB_SSO_URL, String.format("http://localhost:%s/SAML2/SSO", hubServer.port()));
+            put(HUB_METADATA_URL, String.format("http://localhost:%s/SAML2/metadata", hubServer.port()));
+            put(HUB_EXPECTED_ENTITY_ID, HUB_ENTITY_ID);
+            put(METADATA_TRUSTSTORE_PATH, verifyHubKeystoreResource.getAbsolutePath());
+            put(TRUSTSTORE_PASSWORD, verifyHubKeystoreResource.getPassword());
+        }}.forEach(environmentVariables::set);
     }
 
     private String getMsaMetadataUrl() {
@@ -89,7 +94,6 @@ public class MsaMetadataFeatureTest {
     @After
     public void tearDown() {
         applicationTestSupport.after();
-        wireMockServer.stop();
     }
 
     @Test

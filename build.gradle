@@ -53,6 +53,7 @@ dependencies {
         "org.jsoup:jsoup:1.11.1",
         "javax.xml.bind:jaxb-api:$jaxbapiVersion",
         "uk.gov.ida:hub-saml-test-utils:$hub_saml",
+        "com.github.stefanbirkner:system-rules:1.19.0"
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
@@ -81,6 +82,14 @@ sourceSets {
         }
         resources {
             srcDir 'src/acceptance-test/resources'
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+        compileClasspath += sourceSets.test.runtimeClasspath
+        compileClasspath += sourceSets.test.output
+    }
+    featureTest {
+        java {
+            srcDir 'src/feature-test/java'
         }
         compileClasspath += sourceSets.main.runtimeClasspath
         compileClasspath += sourceSets.test.runtimeClasspath
@@ -136,8 +145,14 @@ jar {
 }
 
 task testAcceptance(type: Test) {
-    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
     classpath += sourceSets.acceptanceTest.runtimeClasspath
+}
+
+task testFeature(type: Test) {
+    testClassesDirs = sourceSets.featureTest.output.classesDirs
+    classpath += sourceSets.featureTest.runtimeClasspath
+    forkEvery = 1
 }
 
 run {

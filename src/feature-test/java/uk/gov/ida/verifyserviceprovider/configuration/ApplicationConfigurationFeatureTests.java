@@ -1,18 +1,15 @@
-package feature.uk.gov.ida.verifyserviceprovider.configuration;
+package uk.gov.ida.verifyserviceprovider.configuration;
 
-import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.logging.DefaultLoggingFactory;
-import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.KeyStoreResource;
 import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -23,11 +20,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 
 public class ApplicationConfigurationFeatureTests {
 
     private DropwizardAppRule<VerifyServiceProviderConfiguration> application;
-    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+    @Rule
+    public EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     @Before
     public void setUp() {
@@ -35,7 +39,7 @@ public class ApplicationConfigurationFeatureTests {
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml"
         );
-        environmentHelper.setEnv(new HashMap<String, String>() {{
+        new HashMap<String, String>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
@@ -47,13 +51,12 @@ public class ApplicationConfigurationFeatureTests {
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
             put("CLOCK_SKEW", "PT30s");
-        }});
+        }}.forEach(environmentVariables::set);
     }
 
     @After
     public void cleanup() {
         application.getTestSupport().after();
-        environmentHelper.cleanEnv();
     }
 
     @Test
@@ -78,7 +81,7 @@ public class ApplicationConfigurationFeatureTests {
 
     @Test
     public void applicationShouldStartUpWithListOfServiceEntityIds() throws NoSuchFieldException, IllegalAccessException {
-        environmentHelper.put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");
+        environmentVariables.set("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\",\"http://some-other-service-entity-id\"]");
         application.getTestSupport().before();
 
         VerifyServiceProviderConfiguration configuration = application.getConfiguration();
@@ -87,9 +90,8 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getHashingEntityId()).isEqualTo("some-hashing-entity-id");
     }
 
-    @Ignore("TODO: Implement CUSTOM environment")
     @Test
-    public void applicationShouldUseOverriddenHubMetadataValues() {
+    public void applicationShouldUseOverriddenHubMetadataValuesWhenUsingCustomConfiguration() {
         KeyStoreResource keyStoreResource = aKeyStoreResource()
                 .withCertificate("any-alias", aCertificate().build().getCertificate())
                 .build();
@@ -100,13 +102,17 @@ public class ApplicationConfigurationFeatureTests {
 
         application = new DropwizardAppRule<>(
                 VerifyServiceProviderApplication.class,
-                "verify-service-provider.yml",
-                ConfigOverride.config("verifyHubConfiguration.ssoLocation", ssoUri.toString()),
-                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", keyStoreResource.getAbsolutePath()),
-                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword()),
-                ConfigOverride.config("verifyHubConfiguration.metadata.expectedEntityId", expectedEntityId),
-                ConfigOverride.config("verifyHubConfiguration.metadata.uri", metadataUri.toString())
+                "verify-service-provider.yml"
         );
+
+        new HashMap<String, String>() {{
+            put("VERIFY_ENVIRONMENT", "CUSTOM");
+            put(HUB_SSO_URL, ssoUri.toString());
+            put(HUB_METADATA_URL, metadataUri.toString());
+            put(HUB_EXPECTED_ENTITY_ID, expectedEntityId);
+            put(METADATA_TRUSTSTORE_PATH, keyStoreResource.getAbsolutePath());
+            put(TRUSTSTORE_PASSWORD, keyStoreResource.getPassword());
+        }}.forEach(environmentVariables::set);
 
         application.getTestSupport().before();
 

@@ -1,16 +1,14 @@
-package feature.uk.gov.ida.verifyserviceprovider.configuration;
+package uk.gov.ida.verifyserviceprovider.configuration;
 
 import certificates.values.CACertificates;
-import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import keystore.KeyStoreResource;
 import keystore.builders.KeyStoreResourceBuilder;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
-import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
-
-import java.util.HashMap;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
@@ -23,16 +21,22 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
-@Ignore(value = "TODO: Implement CUSTOM environment")
 public class VerifyHubConfigurationFeatureTests {
 
     private static final KeyStoreResource keyStore = KeyStoreResourceBuilder.aKeyStoreResource()
             .withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
-    private EnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+    @ClassRule
+    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     @Before
     public void setUp() {
         keyStore.create();
+    }
+
+    @After
+    public void tearDown() {
+        keyStore.delete();
     }
 
     @Test
@@ -100,8 +104,8 @@ public class VerifyHubConfigurationFeatureTests {
     public void shouldSetHubMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
         setUpEnvironmentForCustom();
-        environmentHelper.put(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        environmentHelper.put(TRUSTSTORE_PASSWORD, keyStore.getPassword());
+        environmentVariables.set(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        environmentVariables.set(TRUSTSTORE_PASSWORD, keyStore.getPassword());
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
@@ -129,14 +133,12 @@ public class VerifyHubConfigurationFeatureTests {
     }
 
     private void setUpEnvironmentForCustom() {
-        HashMap<String, String> env = new HashMap<>();
-        env.put(HUB_SSO_URL, "http://some-sso-url");
-        env.put(HUB_METADATA_URL, "http://some-metadata-url");
-        env.put(HUB_EXPECTED_ENTITY_ID, "http://some-expected-entity-id");
-        env.put(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        env.put(HUB_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        env.put(IDP_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        env.put(TRUSTSTORE_PASSWORD, keyStore.getPassword());
-        environmentHelper.setEnv(env);
+        environmentVariables.set(HUB_SSO_URL, "http://some-sso-url");
+        environmentVariables.set(HUB_METADATA_URL, "http://some-metadata-url");
+        environmentVariables.set(HUB_EXPECTED_ENTITY_ID, "http://some-expected-entity-id");
+        environmentVariables.set(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        environmentVariables.set(HUB_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        environmentVariables.set(IDP_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
+        environmentVariables.set(TRUSTSTORE_PASSWORD, keyStore.getPassword());
     }
 }
