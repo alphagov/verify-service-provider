@@ -10,8 +10,12 @@ public interface ConfigurationConstants {
     String DEFAULT_TRUST_STORE_PASSWORD = "bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh";
 
     String TEST_METADATA_TRUSTSTORE_NAME = "test-metadata-truststore.ts";
+    String TEST_HUB_TRUSTSTORE_NAME = "test-hub-truststore.ts";
+    String TEST_IDP_TRUSTSTORE_NAME = "test-idp-truststore.ts";
 
     String PROD_METADATA_TRUSTSTORE_NAME = "prod-metadata-truststore.ts";
+    String PROD_HUB_TRUSTSTORE_NAME = "prod-hub-truststore.ts";
+    String PROD_IDP_TRUSTSTORE_NAME = "prod-idp-truststore.ts";
 
     String HUB_JERSEY_CLIENT_NAME = "VerifyHubMetadataClient";
     String MSA_JERSEY_CLIENT_NAME = "MsaMetadataClient";

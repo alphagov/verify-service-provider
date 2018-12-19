@@ -23,6 +23,8 @@ import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.IDP_TRUSTSTORE_PATH;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 
@@ -111,6 +113,8 @@ public class ApplicationConfigurationFeatureTests {
             put(HUB_METADATA_URL, metadataUri.toString());
             put(HUB_EXPECTED_ENTITY_ID, expectedEntityId);
             put(METADATA_TRUSTSTORE_PATH, keyStoreResource.getAbsolutePath());
+            put(HUB_TRUSTSTORE_PATH, keyStoreResource.getAbsolutePath());
+            put(IDP_TRUSTSTORE_PATH, keyStoreResource.getAbsolutePath());
             put(TRUSTSTORE_PASSWORD, keyStoreResource.getPassword());
         }}.forEach(environmentVariables::set);
 

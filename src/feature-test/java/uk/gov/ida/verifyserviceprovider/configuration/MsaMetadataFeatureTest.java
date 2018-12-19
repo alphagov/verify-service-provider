@@ -1,5 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
+import certificates.values.CACertificates;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
@@ -38,6 +39,8 @@ import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_EXPECTED_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_METADATA_URL;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_SSO_URL;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.HUB_TRUSTSTORE_PATH;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.IDP_TRUSTSTORE_PATH;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 
@@ -62,9 +65,13 @@ public class MsaMetadataFeatureTest {
         wireMockServer.start();
         hubServer.serveDefaultMetadata();
 
+        KeyStoreResource verifyMetadataKeystoreResource = aKeyStoreResource()
+                .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
+                .build();
+        verifyMetadataKeystoreResource.create();
         KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
-            .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
-            .build();
+                .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(CACertificates.TEST_CORE_CA).build().getCertificate())
+                .build();
         verifyHubKeystoreResource.create();
         this.applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
@@ -82,7 +89,9 @@ public class MsaMetadataFeatureTest {
             put(HUB_SSO_URL, String.format("http://localhost:%s/SAML2/SSO", hubServer.port()));
             put(HUB_METADATA_URL, String.format("http://localhost:%s/SAML2/metadata", hubServer.port()));
             put(HUB_EXPECTED_ENTITY_ID, HUB_ENTITY_ID);
-            put(METADATA_TRUSTSTORE_PATH, verifyHubKeystoreResource.getAbsolutePath());
+            put(METADATA_TRUSTSTORE_PATH, verifyMetadataKeystoreResource.getAbsolutePath());
+            put(HUB_TRUSTSTORE_PATH, verifyHubKeystoreResource.getAbsolutePath());
+            put(IDP_TRUSTSTORE_PATH, verifyHubKeystoreResource.getAbsolutePath());
             put(TRUSTSTORE_PASSWORD, verifyHubKeystoreResource.getPassword());
         }}.forEach(environmentVariables::set);
     }

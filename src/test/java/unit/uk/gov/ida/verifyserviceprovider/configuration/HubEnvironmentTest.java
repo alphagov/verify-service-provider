@@ -15,7 +15,7 @@ public class HubEnvironmentTest {
         } catch (RuntimeException ex) {
             assertThat(ex.getMessage()).isEqualTo(
                 "Unrecognised Hub Environment: NOT_AN_ENVIRONMENT. \n" +
-                "Valid values are: PRODUCTION, INTEGRATION, COMPLIANCE_TOOL"
+                "Valid values are: PRODUCTION, INTEGRATION, COMPLIANCE_TOOL, CUSTOM"
             );
         }
     }

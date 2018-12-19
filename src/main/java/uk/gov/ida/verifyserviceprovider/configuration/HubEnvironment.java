@@ -23,7 +23,11 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.METADATA_TRUSTSTORE_PATH;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentVariables.TRUSTSTORE_PASSWORD;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PROD_HUB_TRUSTSTORE_NAME;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PROD_IDP_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PROD_METADATA_TRUSTSTORE_NAME;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_HUB_TRUSTSTORE_NAME;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_IDP_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_METADATA_TRUSTSTORE_NAME;
 
 public enum HubEnvironment implements MetadataResolverConfiguration {
@@ -32,6 +36,8 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             "https://www.signin.service.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             PROD_METADATA_TRUSTSTORE_NAME,
+            PROD_HUB_TRUSTSTORE_NAME,
+            PROD_IDP_TRUSTSTORE_NAME,
             DEFAULT_TRUST_STORE_PASSWORD,
             true
     ),
@@ -40,6 +46,8 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             "https://www.integration.signin.service.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             TEST_METADATA_TRUSTSTORE_NAME,
+            TEST_HUB_TRUSTSTORE_NAME,
+            TEST_IDP_TRUSTSTORE_NAME,
             DEFAULT_TRUST_STORE_PASSWORD,
             true
     ),
@@ -48,6 +56,8 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation",
             "https://signin.service.gov.uk",
             TEST_METADATA_TRUSTSTORE_NAME,
+            TEST_HUB_TRUSTSTORE_NAME,
+            TEST_IDP_TRUSTSTORE_NAME,
             DEFAULT_TRUST_STORE_PASSWORD,
             true
     ),
@@ -56,6 +66,8 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             System.getenv().getOrDefault(HUB_METADATA_URL, ""),
             System.getenv().getOrDefault(HUB_EXPECTED_ENTITY_ID, ""),
             System.getenv().getOrDefault(METADATA_TRUSTSTORE_PATH, ""),
+            System.getenv().getOrDefault(HUB_TRUSTSTORE_PATH, ""),
+            System.getenv().getOrDefault(IDP_TRUSTSTORE_PATH, ""),
             System.getenv().getOrDefault(TRUSTSTORE_PASSWORD, ""),
             false
     );
@@ -64,6 +76,8 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
     private String metadataUri;
     private String expectedEntityId;
     private String metadataTrustStorePath;
+    private String hubTrustStorePath;
+    private String idpTrustStorePath;
     private String trustStorePassword;
     private boolean loadTruststoreFromResources;
 
@@ -74,7 +88,7 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
             .findFirst()
             .orElseThrow(() -> new RuntimeException(
                 "Unrecognised Hub Environment: " + name + ". \n" +
-                "Valid values are: PRODUCTION, INTEGRATION, COMPLIANCE_TOOL"
+                "Valid values are: PRODUCTION, INTEGRATION, COMPLIANCE_TOOL, CUSTOM"
             ));
     }
 
@@ -82,12 +96,16 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
                    String metadataUri,
                    String expectedEntityId,
                    String metadataTrustStorePath,
+                   String hubTrustStorePath,
+                   String idpTrustStorePath,
                    String trustStorePassword,
                    boolean loadTruststoreFromResources) {
         this.ssoLocation = ssoLocation;
         this.metadataUri = metadataUri;
         this.expectedEntityId = expectedEntityId;
         this.metadataTrustStorePath = metadataTrustStorePath;
+        this.hubTrustStorePath = hubTrustStorePath;
+        this.idpTrustStorePath = idpTrustStorePath;
         this.trustStorePassword = trustStorePassword;
         this.loadTruststoreFromResources = loadTruststoreFromResources;
     }
@@ -99,6 +117,16 @@ public enum HubEnvironment implements MetadataResolverConfiguration {
     @Override
     public KeyStore getTrustStore() {
         return loadTruststore(metadataTrustStorePath);
+    }
+
+    @Override
+    public Optional<KeyStore> getHubTrustStore() {
+        return Optional.ofNullable(loadTruststore(hubTrustStorePath));
+    }
+
+    @Override
+    public Optional<KeyStore> getIdpTrustStore() {
+        return Optional.ofNullable(loadTruststore(idpTrustStorePath));
     }
 
     @Override
