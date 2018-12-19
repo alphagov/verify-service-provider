@@ -4,6 +4,7 @@ Release notes
 ### Next
 
 * Included support for compilation on Java 9 and 10. Compilation on Java 9 or 10 will produce a multi-release JAR that will run on Java 8, 9, and 10. This release was compiled on Java 8 and does not contain a multi-release JAR.
+* Changed metadata health check names to use the URI of the metadata they are trying to resolve
 
 ### 1.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)

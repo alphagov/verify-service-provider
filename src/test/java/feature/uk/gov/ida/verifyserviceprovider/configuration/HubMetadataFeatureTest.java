@@ -31,6 +31,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
+import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
@@ -53,6 +54,9 @@ public class HubMetadataFeatureTest {
 
     @Before
     public void setUp() {
+        IdaSamlBootstrap.bootstrap();
+        wireMockServer.start();
+        msaServer.serveDefaultMetadata();
         KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
             .build();
@@ -62,7 +66,7 @@ public class HubMetadataFeatureTest {
             "verify-service-provider.yml",
             config("server.connector.port", "0"),
             config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
-            config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
+            config("verifyHubConfiguration.metadata.uri", getHubMetadataUrl()),
             config("msaMetadata.uri", msaServer::getUri),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
@@ -72,10 +76,10 @@ public class HubMetadataFeatureTest {
             config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
             config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
         );
+    }
 
-        IdaSamlBootstrap.bootstrap();
-        wireMockServer.start();
-        msaServer.serveDefaultMetadata();
+    private String getHubMetadataUrl() {
+        return format("http://localhost:%s/SAML2/metadata", wireMockServer.port());
     }
 
     @After
@@ -97,12 +101,12 @@ public class HubMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"hubMetadata\":{\"healthy\":false";
+        String expectedResult = format("\"%s\":{\"healthy\":false", getHubMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/SAML2/metadata")));
 
@@ -133,12 +137,12 @@ public class HubMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"hubMetadata\":{\"healthy\":false";
+        String expectedResult = format("\"%s\":{\"healthy\":false", getHubMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/SAML2/metadata")));
 
@@ -161,12 +165,12 @@ public class HubMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"hubMetadata\":{\"healthy\":true";
+        String expectedResult = format("\"%s\":{\"healthy\":true", getHubMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/SAML2/metadata")));
 
