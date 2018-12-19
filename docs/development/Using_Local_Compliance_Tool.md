@@ -7,7 +7,7 @@ To run VSP against a locally running compliance tool you need to make a number o
 (Currently sample-rp doesn't do this check but the VSP does so we need this signature in the VSP)
 
 ### verify-service-provider:
--> Copy `verify-test-truststore.ts` from src/main/resources to the verify-service-provider root directory
+-> Copy `test-metadata-truststore.ts` from src/main/resources to the verify-service-provider root directory
 
 -> Change verifyHubConfiguration section in configuration/verify-service-provider.yml to
 ```
