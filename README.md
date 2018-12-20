@@ -10,11 +10,11 @@ Using Verify Service Provider will make it easier to:
 
 You will need to host Verify Service Provider on your own infrastructure.
 
-Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about connecting to GOV.UK Verify.
+Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://www.docs.verify.service.gov.uk) for more information about connecting to GOV.UK Verify.
 
 See also:
 * [API reference](/docs/api/api-reference.md)
-* [Tutorial: How to securely exchange information using Verify Service Provider](/docs/tutorial-using-verify-service-provider.md)
+* [How to use the VSP with your service](https://www.docs.verify.service.gov.uk/get-started-with-vsp/use-vsp-with-your-service)
 
 ## Setup
 
@@ -111,7 +111,7 @@ __Startup__
 ```
 ./startup.sh
 ```
-You will need to either have environment variables set as above, or have edited the main configuration file (`verify-service-provider.yml`), or to pass an argument to this script for the application to start. Available arguments are `local-fed` for running against a locally running federation (see [verify local startup](https://github.com/alphagov/verify-local-startup)) or `vsp-only` for using default values to run against compliance tool on the reference environment. 
+You will need to either have environment variables set as above, or have edited the main configuration file (`verify-service-provider.yml`), or to pass an argument to this script for the application to start. Available arguments are `local-fed` for running against a locally running federation (see [verify local startup](https://github.com/alphagov/verify-local-startup)) or `vsp-only` for using default values to run against compliance tool on the reference environment.
 
 __Build a distribution__
 ```
