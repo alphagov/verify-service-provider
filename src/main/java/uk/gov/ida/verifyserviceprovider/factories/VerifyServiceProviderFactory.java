@@ -63,20 +63,6 @@ public class VerifyServiceProviderFactory {
         return new KeyPair(KeySupport.derivePublicKey(key), key);
     }
 
-    public MetadataHealthCheck getHubMetadataHealthCheck() {
-        return new MetadataHealthCheck(
-                getHubMetadataResolver(),
-            configuration.getVerifyHubMetadata().getExpectedEntityId()
-        );
-    }
-
-    public MetadataHealthCheck getMsaMetadataHealthCheck() {
-        return new MetadataHealthCheck(
-            getMsaMetadataResolver(),
-            configuration.getMsaMetadata().getExpectedEntityId()
-        );
-    }
-
     public GenerateAuthnRequestResource getGenerateAuthnRequestResource() throws Exception {
         MetadataCredentialResolver metadataCredentialResolver = getHubMetadataCredentialResolver();
         MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver = new MetadataBackedEncryptionCredentialResolver(metadataCredentialResolver, SPSSODescriptor.DEFAULT_ELEMENT_NAME);

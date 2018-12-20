@@ -26,6 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
+import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
@@ -49,6 +50,10 @@ public class MsaMetadataFeatureTest {
 
     @Before
     public void setUp() {
+        IdaSamlBootstrap.bootstrap();
+        wireMockServer.start();
+        hubServer.serveDefaultMetadata();
+
         KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
             .build();
@@ -57,8 +62,8 @@ public class MsaMetadataFeatureTest {
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
             config("server.connector.port", "0"),
-            config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", hubServer.port())),
-            config("msaMetadata.uri", () -> String.format("http://localhost:%s/matching-service/metadata", wireMockServer.port())),
+            config("verifyHubConfiguration.metadata.uri", format("http://localhost:%s/SAML2/metadata", hubServer.port())),
+            config("msaMetadata.uri", getMsaMetadataUrl()),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
@@ -73,10 +78,10 @@ public class MsaMetadataFeatureTest {
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
         }});
+    }
 
-        IdaSamlBootstrap.bootstrap();
-        wireMockServer.start();
-        hubServer.serveDefaultMetadata();
+    private String getMsaMetadataUrl() {
+        return format("http://localhost:%s/matching-service/metadata", wireMockServer.port());
     }
 
     @After
@@ -98,12 +103,12 @@ public class MsaMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"msaMetadata\":{\"healthy\":false";
+        String expectedResult = format("\"%s\":{\"healthy\":false", getMsaMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 
@@ -125,12 +130,12 @@ public class MsaMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"msaMetadata\":{\"healthy\":true";
+        String expectedResult = format("\"%s\":{\"healthy\":true", getMsaMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 
