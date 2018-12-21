@@ -1,16 +1,25 @@
 package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
+import certificates.values.CACertificates;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.google.common.collect.ImmutableList;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
+import feature.uk.gov.ida.verifyserviceprovider.configuration.support.MSAStubRule;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
+import keystore.CertificateEntry;
 import keystore.KeyStoreResource;
+import keystore.builders.KeyStoreResourceBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestMD5;
 import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -38,6 +47,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
@@ -47,35 +58,47 @@ public class HubMetadataFeatureTest {
 
     private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
 
-    @ClassRule
-    public static MockMsaServer msaServer = new MockMsaServer();
+    private MSAStubRule msaStubRule;
     private DropwizardTestSupport<VerifyServiceProviderConfiguration> applicationTestSupport;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MarshallingException, SignatureException, JsonProcessingException {
+        msaStubRule = new MSAStubRule();
         KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
             .build();
         verifyHubKeystoreResource.create();
+        KeyStoreResource msTrustStore = KeyStoreResourceBuilder.aKeyStoreResource()
+                .withCertificates(ImmutableList.of(new CertificateEntry("test_root_ca", CACertificates.TEST_ROOT_CA),
+                        new CertificateEntry("test_rp_ca", CACertificates.TEST_RP_CA)))
+                .build();
+        msTrustStore.create();
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
             config("server.connector.port", "0"),
             config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", wireMockServer.port())),
-            config("msaMetadata.uri", msaServer::getUri),
-            config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
+            config("msaMetadata.uri", () -> msaStubRule.METADATA_ENTITY_ID),
+            config("msaMetadata.expectedEntityId", msaStubRule.METADATA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
             config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
             config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
             config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
-            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+            config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+            config("samlPrimarySigningCert.cert", TEST_RP_PUBLIC_SIGNING_CERT.replaceAll("\n", "")),
+            config("samlPrimaryEncryptionCert.cert", TEST_RP_PUBLIC_ENCRYPTION_CERT.replaceAll("\n", "")),
+            config("msaMetadata.trustStore.type", "file"),
+            config("msaMetadata.trustStore.store", msTrustStore.getAbsolutePath()),
+            config("msaMetadata.trustStore.password", msTrustStore.getPassword()),
+            config("samlPrimarySigningCert.type", "x509"),
+            config("samlPrimaryEncryptionCert.type", "x509")
         );
 
         IdaSamlBootstrap.bootstrap();
+        msaStubRule.setUpRegularMetadata();
         wireMockServer.start();
-        msaServer.serveDefaultMetadata();
     }
 
     @After

@@ -5,6 +5,7 @@ import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import org.json.JSONObject;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -31,6 +32,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA1_ID;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA2_ID;
 
+@Ignore
 public class UserAccountCreationResponseAcceptanceTest {
 
     @ClassRule

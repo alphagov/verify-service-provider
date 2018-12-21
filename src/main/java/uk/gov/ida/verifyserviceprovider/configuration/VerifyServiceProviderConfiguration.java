@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import org.joda.time.Duration;
+import uk.gov.ida.common.shared.configuration.DeserializablePublicKeyConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -36,8 +37,22 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     @JsonProperty
     @NotNull
     @Valid
+    private DeserializablePublicKeyConfiguration samlPrimarySigningCert;
+
+    @JsonProperty
+    @Valid
+    private DeserializablePublicKeyConfiguration samlSecondarySigningCert = null;
+
+    @JsonProperty
+    @NotNull
+    @Valid
     @JsonDeserialize(using = PrivateKeyDeserializer.class)
     private PrivateKey samlPrimaryEncryptionKey;
+
+    @JsonProperty
+    @NotNull
+    @Valid
+    private DeserializablePublicKeyConfiguration samlPrimaryEncryptionCert;
 
     @JsonProperty
     @Valid
@@ -84,5 +99,17 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public Duration getClockSkew() {
         return clockSkew;
+    }
+
+    public DeserializablePublicKeyConfiguration getSamlPrimarySigningCert() {
+        return samlPrimarySigningCert;
+    }
+
+    public DeserializablePublicKeyConfiguration getSamlPrimaryEncryptionCert() {
+        return samlPrimaryEncryptionCert;
+    }
+
+    public DeserializablePublicKeyConfiguration getSamlSecondarySigningCert() {
+        return samlSecondarySigningCert;
     }
 }

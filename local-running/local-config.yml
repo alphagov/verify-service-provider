@@ -38,9 +38,21 @@ verifyHubConfiguration:
 msaMetadata:
   uri: http://localhost:${TEST_RP_MSA_PORT}/matching-service/SAML2/metadata
   expectedEntityId: ${IDA_TESTRP_MSA_ENTITYID:-"http://dev-rp-ms.local/SAML2/MD"}
+  trustStore:
+    type: encoded
+    store: ${RP_TRUSTSTORE_ENCODED:-}
+    password: ${RP_TRUSTSTORE_PASSWORD:-}
 
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
+samlPrimarySigningCert:
+  type: encoded
+  cert: ${SAML_PRIMARY_SIGNING_CERT:-}
+
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
+
+samlPrimaryEncryptionCert:
+  type: encoded
+  cert: ${SAML_PRIMARY_ENCRYPTION_CERT:-}
 
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}

@@ -2,6 +2,7 @@ package uk.gov.ida.verifyserviceprovider;
 
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore
 public class VersionNumberAcceptanceTest {
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();

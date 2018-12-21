@@ -12,8 +12,10 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.healthcheck.MetadataHealthCheck;
+import uk.gov.ida.verifyserviceprovider.metadata.MetadataRepository;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.VerifyServiceProviderMetadataResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -128,5 +130,9 @@ public class VerifyServiceProviderFactory {
 
     private ExplicitKeySignatureTrustEngine getMsaSignatureTrustEngine() {
         return msaMetadataBundle.getSignatureTrustEngine();
+    }
+
+    public VerifyServiceProviderMetadataResource getVerifyServiceProviderMetadataResource() {
+        return new VerifyServiceProviderMetadataResource(new MetadataRepository(configuration));
     }
 }

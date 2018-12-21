@@ -15,12 +15,15 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 
 import java.util.HashMap;
 
+import static io.dropwizard.testing.ConfigOverride.config;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.apache.xml.security.utils.Base64.decode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
 public class ApplicationConfigurationFeatureTests {
@@ -39,7 +42,14 @@ public class ApplicationConfigurationFeatureTests {
             "verify-service-provider.yml",
             ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
             ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword())
+            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword()),
+            ConfigOverride.config("samlPrimarySigningCert.cert", TEST_RP_PUBLIC_SIGNING_CERT.replaceAll("\n", "")),
+            ConfigOverride.config("samlPrimaryEncryptionCert.cert", TEST_RP_PUBLIC_ENCRYPTION_CERT.replaceAll("\n", "")),
+            config("msaMetadata.trustStore.type", "file"),
+            config("msaMetadata.trustStore.store", keyStoreResource.getAbsolutePath()),
+            config("msaMetadata.trustStore.password", keyStoreResource.getPassword()),
+            config("samlPrimarySigningCert.type", "x509"),
+            config("samlPrimaryEncryptionCert.type", "x509")
         );
     }
 

@@ -26,7 +26,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
         hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
-        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
+        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), true);
     }
 
     public static void main(String[] args) throws Exception {
@@ -67,6 +67,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
+        environment.jersey().register(factory.getVerifyServiceProviderMetadataResource());
 
         environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
         environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());

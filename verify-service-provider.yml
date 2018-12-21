@@ -42,12 +42,28 @@ verifyHubConfiguration:
 msaMetadata:
   uri: ${MSA_METADATA_URL:-}
   expectedEntityId: ${MSA_ENTITY_ID:-}
+  trustStore:
+    type: encoded
+    store: ${RP_TRUSTSTORE_ENCODED:-}
+    password: ${RP_TRUSTSTORE_PASSWORD:-}
 
 # Private key that is used to sign an AuthnRequest
 samlSigningKey: ${SAML_SIGNING_KEY:-}
 
+samlPrimarySigningCert:
+  type: encoded
+  cert: ${SAML_PRIMARY_SIGNING_CERT:-}
+
+#samlSecondarySigningCert:
+#  type: encoded
+#  cert: ${SAML_SECONDARY_SIGNING_CERT:-}
+
 # Private key used to decrypt Assertions in the Response
 samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
+
+samlPrimaryEncryptionCert:
+  type: encoded
+  cert: ${SAML_PRIMARY_ENCRYPTION_CERT:-}
 
 # Secondary private key used to decrypt Assertions in the Response
 # This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
