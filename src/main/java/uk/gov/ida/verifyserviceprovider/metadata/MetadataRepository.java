@@ -23,6 +23,7 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import uk.gov.ida.common.shared.configuration.DeserializablePublicKeyConfiguration;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
@@ -48,15 +49,14 @@ public class MetadataRepository {
     private final VerifyServiceProviderConfiguration verifyServiceProviderConfiguration;
     private final Function<EntitiesDescriptor, Element> entitiesDescriptorElementTransformer;
     private final X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
-    private final String verifyServiceProviderEntityId;
+    private final List<String> verifyServiceProviderEntityIds;
     private final XMLObjectBuilderFactory openSamlBuilderFactory;
     private final SignatureFactory signatureFactory;
 
     public MetadataRepository(VerifyServiceProviderConfiguration verifyServiceProviderConfiguration) {
 
         this.verifyServiceProviderConfiguration = verifyServiceProviderConfiguration;
-        // FIXME: iterate over all entityIds and generate a single metadata file for a multi tenant VSP
-        this.verifyServiceProviderEntityId = verifyServiceProviderConfiguration.getServiceEntityIds().get(0);
+        this.verifyServiceProviderEntityIds = verifyServiceProviderConfiguration.getServiceEntityIds();
         this.openSamlBuilderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
         try {
             if(!verifyServiceProviderConfiguration.getSamlPrimarySigningCert().getPublicKey()
@@ -102,33 +102,42 @@ public class MetadataRepository {
         EntitiesDescriptor entitiesDescriptor = new EntitiesDescriptorBuilder().buildObject();
         entitiesDescriptor.setValidUntil(DateTime.now().plusHours(1));
 
-        final EntityDescriptor vspEntityDescriptor = createEntityDescriptor(verifyServiceProviderEntityId);
-        vspEntityDescriptor.getRoleDescriptors().add(getSpSsoDescriptor());
-
-        entitiesDescriptor.getEntityDescriptors().add(vspEntityDescriptor);
+        for(String entityId : verifyServiceProviderEntityIds) {
+            final EntityDescriptor vspEntityDescriptor = createEntityDescriptor(entityId);
+            vspEntityDescriptor.getRoleDescriptors().add(getSpSsoDescriptor(entityId));
+            entitiesDescriptor.getEntityDescriptors().add(vspEntityDescriptor);
+        }
 
         sign(entitiesDescriptor);
 
         return entitiesDescriptorElementTransformer.apply(entitiesDescriptor).getOwnerDocument();
     }
 
-    private RoleDescriptor getSpSsoDescriptor() {
+    private RoleDescriptor getSpSsoDescriptor(String entityId) {
         SPSSODescriptor spssoDescriptor = createSPSSODescriptor();
         spssoDescriptor.addSupportedProtocol(SAMLConstants.SAML20P_NS);
 
-        spssoDescriptor.getKeyDescriptors().addAll(getKeyDescriptors());
+        spssoDescriptor.getKeyDescriptors().addAll(getKeyDescriptors(entityId));
 
         return spssoDescriptor;
     }
 
-    private Collection<? extends KeyDescriptor> getKeyDescriptors() {
+    private Collection<? extends KeyDescriptor> getKeyDescriptors(String entityId) {
         Collection<Certificate> certificates = new ArrayList<>();
-        certificates.add(new Certificate(verifyServiceProviderEntityId, verifyServiceProviderConfiguration.getSamlPrimarySigningCert().getCert().replaceAll("-----BEGIN CERTIFICATE-----\n", "").replaceAll("-----END CERTIFICATE-----", ""), Certificate.KeyUse.Signing));
+        certificates.add(getCertificate(entityId, verifyServiceProviderConfiguration.getSamlPrimarySigningCert(), Certificate.KeyUse.Signing));
         if(Objects.nonNull(verifyServiceProviderConfiguration.getSamlSecondarySigningCert())) {
-            certificates.add(new Certificate(verifyServiceProviderEntityId, verifyServiceProviderConfiguration.getSamlSecondarySigningCert().getCert().replaceAll("-----BEGIN CERTIFICATE-----\n", "").replaceAll("-----END CERTIFICATE-----", ""), Certificate.KeyUse.Signing));
+            certificates.add(getCertificate(entityId, verifyServiceProviderConfiguration.getSamlSecondarySigningCert(), Certificate.KeyUse.Signing));
         }
-        certificates.add(new Certificate(verifyServiceProviderEntityId, verifyServiceProviderConfiguration.getSamlPrimaryEncryptionCert().getCert().replaceAll("-----BEGIN CERTIFICATE-----\n", "").replaceAll("-----END CERTIFICATE-----", ""), Certificate.KeyUse.Encryption));
+        certificates.add(getCertificate(entityId, verifyServiceProviderConfiguration.getSamlPrimaryEncryptionCert(), Certificate.KeyUse.Encryption));
         return fromCertificates(certificates);
+    }
+
+    private Certificate getCertificate(String entityId, DeserializablePublicKeyConfiguration samlPrimarySigningCert, Certificate.KeyUse signing) {
+        return new Certificate(entityId,
+                samlPrimarySigningCert.getCert()
+                        .replaceAll("-----BEGIN CERTIFICATE-----\n", "")
+                        .replaceAll("-----END CERTIFICATE-----", ""),
+                signing);
     }
 
 
