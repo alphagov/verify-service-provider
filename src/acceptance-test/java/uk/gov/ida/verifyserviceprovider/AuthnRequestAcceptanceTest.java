@@ -3,9 +3,10 @@ package uk.gov.ida.verifyserviceprovider;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.DropwizardTestSupport;
+import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.KeyStoreResource;
 import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -43,7 +44,8 @@ public class AuthnRequestAcceptanceTest {
         KEY_STORE_RESOURCE.create();
     }
 
-    public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardTestSupport<>(
+    @Rule
+    public final DropwizardAppRule<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardAppRule<>(
         VerifyServiceProviderApplication.class,
         "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
@@ -63,7 +65,8 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
-    public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
+    @Rule
+    public final DropwizardAppRule<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardAppRule<>(
         VerifyServiceProviderApplication.class,
         "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
@@ -86,7 +89,6 @@ public class AuthnRequestAcceptanceTest {
 
     @Test
     public void shouldGenerateValidAuthnRequestUsingDefaultEntityId() throws Exception {
-        singleTenantApplication.before();
         Client client = new JerseyClientBuilder(singleTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithDefaultEntityId(client);
@@ -108,13 +110,10 @@ public class AuthnRequestAcceptanceTest {
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
         assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
         assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
-
-        singleTenantApplication.after();
     }
 
     @Test
     public void shouldGenerateValidAuthnRequestWhenPassedAnEntityId() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -136,13 +135,10 @@ public class AuthnRequestAcceptanceTest {
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
         assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
         assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
-
-        multiTenantApplication.after();
     }
 
     @Test
     public void shouldReturn400WhenPassedNoEntityIdForMultiTenantApplication() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -154,13 +150,10 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         assertThat(authnResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-
-        multiTenantApplication.after();
     }
 
     @Test
     public void shouldReturn400WhenPassedInvalidEntityIdForMultiTenantApplication() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -172,8 +165,6 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         assertThat(authnResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-
-        multiTenantApplication.after();
     }
 
     private void setupComplianceToolWithDefaultEntityId(Client client) throws Exception {
