@@ -22,7 +22,7 @@ project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.4.0'
     verifyCommonUtils = '2.0.0-337'
-    samlLibVersion = "$openSamlVersion-163"
+    samlLibVersion = "$openSamlVersion-166"
     dropwizardVersion = '1.3.5'
     jaxbapiVersion = '2.2.9'
     hub_saml="$openSamlVersion-15709"
@@ -46,7 +46,7 @@ dependencies {
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:2.12.0',
+        'org.mockito:mockito-core:2.23.4',
         "uk.gov.ida:saml-metadata-bindings-test:$samlLibVersion",
         "uk.gov.ida:saml-utils:$samlLibVersion",
         "uk.gov.ida:common-test-utils:2.0.0-44",
@@ -136,7 +136,7 @@ jar {
 }
 
 task testAcceptance(type: Test) {
-    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
     classpath += sourceSets.acceptanceTest.runtimeClasspath
 }
 
