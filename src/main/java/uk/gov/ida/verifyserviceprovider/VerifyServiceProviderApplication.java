@@ -2,6 +2,7 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import io.dropwizard.Application;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
@@ -16,6 +17,7 @@ import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
 import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
+import javax.ws.rs.client.Client;
 import java.util.Arrays;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
@@ -59,7 +61,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
-        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, hubMetadataBundle, msaMetadataBundle);
+        Client client = new JerseyClientBuilder(environment).build(getName());
+        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, hubMetadataBundle, msaMetadataBundle, client);
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());

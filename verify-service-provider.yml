@@ -54,3 +54,14 @@ samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 # Secondary private key used to decrypt Assertions in the Response
 # This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
+
+europeanIdentity:
+  enabled: ${EUROPEAN_IDENTITY_ENABLED}
+  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
+  aggregatedMetadata:
+    trustAnchorUri: ${TRUST_ANCHOR_URI}
+    metadataSourceUri: ${METADATA_SOURCE_URI}
+    trustStore:
+      path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
+      password: ${TRUSTSTORE_PASSWORD}
+    jerseyClientName: trust-anchor-client

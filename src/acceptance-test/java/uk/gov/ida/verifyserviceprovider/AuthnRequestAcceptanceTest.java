@@ -3,8 +3,10 @@ package uk.gov.ida.verifyserviceprovider;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.DropwizardTestSupport;
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import keystore.KeyStoreResource;
 import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -19,9 +21,12 @@ import java.net.URI;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
+import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 
 public class AuthnRequestAcceptanceTest {
@@ -32,7 +37,15 @@ public class AuthnRequestAcceptanceTest {
     private static String MULTI_ENTITY_ID_1 = "http://service-entity-id-one";
     private static String MULTI_ENTITY_ID_2 = "http://service-entity-id-two";
 
-    public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardTestSupport<>(
+    private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
+        .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
+        .build();
+    static {
+        KEY_STORE_RESOURCE.create();
+    }
+
+    @Rule
+    public final DropwizardAppRule<VerifyServiceProviderConfiguration> singleTenantApplication = new DropwizardAppRule<>(
         VerifyServiceProviderApplication.class,
         "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
@@ -43,10 +56,17 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+        ConfigOverride.config("europeanIdentity.enabled", "false"),
+        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
-    public static final DropwizardTestSupport<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardTestSupport<>(
+    @Rule
+    public final DropwizardAppRule<VerifyServiceProviderConfiguration> multiTenantApplication = new DropwizardAppRule<>(
         VerifyServiceProviderApplication.class,
         "verify-service-provider.yml",
         ConfigOverride.config("server.connector.port", String.valueOf(0)),
@@ -57,13 +77,18 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
         ConfigOverride.config("msaMetadata.expectedEntityId", "some-msa-expected-entity-id"),
         ConfigOverride.config("msaMetadata.uri", "http://some-msa-uri"),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+        ConfigOverride.config("europeanIdentity.enabled", "false"),
+        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
 
     @Test
     public void shouldGenerateValidAuthnRequestUsingDefaultEntityId() throws Exception {
-        singleTenantApplication.before();
         Client client = new JerseyClientBuilder(singleTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithDefaultEntityId(client);
@@ -85,13 +110,10 @@ public class AuthnRequestAcceptanceTest {
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
         assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
         assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
-
-        singleTenantApplication.after();
     }
 
     @Test
     public void shouldGenerateValidAuthnRequestWhenPassedAnEntityId() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -113,13 +135,10 @@ public class AuthnRequestAcceptanceTest {
         JSONObject complianceToolResponseBody = new JSONObject(complianceToolResponse.readEntity(String.class));
         assertThat(complianceToolResponseBody.getJSONObject("status").get("message")).isEqualTo(null);
         assertThat(complianceToolResponseBody.getJSONObject("status").getString("status")).isEqualTo("PASSED");
-
-        multiTenantApplication.after();
     }
 
     @Test
     public void shouldReturn400WhenPassedNoEntityIdForMultiTenantApplication() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -131,13 +150,10 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         assertThat(authnResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-
-        multiTenantApplication.after();
     }
 
     @Test
     public void shouldReturn400WhenPassedInvalidEntityIdForMultiTenantApplication() throws Exception {
-        multiTenantApplication.before();
         Client client = new JerseyClientBuilder(multiTenantApplication.getEnvironment()).build("Test Client");
 
         setupComplianceToolWithEntityId(client, MULTI_ENTITY_ID_1);
@@ -149,8 +165,6 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         assertThat(authnResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
-
-        multiTenantApplication.after();
     }
 
     private void setupComplianceToolWithDefaultEntityId(Client client) throws Exception {

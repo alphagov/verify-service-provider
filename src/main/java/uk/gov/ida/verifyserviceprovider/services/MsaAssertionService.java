@@ -23,14 +23,18 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
 
-public class MatchingAssertionService implements AssertionService<TranslatedResponseBody> {
+public class MsaAssertionService implements AssertionService<TranslatedResponseBody> {
 
 
     private AssertionValidator assertionValidator;
+    private LevelOfAssuranceValidator levelOfAssuranceValidator;
     private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
-    public MatchingAssertionService( AssertionValidator assertionValidator, SamlAssertionsSignatureValidator assertionsSignatureValidator ) {
+    public MsaAssertionService(AssertionValidator assertionValidator,
+                               LevelOfAssuranceValidator levelOfAssuranceValidator,
+                               SamlAssertionsSignatureValidator assertionsSignatureValidator) {
         this.assertionValidator = assertionValidator;
+        this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
     }
 
@@ -51,7 +55,6 @@ public class MatchingAssertionService implements AssertionService<TranslatedResp
         //  3. validate levelOfAssurance
         AuthnStatement authnStatement = assertion.getAuthnStatements().get(0);
         LevelOfAssurance levelOfAssurance = extractLevelOfAssurance(authnStatement);
-        LevelOfAssuranceValidator levelOfAssuranceValidator = new LevelOfAssuranceValidator();
         levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
         //  4. translateAssertions
         String nameID = assertion.getSubject().getNameID().getValue();
