@@ -9,7 +9,7 @@ import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.Scenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
+import uk.gov.ida.verifyserviceprovider.rules.V1VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
 
@@ -29,7 +29,7 @@ public class V1NoAuthnContextResponseAcceptancTest {
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer);
+    public static V1VerifyServiceProviderAppRule application = new V1VerifyServiceProviderAppRule(msaServer);
 
     private static Client client;
     private static ComplianceToolService complianceTool;

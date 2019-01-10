@@ -8,7 +8,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
+import uk.gov.ida.verifyserviceprovider.rules.V1VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
 
@@ -32,7 +32,7 @@ public class V1TranslateResponseMultiTenantedSetupAcceptanceTest {
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule(msaServer, String.format("%s,%s", configuredEntityIdOne, configuredEntityIdTwo));
+    public static V1VerifyServiceProviderAppRule application = new V1VerifyServiceProviderAppRule(msaServer, String.format("%s,%s", configuredEntityIdOne, configuredEntityIdTwo));
 
     private static Client client;
     private static ComplianceToolService complianceTool;

@@ -12,7 +12,7 @@ import uk.gov.ida.verifyserviceprovider.domain.MatchingAddressV2;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAttributeV2;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingDatasetV2;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
+import uk.gov.ida.verifyserviceprovider.rules.V1VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
 import javax.ws.rs.client.Client;
@@ -39,7 +39,7 @@ public class V2AcceptanceTest {
     public static MockMsaServer msaServer = new MockMsaServer();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
+    public static V1VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
             .withMockMsaServer(msaServer)
             .build();
 

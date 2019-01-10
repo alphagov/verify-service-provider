@@ -14,7 +14,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_E
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
-public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
+public class V1VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
 
     private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
         .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
@@ -24,7 +24,7 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     }
 
 
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
+    public V1VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
@@ -51,11 +51,11 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
         );
     }
 
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer) {
+    public V1VerifyServiceProviderAppRule(MockMsaServer msaServer) {
         this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
     }
 
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String serviceEntityIdOverride) {
+    public V1VerifyServiceProviderAppRule(MockMsaServer msaServer, String serviceEntityIdOverride) {
         this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, serviceEntityIdOverride);
     }
 }

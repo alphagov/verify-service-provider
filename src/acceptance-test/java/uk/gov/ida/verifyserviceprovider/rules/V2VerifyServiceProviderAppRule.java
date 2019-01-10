@@ -49,7 +49,7 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP;
 import static uk.gov.ida.saml.metadata.ResourceEncoder.entityIdAsResource;
 
-public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
+public class V2VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
 
     private static final String VERIFY_METADATA_PATH = "/verify-metadata";
     private static final String TRUST_ANCHOR_PATH = "/trust-anchor";
@@ -66,7 +66,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
 
-    public NonMatchingVerifyServiceProviderAppRule() {
+    public V2VerifyServiceProviderAppRule() {
         super(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",

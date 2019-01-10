@@ -8,7 +8,7 @@ import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
-import uk.gov.ida.verifyserviceprovider.rules.NonMatchingVerifyServiceProviderAppRule;
+import uk.gov.ida.verifyserviceprovider.rules.V2VerifyServiceProviderAppRule;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -22,10 +22,10 @@ import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvali
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class NonMatchingEidasAcceptanceTest {
+public class V2EidasAcceptanceTest {
 
     @ClassRule
-    public static NonMatchingVerifyServiceProviderAppRule application = new NonMatchingVerifyServiceProviderAppRule();
+    public static V2VerifyServiceProviderAppRule application = new V2VerifyServiceProviderAppRule();
 
     @Test
     public void shouldProcessEidasResponseCorrectly() throws MarshallingException, SignatureException {
