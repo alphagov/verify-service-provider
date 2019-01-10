@@ -24,7 +24,7 @@ public class VerifyHubConfiguration {
     }
 
     private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
-        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null);
+        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null, null, null);
     }
 
     public URI getHubSsoLocation() {
