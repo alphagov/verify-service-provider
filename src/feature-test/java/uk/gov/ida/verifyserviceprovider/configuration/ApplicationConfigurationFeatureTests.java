@@ -75,6 +75,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getMsaMetadataConfiguration().getExpectedEntityId()).isEqualTo("some-msa-entity-id");
         assertThat(configuration.getMsaMetadataConfiguration().getUri().toString()).isEqualTo("some-msa-metadata-url");
         assertThat(configuration.getServiceEntityIds()).containsExactly("http://some-service-entity-id");
+        assertThat(configuration.getHashingEntityId()).isEqualTo("some-hashing-entity-id");
         assertThat(configuration.getSamlSigningKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_SIGNING_KEY));
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));

@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
 import certificates.values.CACertificates;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
 import io.dropwizard.client.JerseyClientBuilder;
@@ -20,11 +19,8 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.HashMap;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
 import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
@@ -49,7 +45,7 @@ public class MsaMetadataFeatureTest {
     private final String HEALTHCHECK_URL = "http://localhost:%d/admin/healthcheck";
 
     @ClassRule
-    public static WireMockClassRule wireMockServer = new WireMockClassRule(wireMockConfig().dynamicPort());
+    public static MockMsaServer mockMsaServer = new MockMsaServer();
 
     @ClassRule
     public static MockVerifyHubServer hubServer = new MockVerifyHubServer();
@@ -62,7 +58,7 @@ public class MsaMetadataFeatureTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        wireMockServer.start();
+        mockMsaServer.start();
         hubServer.serveDefaultMetadata();
 
         KeyStoreResource verifyMetadataKeystoreResource = aKeyStoreResource()
@@ -97,7 +93,7 @@ public class MsaMetadataFeatureTest {
     }
 
     private String getMsaMetadataUrl() {
-        return format("http://localhost:%s/matching-service/metadata", wireMockServer.port());
+        return format("http://localhost:%s/matching-service/metadata", mockMsaServer.port());
     }
 
     @After
@@ -107,12 +103,7 @@ public class MsaMetadataFeatureTest {
 
     @Test
     public void shouldFailHealthcheckWhenMsaMetadataUnavailable() {
-        wireMockServer.stubFor(
-            get(urlEqualTo("/matching-service/metadata"))
-                .willReturn(aResponse()
-                    .withStatus(500)
-                )
-        );
+        mockMsaServer.serve500Error();
 
         applicationTestSupport.before();
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
@@ -125,7 +116,7 @@ public class MsaMetadataFeatureTest {
 
         String expectedResult = format("\"%s\":{\"healthy\":false", getMsaMetadataUrl());
 
-        wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
+        mockMsaServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 
         assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(response.readEntity(String.class)).contains(expectedResult);
@@ -133,13 +124,7 @@ public class MsaMetadataFeatureTest {
 
     @Test
     public void shouldPassHealthcheckWhenMsaMetadataAvailable() {
-        wireMockServer.stubFor(
-            get(urlEqualTo("/matching-service/metadata"))
-                .willReturn(aResponse()
-                    .withStatus(200)
-                    .withBody(MockMsaServer.msaMetadata())
-                )
-        );
+        mockMsaServer.serveDefaultMetadata();
 
         applicationTestSupport.before();
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
@@ -152,7 +137,7 @@ public class MsaMetadataFeatureTest {
 
         String expectedResult = format("\"%s\":{\"healthy\":true", getMsaMetadataUrl());
 
-        wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
+        mockMsaServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         assertThat(response.readEntity(String.class)).contains(expectedResult);

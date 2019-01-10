@@ -73,7 +73,11 @@ public class HubMetadataFeatureTest {
         KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
                 .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(CACertificates.TEST_CORE_CA).build().getCertificate())
                 .build();
+        KeyStoreResource verifyIdpKeystoreResource = aKeyStoreResource()
+                .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(CACertificates.TEST_IDP_CA).build().getCertificate())
+                .build();
         verifyHubKeystoreResource.create();
+        verifyIdpKeystoreResource.create();
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
@@ -92,7 +96,7 @@ public class HubMetadataFeatureTest {
             put(HUB_EXPECTED_ENTITY_ID, HUB_ENTITY_ID);
             put(METADATA_TRUSTSTORE_PATH, verifyMetadataKeystoreResource.getAbsolutePath());
             put(HUB_TRUSTSTORE_PATH, verifyHubKeystoreResource.getAbsolutePath());
-            put(IDP_TRUSTSTORE_PATH, verifyMetadataKeystoreResource.getAbsolutePath());
+            put(IDP_TRUSTSTORE_PATH, verifyIdpKeystoreResource.getAbsolutePath());
             put(TRUSTSTORE_PASSWORD, verifyMetadataKeystoreResource.getPassword());
         }}.forEach(environmentVariables::set);
     }

@@ -17,7 +17,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP_MS;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntitiesDescriptorBuilder.anEntitiesDescriptor;
 
-public class  MockMsaServer extends WireMockClassRule {
+public class MockMsaServer extends WireMockClassRule {
 
     public static final String MSA_ENTITY_ID = TEST_RP_MS;
 
@@ -40,12 +40,22 @@ public class  MockMsaServer extends WireMockClassRule {
 
     public void serveDefaultMetadata() {
         stubFor(
-            get(urlEqualTo("/matching-service/metadata"))
-                .willReturn(aResponse()
-                    .withStatus(200)
-                    .withBody(msaMetadata())
-                )
+                get(urlEqualTo("/matching-service/metadata"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody(msaMetadata())
+                        )
         );
+    }
+
+    public void serve500Error() {
+        stubFor(
+                get(urlEqualTo("/matching-service/metadata"))
+                        .willReturn(aResponse()
+                                .withStatus(500)
+                        )
+        );
+
     }
 
     public String getUri() {

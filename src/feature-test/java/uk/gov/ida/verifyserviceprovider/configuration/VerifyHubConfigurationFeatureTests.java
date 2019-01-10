@@ -23,20 +23,20 @@ import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_
 
 public class VerifyHubConfigurationFeatureTests {
 
-    private static final KeyStoreResource keyStore = KeyStoreResourceBuilder.aKeyStoreResource()
+    private static final KeyStoreResource KEY_STORE = KeyStoreResourceBuilder.aKeyStoreResource()
             .withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
 
     @ClassRule
-    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    public static final EnvironmentVariables ENVIRONMENT_VARIABLES = new EnvironmentVariables();
 
     @Before
     public void setUp() {
-        keyStore.create();
+        KEY_STORE.create();
     }
 
     @After
     public void tearDown() {
-        keyStore.delete();
+        KEY_STORE.delete();
     }
 
     @Test
@@ -91,54 +91,25 @@ public class VerifyHubConfigurationFeatureTests {
     }
 
     @Test
-    public void shouldSetHubMetadataExpectedEntityIdToTheConfigValueIfOneHasBeenProvided() throws Exception {
+    public void shouldSetConfigurationValuesWhenOverridesAreProvided() throws Exception {
         String config = "{\"environment\": \"CUSTOM\"}";
         setUpEnvironmentForCustom();
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 
         assertThat(actualConfiguration.getHubMetadataConfiguration().getExpectedEntityId()).isEqualTo("http://some-expected-entity-id");
-    }
-
-    @Test
-    public void shouldSetHubMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
-        String config = "{\"environment\": \"CUSTOM\"}";
-        setUpEnvironmentForCustom();
-        environmentVariables.set(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        environmentVariables.set(TRUSTSTORE_PASSWORD, keyStore.getPassword());
-
-        VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
-
         assertThat(actualConfiguration.getHubMetadataConfiguration().getTrustStore().containsAlias("rootCA")).isTrue();
-    }
-
-    @Test
-    public void shouldSetHubSsoLocationToTheConfigValueIfOneHasBeenProvided() throws Exception {
-        String config = "{\"environment\": \"CUSTOM\"}";
-        setUpEnvironmentForCustom();
-
-        VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
-
         assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("http://some-sso-url");
-    }
-
-    @Test
-    public void shouldSetHubMetadataUriToTheConfigValueIfOneHasBeenProvided() throws Exception {
-        String config = "{\"environment\": \"CUSTOM\"}";
-        setUpEnvironmentForCustom();
-
-        VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
-
         assertThat(actualConfiguration.getHubMetadataConfiguration().getUri().toString()).isEqualTo("http://some-metadata-url");
     }
 
     private void setUpEnvironmentForCustom() {
-        environmentVariables.set(HUB_SSO_URL, "http://some-sso-url");
-        environmentVariables.set(HUB_METADATA_URL, "http://some-metadata-url");
-        environmentVariables.set(HUB_EXPECTED_ENTITY_ID, "http://some-expected-entity-id");
-        environmentVariables.set(METADATA_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        environmentVariables.set(HUB_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        environmentVariables.set(IDP_TRUSTSTORE_PATH, keyStore.getAbsolutePath());
-        environmentVariables.set(TRUSTSTORE_PASSWORD, keyStore.getPassword());
+        ENVIRONMENT_VARIABLES.set(HUB_SSO_URL, "http://some-sso-url");
+        ENVIRONMENT_VARIABLES.set(HUB_METADATA_URL, "http://some-metadata-url");
+        ENVIRONMENT_VARIABLES.set(HUB_EXPECTED_ENTITY_ID, "http://some-expected-entity-id");
+        ENVIRONMENT_VARIABLES.set(METADATA_TRUSTSTORE_PATH, KEY_STORE.getAbsolutePath());
+        ENVIRONMENT_VARIABLES.set(HUB_TRUSTSTORE_PATH, KEY_STORE.getAbsolutePath());
+        ENVIRONMENT_VARIABLES.set(IDP_TRUSTSTORE_PATH, KEY_STORE.getAbsolutePath());
+        ENVIRONMENT_VARIABLES.set(TRUSTSTORE_PASSWORD, KEY_STORE.getPassword());
     }
 }
