@@ -153,13 +153,15 @@ public class ResponseFactory {
     }
 
     public EidasAssertionService createEidasAssertionService(
+            boolean isEnabled,
             DateTimeComparator dateTimeComparator,
-            EidasMetadataResolverRepository eidasMetadataResolverRepository
+            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
         return new EidasAssertionService(
+                isEnabled,
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),

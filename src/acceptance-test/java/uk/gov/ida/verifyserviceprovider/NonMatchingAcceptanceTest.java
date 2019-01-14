@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
+import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
@@ -27,6 +28,7 @@ import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
@@ -38,7 +40,24 @@ import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO
 public class NonMatchingAcceptanceTest {
 
     @ClassRule
-    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule();
+    public static MockMsaServer msaServer = new MockMsaServer();
+
+    @ClassRule
+    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
+            .withMockMsaServer(msaServer)
+            .build();
+            
+    @ClassRule
+    public static VerifyServiceProviderAppRule applicationWithEidasEnabled  = aVerifyServiceProviderAppRule()
+            .withEidasEnabledFlag(true)
+            .build();
+
+    @ClassRule
+    public static VerifyServiceProviderAppRule applicationWithEidasDisabled  = aVerifyServiceProviderAppRule()
+            .withEidasEnabledFlag(false)
+            .build();
+
+
     private static Client client;
     private static ComplianceToolService complianceTool;
     private static GenerateRequestService generateRequestService;
@@ -214,8 +233,91 @@ public class NonMatchingAcceptanceTest {
     }
 
     @Test
-    public void shouldRespondWithSuccessWhenAuthnFailed() {
+    public void shouldProcessIdpResponseCorrectlyWhenEuropeanIdentityEnabled() {
+        Client client = applicationWithEidasEnabled.client();
+        ComplianceToolService complianceTool = new ComplianceToolService(client);
+        GenerateRequestService generateRequestService = new GenerateRequestService(client);
 
+        complianceTool.initialiseWithDefaultsForV2();
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(applicationWithEidasEnabled.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", applicationWithEidasEnabled.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
+    }
+
+    @Test
+    public void shouldProcessIdpResponseCorrectlyWhenEuropeanIdentityDisabled() {
+        Client client = applicationWithEidasDisabled.client();
+        ComplianceToolService complianceTool = new ComplianceToolService(client);
+        GenerateRequestService generateRequestService = new GenerateRequestService(client);
+
+        complianceTool.initialiseWithDefaultsForV2();
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(applicationWithEidasDisabled.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", applicationWithEidasDisabled.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
+    }
+
+    @Test
+    public void shouldProcessIdpResponseCorrectlyWhenEuropeanIdentityConfigAbsent() {
+        Client client = application.client();
+        ComplianceToolService complianceTool = new ComplianceToolService(client);
+        GenerateRequestService generateRequestService = new GenerateRequestService(client);
+
+        complianceTool.initialiseWithDefaultsForV2();
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
+    }
+
+    @Test
+    public void shouldRespondWithSuccessWhenAuthnFailed() {
         complianceTool.initialiseWithDefaultsForV2();
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
