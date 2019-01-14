@@ -38,9 +38,10 @@ hashingEntityId: ${HASHING_ENTITY_ID:-}
 verifyHubConfiguration:
   environment: ${VERIFY_ENVIRONMENT:-}
 
+# (optional) Only use if you are running an MSA
 # Location of Matching Service Metadata
 # Verify Service Provider consumes the metadata and uses
-# public certificates from it to identify the msa
+# public certificates from it to identify the MSA
 msaMetadata:
   uri: ${MSA_METADATA_URL:-}
   expectedEntityId: ${MSA_ENTITY_ID:-}
