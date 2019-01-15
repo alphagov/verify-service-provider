@@ -2,18 +2,14 @@ package feature.uk.gov.ida.verifyserviceprovider.configuration;
 
 import certificates.values.CACertificates;
 import keystore.KeyStoreResource;
-import keystore.KeyStoreRule;
 import keystore.builders.KeyStoreResourceBuilder;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.HubMetadataConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.HUB_JERSEY_CLIENT_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_VERIFY_TRUSTSTORE_NAME;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.TEST_VERIFY_TRUSTSTORE_NAME;
 import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_MAPPER;
 
 public class VerifyHubConfigurationFeatureTests {

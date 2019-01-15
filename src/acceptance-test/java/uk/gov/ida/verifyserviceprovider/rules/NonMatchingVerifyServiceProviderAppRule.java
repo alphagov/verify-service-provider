@@ -65,6 +65,8 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
 
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource hubTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("hubCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource idpTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
 
     public NonMatchingVerifyServiceProviderAppRule() {
         super(
@@ -79,6 +81,10 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
             ConfigOverride.config("verifyHubConfiguration.metadata.uri", () -> "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
             ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
             ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+            ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
             ConfigOverride.config("msaMetadata.uri", msaServer::getUri),
             ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
@@ -95,6 +101,8 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
     protected void before() {
         countryMetadataTrustStore.create();
         metadataTrustStore.create();
+        hubTrustStore.create();
+        idpTrustStore.create();
 
         countryEntityId = "https://localhost:12345" + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
 
