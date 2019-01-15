@@ -2,11 +2,13 @@ package uk.gov.ida.verifyserviceprovider.rules;
 
 import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import io.dropwizard.testing.ConfigOverride;
+import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.KeyStoreResource;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
@@ -48,7 +50,7 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,
-            "verify-service-provider.yml",
+            ResourceHelpers.resourceFilePath("verify-service-provider-with-msa.yml"),
             ConfigOverride.config("serviceEntityIds", serviceEntityIdOverride),
             ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
             ConfigOverride.config("server.connector.port", String.valueOf(0)),

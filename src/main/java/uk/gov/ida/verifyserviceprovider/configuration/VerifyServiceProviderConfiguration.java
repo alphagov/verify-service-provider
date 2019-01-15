@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import org.joda.time.Duration;
+import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
 
 import javax.validation.Valid;
@@ -24,7 +25,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private PrivateKey samlSigningKey;
     private PrivateKey samlPrimaryEncryptionKey;
     private PrivateKey samlSecondaryEncryptionKey;
-    private MsaMetadataConfiguration msaMetadata;
+    private Optional<MsaMetadataConfiguration> msaMetadata;
     private Duration clockSkew;
     private EuropeanIdentityConfiguration europeanIdentity;
 
@@ -36,7 +37,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
         @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
         @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-        @JsonProperty("msaMetadata") @NotNull @Valid MsaMetadataConfiguration msaMetadata,
+        @JsonProperty("msaMetadata") @NotNull @Valid Optional<MsaMetadataConfiguration> msaMetadata,
         @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
         @JsonProperty("europeanIdentity") @Valid EuropeanIdentityConfiguration europeanIdentity
     ) {
@@ -46,7 +47,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSigningKey = samlSigningKey;
         this.samlPrimaryEncryptionKey = samlPrimaryEncryptionKey;
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
-        this.msaMetadata = Optional.ofNullable(msaMetadata).orElseGet(() -> new MsaMetadataConfiguration(URI.create(""), 0L, 0L, "", null, "", ""));
+        this.msaMetadata = msaMetadata;
         this.clockSkew = clockSkew;
         this.europeanIdentity = europeanIdentity;
     }
@@ -81,8 +82,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return samlSecondaryEncryptionKey;
     }
 
-    public MsaMetadataConfiguration getMsaMetadata() {
-        return msaMetadata;
+    public Optional<MetadataResolverConfiguration> getMsaMetadata() {
+        return msaMetadata.map((msaMetadataConfiguration -> msaMetadataConfiguration));
     }
 
     public HubMetadataConfiguration getVerifyHubMetadata() {
