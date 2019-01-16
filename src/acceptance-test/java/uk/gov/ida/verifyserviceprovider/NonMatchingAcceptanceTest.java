@@ -1,17 +1,18 @@
 package uk.gov.ida.verifyserviceprovider;
 
 import com.google.common.collect.ImmutableMap;
-import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import io.dropwizard.jersey.errors.ErrorMessage;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.domain.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.domain.V2MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -20,29 +21,24 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID;
 
 public class NonMatchingAcceptanceTest {
 
     @ClassRule
-    public static MockMsaServer msaServer = new MockMsaServer();
-
-    @ClassRule
-    public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
-            .withMockMsaServer(msaServer)
-            .build();
-
+    public static VerifyServiceProviderAppRule application = new VerifyServiceProviderAppRule();
     private static Client client;
     private static ComplianceToolService complianceTool;
     private static GenerateRequestService generateRequestService;
@@ -128,13 +124,13 @@ public class NonMatchingAcceptanceTest {
         String expectedLaterFromDateString = laterFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String expectedLaterToDateString = laterToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
 
-        checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueInArrayAttribute("middleNames", 0, "Montgomery", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
-        checkMdsValueOfAttribute("dateOfBirth", "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("middleNames", 0, "Montgomery", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAttribute("dateOfBirth", "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
     }
 
     @Test
@@ -184,12 +180,12 @@ public class NonMatchingAcceptanceTest {
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
 
-        checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         assertThat(attributes.getJSONArray("middleNames").length()).isEqualTo(0);
-        checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, null, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, null, attributes);
         assertThat(attributes.isNull("dateOfBirth")).isTrue();
-        checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
     }
 
     @Test
@@ -217,79 +213,76 @@ public class NonMatchingAcceptanceTest {
         assertThat(errorMessage.getMessage()).isEqualTo("Expected Level of Assurance to be at least LEVEL_2, but was LEVEL_1");
     }
 
-    private void checkMdsValueOfAttribute(
-        String attributeName,
-        String expectedValue,
-        boolean expectedIsVerified,
-        String expectedFromDateString,
-        String expectedToDateString,
-        JSONObject attributes
-    ) {
-        JSONObject attribute = attributes.getJSONObject(attributeName);
-        checkMdsValueInJsonObject(attribute, expectedValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
+    @Test
+    public void shouldRespondWithSuccessWhenAuthnFailed() {
+
+        complianceTool.initialiseWithDefaultsForV2();
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
     }
 
-    private void checkMdsValueOfAddress(
-        int index,
-        List<String> lines,
-        String postcode,
-        String internationalPostcode,
-        boolean expectedIsVerified,
-        String expectedFromDateString,
-        String expectedToDateString,
-        JSONObject attributes
-    ) {
-        JSONArray addresses = attributes.getJSONArray("addresses");
-        JSONObject addressMdsValue = addresses.getJSONObject(index);
-        JSONObject addressValue = addressMdsValue.getJSONObject("value");
+    @Test
+    public void shouldRespondWithErrorWhenFraudulentMatchResponse() {
 
-        // TODO: The Compliance Tool isn't currently returning from/to dates for addresses.  Until that is fixed, the next line needs to be commented out.
-        //checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
+        complianceTool.initialiseWithDefaultsForV2();
 
-        JSONArray jsonLines = addressValue.getJSONArray("lines");
-        assertThat(jsonLines.length()).isEqualTo(lines.size());
-        for (index = 0; index < lines.size(); index ++) {
-            assertThat(jsonLines.getString(index)).isEqualTo(lines.get(index));
-        }
-        assertThat(addressValue.getString("postCode")).isEqualTo(postcode);
-        assertThat(addressValue.getString("internationalPostCode")).isEqualTo(internationalPostcode);
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        ErrorMessage errorBody = response.readEntity(ErrorMessage.class);
+
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getCode()).isEqualTo(BAD_REQUEST.getStatusCode());
+        assertThat(errorBody.getMessage()).contains("SAML Validation Specification: Signature was not valid.");
     }
 
-    private void checkMdsValueInArrayAttribute(
-        String attributeName,
-        int index,
-        String expectedValue,
-        boolean expectedIsVerified,
-        String expectedFromDateString,
-        String expectedToDateString,
-        JSONObject attributes
-    ) {
-        JSONArray jsonArray = attributes.getJSONArray(attributeName);
-        JSONObject mdsObjectJson = jsonArray.getJSONObject(index);
-        checkMdsValueInJsonObject(mdsObjectJson, expectedValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
-    }
+    @Test
+    public void shouldRespondWithSuccessWhenNoAuthnContext() {
 
-    private void checkMdsValueInJsonObject(
-        JSONObject jsonObject,
-        String expectedValue,
-        boolean expectedIsVerified,
-        String expectedFromDateString,
-        String expectedToDateString
-    ) {
-        assertThat(jsonObject.getString("value")).isEqualTo(expectedValue);
-        checkMdsMetadataInJsonObject(jsonObject, expectedIsVerified, expectedFromDateString, expectedToDateString);
-    }
+        complianceTool.initialiseWithDefaultsForV2();
 
-    private void checkMdsMetadataInJsonObject(
-        JSONObject jsonObject,
-        boolean expectedIsVerified,
-        String expectedFromDateString,
-        String expectedToDateString
-    ) {
-        assertThat(jsonObject.getBoolean("verified")).isEqualTo(expectedIsVerified);
-        assertThat(jsonObject.getString("from")).isEqualTo(expectedFromDateString);
-        if (expectedToDateString != null) {
-            assertThat(jsonObject.getString("to")).isEqualTo(expectedToDateString);
-        }
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
     }
 }

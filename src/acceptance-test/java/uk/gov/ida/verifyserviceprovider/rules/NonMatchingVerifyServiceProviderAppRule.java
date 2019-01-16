@@ -9,7 +9,6 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.KeyStoreResource;
 import keystore.builders.KeyStoreResourceBuilder;
 import org.joda.time.DateTime;
-import org.junit.After;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
@@ -86,8 +85,6 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
             ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
             ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-            ConfigOverride.config("msaMetadata.uri", msaServer::getUri),
-            ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
             ConfigOverride.config("europeanIdentity.enabled", "true"),
             ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),

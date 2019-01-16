@@ -80,8 +80,6 @@ public class HubMetadataFeatureTest {
             config("server.connector.port", "0"),
             config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             config("verifyHubConfiguration.metadata.uri", getHubMetadataUrl()),
-            config("msaMetadata.uri", msaServer::getUri),
-            config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
             config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),

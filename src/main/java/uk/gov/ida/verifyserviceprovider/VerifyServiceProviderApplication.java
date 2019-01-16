@@ -19,6 +19,7 @@ import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
 import javax.ws.rs.client.Client;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
@@ -27,8 +28,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
-        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
-        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
+        hubMetadataBundle = new MetadataResolverBundle<>(configuration -> Optional.ofNullable(configuration.getVerifyHubMetadata()));
+        msaMetadataBundle = new MetadataResolverBundle<>(configuration -> configuration.getMsaMetadata(), false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -69,8 +70,11 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
-        environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
-        environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
+        if (configuration.getMsaMetadata().isPresent()) {
+            environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
+        } else {
+            environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
+        }
 
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }

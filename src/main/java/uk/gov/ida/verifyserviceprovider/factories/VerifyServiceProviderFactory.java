@@ -26,14 +26,12 @@ import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-
 import javax.ws.rs.client.Client;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.List;
 import java.util.Timer;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 

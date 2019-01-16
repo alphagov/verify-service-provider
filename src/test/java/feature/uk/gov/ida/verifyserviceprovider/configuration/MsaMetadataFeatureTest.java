@@ -6,6 +6,7 @@ import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
 import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
+import io.dropwizard.testing.ResourceHelpers;
 import keystore.KeyStoreResource;
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +73,7 @@ public class MsaMetadataFeatureTest {
 
         this.applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
-            "verify-service-provider.yml",
+                ResourceHelpers.resourceFilePath("verify-service-provider-with-msa.yml"),
             config("server.connector.port", "0"),
             config("verifyHubConfiguration.metadata.uri", format("http://localhost:%s/SAML2/metadata", hubServer.port())),
             config("msaMetadata.uri", getMsaMetadataUrl()),
