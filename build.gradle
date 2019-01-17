@@ -40,7 +40,9 @@ dependencies {
         "uk.gov.ida:saml-serializers:$samlLibVersion",
         "uk.gov.ida:saml-security:$samlLibVersion",
         "uk.gov.ida:saml-extensions:$samlLibVersion",
-        "uk.gov.ida:hub-saml:$hub_saml"
+        "uk.gov.ida:hub-saml:$hub_saml",
+        "org.bouncycastle:bcprov-jdk15on:1.60",
+        "org.bouncycastle:bcpkix-jdk15on:1.60"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
