@@ -6,9 +6,7 @@ import io.dropwizard.Application;
 import io.dropwizard.cli.Command;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.client.JerseyClientConfiguration;
-import io.dropwizard.jackson.Jackson;
 import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import io.dropwizard.util.Duration;
 import keystore.KeyStoreResource;
@@ -55,7 +53,6 @@ import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VE
 public class ComplianceToolModeAcceptanceTest {
 
     private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
-    private static String SINGLE_ENTITY_ID = "http://default-entity-id";
 
     private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
@@ -72,7 +69,11 @@ public class ComplianceToolModeAcceptanceTest {
 
         @Override
         public void run(Bootstrap<?> wildcardBootstrap, Namespace defaultNamespace) throws Exception {
-            Namespace namespace = applyCommandLineArguments(defaultNamespace, "-i", SINGLE_ENTITY_ID, "--url", "http://localhost:8080", "-d", Jackson.newObjectMapper().writeValueAsString(matchingDataset), "file_overriden");
+            Namespace namespace = applyCommandLineArguments(defaultNamespace,
+                    "--url", "http://localhost:8080",
+                    "-d", bootstrap.getObjectMapper().writeValueAsString(matchingDataset),
+                    "--host", "127.0.0.1",
+                    "-p", "0");
             super.run(wildcardBootstrap, namespace);
         }
 
@@ -108,16 +109,9 @@ public class ComplianceToolModeAcceptanceTest {
     @Rule
     public DropwizardAppRule<VerifyServiceProviderConfiguration> appRule = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
-            "verify-service-provider.yml",
+            null,
             Optional.of("dw"),
-            (application)-> commandLineInitiator(application, matchingDataset),
-            ConfigOverride.config("server.connector.port", String.valueOf(0)),
-            ConfigOverride.config("europeanIdentity.enabled", "false"),
-            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+            (application)-> commandLineInitiator(application, matchingDataset)
     );
 
     private Client client;
@@ -204,6 +198,7 @@ public class ComplianceToolModeAcceptanceTest {
                 .request()
                 .post(json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null)));
 
+        assertThat(authnRequest.getStatus()).isEqualTo(200);
         RequestResponseBody authnSaml = authnRequest.readEntity(RequestResponseBody.class);
 
         assertThat(authnSaml.getSsoLocation()).isEqualTo(URI.create(COMPLIANCE_TOOL_HOST + "/SAML2/SSO"));

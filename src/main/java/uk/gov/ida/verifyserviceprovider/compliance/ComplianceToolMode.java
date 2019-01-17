@@ -16,8 +16,9 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
 
     public static final String MATCHING_DATASET = "matchingDataset";
     public static final String ASSERTION_CONSUMER_URL = "assertionConsumerUrl";
-    public static final String ENTITY_ID = "entityId";
     public static final String TIMEOUT = "timeout";
+    private static final String PORT = "port";
+    private static final String BIND_HOST = "bindHost";
     private MatchingDatasetArgumentResolver matchingDatasetArgumentResolver;
 
     public ComplianceToolMode(ObjectMapper objectMapper, Validator validator, Application<VerifyServiceProviderConfiguration> application) {
@@ -29,12 +30,12 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     @Override
     public void configure(Subparser subparser) {
         super.configure(subparser);
-        //noop
-        subparser.addArgument("-i", "--entityId")
-                .dest(ENTITY_ID)
-                .type(String.class)
+
+        subparser.addArgument("-d", "--matchingDataset")
+                .dest(MATCHING_DATASET)
+                .type(matchingDatasetArgumentResolver)
                 .required(true)
-                .help("The entity ID of the VSP");
+                .help("The Matching Dataset that the Compliance Tool will be initialized with");
 
         subparser.addArgument("-u", "--url")
                 .dest(ASSERTION_CONSUMER_URL)
@@ -43,18 +44,26 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
                 .setDefault("http://localhost:8080/SAML2/Response")
                 .help("The URL where the Compliance Tool will send responses");
 
-        subparser.addArgument("-d", "--matchingDataset")
-                .dest(MATCHING_DATASET)
-                .type(matchingDatasetArgumentResolver)
-                .required(true)
-                .help("The Matching Dataset that the Compliance Tool will be initialized with");
-
         subparser.addArgument("-t", "--timeout")
                 .dest(TIMEOUT)
                 .type(Integer.class)
                 .required(false)
                 .setDefault(5)
                 .help("The timeout in seconds when communicating with the Compliance Tool");
+
+        subparser.addArgument("-p", "--port")
+                .dest(PORT)
+                .type(Integer.class)
+                .required(false)
+                .setDefault(50300)
+                .help("The port that this service will use");
+
+        subparser.addArgument("--host")
+                .dest(BIND_HOST)
+                .type(String.class)
+                .required(false)
+                .setDefault("0.0.0.0")
+                .help("The host that this service will bind to");
 
     }
 
@@ -66,18 +75,19 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     }
 
     private void run(Namespace namespace, Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
-        String entityId = namespace.get(ENTITY_ID);
         String url = namespace.get(ASSERTION_CONSUMER_URL);
         Integer timeout = namespace.get(TIMEOUT);
         MatchingDataset matchingDataset = namespace.get(MATCHING_DATASET);
+        Integer port = namespace.get(PORT);
+        String bindHost = namespace.get(BIND_HOST);
 
         bootstrap.addBundle(new InitializeComplianceToolBundle(url, timeout, matchingDataset));
-        bootstrap.setConfigurationFactoryFactory(complianceToolModeConfigurationFactory(entityId));
+        bootstrap.setConfigurationFactoryFactory(complianceToolModeConfigurationFactory(port, bindHost));
     }
 
-    private ConfigurationFactoryFactory<VerifyServiceProviderConfiguration> complianceToolModeConfigurationFactory(String entityId) {
+    private ConfigurationFactoryFactory<VerifyServiceProviderConfiguration> complianceToolModeConfigurationFactory(int port, String bindHost) {
         return (klass, validator, objectMapper, propertyPrefix) ->
-                new ComplianceToolModeConfigurationFactory(entityId, validator, objectMapper, propertyPrefix);
+                new ComplianceToolModeConfigurationFactory(port, bindHost);
     }
 
 }

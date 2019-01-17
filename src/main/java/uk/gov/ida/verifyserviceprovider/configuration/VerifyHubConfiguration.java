@@ -12,6 +12,10 @@ public class VerifyHubConfiguration {
     private URI hubSsoLocation;
     private HubMetadataConfiguration hubMetadataConfiguration;
 
+    public VerifyHubConfiguration(HubEnvironment hubEnvironment) {
+       this(hubEnvironment, null, null);
+    }
+
     @JsonCreator
     public VerifyHubConfiguration(
         @JsonProperty("environment") HubEnvironment hubEnvironment,

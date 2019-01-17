@@ -1,51 +1,66 @@
 package uk.gov.ida.verifyserviceprovider.compliance;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.configuration.ConfigurationException;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
-import io.dropwizard.configuration.YamlConfigurationFactory;
+import io.dropwizard.jetty.HttpConnectorFactory;
+import io.dropwizard.logging.DefaultLoggingFactory;
+import io.dropwizard.server.SimpleServerFactory;
 import org.bouncycastle.operator.OperatorCreationException;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
-import javax.validation.Validator;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.UUID;
 
 public class ComplianceToolModeConfigurationFactory implements ConfigurationFactory<VerifyServiceProviderConfiguration> {
 
-    private final String entityId;
-    private YamlConfigurationFactory<ComplianceToolModeConfiguration> yamlConfigurationFactory;
+    private final int port;
+    private final String bindHost;
 
 
-    ComplianceToolModeConfigurationFactory(String entityId, Validator validator, ObjectMapper objectMapper, String propertyPrefix) {
-        this.entityId = entityId;
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        yamlConfigurationFactory = new YamlConfigurationFactory<>(ComplianceToolModeConfiguration.class, validator, objectMapper, propertyPrefix);
+    ComplianceToolModeConfigurationFactory(int port, String bindHost) {
+        this.port = port;
+        this.bindHost = bindHost;
     }
 
-    @Override
-    public VerifyServiceProviderConfiguration build(ConfigurationSourceProvider provider, String path) throws IOException, ConfigurationException {
-        ComplianceToolModeConfiguration configuration = yamlConfigurationFactory.build(provider, path);
-        addAdditionalConfig(configuration);
-        return configuration;
+    private ComplianceToolModeConfiguration createComplianceToolModeConfiguration() throws IOException {
+        String serviceEntityId = UUID.randomUUID().toString();
+        KeysAndCert signingKeysAndCert = createKeysAndCert(serviceEntityId);
+        KeysAndCert encryptionKeysAndCert = createKeysAndCert(serviceEntityId);
+
+        ComplianceToolModeConfiguration complianceToolModeConfiguration = new ComplianceToolModeConfiguration(serviceEntityId, signingKeysAndCert, encryptionKeysAndCert);
+
+        HttpConnectorFactory httpConnectorFactory = new HttpConnectorFactory();
+        httpConnectorFactory.setPort(port);
+        httpConnectorFactory.setBindHost(bindHost);
+        SimpleServerFactory simpleServerFactory = new SimpleServerFactory();
+        simpleServerFactory.setApplicationContextPath("/");
+        simpleServerFactory.setConnector(httpConnectorFactory);
+        complianceToolModeConfiguration.setServerFactory(simpleServerFactory);
+        complianceToolModeConfiguration.setLoggingFactory(new DefaultLoggingFactory());
+
+        return complianceToolModeConfiguration;
     }
 
-    @Override
-    public VerifyServiceProviderConfiguration build() throws IOException, ConfigurationException {
-        ComplianceToolModeConfiguration configuration = yamlConfigurationFactory.build();
-        addAdditionalConfig(configuration);
-        return configuration;
-    }
-
-    private void addAdditionalConfig(ComplianceToolModeConfiguration configuration) throws IOException {
+    private KeysAndCert createKeysAndCert(String serviceEntityId) throws IOException {
+        KeysAndCert keysAndCert = new KeysAndCert(serviceEntityId);
         try {
-            configuration.setEntityID(entityId);
-            configuration.generateKeys();
+            keysAndCert.generate();
         } catch (CertificateException | NoSuchAlgorithmException | OperatorCreationException e) {
             throw new RuntimeException(e);
         }
+        return keysAndCert;
     }
+
+    @Override
+    public VerifyServiceProviderConfiguration build(ConfigurationSourceProvider provider, String path) throws IOException {
+        return createComplianceToolModeConfiguration();
+    }
+
+    @Override
+    public VerifyServiceProviderConfiguration build() throws IOException {
+        return createComplianceToolModeConfiguration();
+    }
+
 }
