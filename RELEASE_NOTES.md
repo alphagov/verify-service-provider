@@ -5,9 +5,11 @@ Release notes
 
 #### Connect to Verify using only the VSP
 
-This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). This makes it easier to connect to Verify and reduces maintenance tasks once connected.
+This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). Services can then implement matching independently from their connection to GOV.UK Verify.
 
-When used alone, the VSP provides MSA functionality. It can:
+Using only the VSP makes it easier to connect to GOV.UK Verify and reduces maintenance tasks once connected.
+
+When used alone, the VSP provides the required MSA functionality. It will:
 * implement security features to the same security level as the MSA
 * handle European identities
 * do Personal Identifier (PID) hashing
@@ -20,7 +22,7 @@ For more information on connecting to GOV.UK Verify using only the VSP, see the 
 
 #### Tutorial for the new VSP
 
-We moved the [VSP tutorial](https://www.docs.verify.service.gov.uk/get-started-with-vsp/#get-started-with-the-verify-service-provider) to the new technical documentation website and updated it to help you connect to GOV.UK verify using the VSP.
+We moved the [VSP tutorial](https://www.docs.verify.service.gov.uk/get-started-with-vsp/#get-started-with-the-verify-service-provider) to the new technical documentation website and updated it to help you connect to GOV.UK Verify using the VSP.
 
 #### Support for compilation on Java 9 and 10
 

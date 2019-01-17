@@ -58,10 +58,12 @@ samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 # This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 
-# Enable European identities
-# Setting `europeanIdentity.enabled: true` allows your VSP to consume European
-# identities.
+# Enable European identities (optional)
+# Include this section to enable your VSP to process European identities.
 europeanIdentity:
+  # `enabled: true` to allow your VSP to process European identities
+  # `enabled: false` means your VSP won't process European identities, but
+  # the section must contain valid key-value pairs.
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
   aggregatedMetadata:
