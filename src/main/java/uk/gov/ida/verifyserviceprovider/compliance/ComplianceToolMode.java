@@ -7,18 +7,31 @@ import io.dropwizard.configuration.ConfigurationFactoryFactory;
 import io.dropwizard.setup.Bootstrap;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingAddress;
+import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfiguration> {
 
-    public static final String MATCHING_DATASET = "matchingDataset";
-    public static final String ASSERTION_CONSUMER_URL = "assertionConsumerUrl";
-    public static final String TIMEOUT = "timeout";
-    private static final String PORT = "port";
-    private static final String BIND_HOST = "bindHost";
+    static final String MATCHING_DATASET = "matchingDataset";
+    static final String ASSERTION_CONSUMER_URL = "assertionConsumerUrl";
+    static final String TIMEOUT = "timeout";
+    static final String PORT = "port";
+    static final String BIND_HOST = "bindHost";
+    static final int DEFAULT_TIMEOUT = 5;
+    static final int DEFAULT_PORT = 50300;
+    static final String DEFAULT_CONSUMER_URL = "http://localhost:8080/SAML2/Response";
+    static final String DEFAULT_HOST = "0.0.0.0";
+    static final MatchingDataset DEFAULT_MATCHING_DATASET = createDefaultMatchingDataset();
+
     private MatchingDatasetArgumentResolver matchingDatasetArgumentResolver;
 
     public ComplianceToolMode(ObjectMapper objectMapper, Validator validator, Application<VerifyServiceProviderConfiguration> application) {
@@ -34,35 +47,35 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
         subparser.addArgument("-d", "--matchingDataset")
                 .dest(MATCHING_DATASET)
                 .type(matchingDatasetArgumentResolver)
-                .required(true)
+                .setDefault(DEFAULT_MATCHING_DATASET)
                 .help("The Matching Dataset that the Compliance Tool will be initialized with");
 
         subparser.addArgument("-u", "--url")
                 .dest(ASSERTION_CONSUMER_URL)
                 .type(String.class)
                 .required(false)
-                .setDefault("http://localhost:8080/SAML2/Response")
+                .setDefault(DEFAULT_CONSUMER_URL)
                 .help("The URL where the Compliance Tool will send responses");
 
         subparser.addArgument("-t", "--timeout")
                 .dest(TIMEOUT)
                 .type(Integer.class)
                 .required(false)
-                .setDefault(5)
+                .setDefault(DEFAULT_TIMEOUT)
                 .help("The timeout in seconds when communicating with the Compliance Tool");
 
         subparser.addArgument("-p", "--port")
                 .dest(PORT)
                 .type(Integer.class)
                 .required(false)
-                .setDefault(50300)
+                .setDefault(DEFAULT_PORT)
                 .help("The port that this service will use");
 
         subparser.addArgument("--host")
                 .dest(BIND_HOST)
                 .type(String.class)
                 .required(false)
-                .setDefault("0.0.0.0")
+                .setDefault(DEFAULT_HOST)
                 .help("The host that this service will bind to");
 
     }
@@ -88,6 +101,27 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     private ConfigurationFactoryFactory<VerifyServiceProviderConfiguration> complianceToolModeConfigurationFactory(int port, String bindHost) {
         return (klass, validator, objectMapper, propertyPrefix) ->
                 new ComplianceToolModeConfigurationFactory(port, bindHost);
+    }
+
+    private static MatchingDataset createDefaultMatchingDataset() {
+        String standardFromDateString = "2013-02-22T14:32:14.064";
+        String standardToDateString = "2015-10-02T09:32:14.967";
+        String laterFromDateString = "2015-10-02T09:32:14.967";
+        String laterToDateString = "2018-03-03T10:20:50.163";
+        LocalDateTime standardFromDate = LocalDateTime.parse(standardFromDateString);
+        LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
+        LocalDateTime laterFromDate = LocalDateTime.parse(laterFromDateString);
+        LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
+
+        return new MatchingDataset(
+                new MatchingAttribute("Default", true, standardFromDate, standardToDate),
+                new MatchingAttribute("Person", true, standardFromDate, standardToDate),
+                asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
+                new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
+                new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
+                singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+                UUID.randomUUID().toString()
+        );
     }
 
 }
