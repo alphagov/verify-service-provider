@@ -27,7 +27,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private PrivateKey samlSecondaryEncryptionKey;
     private Optional<MsaMetadataConfiguration> msaMetadata;
     private Duration clockSkew;
-    private EuropeanIdentityConfiguration europeanIdentity;
+    private Optional<EuropeanIdentityConfiguration> europeanIdentity;
 
     @JsonCreator
     public VerifyServiceProviderConfiguration(
@@ -49,7 +49,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
         this.msaMetadata = msaMetadata;
         this.clockSkew = clockSkew;
-        this.europeanIdentity = europeanIdentity;
+        this.europeanIdentity = Optional.ofNullable(europeanIdentity);
     }
 
     public List<String> getServiceEntityIds() {
@@ -94,7 +94,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return clockSkew;
     }
 
-    public EuropeanIdentityConfiguration getEuropeanIdentity() {
+    public Optional<EuropeanIdentityConfiguration> getEuropeanIdentity() {
         return europeanIdentity;
     }
 }
