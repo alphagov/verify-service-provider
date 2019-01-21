@@ -65,13 +65,14 @@ public class ComplianceToolModeAcceptanceTest {
 
     private static Command commandLineInitiator(Application<VerifyServiceProviderConfiguration> application, final MatchingDataset matchingDataset) {
         Bootstrap<VerifyServiceProviderConfiguration> bootstrap = new Bootstrap<>(application);
-        return new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), application) {
+        final ObjectMapper objectMapper = bootstrap.getObjectMapper();
+        return new ComplianceToolMode(objectMapper, bootstrap.getValidatorFactory().getValidator(), application) {
 
         @Override
         public void run(Bootstrap<?> wildcardBootstrap, Namespace defaultNamespace) throws Exception {
             Namespace namespace = applyCommandLineArguments(defaultNamespace,
                     "--url", "http://localhost:8080",
-                    "-d", bootstrap.getObjectMapper().writeValueAsString(matchingDataset),
+                    "-d", objectMapper.writeValueAsString(matchingDataset),
                     "--host", "127.0.0.1",
                     "-p", "0");
             super.run(wildcardBootstrap, namespace);
