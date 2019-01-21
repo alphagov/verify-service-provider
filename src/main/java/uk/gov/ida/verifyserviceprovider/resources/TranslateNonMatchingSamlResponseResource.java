@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-@Path("/translate-non-matching-response")
+@Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TranslateNonMatchingSamlResponseResource {

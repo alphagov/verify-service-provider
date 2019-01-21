@@ -82,7 +82,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
@@ -127,7 +127,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
@@ -182,7 +182,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
             .request()
             .buildPost(json(translateResponseRequestData))
             .invoke();
@@ -221,7 +221,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -248,7 +248,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", applicationWithEidasEnabled.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", applicationWithEidasEnabled.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -276,7 +276,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", applicationWithEidasDisabled.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", applicationWithEidasDisabled.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -304,7 +304,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -328,7 +328,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -352,7 +352,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
@@ -377,7 +377,7 @@ public class NonMatchingAcceptanceTest {
         );
 
         Response response = client
-                .target(String.format("http://localhost:%d/translate-non-matching-response", application.getLocalPort()))
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
                 .request()
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
