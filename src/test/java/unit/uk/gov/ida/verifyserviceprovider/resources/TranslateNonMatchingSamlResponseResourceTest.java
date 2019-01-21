@@ -61,7 +61,7 @@ public class TranslateNonMatchingSamlResponseResourceTest {
     public void shouldHaveAPostEndpoint() throws Exception {
 
         Response response = resources.client()
-                .target("/translate-non-matching-response")
+                .target("/translate-response")
                 .request()
                 .post(json(""));
 
@@ -78,7 +78,7 @@ public class TranslateNonMatchingSamlResponseResourceTest {
             .thenReturn(new TranslatedNonMatchingResponseBody(NonMatchingScenario.IDENTITY_VERIFIED, "some-request-id", LEVEL_2, null));
 
         Response response = resources.client()
-            .target("/translate-non-matching-response")
+            .target("/translate-response")
             .request()
             .post(json(translateResponseRequest.toString()));
 

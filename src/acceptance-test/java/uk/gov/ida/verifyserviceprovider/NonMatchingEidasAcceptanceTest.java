@@ -33,7 +33,7 @@ public class NonMatchingEidasAcceptanceTest {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
                  anInvalidAssertionSignatureEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
          );
-         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-non-matching-response", appWithEidasEnabled.getLocalPort())).request().post(
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
                  Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
@@ -48,7 +48,7 @@ public class NonMatchingEidasAcceptanceTest {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
                  aValidEidasResponse("requestId", STUB_COUNTRY_ONE).build()
          );
-         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-non-matching-response", appWithEidasEnabled.getLocalPort())).request().post(
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
                  Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
@@ -60,7 +60,7 @@ public class NonMatchingEidasAcceptanceTest {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
              aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
          );
-         Response response = appWithoutEidasConfig.client().target(format("http://localhost:%s/translate-non-matching-response", appWithoutEidasConfig.getLocalPort())).request().post(
+         Response response = appWithoutEidasConfig.client().target(format("http://localhost:%s/translate-response", appWithoutEidasConfig.getLocalPort())).request().post(
              Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
@@ -72,7 +72,7 @@ public class NonMatchingEidasAcceptanceTest {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
              aValidEidasResponse("requestId", appWithEidasDisabled.getCountryEntityId()).build()
          );
-         Response response = appWithEidasDisabled.client().target(format("http://localhost:%s/translate-non-matching-response", appWithEidasDisabled.getLocalPort())).request().post(
+         Response response = appWithEidasDisabled.client().target(format("http://localhost:%s/translate-response", appWithEidasDisabled.getLocalPort())).request().post(
              Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
@@ -84,7 +84,7 @@ public class NonMatchingEidasAcceptanceTest {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
              aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
          );
-         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-non-matching-response", appWithEidasEnabled.getLocalPort())).request().post(
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
              Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
