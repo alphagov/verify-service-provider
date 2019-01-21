@@ -10,7 +10,9 @@ Supersedes [8. Provide an End To End Stub](0008-provide-an-end-to-end-stub.md)
 
 ## Context
 
-Interacting with the Compliance Tool (CT) is not a straightforward process and the API is not necessarily straightforward. When a user of the VSP is using it for the first time having to configure and run the VSP as well as understand how the CT API works can be burdensome. They need to:
+Interacting with the Compliance Tool (CT) is not a straightforward process and the API could be better.
+When a user is using the VSP for the first time it can be frustrating having to make sense of the CT API in order to make progress.
+In order to get the VSP running with the CT so that can start development they need to:
 1. Create a set of private keys and certificates
 2. Configure the VSP to interact with the CT and use the newly generated keys
    and certificates
@@ -20,10 +22,14 @@ Interacting with the Compliance Tool (CT) is not a straightforward process and t
 
 ## Decision
 
-The VSP will providea development mode initialized by a Dropwizard command that
-will run the VSP in a development mode. When starting in this mode the VSP will
-create its own keys and certificates, as well as some other config, that it will
-use to initialize a new session with the compliance tool. 
+The VSP will provide a development mode initialized by a Dropwizard command.
+
+When starting in this mode the VSP will:
+- create in-memory keys and self-sign certificates
+- use a random UUID for an entity ID
+- configure itself to read the CT's metadata
+- configure itself to run in non-matching mode
+- initialize a new session with the compliance tool. 
 
 A user of the VSP will be able start development mode by running the following
 command from the shell:
@@ -32,7 +38,9 @@ command from the shell:
 ./bin/verify-service-provider development
 ```
 
-The command will provide additional options to the use so that the user can
+The user should also be able to run this mode on Windows.
+
+The command will provide additional options to the user so that they can
 control:
 - the host the VSP will bind to
 - the port the VSP will run on
@@ -44,4 +52,6 @@ available to users of the 'non-matching' journey.
 
 ## Consequences
 
-Supersedes [ADR-0008](docs/adr/0008-provide-an-end-to-end-stub.md)
+- Supersedes [ADR-0008](docs/adr/0008-provide-an-end-to-end-stub.md) (which was
+    never implemented)
+- The VSP will depend on bouncycastle to create the in-memory certificates
