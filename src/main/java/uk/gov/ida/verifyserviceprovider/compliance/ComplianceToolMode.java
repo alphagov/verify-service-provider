@@ -82,20 +82,16 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
 
     @Override
     public void run(Bootstrap<?> wildcardBootstrap, Namespace namespace) throws Exception {
-        Bootstrap<VerifyServiceProviderConfiguration> bootstrap = (Bootstrap<VerifyServiceProviderConfiguration>) wildcardBootstrap;
-        run(namespace, bootstrap);
-        super.run(bootstrap, namespace);
-    }
-
-    private void run(Namespace namespace, Bootstrap<VerifyServiceProviderConfiguration> bootstrap) {
         String url = namespace.get(ASSERTION_CONSUMER_URL);
         Integer timeout = namespace.get(TIMEOUT);
         MatchingDataset matchingDataset = namespace.get(MATCHING_DATASET);
         Integer port = namespace.get(PORT);
         String bindHost = namespace.get(BIND_HOST);
 
+        Bootstrap<VerifyServiceProviderConfiguration> bootstrap = (Bootstrap<VerifyServiceProviderConfiguration>) wildcardBootstrap;
         bootstrap.addBundle(new InitializeComplianceToolBundle(url, timeout, matchingDataset));
         bootstrap.setConfigurationFactoryFactory(complianceToolModeConfigurationFactory(port, bindHost));
+        super.run(bootstrap, namespace);
     }
 
     private ConfigurationFactoryFactory<VerifyServiceProviderConfiguration> complianceToolModeConfigurationFactory(int port, String bindHost) {
