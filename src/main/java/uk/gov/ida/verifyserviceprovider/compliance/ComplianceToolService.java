@@ -50,7 +50,7 @@ public class ComplianceToolService {
         builder.put("encryptionCertificate", encodedEncryptionCertificate);
         builder.put("matchingDatasetJson", matchingDataset);
         builder.put("isMatching", false);
-        return initialiseV2With(Entity.json(builder));
+        return initialiseV2With(Entity.json(builder.build()));
     }
 
     public Response initializeComplianceTool(MatchingDataset matchingDataset) throws CertificateEncodingException {
