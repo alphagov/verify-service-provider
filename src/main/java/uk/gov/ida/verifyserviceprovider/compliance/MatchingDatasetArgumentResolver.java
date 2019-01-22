@@ -28,9 +28,7 @@ class MatchingDatasetArgumentResolver implements ArgumentType<MatchingDataset> {
     @Override
     public MatchingDataset convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
         try {
-            return resolveMatchingDataset(
-                    value
-            );
+            return resolveMatchingDataset(value);
         } catch (IOException | MatchingDatasetArgumentValidationError e) {
             throw new ArgumentParserException(e.getMessage(), e, parser);
         }

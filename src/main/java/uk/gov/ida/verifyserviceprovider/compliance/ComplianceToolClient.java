@@ -29,36 +29,35 @@ public class ComplianceToolClient {
         this.encryptionCertificate = encryptionCertificate;
     }
 
-    private Response initialiseV2With(Entity initialisationRequest) {
+    private Response makeRequest(Entity initialisationRequestBody) {
         Response complianceToolResponse = client
                 .target(URI.create(HOST + "/relying-party-service-test-run"))
                 .request()
-                .buildPost(initialisationRequest)
+                .buildPost(initialisationRequestBody)
                 .invoke();
 
         return complianceToolResponse;
     }
 
-    private Response initialize(MatchingDataset matchingDataset) throws CertificateEncodingException {
+    private Entity buildRequestBody(MatchingDataset matchingDataset) throws CertificateEncodingException {
         String encodedSigningCertificate = Base64.encodeAsString(signingCertificate.getEncoded());
         String encodedEncryptionCertificate = Base64.encodeAsString(encryptionCertificate.getEncoded());
         ImmutableMap.Builder<Object, Object> builder = ImmutableMap.builder();
-
         builder.put("serviceEntityId", serviceEntityId);
         builder.put("assertionConsumerServiceUrl", url);
         builder.put("signingCertificate", encodedSigningCertificate);
         builder.put("encryptionCertificate", encodedEncryptionCertificate);
         builder.put("matchingDatasetJson", matchingDataset);
         builder.put("isMatching", false);
-        return initialiseV2With(Entity.json(builder.build()));
+        return Entity.json(builder.build());
     }
 
     public Response initializeComplianceTool(MatchingDataset matchingDataset) throws CertificateEncodingException {
-        Response initialize = initialize(matchingDataset);
-
-        if(initialize.getStatus() != 200) {
-           throw new RuntimeException(String.format("Compliance Tool Initialization Failure: %s %s", initialize.getStatus(), initialize.readEntity(String.class)));
+        Entity initialisationRequestBody = buildRequestBody(matchingDataset);
+        Response response = makeRequest(initialisationRequestBody);
+        if(response.getStatus() != 200) {
+           throw new RuntimeException(String.format("Compliance Tool Initialization Failure: %s %s", response.getStatus(), response.readEntity(String.class)));
         }
-        return initialize;
+        return response;
     }
 }
