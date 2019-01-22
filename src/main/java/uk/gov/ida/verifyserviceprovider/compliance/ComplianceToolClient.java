@@ -11,7 +11,7 @@ import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-public class ComplianceToolService {
+public class ComplianceToolClient {
 
     private static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
 
@@ -21,7 +21,7 @@ public class ComplianceToolService {
     private final X509Certificate signingCertificate;
     private final X509Certificate encryptionCertificate;
 
-    public ComplianceToolService(Client client, String url, String serviceEntityId, X509Certificate signingCertificate, X509Certificate encryptionCertificate) {
+    public ComplianceToolClient(Client client, String url, String serviceEntityId, X509Certificate signingCertificate, X509Certificate encryptionCertificate) {
         this.client = client;
         this.url = url;
         this.serviceEntityId = serviceEntityId;

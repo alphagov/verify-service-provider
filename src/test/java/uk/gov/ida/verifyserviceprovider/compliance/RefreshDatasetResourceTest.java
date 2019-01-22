@@ -18,11 +18,11 @@ import static org.mockito.Mockito.*;
 
 public class RefreshDatasetResourceTest {
 
-    ComplianceToolService complianceToolService = mock(ComplianceToolService.class);
+    ComplianceToolClient complianceToolClient = mock(ComplianceToolClient.class);
 
     @Rule
     public ResourceTestRule refreshDatasetResource = ResourceTestRule.builder()
-            .addResource(new RefreshDatasetResource(complianceToolService))
+            .addResource(new RefreshDatasetResource(complianceToolClient))
             .build();
 
     @Test
@@ -36,10 +36,10 @@ public class RefreshDatasetResourceTest {
 
     @Test
     public void willCallOnTheComplianceToolIfTheMatchingDatasetIsValid() throws CertificateEncodingException {
-        when(complianceToolService.initializeComplianceTool(any(MatchingDataset.class))).thenReturn(Response.ok().build());
+        when(complianceToolClient.initializeComplianceTool(any(MatchingDataset.class))).thenReturn(Response.ok().build());
         Response response = refreshDatasetResource.client().target("/refresh-matching-dataset").request().post(json(new MatchingDatasetBuilder().build()));
         assertThat(response.getStatus()).isEqualTo(200);
-        verify(complianceToolService).initializeComplianceTool(any(MatchingDataset.class));
+        verify(complianceToolClient).initializeComplianceTool(any(MatchingDataset.class));
     }
 
 }

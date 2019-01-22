@@ -21,10 +21,10 @@ public class InitializeComplianceToolBundle implements ConfiguredBundle<VerifySe
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
         ComplianceToolModeConfiguration complianceToolModeConfiguration = (ComplianceToolModeConfiguration) configuration;
 
-        ComplianceToolService complianceToolService = complianceToolModeConfiguration.createComplianceToolService(environment, url, timeout);
-        complianceToolService.initializeComplianceTool(matchingDataset);
+        ComplianceToolClient complianceToolClient = complianceToolModeConfiguration.createComplianceToolService(environment, url, timeout);
+        complianceToolClient.initializeComplianceTool(matchingDataset);
 
-        environment.jersey().register(new RefreshDatasetResource(complianceToolService));
+        environment.jersey().register(new RefreshDatasetResource(complianceToolClient));
     }
 
     @Override

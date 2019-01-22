@@ -62,12 +62,12 @@ public class ComplianceToolModeConfiguration extends VerifyServiceProviderConfig
     }
 
 
-    public ComplianceToolService createComplianceToolService(Environment environment, String url, Integer timeout) {
+    public ComplianceToolClient createComplianceToolService(Environment environment, String url, Integer timeout) {
         JerseyClientConfiguration configuration = new JerseyClientConfiguration();
         configuration.setConnectionRequestTimeout(Duration.seconds(timeout));
         configuration.setTimeout(Duration.seconds(timeout));
         configuration.setConnectionTimeout(Duration.seconds(timeout));
         Client client = new JerseyClientBuilder(environment).using(configuration).build("Compliance Tool Initiation Client");
-        return new ComplianceToolService(client, url, serviceEntityId, getSigningCertificate(), getEncryptionCertificate());
+        return new ComplianceToolClient(client, url, serviceEntityId, getSigningCertificate(), getEncryptionCertificate());
     }
 }

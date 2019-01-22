@@ -13,17 +13,17 @@ import javax.ws.rs.core.Response;
 
 @Path("/refresh-matching-dataset")
 public class RefreshDatasetResource {
-    private final ComplianceToolService complianceToolService;
+    private final ComplianceToolClient complianceToolClient;
 
-    public RefreshDatasetResource(ComplianceToolService complianceToolService) {
-        this.complianceToolService = complianceToolService;
+    public RefreshDatasetResource(ComplianceToolClient complianceToolClient) {
+        this.complianceToolClient = complianceToolClient;
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response execute(@Valid @NotNull MatchingDataset matchingDataset) throws Exception {
-        Response response = complianceToolService.initializeComplianceTool(matchingDataset);
+        Response response = complianceToolClient.initializeComplianceTool(matchingDataset);
         return response;
 
     }
