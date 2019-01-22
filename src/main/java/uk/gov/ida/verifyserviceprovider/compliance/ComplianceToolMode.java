@@ -5,6 +5,7 @@ import io.dropwizard.Application;
 import io.dropwizard.cli.ServerCommand;
 import io.dropwizard.configuration.ConfigurationFactoryFactory;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingAddress;
@@ -82,16 +83,27 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
 
     @Override
     public void run(Bootstrap<?> wildcardBootstrap, Namespace namespace) throws Exception {
-        String url = namespace.get(ASSERTION_CONSUMER_URL);
-        Integer timeout = namespace.get(TIMEOUT);
-        MatchingDataset matchingDataset = namespace.get(MATCHING_DATASET);
         Integer port = namespace.get(PORT);
         String bindHost = namespace.get(BIND_HOST);
 
         Bootstrap<VerifyServiceProviderConfiguration> bootstrap = (Bootstrap<VerifyServiceProviderConfiguration>) wildcardBootstrap;
-        bootstrap.addBundle(new InitializeComplianceToolBundle(url, timeout, matchingDataset));
         bootstrap.setConfigurationFactoryFactory(complianceToolModeConfigurationFactory(port, bindHost));
         super.run(bootstrap, namespace);
+    }
+
+    @Override
+    protected void run(Environment environment, Namespace namespace, VerifyServiceProviderConfiguration configuration) throws Exception {
+        String url = namespace.get(ASSERTION_CONSUMER_URL);
+        Integer timeout = namespace.get(TIMEOUT);
+        MatchingDataset matchingDataset = namespace.get(MATCHING_DATASET);
+
+        ComplianceToolModeConfiguration complianceToolModeConfiguration = (ComplianceToolModeConfiguration) configuration;
+
+        ComplianceToolClient complianceToolClient = complianceToolModeConfiguration.createComplianceToolService(environment, url, timeout);
+        complianceToolClient.initializeComplianceTool(matchingDataset);
+
+        environment.jersey().register(new RefreshDatasetResource(complianceToolClient));
+        super.run(environment, namespace, configuration);
     }
 
     private ConfigurationFactoryFactory<VerifyServiceProviderConfiguration> complianceToolModeConfigurationFactory(int port, String bindHost) {
