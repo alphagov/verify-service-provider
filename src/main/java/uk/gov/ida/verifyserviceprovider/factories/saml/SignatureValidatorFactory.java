@@ -8,6 +8,7 @@ import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import java.util.Optional;
 
 public class SignatureValidatorFactory {
+    //FIXME this allows for empty SignatureValidators
     public Optional<SamlAssertionsSignatureValidator> getSignatureValidator(Optional<ExplicitKeySignatureTrustEngine> trustEngine) {
         return trustEngine
             .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)

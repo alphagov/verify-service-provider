@@ -16,6 +16,8 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
+import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
 import javax.ws.rs.client.Client;
@@ -30,7 +32,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
         hubMetadataBundle = new MetadataResolverBundle<>(configuration -> Optional.ofNullable(configuration.getVerifyHubMetadata()));
-        msaMetadataBundle = new MetadataResolverBundle<>(configuration -> configuration.getMsaMetadata(), false);
+        msaMetadataBundle = new MetadataResolverBundle<>(VerifyServiceProviderConfiguration::getMsaMetadata, false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -72,10 +74,13 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
+        //FIXME Conditional could be moved into factory (will need translate response resource interface)
         if (configuration.getMsaMetadata().isPresent()) {
-            environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
+            TranslateSamlResponseResource translateMatchingSamlResponseResource = factory.getTranslateMatchingSamlResponseResource();
+            environment.jersey().register(translateMatchingSamlResponseResource);
         } else {
-            environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
+            TranslateNonMatchingSamlResponseResource translateNonMatchingSamlResponseResource = factory.getTranslateNonMatchingSamlResponseResource();
+            environment.jersey().register(translateNonMatchingSamlResponseResource);
         }
 
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));

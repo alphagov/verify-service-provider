@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+//FIXME Class names could be more descriptive of the domain (e.g. NonMatchingAssertionService)
+// AssertionService and its subclasses is using a mixture of composition, generics, and strategy pattern to derive
 public abstract class AssertionServiceV2 implements AssertionService<TranslatedNonMatchingResponseBody> {
 
     protected final SubjectValidator subjectValidator;
@@ -37,6 +39,7 @@ public abstract class AssertionServiceV2 implements AssertionService<TranslatedN
 
 
     @Override
+    //FIXME this method doesn't care about assertions so it probably can be moved up to ResponseService
     public TranslatedNonMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
             .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));

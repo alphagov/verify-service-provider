@@ -32,6 +32,7 @@ public class ClassifyingAssertionService implements AssertionService<TranslatedN
         return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
     }
 
+    //This is a duplicate of AssertionServiceV2's implementations
     @Override
     public TranslatedNonMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
@@ -42,6 +43,7 @@ public class ClassifyingAssertionService implements AssertionService<TranslatedN
             case StatusCode.REQUESTER:
                 return new TranslatedNonMatchingResponseBody(NonMatchingScenario.REQUEST_ERROR, null, null, null);
             case StatusCode.NO_AUTHN_CONTEXT:
+                //FIXME CANCELLATION is not correct
                 return new TranslatedNonMatchingResponseBody(NonMatchingScenario.CANCELLATION, null, null, null);
             case StatusCode.AUTHN_FAILED:
                 return new TranslatedNonMatchingResponseBody(NonMatchingScenario.AUTHENTICATION_FAILED, null, null, null);
@@ -51,6 +53,7 @@ public class ClassifyingAssertionService implements AssertionService<TranslatedN
     }
 
 
+    //FIXME should be something like isCountryResponse
     private boolean isCountryAttributeQuery(List<Assertion> assertions) {
         return assertions.stream().anyMatch(eidasAssertionService::isCountryAssertion);
     }

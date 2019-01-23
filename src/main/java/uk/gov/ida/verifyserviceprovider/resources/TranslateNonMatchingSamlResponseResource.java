@@ -22,6 +22,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+//This class is very similar to TranslateSamlResponseResource - can it be deduplicated somehow?
 public class TranslateNonMatchingSamlResponseResource {
 
     private final ResponseService<TranslatedNonMatchingResponseBody> responseService;

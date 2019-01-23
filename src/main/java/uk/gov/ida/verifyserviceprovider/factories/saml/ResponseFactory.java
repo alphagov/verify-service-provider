@@ -141,6 +141,7 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
         return new IdpAssertionService(
+                //FIXME Optional.of will error if signatureTrustEngine is null so orElseThrow is pointless - why pass something that can't be null
                 signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine)).orElseThrow(() -> new RuntimeException("cannot create")),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),

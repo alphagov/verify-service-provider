@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+//FIXME rename to remove 'nonmatching'
 public class MatchingDatasetToNonMatchingAttributesMapper {
 
     public NonMatchingAttributes mapToNonMatchingAttributes(MatchingDataset matchingDataset) {
@@ -22,7 +23,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
             .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
             .findFirst();
 
-        NonMatchingVerifiableAttribute<String> firstName = firstNameValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
+        //FIXME SHOULD WE BE ALLOWING NULL attributes
         List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
         List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
         NonMatchingVerifiableAttribute<LocalDate> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
@@ -30,7 +31,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses = mapAddresses(matchingDataset.getAddresses());
 
         return new NonMatchingAttributes(
-            firstName,
+                firstNameValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null),
             middleNames,
             surnames,
             dateOfBirth,

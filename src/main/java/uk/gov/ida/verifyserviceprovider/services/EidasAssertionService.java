@@ -22,6 +22,7 @@ import java.util.Optional;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
+//FIXME we can use the null object pattern here
 public class EidasAssertionService extends AssertionServiceV2 {
 
     private final boolean isEnabled;
@@ -73,7 +74,8 @@ public class EidasAssertionService extends AssertionServiceV2 {
     }
 
     private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo, String entityId) {
-        signatureValidatorFactory.getSignatureValidator(metadataResolverRepository.get().getSignatureTrustEngine(assertion.getIssuer().getValue()))
+        signatureValidatorFactory.getSignatureValidator(
+                metadataResolverRepository.get().getSignatureTrustEngine(assertion.getIssuer().getValue()))
                 .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
                 .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
