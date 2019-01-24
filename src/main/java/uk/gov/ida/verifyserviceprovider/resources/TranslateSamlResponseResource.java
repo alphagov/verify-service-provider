@@ -47,7 +47,7 @@ public class TranslateSamlResponseResource {
                 entityId
             );
 
-            LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got Scenario: %s",
+            LOG.info(String.format("Translated response for entityId: %s, requestId: %s, got MatchingScenario: %s",
                     entityId,
                     translateSamlResponseBody.getRequestId(),
                     translatedResponseBody.getScenario()));

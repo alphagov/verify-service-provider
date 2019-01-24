@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
@@ -54,7 +55,7 @@ public class ClassifyingAssertionServiceTest {
         when(idpAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);
@@ -75,7 +76,7 @@ public class ClassifyingAssertionServiceTest {
         when(eidasAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);

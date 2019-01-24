@@ -10,6 +10,7 @@ import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -18,8 +19,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-public abstract class AssertionServiceV2 implements AssertionService<TranslatedNonMatchingResponseBody> {
-
+public abstract class AssertionServiceV2 implements AssertionService<TranslatedResponseBody> {
     protected final SubjectValidator subjectValidator;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;

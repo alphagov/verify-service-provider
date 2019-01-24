@@ -19,7 +19,6 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
@@ -107,7 +106,7 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+    public TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
         IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
@@ -121,7 +120,7 @@ public class VerifyServiceProviderFactory {
                 getEidasMetadataResolverRepository()
         );
 
-        return new TranslateNonMatchingSamlResponseResource(
+        return new TranslateSamlResponseResource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         new ClassifyingAssertionService(idpAssertionService, eidasAssertionService),
@@ -129,6 +128,14 @@ public class VerifyServiceProviderFactory {
                 ),
                 entityIdService
         );
+    }
+
+    public TranslateSamlResponseResource getTranslateSamlResponseResource() {
+        if (configuration.getMsaMetadata().isPresent()) {
+            return getTranslateMatchingSamlResponseResource();
+        } else {
+            return getTranslateNonMatchingSamlResponseResource();
+        }
     }
 
     public VersionNumberResource getVersionNumberResource() {

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class NonMatchingAttributes {
+public class NonMatchingAttributes implements Attributes {
 
     @JsonProperty("firstName")
     private final NonMatchingVerifiableAttribute<String> firstName;
@@ -92,7 +92,7 @@ public class NonMatchingAttributes {
     @Override
     public String toString() {
         return String.format(
-                "Attributes{ firstName=%s, middleNames=%s, surnames=%s, dateOfBirth=%s, gender=%s, addresses=%s}",
+                "UserAccountCreationAttributes{ firstName=%s, middleNames=%s, surnames=%s, dateOfBirth=%s, gender=%s, addresses=%s}",
                 firstName, middleNames, surnames, dateOfBirth, gender, addresses);
     }
 

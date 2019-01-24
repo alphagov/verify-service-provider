@@ -1,24 +1,18 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Optional;
+public abstract class TranslatedResponseBody {
+    @JsonProperty("scenario")
+    protected final Scenario scenario;
+    @JsonProperty("pid")
+    protected final String pid;
+    @JsonProperty("levelOfAssurance")
+    protected final LevelOfAssurance levelOfAssurance;
+    @JsonProperty("attributes")
+    protected final Attributes attributes;
 
-public class TranslatedResponseBody {
-
-    private final Scenario scenario;
-    private final String pid;
-    private final LevelOfAssurance levelOfAssurance;
-    private final Attributes attributes;
-
-    @JsonCreator
-    public TranslatedResponseBody(
-        @JsonProperty("scenario") Scenario scenario,
-        @JsonProperty("pid") String pid,
-        @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
-        @JsonProperty("attributes") Attributes attributes
-    ) {
+    public TranslatedResponseBody(Scenario scenario, String pid, LevelOfAssurance levelOfAssurance, Attributes attributes) {
         this.scenario = scenario;
         this.pid = pid;
         this.levelOfAssurance = levelOfAssurance;
@@ -29,17 +23,6 @@ public class TranslatedResponseBody {
         return scenario;
     }
 
-    public String getPid() {
-        return pid;
-    }
-
-    public LevelOfAssurance getLevelOfAssurance() {
-        return levelOfAssurance;
-    }
-
-    public Optional<Attributes> getAttributes() {
-        return Optional.ofNullable(attributes);
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -66,11 +49,14 @@ public class TranslatedResponseBody {
     @Override
     public String toString() {
         return "TranslatedResponseBody{" +
-            "scenario='" + scenario + '\'' +
-            ", pid='" + pid + '\'' +
-            ", levelOfAssurance=" + levelOfAssurance +
-            ", attributes=" + attributes +
-            '}';
+                "scenario='" + scenario + '\'' +
+                ", pid='" + pid + '\'' +
+                ", levelOfAssurance=" + levelOfAssurance +
+                ", attributes=" + attributes +
+                '}';
     }
 
+    public Attributes getAttributes() {
+        return attributes;
+    }
 }

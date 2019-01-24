@@ -6,7 +6,7 @@ import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.Verified;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
 import uk.gov.ida.verifyserviceprovider.dto.Address;
-import uk.gov.ida.verifyserviceprovider.dto.Attributes;
+import uk.gov.ida.verifyserviceprovider.dto.UserAccountCreationAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.VerifiableAttribute;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 
 public class AttributeTranslationService {
 
-    public static Attributes translateAttributes(AttributeStatement attributeStatement) {
+    public static UserAccountCreationAttributes translateAttributes(AttributeStatement attributeStatement) {
         List<Attribute> statementAttributes = attributeStatement.getAttributes();
 
         VerifiableAttribute<String> verifiableFirstName = getVerifiableStringAttribute(statementAttributes, "firstname", "firstname_verified");
@@ -31,7 +31,7 @@ public class AttributeTranslationService {
         VerifiableAttribute<Address> verifiableAddress = getVerifiableAddressAttribute(statementAttributes, "currentaddress", "currentaddress_verified");
         Optional<List<VerifiableAttribute<Address>>> addressHistory = getVerifiableAddressListAttribute(statementAttributes, "addresshistory");
         Optional<String> cycle3 = getStringAttributeValue(statementAttributes, "cycle_3");
-        return new Attributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, addressHistory.orElse(null), cycle3.orElse(null));
+        return new UserAccountCreationAttributes(verifiableFirstName, verifiableMiddleName, verifiableSurname, verifiableDob, verifiableAddress, addressHistory.orElse(null), cycle3.orElse(null));
     }
 
     private static VerifiableAttribute<String> getVerifiableStringAttribute(List<Attribute> statementAttributes, String attributeName, String attributeVerifiedName) {

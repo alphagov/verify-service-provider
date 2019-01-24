@@ -22,14 +22,13 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -95,9 +94,9 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedNonMatchingResponseBody> createNonMatchingResponseService(
+    public ResponseService<TranslatedResponseBody> createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedNonMatchingResponseBody> nonMatchingAssertionService,
+            AssertionService<TranslatedResponseBody> nonMatchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();

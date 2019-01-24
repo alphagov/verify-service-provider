@@ -3,19 +3,18 @@ package uk.gov.ida.verifyserviceprovider.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TranslatedNonMatchingResponseBody extends TranslatedResponseBody {
+public class TranslatedMatchingResponseBody extends TranslatedResponseBody {
     @JsonCreator
-    public TranslatedNonMatchingResponseBody(
+    public TranslatedMatchingResponseBody(
             @JsonProperty("scenario")
-            NonMatchingScenario scenario,
+                    MatchingScenario scenario,
             @JsonProperty("pid")
-            String pid,
+                    String pid,
             @JsonProperty("levelOfAssurance")
-            LevelOfAssurance levelOfAssurance,
+                    LevelOfAssurance levelOfAssurance,
             @JsonProperty("attributes")
-            NonMatchingAttributes attributes
+                    UserAccountCreationAttributes attributes
     ) {
         super(scenario, pid, levelOfAssurance, attributes);
     }
-
 }
