@@ -79,7 +79,7 @@ public class ResponseFactory {
 
     public ResponseService<TranslatedResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -96,7 +96,7 @@ public class ResponseFactory {
 
     public ResponseService<TranslatedResponseBody> createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> nonMatchingAssertionService,
+            AssertionService nonMatchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();

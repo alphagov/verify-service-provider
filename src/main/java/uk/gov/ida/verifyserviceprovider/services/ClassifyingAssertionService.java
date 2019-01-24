@@ -11,7 +11,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import java.util.List;
 import java.util.Optional;
 
-public class ClassifyingAssertionService implements AssertionService<TranslatedResponseBody> {
+public class ClassifyingAssertionService implements AssertionService {
 
     private final IdpAssertionService idpAssertionService;
     private final EidasAssertionService eidasAssertionService;

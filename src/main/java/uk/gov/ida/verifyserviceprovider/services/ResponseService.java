@@ -18,16 +18,16 @@ public class ResponseService<T> {
 
     private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
-    private final AssertionService<T> assertionService;
+    private final AssertionService assertionService;
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
 
     public ResponseService(
-        StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
-        AssertionDecrypter assertionDecrypter,
-        AssertionService<T> assertionService,
-        SamlResponseSignatureValidator responseSignatureValidator,
-        InstantValidator instantValidator
+            StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
+            AssertionDecrypter assertionDecrypter,
+            AssertionService assertionService,
+            SamlResponseSignatureValidator responseSignatureValidator,
+            InstantValidator instantValidator
     ) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
