@@ -9,6 +9,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
+import uk.gov.ida.verifyserviceprovider.compliance.ComplianceToolMode;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
@@ -53,6 +54,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
         bootstrap.addBundle(hubMetadataBundle);
         bootstrap.addBundle(msaMetadataBundle);
+        bootstrap.addCommand(new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), this));
     }
 
     @Override
