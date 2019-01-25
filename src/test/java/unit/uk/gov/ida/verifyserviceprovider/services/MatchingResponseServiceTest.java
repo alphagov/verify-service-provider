@@ -90,7 +90,7 @@ public class MatchingResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
-    private ResponseService<TranslatedResponseBody> responseService;
+    private ResponseService responseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
 

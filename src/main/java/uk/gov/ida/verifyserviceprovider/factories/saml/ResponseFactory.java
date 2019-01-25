@@ -22,7 +22,6 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
@@ -77,7 +76,7 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedResponseBody> createMatchingResponseService(
+    public ResponseService createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionService matchingAssertionService,
             DateTimeComparator dateTimeComparator
@@ -85,7 +84,7 @@ public class ResponseFactory {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
-        return new ResponseService<>(
+        return new ResponseService(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
                 matchingAssertionService,
@@ -94,7 +93,7 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedResponseBody> createNonMatchingResponseService(
+    public ResponseService createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionService nonMatchingAssertionService,
             DateTimeComparator dateTimeComparator
@@ -102,7 +101,7 @@ public class ResponseFactory {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
-        return new ResponseService<>(
+        return new ResponseService(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
                 nonMatchingAssertionService,

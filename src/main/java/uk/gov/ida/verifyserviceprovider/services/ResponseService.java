@@ -9,12 +9,13 @@ import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import java.util.List;
 
-public class ResponseService<T> {
+public class ResponseService {
 
     private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
@@ -36,7 +37,7 @@ public class ResponseService<T> {
         this.instantValidator = instantValidator;
     }
 
-    public T convertTranslatedResponseBody(
+    public TranslatedResponseBody convertTranslatedResponseBody(
         String decodedSamlResponse,
         String expectedInResponseTo,
         LevelOfAssurance expectedLevelOfAssurance,
