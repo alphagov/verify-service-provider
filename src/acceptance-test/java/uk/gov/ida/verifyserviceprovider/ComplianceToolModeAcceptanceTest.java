@@ -150,7 +150,7 @@ public class ComplianceToolModeAcceptanceTest {
                 "levelOfAssurance", LevelOfAssurance.LEVEL_1.name());
 
         Response response = client
-                .target(appUri("translate-non-matching-response"))
+                .target(appUri("translate-response"))
                 .request()
                 .post(json(translateResponseRequestData));
 
@@ -211,7 +211,7 @@ public class ComplianceToolModeAcceptanceTest {
                 "levelOfAssurance", LevelOfAssurance.LEVEL_1.name());
 
         Response response = client
-                .target(appUri("translate-non-matching-response"))
+                .target(appUri("translate-response"))
                 .request()
                 .post(json(translateResponseRequestData));
 
