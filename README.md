@@ -96,7 +96,7 @@ GOV.UK Verify provides prebuilt clients for the following languages and framewor
 |------------------------------------------------|----------------------------------------------------------------|
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
 
-See [the API reference](https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml) for full details of the API.
+See [the API reference](/docs/api/verify-service-provider-api.swagger.yml) for full details of the API.
 
 ## Development
 
