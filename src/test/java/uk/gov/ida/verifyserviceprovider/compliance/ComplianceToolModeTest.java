@@ -11,8 +11,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDatasetBuilder;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

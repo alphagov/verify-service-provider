@@ -8,9 +8,9 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingAddress;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingAttribute;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import javax.validation.Validator;

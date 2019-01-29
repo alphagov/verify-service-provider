@@ -7,7 +7,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.ArgumentType;
 import org.glassfish.jersey.server.model.Invocable;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;

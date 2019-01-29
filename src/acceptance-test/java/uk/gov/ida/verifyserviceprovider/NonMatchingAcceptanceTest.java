@@ -8,21 +8,23 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker;
-import uk.gov.ida.verifyserviceprovider.domain.MatchingAddress;
-import uk.gov.ida.verifyserviceprovider.domain.MatchingAttribute;
-import uk.gov.ida.verifyserviceprovider.domain.V2MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
+
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -32,10 +34,7 @@ import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderApp
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID;
-import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID;
+import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
 
 public class NonMatchingAcceptanceTest {
 
@@ -107,7 +106,7 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime laterFromDate = LocalDateTime.parse(laterFromDateString);
         LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
 
-        V2MatchingDataset matchingDataset = new V2MatchingDataset(
+        MatchingDataset matchingDataset = new MatchingDataset(
             new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
             new MatchingAttribute("Montgomery", true, standardFromDate, standardToDate),
             Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
@@ -162,7 +161,7 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
 
 
-        V2MatchingDataset matchingDataset = new V2MatchingDataset(
+        MatchingDataset matchingDataset = new MatchingDataset(
                 new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
                 null,
                 singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
@@ -209,9 +208,7 @@ public class NonMatchingAcceptanceTest {
 
     @Test
     public void shouldThrowExceptionIfLoAReturnedByIdpIsTooLow () {
-        String expectedPid = "some-expected-pid";
-
-        complianceTool.initialiseWithPidForV2(expectedPid);
+        complianceTool.initialiseWithDefaultsForV2();
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(

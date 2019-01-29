@@ -4,8 +4,8 @@ import io.dropwizard.jersey.validation.ValidationErrorMessage;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.Rule;
 import org.junit.Test;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDatasetBuilder;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
 
 import javax.ws.rs.core.Response;
 
