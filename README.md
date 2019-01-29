@@ -98,6 +98,33 @@ GOV.UK Verify provides prebuilt clients for the following languages and framewor
 
 See [the API reference](/docs/api/verify-service-provider-api.swagger.yml) for full details of the API.
 
+### Building a client
+
+The Verify Service Provider provides a 'development' mode that you can use if
+you wish to build you own client. Development mode will start the VSP connected to
+the Verify Compliance Tool, which you can interact with in order to test
+different scenarios that can occur when connected to Verify. You don't need to
+configure the VSP with any 
+
+You can launch development mode with:
+
+```
+./bin/verify-service-provider development
+```
+
+
+Several command line options can be passed to the Verify Service
+Provider when starting in development mode to customise its behaviour. The
+following options are available:
+
+| Option | Description | Default |
+| -----: | ----------- | ------- |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The Matching  Dataset  that  the  Compliance  Tool will be  initialized  with. | See technical documentation |
+|`-u URL` or<br> `--url URL` | The URL where the Compliance Tool will send responses | `http://localhost:8080/SAML2/Response` |
+|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the Compliance Tool | `5` |
+| `-p PORT` or<br> `--port PORT` | The port that this service will use | `50300` |
+|`--host BINDHOST` | The host that this service  will bind to | `0.0.0.0` |
+
 ## Development
 
 If you want to make changes to `verify-service-provider` itself, fork the repository then:
