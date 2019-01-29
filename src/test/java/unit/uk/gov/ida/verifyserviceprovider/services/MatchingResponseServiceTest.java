@@ -33,7 +33,7 @@ import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
@@ -78,18 +78,18 @@ import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.AUTHENTICATION_FAILED;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.CANCELLATION;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.NO_MATCH;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.REQUEST_ERROR;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.AUTHENTICATION_FAILED;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.CANCELLATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.NO_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.REQUEST_ERROR;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
 public class MatchingResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
-    private ResponseService<TranslatedResponseBody> responseService;
+    private ResponseService<TranslatedMatchingResponseBody> responseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
 
@@ -147,14 +147,14 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
             VERIFY_SERVICE_PROVIDER_ENTITY_ID
         );
 
-        assertThat(result).isEqualTo(new TranslatedResponseBody(
+        assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
             SUCCESS_MATCH,
             "some-pid",
             LevelOfAssurance.LEVEL_2,
@@ -172,7 +172,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -197,7 +197,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -221,7 +221,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -245,7 +245,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -269,7 +269,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,

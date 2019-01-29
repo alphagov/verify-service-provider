@@ -23,7 +23,7 @@ import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
@@ -78,9 +78,9 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedResponseBody> createMatchingResponseService(
+    public ResponseService<TranslatedMatchingResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService<TranslatedMatchingResponseBody> matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();

@@ -1,23 +1,23 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody {
+import java.util.Optional;
 
-    @JsonProperty("scenario")
-    private final NonMatchingScenario scenario;
-    @JsonProperty("pid")
-    protected final String pid;
-    @JsonProperty("levelOfAssurance")
-    protected final LevelOfAssurance levelOfAssurance;
-    @JsonProperty("attributes")
-    protected final NonMatchingAttributes attributes;
+public class TranslatedMatchingResponseBody implements TranslatedResponseBody {
 
-    public TranslatedNonMatchingResponseBody(
-            NonMatchingScenario scenario,
-            String pid,
-            LevelOfAssurance levelOfAssurance,
-            NonMatchingAttributes attributes
+    private final MatchingScenario scenario;
+    private final String pid;
+    private final LevelOfAssurance levelOfAssurance;
+    private final Attributes attributes;
+
+    @JsonCreator
+    public TranslatedMatchingResponseBody(
+        @JsonProperty("scenario") MatchingScenario scenario,
+        @JsonProperty("pid") String pid,
+        @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
+        @JsonProperty("attributes") Attributes attributes
     ) {
         this.scenario = scenario;
         this.pid = pid;
@@ -25,9 +25,20 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
         this.attributes = attributes;
     }
 
-    @Override
-    public Scenario getScenario() {
+    public MatchingScenario getScenario() {
         return scenario;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public LevelOfAssurance getLevelOfAssurance() {
+        return levelOfAssurance;
+    }
+
+    public Optional<Attributes> getAttributes() {
+        return Optional.ofNullable(attributes);
     }
 
     @Override
@@ -35,7 +46,7 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TranslatedNonMatchingResponseBody that = (TranslatedNonMatchingResponseBody) o;
+        TranslatedMatchingResponseBody that = (TranslatedMatchingResponseBody) o;
 
         if (scenario != that.scenario) return false;
         if (pid != null ? !pid.equals(that.pid) : that.pid != null) return false;
@@ -55,11 +66,11 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
     @Override
     public String toString() {
         return "TranslatedMatchingResponseBody{" +
-                "scenario='" + scenario + '\'' +
-                ", pid='" + pid + '\'' +
-                ", levelOfAssurance=" + levelOfAssurance +
-                ", attributes=" + attributes +
-                '}';
+            "scenario='" + scenario + '\'' +
+            ", pid='" + pid + '\'' +
+            ", levelOfAssurance=" + levelOfAssurance +
+            ", attributes=" + attributes +
+            '}';
     }
 
 }

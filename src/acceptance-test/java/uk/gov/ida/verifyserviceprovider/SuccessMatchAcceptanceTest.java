@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -23,7 +23,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_SUCCESSFUL_MATCH_WITH_LOA1_ID;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID;
 
@@ -68,7 +68,7 @@ public class SuccessMatchAcceptanceTest {
             .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class)).isEqualTo(new TranslatedResponseBody(
+        assertThat(response.readEntity(TranslatedMatchingResponseBody.class)).isEqualTo(new TranslatedMatchingResponseBody(
             SUCCESS_MATCH,
             "some-expected-pid",
             LEVEL_2,
@@ -96,7 +96,7 @@ public class SuccessMatchAcceptanceTest {
             .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class)).isEqualTo(new TranslatedResponseBody(
+        assertThat(response.readEntity(TranslatedMatchingResponseBody.class)).isEqualTo(new TranslatedMatchingResponseBody(
             SUCCESS_MATCH,
             "some-expected-pid",
             LEVEL_2,
@@ -120,7 +120,7 @@ public class SuccessMatchAcceptanceTest {
                 .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class)).isEqualTo(new TranslatedResponseBody(
+        assertThat(response.readEntity(TranslatedMatchingResponseBody.class)).isEqualTo(new TranslatedMatchingResponseBody(
                 SUCCESS_MATCH,
                 "some-expected-pid",
                 LEVEL_1,
