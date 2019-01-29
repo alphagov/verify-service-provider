@@ -43,8 +43,6 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
 
     @Override
     public void configure(Subparser subparser) {
-        super.configure(subparser);
-
         subparser.addArgument("-d", "--matchingDataset")
                 .dest(MATCHING_DATASET)
                 .type(matchingDatasetArgumentResolver)
