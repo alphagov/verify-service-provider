@@ -59,6 +59,27 @@ You can use the following command line options to customise the behaviour of the
 |`--host BINDHOST` | The host that this service  will bind to | `0.0.0.0` |
 
 
+### Check mode
+
+Checks if your configuration file is correct
+
+### Server mode
+
+Use this when you're deploying your VSP to the Integration or Production environments.
+
+To run the application, export your environment variables and start the application with:
+
+```
+./bin/verify-service-provider server verify-service-provider.yml
+```
+
+The application will write logs to STDOUT.
+
+You can check the application is running by calling the healthcheck endpoint with:
+
+```
+curl localhost:{$PORT}/admin/healthcheck
+```
 
 Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
