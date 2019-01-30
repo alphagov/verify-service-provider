@@ -26,7 +26,22 @@ To use the Verify Service Provider, we recommend you use Java 11 or a long-term 
 
 [Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of the Verify Service Provider.
 
-### Configure
+## Get started
+
+GOV.UK Verify provides prebuilt clients for the following languages and frameworks:
+
+|             Language / Framework               |                            Client Library                      |
+|------------------------------------------------|----------------------------------------------------------------|
+| node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
+
+See [the API reference][vsp-api] for full details of the API.
+
+## Run
+
+The Verify Service Provider has several modes you can use:
+
+Explain reasoning behind modes.
+
 ### Development mode
 
 You can use development mode if you're building your own client for the VSP. For more information on building your own client using the VSP in development mode, see the [technical documentation on how to get started][vsp-get-started].
@@ -79,6 +94,8 @@ You can check the application is running by calling the healthcheck endpoint wit
 curl localhost:{$PORT}/admin/healthcheck
 ```
 
+## Configure
+
 Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
 
@@ -89,7 +106,7 @@ VERIFY_ENVIRONMENT            # The environment of the Verify Hub to run against
 
 SERVICE_ENTITY_IDS            # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'
                               # If you have multiple services using a single Verify Service Provider you should provide all of their entity IDs in this array.
-                              
+
 SAML_SIGNING_KEY              # A base64 encoded RSA private key that is used for signing the request to Verify
 SAML_PRIMARY_ENCRYPTION_KEY   # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
 SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that
@@ -108,7 +125,7 @@ MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML m
 
 As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
 
-### Generate keys for testing
+## Generate keys for testing
 
 In order to generate keys for testing, we recommend using [OpenSSL](https://www.openssl.org).
 
@@ -126,33 +143,8 @@ Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print
 openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openssl base64 -A; echo
 ```
 
-### Run
 
-To run the application, export your environment variables and start the application with:
-
-```
-./bin/verify-service-provider server verify-service-provider.yml
-```
-
-The application will write logs to STDOUT.
-
-You can check the application is running by calling the healthcheck endpoint with:
-
-```
-curl localhost:{$PORT}/admin/healthcheck
-```
-
-## Usage
-
-GOV.UK Verify provides prebuilt clients for the following languages and frameworks:
-
-|             Language / Framework               |                            Client Library                      |
-|------------------------------------------------|----------------------------------------------------------------|
-| node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
-
-See [the API reference](https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml) for full details of the API.
-
-## Development
+## Contribute to the Verify Service Provider
 
 If you want to make changes to `verify-service-provider` itself, fork the repository then:
 
@@ -183,4 +175,8 @@ If you think you have discovered a security issue in this code please email [dis
 For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the GitHub issue tracker.
 
 ## Licensing
-[MIT License](https://github.com/alphagov/verify-service-provider/blob/master/LICENSE)
+[MIT License][mit-license]
+
+[vsp-get-started]: https://www.docs.verify.service.gov.uk/set-up-vsp-with-your-service/get-started-with-the-vsp
+[vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+[mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
