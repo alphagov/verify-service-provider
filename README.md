@@ -29,6 +29,36 @@ To download and use Verify Service Provider you must:
 [Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of the Verify Service Provider.
 
 ### Configure
+### Development mode
+
+You can use development mode if you're building your own client for the VSP. For more information on building your own client using the VSP in development mode, see the [technical documentation on how to get started][vsp-get-started].
+
+Development mode starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
+
+Every time you start the VSP in development mode, it initialises the test tool by:
+
+- generating its self-signed keys and certificates
+- adding the keys and certificates to the VSP configuration
+- setting the test tool environment in the VSP configuration
+- initialising an instance of the test tool
+
+To start the VSP in development mode, run:
+
+```
+./bin/verify-service-provider development
+```
+
+You can use the following command line options to customise the behaviour of the VSP in development mode:
+
+| Option | Description | Default |
+| -----: | ----------- | ------- |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The Matching  Dataset  that  the  Compliance  Tool will be  initialized  with. | See technical documentation |
+|`-u URL` or<br> `--url URL` | The URL where the Compliance Tool will send responses | `http://localhost:8080/SAML2/Response` |
+|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the Compliance Tool | `5` |
+| `-p PORT` or<br> `--port PORT` | The port that this service will use | `50300` |
+|`--host BINDHOST` | The host that this service  will bind to | `0.0.0.0` |
+
+
 
 Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
