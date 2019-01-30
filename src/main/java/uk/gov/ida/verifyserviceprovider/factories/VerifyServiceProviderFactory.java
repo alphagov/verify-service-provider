@@ -23,9 +23,9 @@ import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlRespon
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import javax.ws.rs.client.Client;
 import java.security.KeyException;
@@ -108,14 +108,14 @@ public class VerifyServiceProviderFactory {
     }
 
     public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
-        IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
+        VerifyIdentityAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
                 dateTimeComparator,
                 configuration.getHashingEntityId()
         );
 
-        EidasAssertionService eidasAssertionService = responseFactory.createEidasAssertionService(
+        EidasIdentityAssertionService eidasAssertionService = responseFactory.createEidasAssertionService(
                 isEidasEnabled(),
                 dateTimeComparator,
                 getEidasMetadataResolverRepository()

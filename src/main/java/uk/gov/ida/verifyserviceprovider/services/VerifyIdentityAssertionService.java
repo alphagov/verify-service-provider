@@ -31,7 +31,7 @@ import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidation
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class IdpAssertionService extends AssertionServiceV2 {
+public class VerifyIdentityAssertionService extends IdentityAssertionService {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
@@ -39,7 +39,7 @@ public class IdpAssertionService extends AssertionServiceV2 {
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
     private UserIdHashFactory userIdHashFactory;
 
-    public IdpAssertionService(
+    public VerifyIdentityAssertionService(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
             SubjectValidator subjectValidator,
             AssertionAttributeStatementValidator attributeStatementValidator,

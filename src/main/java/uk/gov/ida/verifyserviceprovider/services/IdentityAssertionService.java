@@ -18,14 +18,14 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-public abstract class AssertionServiceV2 implements AssertionService<TranslatedNonMatchingResponseBody> {
+public abstract class IdentityAssertionService implements AssertionService<TranslatedNonMatchingResponseBody> {
 
     protected final SubjectValidator subjectValidator;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
 
 
-    public AssertionServiceV2(
+    public IdentityAssertionService(
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper

@@ -16,7 +16,7 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -51,7 +51,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 public class EidasAssertionServiceTest {
 
-    private EidasAssertionService eidasAssertionService;
+    private EidasIdentityAssertionService eidasAssertionService;
     @Mock
     private SubjectValidator subjectValidator;
     @Mock
@@ -75,7 +75,7 @@ public class EidasAssertionServiceTest {
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
-        eidasAssertionService = new EidasAssertionService(
+        eidasAssertionService = new EidasIdentityAssertionService(
             true,
             subjectValidator,
             eidasMatchingDatasetUnmarshaller,

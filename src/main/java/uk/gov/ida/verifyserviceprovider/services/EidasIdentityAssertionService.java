@@ -22,7 +22,7 @@ import java.util.Optional;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class EidasAssertionService extends AssertionServiceV2 {
+public class EidasIdentityAssertionService extends IdentityAssertionService {
 
     private final boolean isEnabled;
     private final InstantValidator instantValidator;
@@ -32,7 +32,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
     private final SignatureValidatorFactory signatureValidatorFactory;
 
 
-    public EidasAssertionService(
+    public EidasIdentityAssertionService(
             boolean isEnabled,
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,

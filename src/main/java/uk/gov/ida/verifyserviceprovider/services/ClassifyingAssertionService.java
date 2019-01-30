@@ -12,13 +12,13 @@ import java.util.Optional;
 
 public class ClassifyingAssertionService implements AssertionService<TranslatedNonMatchingResponseBody> {
 
-    private final IdpAssertionService idpAssertionService;
-    private final EidasAssertionService eidasAssertionService;
+    private final VerifyIdentityAssertionService idpAssertionService;
+    private final EidasIdentityAssertionService eidasAssertionService;
 
 
     public ClassifyingAssertionService(
-            IdpAssertionService idpAssertionService,
-            EidasAssertionService eidasAssertionService
+            VerifyIdentityAssertionService idpAssertionService,
+            EidasIdentityAssertionService eidasAssertionService
     ) {
         this.idpAssertionService = idpAssertionService;
         this.eidasAssertionService = eidasAssertionService;
@@ -27,7 +27,7 @@ public class ClassifyingAssertionService implements AssertionService<TranslatedN
 
     @Override
     public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        AssertionServiceV2 assertionService = isCountryAttributeQuery(assertions) ? eidasAssertionService : idpAssertionService;
+        IdentityAssertionService assertionService = isCountryAttributeQuery(assertions) ? eidasAssertionService : idpAssertionService;
 
         return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
     }

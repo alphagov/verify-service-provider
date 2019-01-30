@@ -27,9 +27,9 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -133,14 +133,14 @@ public class ResponseFactory {
         );
     }
 
-    public IdpAssertionService createIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                         SignatureValidatorFactory signatureValidatorFactory,
-                                                         DateTimeComparator dateTimeComparator,
-                                                         String hashingEntityId) {
+    public VerifyIdentityAssertionService createIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                                    SignatureValidatorFactory signatureValidatorFactory,
+                                                                    DateTimeComparator dateTimeComparator,
+                                                                    String hashingEntityId) {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-        return new IdpAssertionService(
+        return new VerifyIdentityAssertionService(
                 signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine)).orElseThrow(() -> new RuntimeException("cannot create")),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
@@ -152,7 +152,7 @@ public class ResponseFactory {
             );
     }
 
-    public EidasAssertionService createEidasAssertionService(
+    public EidasIdentityAssertionService createEidasAssertionService(
             boolean isEnabled,
             DateTimeComparator dateTimeComparator,
             Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
@@ -160,7 +160,7 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
-        return new EidasAssertionService(
+        return new EidasIdentityAssertionService(
                 isEnabled,
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),

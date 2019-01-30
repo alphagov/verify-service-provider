@@ -31,7 +31,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyIdentityAssertionService;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 import uk.gov.ida.saml.core.domain.AuthnContext;
@@ -68,7 +68,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class IdpAssertionServiceTest {
 
-    private IdpAssertionService idpAssertionService;
+    private VerifyIdentityAssertionService idpAssertionService;
 
     @Mock
     private SubjectValidator subjectValidator;
@@ -99,7 +99,7 @@ public class IdpAssertionServiceTest {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
 
-        idpAssertionService = new IdpAssertionService(
+        idpAssertionService = new VerifyIdentityAssertionService(
                 hubSignatureValidator,
                 subjectValidator,
                 attributeStatementValidator,
