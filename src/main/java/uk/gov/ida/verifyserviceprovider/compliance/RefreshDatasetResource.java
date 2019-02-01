@@ -1,6 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.compliance;
 
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

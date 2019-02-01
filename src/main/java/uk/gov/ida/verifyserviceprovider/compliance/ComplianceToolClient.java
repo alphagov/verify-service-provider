@@ -2,7 +2,7 @@ package uk.gov.ida.verifyserviceprovider.compliance;
 
 import com.amazonaws.util.Base64;
 import com.google.common.collect.ImmutableMap;
-import uk.gov.ida.verifyserviceprovider.compliance.domain.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;

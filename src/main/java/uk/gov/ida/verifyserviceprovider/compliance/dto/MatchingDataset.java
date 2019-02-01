@@ -1,4 +1,4 @@
-package uk.gov.ida.verifyserviceprovider.compliance.domain;
+package uk.gov.ida.verifyserviceprovider.compliance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
