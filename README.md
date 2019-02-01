@@ -125,23 +125,9 @@ MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML m
 
 As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
 
-## Generate keys for testing
 
-In order to generate keys for testing, we recommend using [OpenSSL](https://www.openssl.org).
 
-You can generate a private key by:
-1. generating an RSA key in PEM format
-2. converting the key to base64 encoded PKCS8
 
-Generate an RSA key in PEM format with:
-```
-openssl genrsa -des3 -passout pass:x 2048 | openssl rsa -passin pass:x -out key-name.pem
-```
-
-Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print the key to STDOUT with:
-```
-openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openssl base64 -A; echo
-```
 
 
 ## Contribute to the Verify Service Provider
