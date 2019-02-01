@@ -24,9 +24,6 @@ For more information on connecting to GOV.UK Verify using only the VSP, see the 
 
 We moved the [VSP tutorial](https://www.docs.verify.service.gov.uk/get-started-with-vsp/#get-started-with-the-verify-service-provider) to the new technical documentation website and updated it to help you connect to GOV.UK Verify using the VSP.
 
-#### Support for compilation on Java 9 and 10
-
-Compilation on Java 9 or 10 will produce a multi-release JAR that will run on Java 8, 9, and 10. This release was compiled on Java 8 and does not contain a multi-release JAR.
 
 #### Metadata health check changes
 
