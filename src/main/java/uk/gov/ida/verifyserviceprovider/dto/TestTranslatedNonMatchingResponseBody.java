@@ -17,10 +17,6 @@ public class TestTranslatedNonMatchingResponseBody extends TranslatedNonMatching
         super(scenario, pid, levelOfAssurance, attributes);
     }
 
-    public NonMatchingScenario getScenario() {
-        return super.getScenario();
-    }
-
     public String getPid() {
         return pid;
     }

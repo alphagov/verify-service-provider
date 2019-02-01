@@ -10,11 +10,11 @@ Using Verify Service Provider will make it easier to:
 
 You will need to host Verify Service Provider on your own infrastructure.
 
-Using Verify Service Provider is the main part of connecting to GOV.UK Verify. Refer to the [technical documentation](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about using the Verify Service Provider and connecting to GOV.UK Verify.
+Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://www.docs.verify.service.gov.uk) for more information about connecting to GOV.UK Verify.
 
 See also:
 * [API reference](/docs/api/api-reference.md)
-* [Using the VSP](LINK)
+* [How to use the VSP with your service](https://www.docs.verify.service.gov.uk/get-started-with-vsp/use-vsp-with-your-service)
 
 ## Setup
 
@@ -117,7 +117,6 @@ If you are using the legacy version involving a [Matching Service Adapter (MSA)]
 | ---------------- | ----------------------------------- |
 | MSA_ENTITY_ID    | The `entityId` of the service's MSA |
 | MSA_METADATA_URL | The URL to the MSA's metadata       |
-
 
 Verify Service Provider is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard](https://www.dropwizard.io).
 

@@ -1,9 +1,8 @@
-package uk.gov.ida.verifyserviceprovider.domain;
+package uk.gov.ida.verifyserviceprovider.compliance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +23,8 @@ public class MatchingAddress {
     @JsonProperty
     private Optional<String> uprn;
 
+    public MatchingAddress() {}
+
     public MatchingAddress(
         final boolean verified,
         final LocalDateTime from,
@@ -42,4 +43,31 @@ public class MatchingAddress {
         this.uprn = Optional.ofNullable(uprn);
     }
 
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public LocalDateTime getFrom() {
+        return from;
+    }
+
+    public LocalDateTime getTo() {
+        return to;
+    }
+
+    public Optional<String> getPostCode() {
+        return postCode;
+    }
+
+    public List<String> getLines() {
+        return lines;
+    }
+
+    public Optional<String> getInternationalPostCode() {
+        return internationalPostCode;
+    }
+
+    public Optional<String> getUprn() {
+        return uprn;
+    }
 }

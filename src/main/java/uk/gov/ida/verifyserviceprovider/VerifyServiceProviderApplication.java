@@ -2,12 +2,14 @@ package uk.gov.ida.verifyserviceprovider;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import io.dropwizard.Application;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
+import uk.gov.ida.verifyserviceprovider.compliance.ComplianceToolMode;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
@@ -16,7 +18,9 @@ import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
 import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
+import javax.ws.rs.client.Client;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
@@ -25,8 +29,8 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
-        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
-        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
+        hubMetadataBundle = new MetadataResolverBundle<>(configuration -> Optional.ofNullable(configuration.getVerifyHubMetadata()));
+        msaMetadataBundle = new MetadataResolverBundle<>(configuration -> configuration.getMsaMetadata(), false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,6 +54,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
         bootstrap.addBundle(hubMetadataBundle);
         bootstrap.addBundle(msaMetadataBundle);
+        bootstrap.addCommand(new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), this));
     }
 
     @Override
@@ -59,20 +64,15 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
 
     @Override
     public void run(VerifyServiceProviderConfiguration configuration, Environment environment) throws Exception {
-        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, hubMetadataBundle, msaMetadataBundle);
+        Client client = new JerseyClientBuilder(environment).build(getName());
+        VerifyServiceProviderFactory factory = new VerifyServiceProviderFactory(configuration, hubMetadataBundle, msaMetadataBundle, client);
 
         environment.jersey().register(new JerseyViolationExceptionMapper());
         environment.jersey().register(new JsonProcessingExceptionMapper());
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
-        environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
-        environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
-
-
-        environment.healthChecks().register("hubMetadata", factory.getHubMetadataHealthCheck());
-        environment.healthChecks().register("msaMetadata", factory.getMsaMetadataHealthCheck());
-
+        environment.jersey().register(factory.getTranslateSamlResponseResource());
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }
 }

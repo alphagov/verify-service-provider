@@ -10,6 +10,7 @@ repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
         maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+        maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases' }
         jcenter()
     }
     else {
@@ -19,12 +20,12 @@ repositories {
 
 project.ext {
     version_number = '1.0.0'
-    openSamlVersion = '3.3.0'
+    openSamlVersion = '3.4.0'
     verifyCommonUtils = '2.0.0-337'
-    samlLibVersion = "$openSamlVersion-152"
+    samlLibVersion = "$openSamlVersion-174"
     dropwizardVersion = '1.3.5'
     jaxbapiVersion = '2.2.9'
-    hub_saml="$openSamlVersion-15682"
+    hub_saml="$openSamlVersion-15709"
 
 }
 
@@ -39,19 +40,22 @@ dependencies {
         "uk.gov.ida:saml-serializers:$samlLibVersion",
         "uk.gov.ida:saml-security:$samlLibVersion",
         "uk.gov.ida:saml-extensions:$samlLibVersion",
-        "uk.gov.ida:hub-saml:$hub_saml"
+        "uk.gov.ida:hub-saml:$hub_saml",
+        "org.bouncycastle:bcprov-jdk15on:1.60",
+        "org.bouncycastle:bcpkix-jdk15on:1.60"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:2.12.0',
+        'org.mockito:mockito-core:2.23.4',
         "uk.gov.ida:saml-metadata-bindings-test:$samlLibVersion",
         "uk.gov.ida:saml-utils:$samlLibVersion",
         "uk.gov.ida:common-test-utils:2.0.0-44",
         "org.jsoup:jsoup:1.11.1",
         "javax.xml.bind:jaxb-api:$jaxbapiVersion",
         "uk.gov.ida:hub-saml-test-utils:$hub_saml",
+        "uk.gov.ida:saml-test-utils:$samlLibVersion",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
@@ -135,7 +139,7 @@ jar {
 }
 
 task testAcceptance(type: Test) {
-    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
     classpath += sourceSets.acceptanceTest.runtimeClasspath
 }
 

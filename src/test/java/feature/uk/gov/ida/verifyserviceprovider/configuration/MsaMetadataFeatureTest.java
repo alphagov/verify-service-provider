@@ -6,6 +6,7 @@ import common.uk.gov.ida.verifyserviceprovider.servers.MockVerifyHubServer;
 import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
+import io.dropwizard.testing.ResourceHelpers;
 import keystore.KeyStoreResource;
 import org.junit.After;
 import org.junit.Before;
@@ -20,12 +21,15 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.HashMap;
 
+import static certificates.values.CACertificates.TEST_CORE_CA;
+import static certificates.values.CACertificates.TEST_IDP_CA;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.dropwizard.testing.ConfigOverride.config;
+import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
@@ -49,20 +53,44 @@ public class MsaMetadataFeatureTest {
 
     @Before
     public void setUp() {
-        KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
-            .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
-            .build();
-        verifyHubKeystoreResource.create();
+        IdaSamlBootstrap.bootstrap();
+        wireMockServer.start();
+        hubServer.serveDefaultMetadata();
+
+        KeyStoreResource metadataTrustStore = aKeyStoreResource()
+                .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
+                .build();
+        KeyStoreResource hubTrustStore = aKeyStoreResource()
+                .withCertificate("VERIFY-HUB", aCertificate().withCertificate(TEST_CORE_CA).build().getCertificate())
+                .build();
+        KeyStoreResource idpTrustStore = aKeyStoreResource()
+                .withCertificate("VERIFY-IDP", aCertificate().withCertificate(TEST_IDP_CA).build().getCertificate())
+                .build();
+
+        metadataTrustStore.create();
+        hubTrustStore.create();
+        idpTrustStore.create();
+
         this.applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
-            "verify-service-provider.yml",
+                ResourceHelpers.resourceFilePath("verify-service-provider-with-msa.yml"),
             config("server.connector.port", "0"),
-            config("verifyHubConfiguration.metadata.uri", () -> String.format("http://localhost:%s/SAML2/metadata", hubServer.port())),
-            config("msaMetadata.uri", () -> String.format("http://localhost:%s/matching-service/metadata", wireMockServer.port())),
+            config("verifyHubConfiguration.metadata.uri", format("http://localhost:%s/SAML2/metadata", hubServer.port())),
+            config("msaMetadata.uri", getMsaMetadataUrl()),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
             config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
+            config("verifyHubConfiguration.metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+            config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
+            config("europeanIdentity.enabled", "false"),
+            config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
+            config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
+            config("europeanIdentity.aggregatedMetadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            config("europeanIdentity.aggregatedMetadata.trustStore.password", metadataTrustStore.getPassword())
         );
 
         environmentHelper.setEnv(new HashMap<String, String>() {{
@@ -73,10 +101,10 @@ public class MsaMetadataFeatureTest {
             put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY);
             put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY);
         }});
+    }
 
-        IdaSamlBootstrap.bootstrap();
-        wireMockServer.start();
-        hubServer.serveDefaultMetadata();
+    private String getMsaMetadataUrl() {
+        return format("http://localhost:%s/matching-service/metadata", wireMockServer.port());
     }
 
     @After
@@ -98,12 +126,12 @@ public class MsaMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"msaMetadata\":{\"healthy\":false";
+        String expectedResult = format("\"%s\":{\"healthy\":false", getMsaMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 
@@ -125,12 +153,12 @@ public class MsaMetadataFeatureTest {
         Client client = new JerseyClientBuilder(applicationTestSupport.getEnvironment()).build("test client");
 
         Response response = client
-            .target(URI.create(String.format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
+            .target(URI.create(format(HEALTHCHECK_URL, applicationTestSupport.getLocalPort())))
             .request()
             .buildGet()
             .invoke();
 
-        String expectedResult = "\"msaMetadata\":{\"healthy\":true";
+        String expectedResult = format("\"%s\":{\"healthy\":true", getMsaMetadataUrl());
 
         wireMockServer.verify(getRequestedFor(urlEqualTo("/matching-service/metadata")));
 

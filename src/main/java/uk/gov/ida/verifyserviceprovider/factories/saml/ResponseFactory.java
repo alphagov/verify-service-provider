@@ -4,6 +4,7 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.domain.AddressFactory;
+import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
@@ -11,6 +12,7 @@ import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
 import uk.gov.ida.saml.deserializers.validators.Base64StringDecoder;
 import uk.gov.ida.saml.deserializers.validators.NotNullSamlStringValidator;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
@@ -21,12 +23,13 @@ import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.NonMatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -40,6 +43,7 @@ import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
 import java.util.List;
+import java.util.Optional;
 
 public class ResponseFactory {
 
@@ -74,9 +78,9 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedResponseBody> createMatchingResponseService(
+    public ResponseService<TranslatedMatchingResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService<TranslatedMatchingResponseBody> matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -108,45 +112,64 @@ public class ResponseFactory {
         );
     }
 
-    public MatchingAssertionService createMatchingAssertionService(
+    public MsaAssertionService createMsaAssertionService(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
+            SignatureValidatorFactory signatureValidatorFactory,
             DateTimeComparator dateTimeComparator
     ) {
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
-        SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-        SamlAssertionsSignatureValidator assertionsSignatureValidator = new SamlAssertionsSignatureValidator(samlMessageSignatureValidator);
+        Optional<SamlAssertionsSignatureValidator> assertionsSignatureValidator = signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine));
         AssertionValidator assertionValidator = new AssertionValidator(
                 new InstantValidator(dateTimeComparator),
                 new SubjectValidator(timeRestrictionValidator),
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new MatchingAssertionService(
+        return new MsaAssertionService(
                 assertionValidator,
-                assertionsSignatureValidator
+                new LevelOfAssuranceValidator(),
+                assertionsSignatureValidator.orElseThrow(() -> new RuntimeException("Cannot create MSA signature validator"))
         );
     }
 
-    public NonMatchingAssertionService createNonMatchingAssertionService( ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                                          DateTimeComparator dateTimeComparator,
-                                                                          String hashingEntityId) {
+    public IdpAssertionService createIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                         SignatureValidatorFactory signatureValidatorFactory,
+                                                         DateTimeComparator dateTimeComparator,
+                                                         String hashingEntityId) {
 
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
-        SamlMessageSignatureValidator samlMessageSignatureValidator = new SamlMessageSignatureValidator(metadataBackedSignatureValidator);
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-
-        return new NonMatchingAssertionService(
-                new SamlAssertionsSignatureValidator(samlMessageSignatureValidator),
+        return new IdpAssertionService(
+                signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine)).orElseThrow(() -> new RuntimeException("cannot create")),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
-                new LevelOfAssuranceValidator()
+                new LevelOfAssuranceValidator(),
+                new UserIdHashFactory(hashingEntityId)
             );
+    }
+
+    public EidasAssertionService createEidasAssertionService(
+            boolean isEnabled,
+            DateTimeComparator dateTimeComparator,
+            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
+    ) {
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
+        AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
+
+        return new EidasAssertionService(
+                isEnabled,
+                new SubjectValidator(timeRestrictionValidator),
+                new EidasMatchingDatasetUnmarshaller(),
+                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new InstantValidator(dateTimeComparator),
+                new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
+                new LevelOfAssuranceValidator(),
+                eidasMetadataResolverRepository,
+                new SignatureValidatorFactory());
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {

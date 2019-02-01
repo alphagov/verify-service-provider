@@ -7,8 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -63,6 +63,6 @@ public class ErrorResponseAcceptanceTest {
             .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(response.readEntity(TranslatedResponseBody.class).getScenario()).isEqualTo(Scenario.REQUEST_ERROR);
+        assertThat(response.readEntity(TranslatedMatchingResponseBody.class).getScenario()).isEqualTo(MatchingScenario.REQUEST_ERROR);
     }
 }
