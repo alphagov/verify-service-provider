@@ -20,10 +20,16 @@ If you want to switch off your Matching Service Adapter and only use the Verify 
 
 For more information on connecting to GOV.UK Verify using only the VSP, see the [technical documentation](https://www.docs.verify.service.gov.uk).
 
-#### Tutorial for the new VSP
+#### Improved technical documentation
 
-We moved the [VSP tutorial](https://www.docs.verify.service.gov.uk/get-started-with-vsp/#get-started-with-the-verify-service-provider) to the new technical documentation website and updated it to help you connect to GOV.UK Verify using the VSP.
+The [new technical documentation website](LINK) has new guidance to help users connect to GOV.UK Verify using the VSP.
 
+[Get started with the VSP](LINK) is the first step in integrating your service with the VSP. It explains how to set up the successful verification journey
+
+[The second guide](LINK) explains how to handle failure responses so your service can handle all possible scenarios in a verification journey.
+give more details
+
+In case your service needs to do matching, [this page](LINK) has guidelines about what to do.
 
 #### Metadata health check changes
 
