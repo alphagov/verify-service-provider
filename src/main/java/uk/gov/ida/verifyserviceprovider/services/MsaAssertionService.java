@@ -10,8 +10,8 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
-public class MsaAssertionService implements AssertionService<TranslatedResponseBody> {
+public class MsaAssertionService implements AssertionService<TranslatedMatchingResponseBody> {
 
 
     private AssertionValidator assertionValidator;
@@ -40,7 +40,7 @@ public class MsaAssertionService implements AssertionService<TranslatedResponseB
 
 
     @Override
-    public TranslatedResponseBody translateSuccessResponse(
+    public TranslatedMatchingResponseBody translateSuccessResponse(
             List<Assertion> assertions,
             String expectedInResponseTo,
             LevelOfAssurance expectedLevelOfAssurance,
@@ -60,7 +60,7 @@ public class MsaAssertionService implements AssertionService<TranslatedResponseB
         String nameID = assertion.getSubject().getNameID().getValue();
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
         if (isUserAccountCreation(attributeStatements)) {
-            return new TranslatedResponseBody(
+            return new TranslatedMatchingResponseBody(
                 ACCOUNT_CREATION,
                 nameID,
                 levelOfAssurance,
@@ -68,25 +68,25 @@ public class MsaAssertionService implements AssertionService<TranslatedResponseB
             );
 
         }
-        return new TranslatedResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
+        return new TranslatedMatchingResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
 
     }
 
     @Override
-    public TranslatedResponseBody translateNonSuccessResponse(StatusCode statusCode) {
+    public TranslatedMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
                 .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
         String subStatus = statusCode.getStatusCode().getValue();
 
         switch (subStatus) {
             case SamlStatusCode.NO_MATCH:
-                return new TranslatedResponseBody(Scenario.NO_MATCH, null, null, null);
+                return new TranslatedMatchingResponseBody(MatchingScenario.NO_MATCH, null, null, null);
             case StatusCode.REQUESTER:
-                return new TranslatedResponseBody(Scenario.REQUEST_ERROR, null, null, null);
+                return new TranslatedMatchingResponseBody(MatchingScenario.REQUEST_ERROR, null, null, null);
             case StatusCode.NO_AUTHN_CONTEXT:
-                return new TranslatedResponseBody(Scenario.CANCELLATION, null, null, null);
+                return new TranslatedMatchingResponseBody(MatchingScenario.CANCELLATION, null, null, null);
             case StatusCode.AUTHN_FAILED:
-                return new TranslatedResponseBody(Scenario.AUTHENTICATION_FAILED, null, null, null);
+                return new TranslatedMatchingResponseBody(MatchingScenario.AUTHENTICATION_FAILED, null, null, null);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
         }
