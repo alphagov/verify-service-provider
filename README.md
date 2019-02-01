@@ -177,6 +177,7 @@ For non-security related bugs and feature requests please [raise an issue](https
 ## Licensing
 [MIT License][mit-license]
 
+[key-rotation]: https://www.docs.verify.service.gov.uk/maintain-your-connection/rotate-keys/
 [vsp-get-started]: https://www.docs.verify.service.gov.uk/set-up-vsp-with-your-service/get-started-with-the-vsp
 [vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
