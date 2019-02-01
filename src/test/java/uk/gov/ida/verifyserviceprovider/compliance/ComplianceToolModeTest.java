@@ -2,13 +2,16 @@ package uk.gov.ida.verifyserviceprovider.compliance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
+import io.dropwizard.testing.FixtureHelpers;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.json.JSONObject;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
@@ -21,7 +24,8 @@ import static org.mockito.Mockito.mock;
 public class ComplianceToolModeTest {
 
     public static final String HTTP_LOCALHOST_8080 = "http://localhost:8080";
-    private final ObjectMapper objectMapper = Jackson.newObjectMapper();
+    private final ObjectMapper objectMapper = Jackson.newObjectMapper()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     @Test
     public void testThatConfigurationArgumentCanBeParsed() throws ArgumentParserException, JsonProcessingException {
@@ -64,7 +68,7 @@ public class ComplianceToolModeTest {
     }
 
     @Test
-    public void testThatThereAreDefaults() throws ArgumentParserException {
+    public void testThatThereAreDefaults() throws Exception {
         ComplianceToolMode complianceToolMode = new ComplianceToolMode(objectMapper, Validators.newValidator(), mock(VerifyServiceProviderApplication.class));
 
         final Subparser subparser = createParser();
@@ -73,7 +77,10 @@ public class ComplianceToolModeTest {
         Namespace namespace = subparser.parseArgs(noArguments());
 
         MatchingDataset actual = namespace.get(ComplianceToolMode.MATCHING_DATASET);
-        assertThat(actual).isEqualToComparingFieldByFieldRecursively(ComplianceToolMode.DEFAULT_MATCHING_DATASET);
+        String expectedMatchingDataset = FixtureHelpers.fixture("default-test-identity-dataset.json");
+        String receivedMatchingDataset = objectMapper.writeValueAsString(actual);
+        assertThat(new JSONObject(receivedMatchingDataset))
+                .isEqualToComparingFieldByFieldRecursively(new JSONObject(expectedMatchingDataset));
 
         String url = namespace.get(ComplianceToolMode.ASSERTION_CONSUMER_URL);
         assertThat(url).isEqualTo(ComplianceToolMode.DEFAULT_CONSUMER_URL);

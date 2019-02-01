@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.compliance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Resources;
 import io.dropwizard.Application;
 import io.dropwizard.cli.ServerCommand;
 import io.dropwizard.configuration.ConfigurationFactoryFactory;
@@ -8,17 +9,12 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
-import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import java.io.IOException;
+import java.net.URL;
 
 public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfiguration> {
 
@@ -31,13 +27,14 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     static final int DEFAULT_PORT = 50300;
     static final String DEFAULT_CONSUMER_URL = "http://localhost:8080/SAML2/Response";
     static final String DEFAULT_HOST = "0.0.0.0";
-    static final MatchingDataset DEFAULT_MATCHING_DATASET = createDefaultMatchingDataset();
+    private final MatchingDataset defaultMatchingDataset;
 
     private MatchingDatasetArgumentResolver matchingDatasetArgumentResolver;
 
     public ComplianceToolMode(ObjectMapper objectMapper, Validator validator, Application<VerifyServiceProviderConfiguration> application) {
         super(application, "development", "Run the VSP in development mode");
         this.matchingDatasetArgumentResolver = new MatchingDatasetArgumentResolver(objectMapper, validator);
+        this.defaultMatchingDataset = createDefaultMatchingDataset(objectMapper);
     }
 
 
@@ -46,7 +43,7 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
         subparser.addArgument("-d", "--matchingDataset")
                 .dest(MATCHING_DATASET)
                 .type(matchingDatasetArgumentResolver)
-                .setDefault(DEFAULT_MATCHING_DATASET)
+                .setDefault(defaultMatchingDataset)
                 .help("The Matching Dataset that the Compliance Tool will be initialized with");
 
         subparser.addArgument("-u", "--url")
@@ -109,25 +106,22 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
                 new ComplianceToolModeConfigurationFactory(port, bindHost);
     }
 
-    private static MatchingDataset createDefaultMatchingDataset() {
-        String standardFromDateString = "2013-02-22T14:32:14.064";
-        String standardToDateString = "2015-10-02T09:32:14.967";
-        String laterFromDateString = "2015-10-02T09:32:14.967";
-        String laterToDateString = "2018-03-03T10:20:50.163";
-        LocalDateTime standardFromDate = LocalDateTime.parse(standardFromDateString);
-        LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
-        LocalDateTime laterFromDate = LocalDateTime.parse(laterFromDateString);
-        LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
-
-        return new MatchingDataset(
-                new MatchingAttribute("Default", true, standardFromDate, standardToDate),
-                new MatchingAttribute("Person", true, standardFromDate, standardToDate),
-                asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
-                new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
-                new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
-                singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
-                UUID.randomUUID().toString()
-        );
+    private static MatchingDataset createDefaultMatchingDataset(ObjectMapper objectMapper) {
+        URL resource = Resources.getResource("default-test-identity-dataset.json");
+        try {
+            return objectMapper.readValue(resource, DefaultMatchingDataset.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    public static class DefaultMatchingDataset extends MatchingDataset {
+        public DefaultMatchingDataset() {
+        }
+
+        @Override
+        public String toString() {
+            return "See the README for a description of this field";
+        }
+    }
 }
