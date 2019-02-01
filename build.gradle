@@ -22,7 +22,7 @@ project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.4.0'
     verifyCommonUtils = '2.0.0-337'
-    samlLibVersion = "$openSamlVersion-167"
+    samlLibVersion = "$openSamlVersion-174"
     dropwizardVersion = '1.3.5'
     jaxbapiVersion = '2.2.9'
     hub_saml="$openSamlVersion-15709"
@@ -55,6 +55,7 @@ dependencies {
         "org.jsoup:jsoup:1.11.1",
         "javax.xml.bind:jaxb-api:$jaxbapiVersion",
         "uk.gov.ida:hub-saml-test-utils:$hub_saml",
+        "uk.gov.ida:saml-test-utils:$samlLibVersion",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
