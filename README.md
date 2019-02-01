@@ -14,7 +14,7 @@ Using Verify Service Provider is the main part of connecting to GOV.UK Verify. R
 
 See also:
 * [API reference](/docs/api/api-reference.md)
-* [Using the VSP](techdocs)
+* [Using the VSP](LINK)
 
 ## Setup
 
@@ -64,12 +64,12 @@ To start the VSP in development mode, run:
 You can use the following command line options to customise the behaviour of the VSP in development mode:
 
 | Option | Description | Default |
-| -----: | ----------- | ------- |
-| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The Matching  Dataset  that  the  Compliance  Tool will be  initialized  with. | See technical documentation |
-|`-u URL` or<br> `--url URL` | The URL where the Compliance Tool will send responses | `http://localhost:8080/SAML2/Response` |
-|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the Compliance Tool | `5` |
-| `-p PORT` or<br> `--port PORT` | The port that this service will use | `50300` |
-|`--host BINDHOST` | The host that this service  will bind to | `0.0.0.0` |
+| ------ | ----------- | ------- |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The matching dataset the test tool will use | See technical documentation. |
+|`-u URL` or<br> `--url URL` | The URL where the test tool will send responses | `http://localhost:8080/SAML2/Response` |
+|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the test tool | `5` |
+| `-p PORT` or<br> `--port PORT` | The port the service will use | `50300` |
+|`--host BINDHOST` | The host the service will bind to | `0.0.0.0` |
 
 
 ### Check mode
@@ -101,34 +101,25 @@ called `verify-service-provider.yml` which you can customise either by providing
 
 By default the following environment variables are supported:
 
-```
-VERIFY_ENVIRONMENT            # The environment of the Verify Hub to run against - PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL
+| Variable | Description |
+| -------- | ----------- |
+| `VERIFY_ENVIRONMENT` | The GOV.UK Verify Hub environment to run in.<br/>For example `PRODUCTION`, `INTEGRATION`|
+| `SERVICE_ENTITY_IDS` | A JSON string array with the service's entity ID, for example `'["http://entity-id"]'`. If you have several services using one VSP deployment,<br/> the array should contain all of their service entity IDs. |
+| `SAML_SIGNING_KEY` | A base64 encoded RSA private key used for signing the request to GOV.UK Verify Hub.|
+| `SAML_PRIMARY_ENCRYPTION_KEY`| A primary base64 encoded PKCS8 RSA private key used to decrypt SAML responses.|
+|`SAML_SECONDARY_ENCRYPTION_KEY`|(Optional - default empty) A secondary base64 encoded PKCS8 RSA private key is used to decrypt SAML responses. This parameter applies during [key rotation][key-rotation] events.|
+| `PORT` | (Optional - default `50400`) The TCP port where the application will listen for HTTP traffic|
+| `LOG_LEVEL` | Optional - default `INFO`) The threshold level for logs to be written, for example `DEBUG`, `INFO`, `WARN`, or `ERROR`) |
 
-SERVICE_ENTITY_IDS            # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'
-                              # If you have multiple services using a single Verify Service Provider you should provide all of their entity IDs in this array.
+If you are using the legacy version involving a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter), two additional environment variables apply:
 
-SAML_SIGNING_KEY              # A base64 encoded RSA private key that is used for signing the request to Verify
-SAML_PRIMARY_ENCRYPTION_KEY   # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
-SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that
-                              # will be used during certificate rotation events (see "Generating keys for testing")
-
-PORT                          # (Optional - default 50400) The TCP port where the application will listen for HTTP traffic
-LOG_LEVEL                     # (Optional - default INFO) The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR)
-```
-
-If you are using the legacy version involving a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter), two additional environment variables apply:
-
-```
-MSA_ENTITY_ID                 # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
-MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML metadata.
-```
-
-As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
+| Variable         | Description                         |
+| ---------------- | ----------------------------------- |
+| MSA_ENTITY_ID    | The `entityId` of the service's MSA |
+| MSA_METADATA_URL | The URL to the MSA's metadata       |
 
 
-
-
-
+Verify Service Provider is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard](https://www.dropwizard.io).
 
 ## Contribute to the Verify Service Provider
 
