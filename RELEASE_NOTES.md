@@ -5,13 +5,13 @@ Release notes
 
 #### Connect to Verify using only the VSP
 
-This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). Services can then implement matching independently from their connection to GOV.UK Verify.
+This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). If needed, services can then implement matching independently from their connection to GOV.UK Verify.
 
 Using only the VSP makes it easier to connect to GOV.UK Verify and reduces maintenance tasks once connected.
 
 When used alone, the VSP provides the required MSA functionality. It will:
-* implement security features to the same security level as the MSA
-* handle European identities
+* implement security features to the same level as the MSA
+* handle both GOV.UK Verify and European identities
 * do Personal Identifier (PID) hashing
 
 If you are already connected to GOV.UK Verify and are running an MSA, you can upgrade to VSP 2.0.0 without needing to do any configuration changes.
