@@ -18,7 +18,7 @@ import java.net.URL;
 
 public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfiguration> {
 
-    static final String MATCHING_DATASET = "matchingDataset";
+    static final String IDENTITY_DATASET = "identityDataset";
     static final String ASSERTION_CONSUMER_URL = "assertionConsumerUrl";
     static final String TIMEOUT = "timeout";
     static final String PORT = "port";
@@ -27,24 +27,24 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     static final int DEFAULT_PORT = 50300;
     static final String DEFAULT_CONSUMER_URL = "http://localhost:8080/SAML2/Response";
     static final String DEFAULT_HOST = "0.0.0.0";
-    private final MatchingDataset defaultMatchingDataset;
+    private final MatchingDataset defaultIdentityDataset;
 
-    private MatchingDatasetArgumentResolver matchingDatasetArgumentResolver;
+    private IdentityDatasetArgumentResolver identityDatasetArgumentResolver;
 
     public ComplianceToolMode(ObjectMapper objectMapper, Validator validator, Application<VerifyServiceProviderConfiguration> application) {
         super(application, "development", "Run the VSP in development mode");
-        this.matchingDatasetArgumentResolver = new MatchingDatasetArgumentResolver(objectMapper, validator);
-        this.defaultMatchingDataset = createDefaultMatchingDataset(objectMapper);
+        this.identityDatasetArgumentResolver = new IdentityDatasetArgumentResolver(objectMapper, validator);
+        this.defaultIdentityDataset = createDefaultIdentityDataset(objectMapper);
     }
 
 
     @Override
     public void configure(Subparser subparser) {
-        subparser.addArgument("-d", "--matchingDataset")
-                .dest(MATCHING_DATASET)
-                .type(matchingDatasetArgumentResolver)
-                .setDefault(defaultMatchingDataset)
-                .help("The Matching Dataset that the Compliance Tool will be initialized with");
+        subparser.addArgument("-d", "--identityDataset")
+                .dest(IDENTITY_DATASET)
+                .type(identityDatasetArgumentResolver)
+                .setDefault(defaultIdentityDataset)
+                .help("The identity dataset that the Compliance Tool will be initialized with");
 
         subparser.addArgument("-u", "--url")
                 .dest(ASSERTION_CONSUMER_URL)
@@ -90,7 +90,7 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
     protected void run(Environment environment, Namespace namespace, VerifyServiceProviderConfiguration configuration) throws Exception {
         String url = namespace.get(ASSERTION_CONSUMER_URL);
         Integer timeout = namespace.get(TIMEOUT);
-        MatchingDataset matchingDataset = namespace.get(MATCHING_DATASET);
+        MatchingDataset matchingDataset = namespace.get(IDENTITY_DATASET);
 
         ComplianceToolModeConfiguration complianceToolModeConfiguration = (ComplianceToolModeConfiguration) configuration;
 
@@ -106,17 +106,17 @@ public class ComplianceToolMode extends ServerCommand<VerifyServiceProviderConfi
                 new ComplianceToolModeConfigurationFactory(port, bindHost);
     }
 
-    private static MatchingDataset createDefaultMatchingDataset(ObjectMapper objectMapper) {
+    private static MatchingDataset createDefaultIdentityDataset(ObjectMapper objectMapper) {
         URL resource = Resources.getResource("default-test-identity-dataset.json");
         try {
-            return objectMapper.readValue(resource, DefaultMatchingDataset.class);
+            return objectMapper.readValue(resource, DefaultIdentityDataset.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static class DefaultMatchingDataset extends MatchingDataset {
-        public DefaultMatchingDataset() {
+    public static class DefaultIdentityDataset extends MatchingDataset {
+        public DefaultIdentityDataset() {
         }
 
         @Override

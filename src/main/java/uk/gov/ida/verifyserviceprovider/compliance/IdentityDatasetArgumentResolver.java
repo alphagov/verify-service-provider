@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class MatchingDatasetArgumentResolver implements ArgumentType<MatchingDataset> {
+class IdentityDatasetArgumentResolver implements ArgumentType<MatchingDataset> {
 
     private final ObjectMapper objectMapper;
     private final Validator validator;
 
-    public MatchingDatasetArgumentResolver(ObjectMapper objectMapper, Validator validator) {
+    public IdentityDatasetArgumentResolver(ObjectMapper objectMapper, Validator validator) {
         this.objectMapper = objectMapper;
         this.validator = validator;
     }

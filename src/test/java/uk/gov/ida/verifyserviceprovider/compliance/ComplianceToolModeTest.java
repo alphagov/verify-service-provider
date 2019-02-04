@@ -50,7 +50,7 @@ public class ComplianceToolModeTest {
                 )
         );
 
-        MatchingDataset actual = namespace.get(ComplianceToolMode.MATCHING_DATASET);
+        MatchingDataset actual = namespace.get(ComplianceToolMode.IDENTITY_DATASET);
         assertThat(actual).isEqualToComparingFieldByFieldRecursively(suppliedMatchingDataset);
 
         String url = namespace.get(ComplianceToolMode.ASSERTION_CONSUMER_URL);
@@ -76,7 +76,7 @@ public class ComplianceToolModeTest {
 
         Namespace namespace = subparser.parseArgs(noArguments());
 
-        MatchingDataset actual = namespace.get(ComplianceToolMode.MATCHING_DATASET);
+        MatchingDataset actual = namespace.get(ComplianceToolMode.IDENTITY_DATASET);
         String expectedMatchingDataset = FixtureHelpers.fixture("default-test-identity-dataset.json");
         String receivedMatchingDataset = objectMapper.writeValueAsString(actual);
         assertThat(new JSONObject(receivedMatchingDataset))
