@@ -89,7 +89,7 @@ public class IdpAssertionService extends AssertionServiceV2 {
             case StatusCode.REQUESTER:
                 return new TranslatedNonMatchingResponseBody(NonMatchingScenario.REQUEST_ERROR, null, null, null);
             case StatusCode.NO_AUTHN_CONTEXT:
-                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.CANCELLATION, null, null, null);
+                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.NO_AUTHENTICATION, null, null, null);
             case StatusCode.AUTHN_FAILED:
                 return new TranslatedNonMatchingResponseBody(NonMatchingScenario.AUTHENTICATION_FAILED, null, null, null);
             default:
