@@ -382,6 +382,6 @@ public class NonMatchingAcceptanceTest {
         TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.CANCELLATION);
+        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.NO_AUTHENTICATION);
     }
 }
