@@ -76,14 +76,13 @@ public class EidasAssertionServiceTest {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
         eidasAssertionService = new EidasAssertionService(
-            true,
             subjectValidator,
             eidasMatchingDatasetUnmarshaller,
             mdsMapper,
             instantValidator,
             conditionsValidator,
             levelOfAssuranceValidator,
-            Optional.of(metadataResolverRepository),
+            metadataResolverRepository,
             signatureValidatorFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());

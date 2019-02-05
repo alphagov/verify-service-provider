@@ -22,14 +22,18 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.factories.EidasMetadataFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
+import uk.gov.ida.verifyserviceprovider.services.DisabledEidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -41,6 +45,7 @@ import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
+import javax.ws.rs.client.Client;
 import java.security.KeyPair;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +59,7 @@ public class ResponseFactory {
     private static final OpenSamlXMLObjectUnmarshaller<Response> responseOpenSamlXMLObjectUnmarshaller = new OpenSamlXMLObjectUnmarshaller<>(samlObjectParser);
     private static final EncryptionAlgorithmValidator encryptionAlgorithmValidator = new EncryptionAlgorithmValidator();
     private static final DecrypterFactory decrypterFactory = new DecrypterFactory();
+    private final EidasMetadataFactory eidasMetadataFactory = new EidasMetadataFactory();
 
     private List<KeyPair> encryptionKeyPairs;
 
@@ -153,15 +159,23 @@ public class ResponseFactory {
     }
 
     public EidasAssertionService createEidasAssertionService(
-            boolean isEnabled,
+            VerifyServiceProviderConfiguration verifyServiceProviderConfiguration,
             DateTimeComparator dateTimeComparator,
-            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
-    ) {
+            Client client) {
+        return verifyServiceProviderConfiguration.getEuropeanIdentity()
+                .filter(EuropeanIdentityConfiguration::isEnabled)
+                .map((config) -> createEnabledEidasAssertionService(dateTimeComparator, client, config))
+                .orElse(new DisabledEidasAssertionService());
+        }
+
+    private EidasAssertionService createEnabledEidasAssertionService(DateTimeComparator dateTimeComparator, Client client, EuropeanIdentityConfiguration config) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
+        EidasMetadataResolverRepository eidasMetadataResolverRepository = eidasMetadataFactory
+                .createEidasMetadataResolverRepository(config, client);
+
         return new EidasAssertionService(
-                isEnabled,
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
@@ -169,7 +183,8 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
-                new SignatureValidatorFactory());
+                new SignatureValidatorFactory()
+        );
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
