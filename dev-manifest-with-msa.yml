@@ -2,7 +2,7 @@ memory: 1024M
 applications:
   - name: vsp-with-matching-dev
     buildpack: java_buildpack
-    command: (cd verify-serivce-provider-* && bin/verify-service-provider server configuration/vsp-with-matching.yml
+    command: (cd verify-serivce-provider-* && bin/verify-service-provider server vsp-with-matching.yml
     env:
       CLOCK_SKEW: PT30s
       SERVICE_ENTITY_IDS: '["http://verify-service-provider-dev-service"]'

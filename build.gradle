@@ -123,6 +123,8 @@ distributions {
             }
         }
     }
+}
+distributions {
     testing {
         contents {
             from {
@@ -130,8 +132,10 @@ distributions {
                     'configuration/vsp-with-matching.yml',
                     'configuration/vsp-no-eidas.yml',
                     'verify-service-provider.yml'
+
                 ]
             }
+            with distributions.main.contents
         }
     }
 }
