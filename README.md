@@ -76,8 +76,12 @@ You can use the following command line options to customise the behaviour of the
 | `-p PORT` or<br> `--port PORT` | The port the service will use | `50300` |
 |`--host BINDHOST` | The host the service will bind to | `0.0.0.0` |
 
+You can check the application is running by calling the healthcheck endpoint with:
 
 ### Check mode
+```
+curl localhost:{$PORT}/admin/healthcheck
+```
 
 Checks if your configuration file is correct
 
