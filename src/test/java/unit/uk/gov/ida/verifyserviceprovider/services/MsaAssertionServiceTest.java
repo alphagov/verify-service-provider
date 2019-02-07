@@ -15,7 +15,7 @@ import org.opensaml.security.credential.BasicCredential;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.impl.CollectionCredentialResolver;
 import org.opensaml.security.crypto.KeySupport;
-import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
+import org.opensaml.xmlsec.config.impl.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
@@ -27,11 +27,12 @@ import uk.gov.ida.saml.core.test.builders.ConditionsBuilder;
 import uk.gov.ida.saml.core.test.builders.IssuerBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
-import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionService;
+import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import java.security.KeyPair;
@@ -60,13 +61,13 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSub
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.SUCCESS_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
-public class MatchingAssertionServiceTest {
+public class MsaAssertionServiceTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
-    private MatchingAssertionService matchingAssertionService;
+    private MsaAssertionService msaAssertionService;
     private Credential testRpMsaSigningCredential = createMSSigningCredential();
 
     private Credential createMSSigningCredential() {
@@ -87,7 +88,7 @@ public class MatchingAssertionServiceTest {
 
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
 
-        matchingAssertionService = responseFactory.createMatchingAssertionService(explicitKeySignatureTrustEngine, dateTimeComparator);
+        msaAssertionService = responseFactory.createMsaAssertionService(explicitKeySignatureTrustEngine, new SignatureValidatorFactory(), dateTimeComparator);
     }
 
     @Rule
@@ -100,10 +101,10 @@ public class MatchingAssertionServiceTest {
 
     @Test
     public void shouldTranslateValidAssertion() {
-        TranslatedResponseBody result = matchingAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = msaAssertionService.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-        assertThat(result).isEqualTo(new TranslatedResponseBody(
+        assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
             SUCCESS_MATCH,
             "some-pid",
             LEVEL_2,
@@ -113,10 +114,10 @@ public class MatchingAssertionServiceTest {
 
     @Test
     public void shouldAllowHigherLevelOfAssuranceThanRequested() throws Exception {
-        TranslatedResponseBody result = matchingAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = msaAssertionService.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_1, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
-        assertThat(result).isEqualTo(new TranslatedResponseBody(
+        assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
             SUCCESS_MATCH,
             "some-pid",
             LEVEL_2,
@@ -129,7 +130,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        matchingAssertionService.translateSuccessResponse(emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionService.translateSuccessResponse(emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -137,7 +138,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        matchingAssertionService.translateSuccessResponse(null, IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionService.translateSuccessResponse(null, IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -145,7 +146,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        matchingAssertionService.translateSuccessResponse(
+        msaAssertionService.translateSuccessResponse(
             ImmutableList.of(
                 anAssertion().buildUnencrypted(),
                 anAssertion().buildUnencrypted()
@@ -160,7 +161,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
 
-        matchingAssertionService.translateSuccessResponse(Collections.singletonList(
+        msaAssertionService.translateSuccessResponse(Collections.singletonList(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).withoutSigning().buildUnencrypted()),
             IN_RESPONSE_TO,
             LEVEL_2,
@@ -174,7 +175,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
 
         Credential unknownSigningCredential = new TestCredentialFactory(TEST_PUBLIC_CERT, TEST_PRIVATE_KEY).getSigningCredential();
-        matchingAssertionService.translateSuccessResponse(Collections.singletonList(
+        msaAssertionService.translateSuccessResponse(Collections.singletonList(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX)
                 .withSignature(aSignature().withSigningCredential(unknownSigningCredential).build())
                 .buildUnencrypted()),
@@ -196,7 +197,7 @@ public class MatchingAssertionServiceTest {
             .addAuthnStatement(authnStatement
             ).buildUnencrypted();
 
-        matchingAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -214,7 +215,7 @@ public class MatchingAssertionServiceTest {
                 .build())
             .buildUnencrypted();
 
-        matchingAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -223,7 +224,7 @@ public class MatchingAssertionServiceTest {
         expectedException.expectMessage("Missing status code for non-Success response");
 
         StatusCode statusCode = aStatusCode().withValue(StatusCode.RESPONDER).build();
-        matchingAssertionService.translateNonSuccessResponse(statusCode);
+        msaAssertionService.translateNonSuccessResponse(statusCode);
     }
 
     @Test
@@ -232,8 +233,8 @@ public class MatchingAssertionServiceTest {
                 .withValue(StatusCode.RESPONDER)
                 .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AUTHN_CONTEXT).build())
                 .build();
-        TranslatedResponseBody response = matchingAssertionService.translateNonSuccessResponse(statusCode);
-        assertThat(response.getScenario()).isEqualTo(Scenario.CANCELLATION);
+        TranslatedMatchingResponseBody response = msaAssertionService.translateNonSuccessResponse(statusCode);
+        assertThat(response.getScenario()).isEqualTo(MatchingScenario.CANCELLATION);
     }
 
     @Test
@@ -242,8 +243,8 @@ public class MatchingAssertionServiceTest {
                 .withValue(StatusCode.RESPONDER)
                 .withSubStatusCode(aStatusCode().withValue(SamlStatusCode.NO_MATCH).build())
                 .build();
-        TranslatedResponseBody response = matchingAssertionService.translateNonSuccessResponse(statusCode);
-        assertThat(response.getScenario()).isEqualTo(Scenario.NO_MATCH);
+        TranslatedMatchingResponseBody response = msaAssertionService.translateNonSuccessResponse(statusCode);
+        assertThat(response.getScenario()).isEqualTo(MatchingScenario.NO_MATCH);
     }
 
     @Test
@@ -252,8 +253,8 @@ public class MatchingAssertionServiceTest {
                 .withValue(StatusCode.RESPONDER)
                 .withSubStatusCode(aStatusCode().withValue(StatusCode.AUTHN_FAILED).build())
                 .build();
-        TranslatedResponseBody response = matchingAssertionService.translateNonSuccessResponse(statusCode);
-        assertThat(response.getScenario()).isEqualTo(Scenario.AUTHENTICATION_FAILED);
+        TranslatedMatchingResponseBody response = msaAssertionService.translateNonSuccessResponse(statusCode);
+        assertThat(response.getScenario()).isEqualTo(MatchingScenario.AUTHENTICATION_FAILED);
     }
 
     @Test
@@ -262,8 +263,8 @@ public class MatchingAssertionServiceTest {
                 .withValue(StatusCode.RESPONDER)
                 .withSubStatusCode(aStatusCode().withValue(StatusCode.REQUESTER).build())
                 .build();
-        TranslatedResponseBody response = matchingAssertionService.translateNonSuccessResponse(statusCode);
-        assertThat(response.getScenario()).isEqualTo(Scenario.REQUEST_ERROR);
+        TranslatedMatchingResponseBody response = msaAssertionService.translateNonSuccessResponse(statusCode);
+        assertThat(response.getScenario()).isEqualTo(MatchingScenario.REQUEST_ERROR);
     }
 
     @Test
@@ -275,7 +276,7 @@ public class MatchingAssertionServiceTest {
                 .withValue(StatusCode.RESPONDER)
                 .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AVAILABLE_IDP).build())
                 .build();
-        matchingAssertionService.translateNonSuccessResponse(statusCode);
+        msaAssertionService.translateNonSuccessResponse(statusCode);
     }
 
     private AssertionBuilder aSignedAssertion() {
