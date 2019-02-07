@@ -124,7 +124,7 @@ If you are using the legacy version involving a [Matching Service Adapter (MSA)]
 | MSA_METADATA_URL | The URL to the MSA's metadata       |
 
 
-The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard](https://www.dropwizard.io).
+The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard](https://www.dropwizard.io). Check the [VSP release notes][release-notes] to find out which Dropwizard version was used when building the release you're using.
 
 ## Contribute to the Verify Service Provider
 
@@ -163,4 +163,5 @@ For non-security related bugs and feature requests please [raise an issue](https
 [vsp-get-started]: https://www.docs.verify.service.gov.uk/get-started-with-vsp/
 [vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
 [identity-dataset]: /src/main/resources/default-test-identity-dataset.json
+[release-notes]: /RELEASE_NOTES.md
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
