@@ -101,7 +101,7 @@ curl localhost:{$PORT}/admin/healthcheck
 
 ## Configure
 
-Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
+The VSP comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
 called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
 
 By default the following environment variables are supported:
@@ -124,7 +124,7 @@ If you are using the legacy version involving a [Matching Service Adapter (MSA)]
 | MSA_METADATA_URL | The URL to the MSA's metadata       |
 
 
-Verify Service Provider is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard](https://www.dropwizard.io).
+The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard](https://www.dropwizard.io).
 
 ## Contribute to the Verify Service Provider
 
@@ -148,7 +148,7 @@ __Build a distribution__
 
 You can find the distribution zip at `build/distributions`.
 
-See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of Verify Service Provider, including how to run the application against a local compliance tool and see advanced configuration options.
+See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of the VSP, including how to run the application against a local compliance tool and see advanced configuration options.
 
 ## Support and raising issues
 
