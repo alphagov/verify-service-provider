@@ -68,7 +68,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
     public NonMatchingVerifyServiceProviderAppRule() {
         super(
                 VerifyServiceProviderApplication.class,
-                "verify-service-provider-no-eidas.yml",
+                "configuration/vsp-no-eidas.yml",
                 ConfigOverride.config("serviceEntityIds", TEST_RP),
                 ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
                 ConfigOverride.config("server.connector.port", String.valueOf(0)),

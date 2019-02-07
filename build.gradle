@@ -115,7 +115,22 @@ distributions {
     main {
         contents {
             from {
-                ['README.md', 'RELEASE_NOTES.md', 'verify-service-provider.yml']
+              [
+                  'README.md',
+                  'RELEASE_NOTES.md',
+                  'verify-service-provider.yml'
+              ]
+            }
+        }
+    }
+    testing {
+        contents {
+            from {
+                [
+                    'configuration/vsp-with-matching.yml',
+                    'configuration/vsp-no-eidas.yml',
+                    'verify-service-provider.yml'
+                ]
             }
         }
     }
