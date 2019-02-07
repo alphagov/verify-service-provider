@@ -43,30 +43,32 @@ See [the API reference][vsp-api] for full details of the API.
 
 ## Run
 
-The Verify Service Provider has several modes you can use:
+You can run the the VSP using several commands, depending on your development needs:
 
-Explain reasoning behind modes.
+| Command       | Use case                               |
+| ------------- | ----------------------------------------- |
+| `development` | Local development of a VSP client <br> The VSP is connected to a test tool hosted by the GOV.UK Verify team. |
+| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to <br> a full-scale of the GOV.UK Verify Hub.                                          |
+| `check`       | Validates your configuration file.        |
 
-### Development mode
+### `development`
 
-You can use development mode if you're building your own client for the VSP. For more information on building your own client using the VSP in development mode, see the [technical documentation on how to get started][vsp-get-started].
+You can use `development` command if you're building your own client for the VSP.The command starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
 
-Development mode starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
-
-Every time you start the VSP in development mode, it initialises the test tool by:
+When running the VSP using the `development` command, it initialises the test tool by:
 
 - generating its self-signed keys and certificates
 - adding the keys and certificates to the VSP configuration
 - setting the test tool environment in the VSP configuration
 - initialising an instance of the test tool
 
-To start the VSP in development mode, run:
+To start the VSP connected to the test tool, run:
 
 ```
 ./bin/verify-service-provider development
 ```
 
-You can use the following command line options to customise the behaviour of the VSP in development mode:
+You can use the following command line options to customise the behaviour of the `development` command:
 
 | Option | Description | Default |
 | ------ | ----------- | ------- |
@@ -78,18 +80,17 @@ You can use the following command line options to customise the behaviour of the
 
 You can check the application is running by calling the healthcheck endpoint with:
 
-### Check mode
 ```
 curl localhost:{$PORT}/admin/healthcheck
 ```
 
-Checks if your configuration file is correct
+For more information on building your own client using the `development` command, see the [technical documentation on how to get started][vsp-get-started].
 
-### Server mode
+### `server`
 
-Use this when you're deploying your VSP to the Integration or Production environments.
+Use the `server` command when running the VSP in an environment containing a full-scale deployment of the GOV.UK Verify Hub, for example the Integration or Production environments.
 
-To run the application, export your environment variables and start the application with:
+For example, to run the VSP using the environment and security configuration in `verify-service-provider.yml`, export your environment variables and run:
 
 ```
 ./bin/verify-service-provider server verify-service-provider.yml
