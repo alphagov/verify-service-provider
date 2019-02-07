@@ -176,4 +176,5 @@ For non-security related bugs and feature requests please [raise an issue](https
 [vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
 [identity-dataset]: /src/main/resources/default-test-identity-dataset.json
 [release-notes]: /RELEASE_NOTES.md
+[dropwizard]: https://www.dropwizard.io
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
