@@ -70,7 +70,7 @@ You can use the following command line options to customise the behaviour of the
 
 | Option | Description | Default |
 | ------ | ----------- | ------- |
-| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The matching dataset the test tool will use | See technical documentation. |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The matching dataset the test tool will use | See the [example identity dataset][identity-dataset]. |
 |`-u URL` or<br> `--url URL` | The URL where the test tool will send responses | `http://localhost:8080/SAML2/Response` |
 |`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the test tool | `5` |
 | `-p PORT` or<br> `--port PORT` | The port the service will use | `50300` |
@@ -162,4 +162,5 @@ For non-security related bugs and feature requests please [raise an issue](https
 [key-rotation]: https://www.docs.verify.service.gov.uk/maintain-your-connection/rotate-keys/
 [vsp-get-started]: https://www.docs.verify.service.gov.uk/get-started-with-vsp/
 [vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+[identity-dataset]: /src/main/resources/default-test-identity-dataset.json
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
