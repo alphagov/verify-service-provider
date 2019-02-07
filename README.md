@@ -2,19 +2,24 @@
 
 [![Build Status](https://travis-ci.org/alphagov/verify-service-provider.svg?branch=master)](https://travis-ci.org/alphagov/verify-service-provider)
 
-GOV.UK Verify uses SAML (Security Assertion Markup Language) to securely exchange information about identities. A Relying Party can use Verify Service Provider to generate and translate SAML communication to and from the Verify Hub.
+The Verify Service Provider (VSP) generates and translates Security Assertion Markup Language (SAML) messages to and from the GOV.UK Verify Hub. SAML is an open standard for secure message exchange which GOV.UK Verify uses when handling information about identities.
 
-Using Verify Service Provider will make it easier to:
-* connect multiple services with GOV.UK Verify - you only need one instance of Verify Service Provider
-* handle certificate rotations - you can host multiple certificates at a time
+Using the VSP removes the need for services to handle SAML by:
 
-You will need to host Verify Service Provider on your own infrastructure.
+* generating SAML requests to send to the GOV.UK Verify Hub
+* translating SAML responses from the GOV.UK Verify Hub into JSON
 
-Using Verify Service Provider is the main part of connecting to GOV.UK Verify. Refer to the [technical documentation](https://alphagov.github.io/rp-onboarding-tech-docs/) for more information about using the Verify Service Provider and connecting to GOV.UK Verify.
+Services will need to host the VSP on their own infrastructure.
+
+The VSP allows connected services to handle signing and encryption key rotation without service downtime.
+
+Multiple services can connect to GOV.UK Verify using the same VSP deployment.
 
 See also:
-* [API reference](/docs/api/api-reference.md)
-* [Using the VSP](LINK)
+* [Technical documentation for connecting services][tech-docs]
+* [Setting up the VSP][vsp-get-started]
+* [VSP API reference][vsp-api]
+
 
 ## Setup
 
@@ -155,6 +160,6 @@ For non-security related bugs and feature requests please [raise an issue](https
 [MIT License][mit-license]
 
 [key-rotation]: https://www.docs.verify.service.gov.uk/maintain-your-connection/rotate-keys/
-[vsp-get-started]: https://www.docs.verify.service.gov.uk/set-up-vsp-with-your-service/get-started-with-the-vsp
+[vsp-get-started]: https://www.docs.verify.service.gov.uk/get-started-with-vsp/
 [vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
