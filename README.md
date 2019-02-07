@@ -99,6 +99,14 @@ You can check the application is running by calling the healthcheck endpoint wit
 curl localhost:{$PORT}/admin/healthcheck
 ```
 
+### `check`
+
+You can run the VSP with the `check` command to confirm that your configuration file is valid. For example, to check that `verify-service-provider.yml` is valid, run:
+
+```
+./bin/verify-service-provider check verify-service-provider.yml
+```
+
 ## Configure
 
 The VSP comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
