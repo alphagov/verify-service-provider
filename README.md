@@ -53,7 +53,7 @@ You can run the the VSP using several commands, depending on your development ne
 
 ### `development`
 
-You can use the `development` command if you're building your own client for the VSP.The command starts the VSP connected to a testing service hosted by the GOV.UK Verify team. The testing service acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
+You can use the `development` command if you're building your own client for the VSP. The command starts the VSP connected to a testing service hosted by the GOV.UK Verify team. The testing service acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
 
 When running the VSP using the `development` command, it initialises the testing service by:
 
@@ -137,7 +137,7 @@ If you are using the legacy version involving a [Matching Service Adapter (MSA)]
 | MSA_METADATA_URL | The URL to the MSA's metadata       |
 
 
-The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard](https://www.dropwizard.io). Check the [VSP release notes][release-notes] to find out which Dropwizard version was used when building the release you're using.
+The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard]. Check the [VSP release notes][release-notes] to find out which Dropwizard version was used when building the release you're using.
 
 ## Contribute to the Verify Service Provider
 
