@@ -48,7 +48,7 @@ You can run the the VSP using several commands, depending on your development ne
 | Command       | Use case                               |
 | ------------- | ----------------------------------------- |
 | `development` | Local development of a VSP client <br> The VSP is connected to a testing service hosted by the GOV.UK Verify team. |
-| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to <br> a full-scale deployment of the GOV.UK Verify Hub.                                          |
+| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to a full-scale deployment of the GOV.UK Verify Hub.                                          |
 | `check`       | Validates your configuration file.        |
 
 ### `development`
