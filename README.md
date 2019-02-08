@@ -48,19 +48,19 @@ You can run the the VSP using several commands, depending on your development ne
 | Command       | Use case                               |
 | ------------- | ----------------------------------------- |
 | `development` | Local development of a VSP client <br> The VSP is connected to a test tool hosted by the GOV.UK Verify team. |
-| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to <br> a full-scale of the GOV.UK Verify Hub.                                          |
+| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to <br> a full-scale deployment of the GOV.UK Verify Hub.                                          |
 | `check`       | Validates your configuration file.        |
 
 ### `development`
 
-You can use `development` command if you're building your own client for the VSP.The command starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
+You can use the `development` command if you're building your own client for the VSP.The command starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
 
 When running the VSP using the `development` command, it initialises the test tool by:
 
 - generating its self-signed keys and certificates
 - adding the keys and certificates to the VSP configuration
 - setting the test tool environment in the VSP configuration
-- initialising an instance of the test tool
+- initialising a testing session with the test tool
 
 To start the VSP connected to the test tool, run:
 
