@@ -47,22 +47,22 @@ You can run the the VSP using several commands, depending on your development ne
 
 | Command       | Use case                               |
 | ------------- | ----------------------------------------- |
-| `development` | Local development of a VSP client <br> The VSP is connected to a test tool hosted by the GOV.UK Verify team. |
+| `development` | Local development of a VSP client <br> The VSP is connected to a testing service hosted by the GOV.UK Verify team. |
 | `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to <br> a full-scale deployment of the GOV.UK Verify Hub.                                          |
 | `check`       | Validates your configuration file.        |
 
 ### `development`
 
-You can use the `development` command if you're building your own client for the VSP.The command starts the VSP connected to a test tool hosted by the GOV.UK Verify team. The test tool acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
+You can use the `development` command if you're building your own client for the VSP.The command starts the VSP connected to a testing service hosted by the GOV.UK Verify team. The testing service acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
 
-When running the VSP using the `development` command, it initialises the test tool by:
+When running the VSP using the `development` command, it initialises the testing service by:
 
 - generating its self-signed keys and certificates
 - adding the keys and certificates to the VSP configuration
-- setting the test tool environment in the VSP configuration
-- initialising a testing session with the test tool
+- setting the testing service environment in the VSP configuration
+- initialising a testing session with the testing service
 
-To start the VSP connected to the test tool, run:
+To start the VSP connected to the testing service, run:
 
 ```
 ./bin/verify-service-provider development
@@ -72,9 +72,9 @@ You can use the following command line options to customise the behaviour of the
 
 | Option | Description | Default |
 | ------ | ----------- | ------- |
-| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The identity dataset the test tool will use | [Test identity dataset][identity-dataset] |
-|`-u URL` or<br> `--url URL` | The URL where the test tool will send responses | `http://localhost:8080/SAML2/Response` |
-|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the test tool | `5` |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The identity dataset the testing service will use | [Test identity dataset][identity-dataset] |
+|`-u URL` or<br> `--url URL` | The URL where the testing service will send responses | `http://localhost:8080/SAML2/Response` |
+|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the testing service | `5` |
 | `-p PORT` or<br> `--port PORT` | The port the service will use | `50300` |
 |`--host BINDHOST` | The host the service will bind to | `0.0.0.0` |
 
