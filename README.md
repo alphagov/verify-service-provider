@@ -39,6 +39,8 @@ GOV.UK Verify provides prebuilt clients for the following languages and framewor
 |------------------------------------------------|----------------------------------------------------------------|
 | node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
 
+If you're building or setting up your own client for the VSP, see the [technical documentation on how to get started with the VSP][vsp-get-started].
+
 See [the API reference][vsp-api] for full details of the API.
 
 ## Run
