@@ -11,6 +11,18 @@ import java.security.KeyStore;
 import java.util.Arrays;
 
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.DEFAULT_TRUST_STORE_PASSWORD;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.COMPLIANCE_SSO;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.COMPLIANCE_METADATA;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.PRODUCTION_SSO;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.PRODUCTION_METADATA;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.INTEGRATION_SSO;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.INTEGRATION_METADATA;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.COMPLIANCE_METADATASOURCE_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.COMPLIANCE_TRUSTANCHOR_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.INTEGRATION_METADATASOURCE_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.INTEGRATION_TRUSTANCHOR_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.PRODUCTION_METADATASOURCE_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.EnvironmentUrls.PRODUCTION_TRUSTANCHOR_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_HUB_TRUSTSTORE;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_IDP_TRUSTSTORE;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_METADATA_TRUSTSTORE;
@@ -20,20 +32,30 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 
 public enum HubEnvironment {
     PRODUCTION(
-            URI.create("https://www.signin.service.gov.uk/SAML2/SSO"),
-            URI.create("https://www.signin.service.gov.uk/SAML2/metadata/federation"),
+            URI.create(PRODUCTION_SSO),
+            URI.create(PRODUCTION_METADATA),
+            URI.create(PRODUCTION_METADATASOURCE_URI),
+            URI.create(PRODUCTION_TRUSTANCHOR_URI),
             PRODUCTION_METADATA_TRUSTSTORE, PRODUCTION_HUB_TRUSTSTORE, PRODUCTION_IDP_TRUSTSTORE),
     INTEGRATION(
-            URI.create("https://www.integration.signin.service.gov.uk/SAML2/SSO"),
-            URI.create("https://www.integration.signin.service.gov.uk/SAML2/metadata/federation"),
+            URI.create(INTEGRATION_SSO),
+            URI.create(INTEGRATION_METADATA),
+            URI.create(INTEGRATION_METADATASOURCE_URI),
+            URI.create(INTEGRATION_TRUSTANCHOR_URI),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE),
     COMPLIANCE_TOOL(
-            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"),
-            URI.create("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation"),
+            URI.create(COMPLIANCE_SSO),
+            URI.create(COMPLIANCE_METADATA),
+            URI.create(COMPLIANCE_METADATASOURCE_URI),
+            URI.create(COMPLIANCE_TRUSTANCHOR_URI),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE);
+
 
     private URI ssoLocation;
     private URI metadataUri;
+
+    private URI eidasMetaDataSourceUri;
+    private URI eidasMetadataTrustAnchorUri;
     private String metadataTrustStore;
     private String hubTrustStore;
     private String idpTrustStore;
@@ -49,9 +71,11 @@ public enum HubEnvironment {
             ));
     }
 
-    HubEnvironment(URI ssoLocation, URI metadataUri, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
+    HubEnvironment(URI ssoLocation, URI metadataUri, URI eidasMetadataSourceUri, URI eidasMetadataTrustAnchorUri, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
         this.ssoLocation = ssoLocation;
         this.metadataUri = metadataUri;
+        this.eidasMetaDataSourceUri = eidasMetadataSourceUri;
+        this.eidasMetadataTrustAnchorUri = eidasMetadataTrustAnchorUri;
         this.metadataTrustStore = metadataTrustStore;
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
@@ -65,6 +89,13 @@ public enum HubEnvironment {
         return this.metadataUri;
     }
 
+    public URI getEidasMetadataSourceUri() {
+        return this.eidasMetaDataSourceUri;
+    }
+
+    public URI getEidasMetadataTrustAnchorUri() {
+        return this.eidasMetadataTrustAnchorUri;
+    }
     public KeyStore getMetadataTrustStore() {
         return loadTrustStore(metadataTrustStore);
     }

@@ -135,7 +135,7 @@ public class VerifyServiceProviderConfigurationTest {
                 mock(PrivateKey.class),
                 Optional.empty(),
                 new Duration(1000L),
-                mock(EuropeanIdentityConfiguration.class)
+                Optional.ofNullable(mock(EuropeanIdentityConfiguration.class))
         );
     }
 
