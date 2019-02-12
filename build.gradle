@@ -163,6 +163,36 @@ task testAcceptance(type: Test) {
     classpath += sourceSets.acceptanceTest.runtimeClasspath
 }
 
+task buildDockerImage(type: Exec) {
+    commandLine = [
+        "docker", "build",
+        "-t", "govukverify/verify-service-provider:${version_number}",
+        "-f", "Dockerfile.internal",
+        "."
+    ]
+}
+
+task dockerRun(type: Exec) {
+    commandLine = [
+        "docker", "run", "--detach", "--rm",
+        "--name", "verify-service-provider",
+        "--env", "SERVICE_ENTITY_IDS",
+        "--env", "VERIFY_ENVIRONMENT",
+        "--env", "MSA_METADATA_URL",
+        "--env", "MSA_ENTITY_ID",
+        "--env", "SAML_SIGNING_KEY",
+        "--env", "SAML_PRIMARY_ENCRYPTION_KEY",
+        "--publish", "50400:50400",
+        "govukverify/verify-service-provider:${version_number}",
+    ]
+}
+
+task dockerStop(type: Exec) {
+    commandLine = [
+        "docker", "stop", "verify-service-provider"
+    ]
+}
+
 run {
     args = ["server", "verify-service-provider.yml"]
 }

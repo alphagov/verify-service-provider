@@ -1,0 +1,29 @@
+FROM gradle:5.1-jdk8 as build
+WORKDIR /verify-service-provider
+USER root
+ENV GRADLE_USER_HOME ~/.gradle
+
+COPY build.gradle build.gradle
+COPY settings.gradle settings.gradle
+# There is an issue running idea.gradle in the container
+# So just make this an empty file
+RUN touch idea.gradle
+RUN gradle install
+
+
+COPY src src
+
+RUN gradle installDist
+
+ENTRYPOINT ["gradle"]
+CMD ["tasks"]
+
+FROM openjdk:8-jre-slim
+
+WORKDIR /verify-service-provider
+
+COPY verify-service-provider.yml verify-service-provider.yml
+COPY --from=build /verify-service-provider/build/install/verify-service-provider .
+
+ENTRYPOINT ["sh", "-c"]
+CMD ["bin/verify-service-provider", "server", "verify-service-provider.yml"]
