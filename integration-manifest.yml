@@ -1,8 +1,0 @@
-memory: 1024M
-applications:
-  - name: verify-service-provider-integration
-    buildpack: java_buildpack
-    env:
-      CLOCK_SKEW: PT30s
-      SERVICE_ENTITY_IDS: '["http://verify-service-provider-integration-service"]'
-      VERIFY_ENVIRONMENT: INTEGRATION

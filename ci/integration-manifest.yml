@@ -1,0 +1,11 @@
+applications:
+  - name: ((app))
+    memory: 1G
+    routes:
+      - route: ((app)).apps.internal
+        buildpack: java_buildpack
+        command: (cd ((dist))-* && bin/((dist)) server ((config_file)) )
+        env:
+          JAVA_HOME: "../.java-buildpack/open_jdk_jre"
+          CLOCK_SKEW: PT30s
+          VERIFY_ENVIRONMENT: INTEGRATION
