@@ -8,6 +8,7 @@ import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.EncryptedAttribute;
 import org.opensaml.saml.saml2.core.Extensions;
+import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.credential.BasicCredential;
@@ -17,6 +18,7 @@ import uk.gov.ida.common.shared.security.PrivateKeyStore;
 import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.extensions.versioning.Version;
 import uk.gov.ida.saml.core.test.PrivateKeyStoreFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
@@ -128,6 +130,27 @@ public class AuthnRequestFactoryTest {
         factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
 
         verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
+    }
+
+    @Test
+    public void shouldContainBothAuthnContextClassRefsForLOA1() {
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_1, SERVICE_ENTITY_ID);
+        RequestedAuthnContext requestedAuthnContext = authnRequest.getRequestedAuthnContext();
+
+        assertThat(requestedAuthnContext).isNotNull();
+        assertThat(requestedAuthnContext.getAuthnContextClassRefs().size()).isEqualTo(2);
+        assertThat(requestedAuthnContext.getAuthnContextClassRefs().get(0).getAuthnContextClassRef()).isEqualTo(IdaAuthnContext.LEVEL_1_AUTHN_CTX);
+        assertThat(requestedAuthnContext.getAuthnContextClassRefs().get(1).getAuthnContextClassRef()).isEqualTo(IdaAuthnContext.LEVEL_2_AUTHN_CTX);
+    }
+
+    @Test
+    public void shouldOnlyContainLevel2AuthnContextClassRefForLOA2() {
+        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        RequestedAuthnContext requestedAuthnContext = authnRequest.getRequestedAuthnContext();
+
+        assertThat(requestedAuthnContext).isNotNull();
+        assertThat(requestedAuthnContext.getAuthnContextClassRefs().size()).isEqualTo(1);
+        assertThat(requestedAuthnContext.getAuthnContextClassRefs().get(0).getAuthnContextClassRef()).isEqualTo(IdaAuthnContext.LEVEL_2_AUTHN_CTX);
     }
 
     private BasicCredential createBasicCredential() {
