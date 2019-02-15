@@ -11,9 +11,10 @@ Using the VSP removes the need for services to handle SAML by:
 
 Services will need to host the VSP on their own infrastructure.
 
-The VSP allows connected services to handle signing and encryption key rotation without service downtime.
+The VSP allows you to:
 
-Multiple services can connect to GOV.UK Verify using the same VSP deployment.
+- handle signing and encryption key rotation without service downtime.
+- connect multiple services to GOV.UK Verify using the same VSP deployment
 
 See also:
 * [Technical documentation for connecting services][tech-docs]
