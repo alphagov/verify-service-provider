@@ -93,7 +93,7 @@ For more information on building your own client using the `development` command
 
 Use the `server` command when running the VSP in an environment containing a full-scale deployment of the GOV.UK Verify Hub, for example the Integration or Production environments.
 
-For example, to run the VSP using the environment and security configuration in `verify-service-provider.yml`, export your environment variables and run:
+To run the VSP using the [environment and security configuration][configuration] in `verify-service-provider.yml`, export your environment variables and run:
 
 ```
 ./bin/verify-service-provider server verify-service-provider.yml
@@ -185,4 +185,5 @@ For non-security related bugs and feature requests please [raise an issue](https
 [release-notes]: /RELEASE_NOTES.md
 [contact-verify]: https://www.verify.service.gov.uk/support/
 [dropwizard]: https://www.dropwizard.io
+[configuration]: /README.md#configure
 [mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE
