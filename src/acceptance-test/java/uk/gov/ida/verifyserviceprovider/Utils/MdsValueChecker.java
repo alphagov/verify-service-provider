@@ -34,8 +34,7 @@ public class MdsValueChecker {
         JSONObject addressMdsValue = addresses.getJSONObject(index);
         JSONObject addressValue = addressMdsValue.getJSONObject("value");
 
-        // TODO: The Compliance Tool isn't currently returning from/to dates for addresses.  Until that is fixed, the next line needs to be commented out.
-        //checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
+        checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
 
         JSONArray jsonLines = addressValue.getJSONArray("lines");
         Assertions.assertThat(jsonLines.length()).isEqualTo(lines.size());

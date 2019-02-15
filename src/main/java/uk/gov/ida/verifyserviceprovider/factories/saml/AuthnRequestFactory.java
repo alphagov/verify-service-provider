@@ -108,7 +108,7 @@ public class AuthnRequestFactory {
         try {
             applicationManifestVersion = manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
         } catch (IOException e) {
-            LOG.error("Failed to read version number from the manifest", e);
+            LOG.warn("Failed to read version number from the manifest");
         }
 
         applicationVersion.setValue(applicationManifestVersion);
