@@ -132,14 +132,7 @@ By default the following environment variables are supported:
 | `PORT` | (Optional - default `50400`) The TCP port where the application will listen for HTTP traffic|
 | `LOG_LEVEL` | Optional - default `INFO`) The threshold level for logs to be written, for example `DEBUG`, `INFO`, `WARN`, or `ERROR`) |
 
-If you are using the legacy version involving a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter), 2 additional environment variables apply:
-
-| Variable         | Description                         |
-| ---------------- | ----------------------------------- |
-| MSA_ENTITY_ID    | The `entityId` of the service's MSA |
-| MSA_METADATA_URL | The URL to the MSA's metadata       |
-
-[Contact the Verify team][contact-verify] if you need to use the MSA environment variables with VSP 2.0.0 or above.
+If you are using the legacy setup involving a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter), additional environment variables apply. [Contact the Verify team][contact-verify] if you need to use the MSA with VSP 2.0.0 or above.
 
 The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard]. Check the [VSP release notes][release-notes] to find out which Dropwizard version was used when building the release you're using.
 
