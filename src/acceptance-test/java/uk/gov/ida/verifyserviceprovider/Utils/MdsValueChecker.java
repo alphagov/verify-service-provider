@@ -20,6 +20,16 @@ public class MdsValueChecker {
         checkMdsValueInJsonObject(attribute, expectedValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
     }
 
+    public static void checkMdsValueOfAttributeWithoutDates(
+            String attributeName,
+            String expectedValue,
+            boolean expectedIsVerified,
+            JSONObject attributes
+    ) {
+        JSONObject attribute = attributes.getJSONObject(attributeName);
+        checkMdsValueInJsonObject(attribute, expectedValue, expectedIsVerified);
+    }
+
     public static void checkMdsValueOfAddress(
             int index,
             List<String> lines,
@@ -35,7 +45,7 @@ public class MdsValueChecker {
         JSONObject addressValue = addressMdsValue.getJSONObject("value");
 
         // TODO: The Compliance Tool isn't currently returning from/to dates for addresses.  Until that is fixed, the next line needs to be commented out.
-        //checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
+//        checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
 
         JSONArray jsonLines = addressValue.getJSONArray("lines");
         Assertions.assertThat(jsonLines.length()).isEqualTo(lines.size());
@@ -60,6 +70,18 @@ public class MdsValueChecker {
         checkMdsValueInJsonObject(mdsObjectJson, expectedValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
     }
 
+    public static void checkMdsValueInArrayAttributeWithoutDates(
+            String attributeName,
+            int index,
+            String expectedValue,
+            boolean expectedIsVerified,
+            JSONObject attributes
+    ) {
+        JSONArray jsonArray = attributes.getJSONArray(attributeName);
+        JSONObject mdsObjectJson = jsonArray.getJSONObject(index);
+        checkMdsValueInJsonObject(mdsObjectJson, expectedValue, expectedIsVerified);
+    }
+
     public static void checkMdsValueInJsonObject(
             JSONObject jsonObject,
             String expectedValue,
@@ -82,5 +104,23 @@ public class MdsValueChecker {
         if (expectedToDateString != null) {
             Assertions.assertThat(jsonObject.getString("to")).isEqualTo(expectedToDateString);
         }
+    }
+
+    public static void checkMdsValueInJsonObject(
+            JSONObject jsonObject,
+            String expectedValue,
+            boolean expectedIsVerified
+    ) {
+        Assertions.assertThat(jsonObject.getString("value")).isEqualTo(expectedValue);
+        checkMdsMetadataInJsonObject(jsonObject, expectedIsVerified);
+    }
+
+    public static void checkMdsMetadataInJsonObject(
+            JSONObject jsonObject,
+            boolean expectedIsVerified
+    ) {
+        Assertions.assertThat(jsonObject.getBoolean("verified")).isEqualTo(expectedIsVerified);
+        Assertions.assertThat(jsonObject.has("from")).isFalse();
+        Assertions.assertThat(jsonObject.has("to")).isFalse();
     }
 }
