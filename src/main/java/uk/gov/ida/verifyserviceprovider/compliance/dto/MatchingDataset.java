@@ -1,6 +1,9 @@
 package uk.gov.ida.verifyserviceprovider.compliance.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -20,9 +23,11 @@ public class MatchingDataset {
     @NotNull
     @Valid
     @JsonProperty
+    @NotEmpty
     private List<MatchingAttribute> surnames;
 
-    @NotNull
+
+    @JsonInclude(Include.NON_NULL)
     @Valid
     @JsonProperty
     private MatchingAttribute gender;
@@ -32,9 +37,9 @@ public class MatchingDataset {
     @JsonProperty
     private MatchingAttribute dateOfBirth;
 
-    @NotNull
     @Valid
     @JsonProperty
+    @JsonInclude(Include.NON_NULL)
     private List<MatchingAddress> addresses;
 
     @NotNull

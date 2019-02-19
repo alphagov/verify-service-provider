@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.compliance.dto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,10 @@ public class MatchingDatasetBuilder {
 
     public MatchingDatasetBuilder withFirstName(String value, boolean verified, LocalDateTime fromDate, LocalDateTime toDate) {
         return withFirstName(new MatchingAttribute(value, verified, fromDate, toDate));
+    }
+
+    public MatchingDatasetBuilder withEidasFirstName(String value) {
+        return withFirstName(new MatchingAttribute(value));
     }
 
     public MatchingDatasetBuilder withMiddleNames(MatchingAttribute middleNames) {
@@ -78,6 +83,10 @@ public class MatchingDatasetBuilder {
         return this;
     }
 
+    public MatchingDatasetBuilder withDateOfBirth(String dateOfBirth) {
+        return withDateOfBirth(new MatchingAttribute(dateOfBirth));
+    }
+
     public MatchingDatasetBuilder withDateOfBirth(String value, boolean verified, LocalDateTime fromDate, LocalDateTime toDate) {
         return withDateOfBirth(new MatchingAttribute(value, verified, fromDate, toDate));
     }
@@ -99,5 +108,24 @@ public class MatchingDatasetBuilder {
 
     public MatchingDataset build() {
         return new MatchingDataset(firstName, middleNames, surnames, gender, dateOfBirth, addresses, persistentId);
+    }
+
+    public MatchingDatasetBuilder withEidasSurname(String value) {
+        this.surnames = Collections.singletonList(new MatchingAttribute(value));
+        return this;
+    }
+
+    public MatchingDatasetBuilder withEidasMiddlename(String value) {
+        return withMiddleNames(new MatchingAttribute(value));
+    }
+
+    public MatchingDatasetBuilder withoutAddress() {
+        this.addresses = null;
+        return this;
+    }
+
+    public MatchingDatasetBuilder withoutGender() {
+        this.gender = null;
+        return this;
     }
 }

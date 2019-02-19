@@ -2,79 +2,98 @@
 
 [![Build Status](https://travis-ci.org/alphagov/verify-service-provider.svg?branch=master)](https://travis-ci.org/alphagov/verify-service-provider)
 
-GOV.UK Verify uses SAML (Security Assertion Markup Language) to securely exchange information about identities. A Relying Party can use Verify Service Provider to generate and translate SAML communication to and from the Verify Hub.
+The Verify Service Provider (VSP) generates and translates Security Assertion Markup Language (SAML) messages to and from the GOV.UK Verify Hub. SAML is an open standard for secure message exchange which GOV.UK Verify uses when handling information about identities.
 
-Using Verify Service Provider will make it easier to:
-* connect multiple services with GOV.UK Verify - you only need one instance of Verify Service Provider
-* handle certificate rotations - you can host multiple certificates at a time
+Using the VSP removes the need for services to handle SAML by:
 
-You will need to host Verify Service Provider on your own infrastructure.
+* generating SAML requests to send to the GOV.UK Verify Hub
+* translating SAML responses from the GOV.UK Verify Hub into JSON
 
-Using Verify Service Provider is just one part of connecting to GOV.UK Verify. Refer to the [technical onboarding guide](https://www.docs.verify.service.gov.uk) for more information about connecting to GOV.UK Verify.
+Services will need to host the VSP on their own infrastructure.
+
+The VSP allows you to:
+
+- handle signing and encryption key rotation without service downtime.
+- connect multiple services to GOV.UK Verify using the same VSP deployment
 
 See also:
-* [API reference](/docs/api/api-reference.md)
-* [How to use the VSP with your service](https://www.docs.verify.service.gov.uk/get-started-with-vsp/use-vsp-with-your-service)
+* [Technical documentation for connecting services][tech-docs]
+* [Setting up the VSP][vsp-get-started]
+* [VSP API reference][vsp-api]
+
 
 ## Setup
 
 ### Prerequisites
 
-To download and use Verify Service Provider you must:
-* have Java 8
-* have a working [Matching Service Adapter](https://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html)
+To use the Verify Service Provider, we recommend you use Java 11 or a long-term supported version of Java 8.
 
 ### Download
 
-[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of Verify Service Provider.
+[Download your own copy](https://github.com/alphagov/verify-service-provider/releases) of the Verify Service Provider.
 
-### Configure
+## Get started
 
-Verify Service Provider comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
-called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
+GOV.UK Verify provides prebuilt clients for the following languages and frameworks:
 
-By default the following environment variables are supported:
+|             Language / Framework               |                            Client Library                      |
+|------------------------------------------------|----------------------------------------------------------------|
+| node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
+
+If you're building or setting up your own client for the VSP, see the [technical documentation on how to get started with the VSP][vsp-get-started].
+
+See [the API reference][vsp-api] for full details of the API.
+
+## Run
+
+You can run the the VSP using several commands, depending on your development needs:
+
+| Command       | Use case                               |
+| ------------- | ----------------------------------------- |
+| `development` | Local development of a VSP client <br> The VSP is connected to a testing service hosted by the GOV.UK Verify team. |
+| `server`      | End-to-end testing and running in production <br> The VSP uses the configuration provided to connect to a full-scale deployment of the GOV.UK Verify Hub.                                          |
+| `check`       | Validates your configuration file.        |
+
+### `development`
+
+You can use the `development` command if you're building your own client for the VSP. The command starts the VSP connected to a testing service hosted by the GOV.UK Verify team. The testing service acts as a placeholder for the GOV.UK Verify Hub. This means you can use your local setup to test if your service can respond appropriately to all possible scenarios in a Verify journey.
+
+When running the VSP using the `development` command, it initialises the testing service by:
+
+- generating its self-signed keys and certificates
+- adding the keys and certificates to the VSP configuration
+- setting the testing service environment in the VSP configuration
+- initialising a testing session with the testing service
+
+To start the VSP connected to the testing service, run:
 
 ```
-VERIFY_ENVIRONMENT            # The environment of the Verify Hub to run against - PRODUCTION, INTEGRATION, or COMPLIANCE_TOOL
-
-SERVICE_ENTITY_IDS            # A JSON string array containing the entity id of the service using Verify Service Provider, e.g. '["http://entity-id"]'
-                              # If you have multiple services using a single Verify Service Provider you should provide all of their entity IDs in this array.
-MSA_ENTITY_ID                 # The SAML Entity Id that identifies the Relying Party's Matching Service Adapter
-MSA_METADATA_URL              # The URL to the Matching Service Adapter's SAML metadata.
-
-SAML_SIGNING_KEY              # A base64 encoded RSA private key that is used for signing the request to Verify
-SAML_PRIMARY_ENCRYPTION_KEY   # A primary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions (see "Generating keys for testing")
-SAML_SECONDARY_ENCRYPTION_KEY # (Optional - default empty) A secondary base64 encoded PKCS8 RSA private key that is used to decrypt encrypted SAML Assertions that
-                              # will be used during certificate rotation events (see "Generating keys for testing")
-
-PORT                          # (Optional - default 50400) The TCP port where the application will listen for HTTP traffic
-LOG_LEVEL                     # (Optional - default INFO) The threshold level for logs to be written (e.g. DEBUG, INFO, WARN, or ERROR)
+./bin/verify-service-provider development
 ```
 
-As Verify Service Provider is a Dropwizard application, you can also configure it with all [options provided by Dropwizard](http://www.dropwizard.io/1.3.5/docs/manual/configuration.html).
+You can use the following command line options to customise the behaviour of the `development` command:
 
-### Generate keys for testing
+| Option | Description | Default |
+| ------ | ----------- | ------- |
+| `-d MATCHINGDATASET` or <br> `--matchingDataset MATCHINGDATASET`| The identity dataset the testing service will use | [Test identity dataset][identity-dataset] |
+|`-u URL` or<br> `--url URL` | The URL where the testing service will send responses | `http://localhost:8080/SAML2/Response` |
+|`-t TIMEOUT` or<br> `--timeout TIMEOUT` | The timeout in seconds when communicating with the testing service | `5` |
+| `-p PORT` or<br> `--port PORT` | The port the service will use | `50300` |
+|`--host BINDHOST` | The host the service will bind to | `0.0.0.0` |
 
-In order to generate keys for testing, we recommend using [OpenSSL](https://www.openssl.org).
+You can check the application is running by calling the healthcheck endpoint with:
 
-You can generate a private key by:
-1. generating an RSA key in PEM format
-2. converting the key to base64 encoded PKCS8
-
-Generate an RSA key in PEM format with:
 ```
-openssl genrsa -des3 -passout pass:x 2048 | openssl rsa -passin pass:x -out key-name.pem
-```
-
-Convert the PEM formatted key to base64 encoded PKCS8 for the config file. Print the key to STDOUT with:
-```
-openssl pkcs8 -topk8 -inform PEM -outform DER -in key-name.pem -nocrypt | openssl base64 -A; echo
+curl localhost:{$PORT}/admin/healthcheck
 ```
 
-### Run
+For more information on building your own client using the `development` command, see the [technical documentation on how to get started][vsp-get-started].
 
-To run the application, export your environment variables and start the application with:
+### `server`
+
+Use the `server` command when running the VSP in an environment containing a full-scale deployment of the GOV.UK Verify Hub, for example the Integration or Production environments.
+
+To run the VSP using the [environment and security configuration][configuration] in `verify-service-provider.yml`, export your environment variables and run:
 
 ```
 ./bin/verify-service-provider server verify-service-provider.yml
@@ -88,17 +107,36 @@ You can check the application is running by calling the healthcheck endpoint wit
 curl localhost:{$PORT}/admin/healthcheck
 ```
 
-## Usage
+### `check`
 
-GOV.UK Verify provides prebuilt clients for the following languages and frameworks:
+You can run the VSP with the `check` command to confirm that your configuration file is valid. For example, to check that `verify-service-provider.yml` is valid, run:
 
-|             Language / Framework               |                            Client Library                      |
-|------------------------------------------------|----------------------------------------------------------------|
-| node js / [passport.js](http://passportjs.org) | [passport-verify](https://github.com/alphagov/passport-verify) |
+```
+./bin/verify-service-provider check verify-service-provider.yml
+```
 
-See [the API reference](/docs/api/verify-service-provider-api.swagger.yml) for full details of the API.
+## Configure
 
-## Development
+The VSP comes with a default [YAML configuration file](https://github.com/alphagov/verify-service-provider/blob/master/verify-service-provider.yml)
+called `verify-service-provider.yml` which you can customise either by providing environment variables or by editing the file directly.
+
+By default the following environment variables are supported:
+
+| Variable | Description |
+| -------- | ----------- |
+| `VERIFY_ENVIRONMENT` | The GOV.UK Verify Hub environment to run in.<br/>For example `PRODUCTION`, `INTEGRATION`|
+| `SERVICE_ENTITY_IDS` | A JSON string array with the service's entity ID, for example `'["http://entity-id"]'`. If you have several services using one VSP deployment,<br/> the array should contain all of their service entity IDs. |
+| `SAML_SIGNING_KEY` | A base64 encoded RSA private key used for signing the request to GOV.UK Verify Hub.|
+| `SAML_PRIMARY_ENCRYPTION_KEY`| A primary base64 encoded PKCS8 RSA private key used to decrypt SAML responses.|
+|`SAML_SECONDARY_ENCRYPTION_KEY`|(Optional - default empty) A secondary base64 encoded PKCS8 RSA private key is used to decrypt SAML responses. This parameter applies during [key rotation][key-rotation] events.|
+| `PORT` | (Optional - default `50400`) The TCP port where the application will listen for HTTP traffic|
+| `LOG_LEVEL` | Optional - default `INFO`) The threshold level for logs to be written, for example `DEBUG`, `INFO`, `WARN`, or `ERROR`) |
+
+If you are using the legacy setup involving a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter), additional environment variables apply. [Contact the Verify team][contact-verify] if you need to use the MSA with VSP 2.0.0 or above.
+
+The VSP is a Dropwizard application, so you can also configure it with the [options provided by Dropwizard][dropwizard]. Check the [VSP release notes][release-notes] to find out which Dropwizard version was used when building the release you're using.
+
+## Contribute to the Verify Service Provider
 
 If you want to make changes to `verify-service-provider` itself, fork the repository then:
 
@@ -120,7 +158,7 @@ __Build a distribution__
 
 You can find the distribution zip at `build/distributions`.
 
-See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of Verify Service Provider, including how to run the application against a local compliance tool and see advanced configuration options.
+See [docs/development](https://github.com/alphagov/verify-service-provider/tree/master/docs/development) for more information about the development of the VSP, including how to run the application against a local compliance tool and see advanced configuration options.
 
 ## Support and raising issues
 
@@ -129,4 +167,16 @@ If you think you have discovered a security issue in this code please email [dis
 For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-service-provider/issues/new) in the GitHub issue tracker.
 
 ## Licensing
-[MIT License](https://github.com/alphagov/verify-service-provider/blob/master/LICENSE)
+[MIT License][mit-license]
+
+
+[tech-docs]: https://www.docs.verify.service.gov.uk
+[key-rotation]: https://www.docs.verify.service.gov.uk/maintain-your-connection/rotate-keys/
+[vsp-get-started]: https://www.docs.verify.service.gov.uk/get-started/
+[vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+[identity-dataset]: /src/main/resources/default-test-identity-dataset.json
+[release-notes]: /RELEASE_NOTES.md
+[contact-verify]: https://www.verify.service.gov.uk/support/
+[dropwizard]: https://www.dropwizard.io
+[configuration]: /README.md#configure
+[mit-license]: https://github.com/alphagov/verify-service-provider/blob/master/LICENSE

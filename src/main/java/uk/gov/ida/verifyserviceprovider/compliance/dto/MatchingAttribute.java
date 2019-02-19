@@ -37,6 +37,11 @@ public class MatchingAttribute {
         return verified;
     }
 
+    public MatchingAttribute(String value) {
+        this.value = value;
+        this.verified = true;
+    }
+
     public MatchingAttribute(
             final String value,
             final boolean verified,
