@@ -102,7 +102,7 @@ public class ComplianceToolModeTest {
         final Subparser subparser = createParser();
         complianceToolMode.configure(subparser);
 
-        assertThatThrownBy(()->{subparser.parseArgs(createArguments("-d", "{}"));})
+        assertThatThrownBy(()-> subparser.parseArgs(createArguments("-d", "{}")))
                 .isInstanceOf(ArgumentParserException.class)
                 .hasMessageStartingWith("Matching Dataset argument was not valid:");
     }
