@@ -8,13 +8,14 @@ import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
 
 import javax.ws.rs.core.Response;
-
 import java.security.cert.CertificateEncodingException;
 
 import static javax.ws.rs.client.Entity.json;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RefreshDatasetResourceTest {
 
