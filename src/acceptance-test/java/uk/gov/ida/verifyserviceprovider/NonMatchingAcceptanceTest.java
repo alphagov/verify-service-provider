@@ -112,7 +112,10 @@ public class NonMatchingAcceptanceTest {
             Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
             new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
             new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
-            singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+            Arrays.asList(
+                    new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null),
+                    new MatchingAddress(true, laterFromDate, laterToDate, "E1 8QX", Arrays.asList("The White Chapel Building 2" ,"11 Whitechapel High Street"), null, null)
+            ),
             expectedPid
         );
 
