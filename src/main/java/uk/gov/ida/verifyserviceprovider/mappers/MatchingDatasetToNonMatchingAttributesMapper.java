@@ -4,10 +4,10 @@ import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
-import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,23 +17,29 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToNonMatchingAttributesMapper {
 
     public NonMatchingAttributes mapToNonMatchingAttributes(MatchingDataset matchingDataset) {
-        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
-        Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream()
+        List<NonMatchingVerifiableAttribute<String>> firstNames = matchingDataset.getFirstNames().stream()
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .collect(Collectors.toList());
+        List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth = matchingDataset.getDateOfBirths().stream()
             .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
-            .findFirst();
-
-        NonMatchingVerifiableAttribute<String> firstName = firstNameValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
-        List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
-        List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream().map(this::mapToNonMatchingVerifiableAttribute).collect(Collectors.toList());
-        NonMatchingVerifiableAttribute<LocalDate> dateOfBirth = birthDateValue.map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
-        NonMatchingVerifiableAttribute<Gender> gender = matchingDataset.getGender().map(this::mapToNonMatchingVerifiableAttribute).orElse(null);
+            .map(this::mapToNonMatchingVerifiableAttribute)
+            .collect(Collectors.toList());
+        List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames()
+                .stream().map(this::mapToNonMatchingVerifiableAttribute)
+                .collect(Collectors.toList());
+        List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream()
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .collect(Collectors.toList());
+        NonMatchingVerifiableAttribute<Gender> gender = matchingDataset.getGender()
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .orElse(null);
         List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses = mapAddresses(matchingDataset.getAddresses());
 
         return new NonMatchingAttributes(
-            firstName,
+            firstNames,
             middleNames,
             surnames,
-            dateOfBirth,
+            datesOfBirth,
             gender,
             addresses
         );
