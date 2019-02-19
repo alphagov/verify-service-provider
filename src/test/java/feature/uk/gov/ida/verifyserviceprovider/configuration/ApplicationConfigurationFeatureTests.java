@@ -56,7 +56,7 @@ public class ApplicationConfigurationFeatureTests {
 
     @Test
     public void applicationShouldStartUp() throws Exception {
-        environmentHelper.setEnv(new HashMap<String, String>() {{
+        environmentHelper.setEnv(new HashMap<>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
@@ -85,7 +85,7 @@ public class ApplicationConfigurationFeatureTests {
 
     @Test
     public void applicationShouldStartUpWithListOfServiceEntityIds() throws Exception {
-        environmentHelper.setEnv(new HashMap<String, String>() {{
+        environmentHelper.setEnv(new HashMap<>() {{
             put("PORT", "50555");
             put("LOG_LEVEL", "ERROR");
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");

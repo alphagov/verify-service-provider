@@ -93,7 +93,7 @@ public class MsaMetadataFeatureTest {
             config("europeanIdentity.aggregatedMetadata.trustStore.password", metadataTrustStore.getPassword())
         );
 
-        environmentHelper.setEnv(new HashMap<String, String>() {{
+        environmentHelper.setEnv(new HashMap<>() {{
             put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL");
             put("MSA_METADATA_URL", "some-msa-metadata-url");
             put("MSA_ENTITY_ID", "some-msa-entity-id");
