@@ -1,5 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.compliance.dto;
 
+import uk.gov.ida.saml.core.domain.AuthnContext;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +28,7 @@ public class MatchingDatasetBuilder {
             null,
             null
     ));
+    private AuthnContext levelOfAssurance = AuthnContext.LEVEL_1;
     private String persistentId = UUID.randomUUID().toString();
 
     public MatchingDatasetBuilder withFirstName(MatchingAttribute firstName) {
@@ -101,13 +104,18 @@ public class MatchingDatasetBuilder {
         return this;
     }
 
+    public MatchingDatasetBuilder withLevelOfAssurance(AuthnContext levelOfAssurance) {
+        this.levelOfAssurance = levelOfAssurance;
+        return this;
+    }
+
     public MatchingDatasetBuilder withPersistentId(String persistentId) {
         this.persistentId = persistentId;
         return this;
     }
 
     public MatchingDataset build() {
-        return new MatchingDataset(firstName, middleNames, surnames, gender, dateOfBirth, addresses, persistentId);
+        return new MatchingDataset(firstName, middleNames, surnames, gender, dateOfBirth, addresses, levelOfAssurance, persistentId);
     }
 
     public MatchingDatasetBuilder withEidasSurname(String value) {

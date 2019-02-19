@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.builders;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
 
 import javax.ws.rs.client.Entity;
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ public class ComplianceToolV2InitialisationRequestBuilder {
     private String assertionConsumerServiceUrl = "http://verify-service-provider/response";
     private String signingCertificate = TEST_RP_PUBLIC_SIGNING_CERT;
     private String encryptionCertificate = TEST_RP_PUBLIC_ENCRYPTION_CERT;
-    private MatchingDataset matchingDataset = new MatchingDataset(new MatchingAttribute("Bob", true, LocalDateTime.now().minusDays(30), LocalDateTime.now()), null, singletonList(new MatchingAttribute("Smith", true, LocalDateTime.now().minusDays(30), LocalDateTime.now())), new MatchingAttribute("NOT_SPECIFIED", true, LocalDateTime.now().minusDays(30), LocalDateTime.now()), null, singletonList(new MatchingAddress(true, LocalDateTime.now().minusDays(30), LocalDateTime.now(), "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)), UUID.randomUUID().toString());
+    private MatchingDataset matchingDataset = new MatchingDatasetBuilder().build();
 
     public static ComplianceToolV2InitialisationRequestBuilder aComplianceToolV2InitialisationRequest() {
         return new ComplianceToolV2InitialisationRequestBuilder();
