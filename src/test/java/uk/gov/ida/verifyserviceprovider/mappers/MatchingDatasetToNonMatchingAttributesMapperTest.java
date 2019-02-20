@@ -11,7 +11,9 @@ import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttributeBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +31,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
     private final DateTime fromOne = DateTime.now();
     private final DateTime fromThree = DateTime.now().minusDays(6);
     private final DateTime fromFour = null;
+
     private final String foo = "Foo";
     private final String bar = "Bar";
     private final String baz = "Baz";
@@ -259,6 +262,43 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
         NonMatchingAttributes nonMatchingAttributes = new MatchingDatasetToNonMatchingAttributesMapper().mapToNonMatchingAttributes(matchingDataset);
 
         assertThat(nonMatchingAttributes.getGender().getValue()).isEqualTo(gender);
+    }
+
+    @Test
+    public void sortTheListByToDateThenIsVerifiedThenFromDate() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime fiveDaysAgo = now.minusDays(5);
+        LocalDateTime threeDaysAgo = now.minusDays(3);
+        NonMatchingVerifiableAttribute<String> attributeOne = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(null).withFrom(now).build();
+        NonMatchingVerifiableAttribute<String> attributeTwo = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(null).withFrom(fiveDaysAgo).build();
+        NonMatchingVerifiableAttribute<String> attributeThree = new NonMatchingVerifiableAttributeBuilder().withVerified(false).withTo(null).withFrom(now).build();
+        NonMatchingVerifiableAttribute<String> attributeFour = new NonMatchingVerifiableAttributeBuilder().withVerified(false).withTo(now).withFrom(now).build();
+        NonMatchingVerifiableAttribute<String> attributeFive = new NonMatchingVerifiableAttributeBuilder().withVerified(false).withTo(now).withFrom(fiveDaysAgo).build();
+        NonMatchingVerifiableAttribute<String> attributeSix = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(fiveDaysAgo).withFrom(now).build();
+        NonMatchingVerifiableAttribute<String> attributeSeven = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(fiveDaysAgo).withFrom(threeDaysAgo).build();
+        NonMatchingVerifiableAttribute<String> attributeEight = new NonMatchingVerifiableAttributeBuilder().withVerified(false).withTo(fiveDaysAgo).withFrom(null).build();
+        List<NonMatchingVerifiableAttribute<String>> unsorted = asList(
+                attributeFour,
+                attributeOne,
+                attributeSix,
+                attributeTwo,
+                attributeSeven,
+                attributeFive,
+                attributeThree,
+                attributeEight
+        );
+        assertThat(unsorted.stream().sorted(MatchingDatasetToNonMatchingAttributesMapper.attributeComparator()).collect(Collectors.toList())).isEqualTo(
+                asList(
+                        attributeOne,
+                        attributeTwo,
+                        attributeThree,
+                        attributeFour,
+                        attributeFive,
+                        attributeSix,
+                        attributeSeven,
+                        attributeEight
+                )
+        );
     }
 
     private Comparator<NonMatchingVerifiableAttribute<?>> comparedByFromDate() {

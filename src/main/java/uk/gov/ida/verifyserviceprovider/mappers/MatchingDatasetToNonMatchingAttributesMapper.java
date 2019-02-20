@@ -41,7 +41,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     private List<NonMatchingVerifiableAttribute<String>> convertNameAttributes(List<SimpleMdsValue<String>> values) {
         return values.stream()
                 .map(this::mapToNonMatchingVerifiableAttribute)
-                .sorted(fromDateComparator())
+                .sorted(attributeComparator())
                 .collect(Collectors.toList());
     }
 
@@ -49,20 +49,22 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         return values.stream()
                 .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
                 .map(this::mapToNonMatchingVerifiableAttribute)
-                .sorted(fromDateComparator())
+                .sorted(attributeComparator())
                 .collect(Collectors.toList());
     }
 
     private List<NonMatchingVerifiableAttribute<String>> convertTransliterableNameAttributes(List<TransliterableMdsValue> values) {
         return values.stream()
                 .map(this::mapToNonMatchingVerifiableAttribute)
-                .sorted(fromDateComparator())
+                .sorted(attributeComparator())
                 .collect(Collectors.toList());
     }
 
 
-    private <T> Comparator<NonMatchingVerifiableAttribute<T>> fromDateComparator() {
-        return Comparator.comparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
+    public static <T> Comparator<NonMatchingVerifiableAttribute<T>> attributeComparator() {
+        return Comparator.<NonMatchingVerifiableAttribute<T>, LocalDateTime>comparing(NonMatchingVerifiableAttribute::getTo, Comparator.nullsFirst(Comparator.reverseOrder()))
+                .thenComparing(NonMatchingVerifiableAttribute::isVerified, Comparator.reverseOrder())
+                .thenComparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
     private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
@@ -104,7 +106,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
                 from,
                 to
             );
-        }).sorted(fromDateComparator()).collect(Collectors.toList());
+        }).sorted(attributeComparator()).collect(Collectors.toList());
     }
 
     private static LocalDateTime convertJodaDateTimeToJavaLocalDateTime(org.joda.time.DateTime jodaDateTime) {
