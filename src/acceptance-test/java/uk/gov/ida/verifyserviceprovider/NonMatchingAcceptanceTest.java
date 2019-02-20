@@ -148,8 +148,8 @@ public class NonMatchingAcceptanceTest {
 
         MdsValueChecker.checkMdsValueInArrayAttribute("firstNames", 0, "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("middleNames", 0, "Montgomery", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("datesOfBirth", 0, "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);

@@ -4,12 +4,14 @@ import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
+import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,19 +19,10 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToNonMatchingAttributesMapper {
 
     public NonMatchingAttributes mapToNonMatchingAttributes(MatchingDataset matchingDataset) {
-        List<NonMatchingVerifiableAttribute<String>> firstNames = matchingDataset.getFirstNames().stream()
-                .map(this::mapToNonMatchingVerifiableAttribute)
-                .collect(Collectors.toList());
-        List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth = matchingDataset.getDateOfBirths().stream()
-            .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
-            .map(this::mapToNonMatchingVerifiableAttribute)
-            .collect(Collectors.toList());
-        List<NonMatchingVerifiableAttribute<String>> middleNames = matchingDataset.getMiddleNames()
-                .stream().map(this::mapToNonMatchingVerifiableAttribute)
-                .collect(Collectors.toList());
-        List<NonMatchingVerifiableAttribute<String>> surnames = matchingDataset.getSurnames().stream()
-                .map(this::mapToNonMatchingVerifiableAttribute)
-                .collect(Collectors.toList());
+        List<NonMatchingVerifiableAttribute<String>> firstNames = convertTransliterableNameAttributes(matchingDataset.getFirstNames());
+        List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth = convertDateOfBirths(matchingDataset.getDateOfBirths());
+        List<NonMatchingVerifiableAttribute<String>> middleNames = convertNameAttributes(matchingDataset.getMiddleNames());
+        List<NonMatchingVerifiableAttribute<String>> surnames = convertTransliterableNameAttributes(matchingDataset.getSurnames());
         NonMatchingVerifiableAttribute<Gender> gender = matchingDataset.getGender()
                 .map(this::mapToNonMatchingVerifiableAttribute)
                 .orElse(null);
@@ -43,6 +36,33 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
             gender,
             addresses
         );
+    }
+
+    private List<NonMatchingVerifiableAttribute<String>> convertNameAttributes(List<SimpleMdsValue<String>> values) {
+        return values.stream()
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .sorted(fromDateComparator())
+                .collect(Collectors.toList());
+    }
+
+    private List<NonMatchingVerifiableAttribute<LocalDate>> convertDateOfBirths(List<SimpleMdsValue<org.joda.time.LocalDate>> values) {
+        return values.stream()
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertWrappedJodaLocalDateToJavaLocalDate)
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .sorted(fromDateComparator())
+                .collect(Collectors.toList());
+    }
+
+    private List<NonMatchingVerifiableAttribute<String>> convertTransliterableNameAttributes(List<TransliterableMdsValue> values) {
+        return values.stream()
+                .map(this::mapToNonMatchingVerifiableAttribute)
+                .sorted(fromDateComparator())
+                .collect(Collectors.toList());
+    }
+
+
+    private <T> Comparator<NonMatchingVerifiableAttribute<T>> fromDateComparator() {
+        return Comparator.comparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
     private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
@@ -63,9 +83,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     }
 
     private List<NonMatchingVerifiableAttribute<NonMatchingAddress>> mapAddresses(List<Address> addresses) {
-        List<NonMatchingVerifiableAttribute<NonMatchingAddress>> output = new java.util.ArrayList<>();
-
-        for (Address input : addresses) {
+        return addresses.stream().map((input) -> {
             NonMatchingAddress transformedAddress = new NonMatchingAddress(
                 input.getLines(),
                 input.getPostCode().orElse(""),
@@ -80,17 +98,13 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
                     .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
                     .orElse(null);
 
-            NonMatchingVerifiableAttribute<NonMatchingAddress> addressAttribute = new NonMatchingVerifiableAttribute<>(
+            return new NonMatchingVerifiableAttribute<>(
                 transformedAddress,
                 input.isVerified(),
                 from,
                 to
             );
-
-            output.add(addressAttribute);
-        }
-
-        return output;
+        }).sorted(fromDateComparator()).collect(Collectors.toList());
     }
 
     private static LocalDateTime convertJodaDateTimeToJavaLocalDateTime(org.joda.time.DateTime jodaDateTime) {

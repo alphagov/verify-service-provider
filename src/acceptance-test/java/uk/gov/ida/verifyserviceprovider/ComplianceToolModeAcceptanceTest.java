@@ -39,10 +39,12 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.client.Entity.json;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
@@ -289,8 +291,12 @@ public class ComplianceToolModeAcceptanceTest {
     private void checkMatchingDatasetMatches(JSONObject attributes, MatchingDataset matchingDataset) {
         checkMatchingDatasetListAttribute(attributes, "firstNames", 0, matchingDataset.getFirstName());
         checkMatchingDatasetListAttribute(attributes, "middleNames", 0, matchingDataset.getMiddleNames());
-        checkMatchingDatasetListAttribute(attributes, "surnames", 0, matchingDataset.getSurnames());
-        checkMatchingDatasetListAttribute(attributes, "surnames", 1, matchingDataset.getSurnames());
+        List<MatchingAttribute> sortedSurnames = matchingDataset.getSurnames()
+                .stream()
+                .sorted(Comparator.comparing(MatchingAttribute::getFrom, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+        checkMatchingDatasetListAttribute(attributes, "surnames", 0, sortedSurnames);
+        checkMatchingDatasetListAttribute(attributes, "surnames", 1, sortedSurnames);
         checkMatchingDatasetListAttribute(attributes, "datesOfBirth", 0, matchingDataset.getDateOfBirth());
         checkMatchingDatasetAttribute(attributes, "gender", matchingDataset.getGender());
         checkMatchingDatasetAddress(attributes, 0, matchingDataset.getAddresses());
