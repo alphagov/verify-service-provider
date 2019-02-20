@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
@@ -152,8 +153,8 @@ public class NonMatchingAcceptanceTest {
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("datesOfBirth", 0, "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), "E1 8QX", "", true, expectedLaterFromDateString, null, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), Optional.of("E1 8QX"), Optional.empty(), true, expectedLaterFromDateString, null, attributes);
     }
 
     @Test
@@ -208,7 +209,7 @@ public class NonMatchingAcceptanceTest {
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, null, attributes);
         assertThat(attributes.getJSONArray("datesOfBirth")).isEmpty();
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
     }
 
     @Test

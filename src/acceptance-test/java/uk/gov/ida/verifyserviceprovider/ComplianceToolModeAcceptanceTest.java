@@ -307,7 +307,7 @@ public class ComplianceToolModeAcceptanceTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String fromDate = address.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String toDate = address.getTo().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        MdsValueChecker.checkMdsValueOfAddress(index, address.getLines(), address.getPostCode().orElse(null), address.getInternationalPostCode().orElse(""), address.isVerified(), fromDate, toDate, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(index, address.getLines(), address.getPostCode(), address.getInternationalPostCode(), address.isVerified(), fromDate, toDate, attributes);
     }
 
     private void checkMatchingDatasetListAttribute(JSONObject attributes, String attributeName, int index, MatchingAttribute expectedAttribute) {

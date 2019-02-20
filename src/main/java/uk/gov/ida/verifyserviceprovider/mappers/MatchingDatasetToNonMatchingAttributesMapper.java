@@ -86,8 +86,8 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         return addresses.stream().map((input) -> {
             NonMatchingAddress transformedAddress = new NonMatchingAddress(
                 input.getLines(),
-                input.getPostCode().orElse(""),
-                input.getInternationalPostCode().orElse("")
+                input.getPostCode().orElse(null),
+                input.getInternationalPostCode().orElse(null)
             );
 
             LocalDateTime from = Optional.ofNullable(input.getFrom())
