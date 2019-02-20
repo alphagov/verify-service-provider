@@ -153,10 +153,8 @@ public class NonMatchingAcceptanceTest {
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("dateOfBirth", "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-
-        // Checking the address is disabled due to the bug described on Trello card UxVgyEvD
-        //MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
-        //MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), "E1 8QX", "", true, expectedLaterFromDateString, null, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), "E1 8QX", "", true, expectedLaterFromDateString, null, attributes);
     }
 
     @Test
