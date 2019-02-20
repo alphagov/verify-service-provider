@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
+import uk.gov.ida.saml.core.domain.AuthnContext;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -45,6 +46,11 @@ public class MatchingDataset {
     @NotNull
     @Valid
     @JsonProperty
+    private AuthnContext levelOfAssurance;
+
+    @NotNull
+    @Valid
+    @JsonProperty
     private String persistentId;
 
     public MatchingDataset() {}
@@ -55,6 +61,7 @@ public class MatchingDataset {
                            MatchingAttribute gender,
                            MatchingAttribute dateOfBirth,
                            List<MatchingAddress> addresses,
+                           AuthnContext levelOfAssurance,
                            String persistentId) {
         this.firstName = firstName;
         this.middleNames = middleNames;
@@ -62,6 +69,7 @@ public class MatchingDataset {
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.addresses = addresses;
+        this.levelOfAssurance = levelOfAssurance;
         this.persistentId = persistentId;
     }
 
@@ -87,6 +95,10 @@ public class MatchingDataset {
 
     public List<MatchingAddress> getAddresses() {
         return addresses;
+    }
+
+    public AuthnContext getLevelOfAssurance() {
+        return levelOfAssurance;
     }
 
     public String getPersistentId() {

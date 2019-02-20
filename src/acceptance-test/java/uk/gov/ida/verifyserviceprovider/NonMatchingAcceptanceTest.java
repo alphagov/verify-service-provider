@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
@@ -116,6 +117,7 @@ public class NonMatchingAcceptanceTest {
                     new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null),
                     new MatchingAddress(true, laterFromDate, null, "E1 8QX", Arrays.asList("The White Chapel Building 2" ,"11 Whitechapel High Street"), null, null)
             ),
+            AuthnContext.LEVEL_1,
             expectedPid
         );
 
@@ -172,6 +174,7 @@ public class NonMatchingAcceptanceTest {
                 new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
                 null,
                 singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+                AuthnContext.LEVEL_1,
                 expectedPid
         );
 
