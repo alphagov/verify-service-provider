@@ -4,7 +4,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
-import unit.uk.gov.ida.verifyserviceprovider.VerifyServiceProviderConfigurationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.MSA_JERSEY_CLIENT_NAME;
