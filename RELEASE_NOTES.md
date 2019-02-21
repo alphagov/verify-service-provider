@@ -22,13 +22,14 @@ For more information on connecting to GOV.UK Verify using only the VSP, see the 
 
 #### Improved technical documentation
 
-The [new technical documentation website](LINK) has new guidance to help users connect to GOV.UK Verify using the VSP.
+The [new technical documentation website](https://www.docs.verify.service.gov.uk) has new guidance to help users connect to GOV.UK Verify using the VSP.
 
-[Get started with the VSP](LINK) is the first step in integrating your service with the VSP. It explains how to set up the successful verification journey
+Follow the step-by-step guides in the 'Get started' section to make sure your service correctly uses the VSP to handle:
 
-[The second guide](LINK) explains how to handle failure responses so your service can handle all possible scenarios in a verification journey.
-give more details
+- [successful verification responses](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey)
+- [possible failure scenarios](https://www.docs.verify.service.gov.uk/get-started/handle-failure-scenarios)
 
+**TODO**
 In case your service needs to do matching, [this page](LINK) has guidelines about what to do.
 
 #### Metadata health check changes
