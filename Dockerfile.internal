@@ -1,4 +1,5 @@
 FROM gradle:5.1-jdk8 as build
+ARG VERIFY_USE_PUBLIC_BINARIES=false
 WORKDIR /verify-service-provider
 USER root
 ENV GRADLE_USER_HOME ~/.gradle
