@@ -24,7 +24,6 @@ import org.junit.Test;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker;
 import uk.gov.ida.verifyserviceprovider.compliance.ComplianceToolMode;
-import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
@@ -299,15 +298,7 @@ public class ComplianceToolModeAcceptanceTest {
         checkMatchingDatasetListAttribute(attributes, "surnames", 1, sortedSurnames);
         checkMatchingDatasetListAttribute(attributes, "datesOfBirth", 0, matchingDataset.getDateOfBirth());
         checkMatchingDatasetAttribute(attributes, "gender", matchingDataset.getGender());
-        checkMatchingDatasetAddress(attributes, 0, matchingDataset.getAddresses());
-    }
-
-    private void checkMatchingDatasetAddress(JSONObject attributes, int index, List<MatchingAddress> addresses) {
-        MatchingAddress address = addresses.get(index);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String fromDate = address.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String toDate = address.getTo().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        MdsValueChecker.checkMdsValueOfAddress(index, address.getLines(), address.getPostCode(), address.getInternationalPostCode(), address.isVerified(), fromDate, toDate, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, attributes, matchingDataset.getAddresses().get(0));
     }
 
     private void checkMatchingDatasetListAttribute(JSONObject attributes, String attributeName, int index, MatchingAttribute expectedAttribute) {

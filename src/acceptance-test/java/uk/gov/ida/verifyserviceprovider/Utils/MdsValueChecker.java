@@ -3,7 +3,9 @@ package uk.gov.ida.verifyserviceprovider.Utils;
 import org.assertj.core.api.Assertions;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,13 +35,37 @@ public class MdsValueChecker {
 
     public static void checkMdsValueOfAddress(
             int index,
+            JSONObject attributes,
+            MatchingAddress matchingAddress
+    ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String fromDate = matchingAddress.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        String toDate = Optional.ofNullable(matchingAddress.getTo())
+                .map((dt) -> dt.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T"))
+                .orElse(null);
+        checkMdsValueOfAddress(
+                index,
+                matchingAddress.getLines(),
+                matchingAddress.getPostCode(),
+                matchingAddress.getInternationalPostCode(),
+                matchingAddress.getUprn(),
+                fromDate,
+                toDate,
+                attributes,
+                matchingAddress.isVerified()
+        );
+    }
+
+    public static void checkMdsValueOfAddress(
+            int index,
             List<String> lines,
             Optional<String> postcode,
             Optional<String> internationalPostcode,
-            boolean expectedIsVerified,
+            Optional<String> uprn,
             String expectedFromDateString,
             String expectedToDateString,
-            JSONObject attributes
+            JSONObject attributes,
+            boolean expectedIsVerified
     ) {
         JSONArray addresses = attributes.getJSONArray("addresses");
         JSONObject addressMdsValue = addresses.getJSONObject(index);
@@ -48,20 +74,21 @@ public class MdsValueChecker {
         checkMdsMetadataInJsonObject(addressMdsValue, expectedIsVerified, expectedFromDateString, expectedToDateString);
 
         JSONArray jsonLines = addressValue.getJSONArray("lines");
-        Assertions.assertThat(jsonLines.length()).isEqualTo(lines.size());
-        for (index = 0; index < lines.size(); index++) {
-            Assertions.assertThat(jsonLines.getString(index)).isEqualTo(lines.get(index));
-        }
+        Assertions.assertThat(jsonLines.toList()).isEqualTo(lines);
         if(postcode.isPresent()) {
             Assertions.assertThat(addressValue.getString("postCode")).isEqualTo(postcode.get());
         } else {
-
             Assertions.assertThat(addressValue.has("postCode")).isFalse();
         }
         if(internationalPostcode.isPresent()) {
             Assertions.assertThat(addressValue.getString("internationalPostCode")).isEqualTo(internationalPostcode.get());
         } else {
             Assertions.assertThat(addressValue.has("internationalPostCode")).isFalse();
+        }
+        if(uprn.isPresent()) {
+            Assertions.assertThat(addressValue.getString("uprn")).isEqualTo(uprn.get());
+        } else {
+            Assertions.assertThat(addressValue.has("uprn")).isFalse();
         }
     }
 

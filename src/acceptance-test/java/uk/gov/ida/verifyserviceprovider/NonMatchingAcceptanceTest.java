@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
@@ -109,16 +108,29 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime laterFromDate = LocalDateTime.parse(laterFromDateString);
         LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
 
+        MatchingAddress matchingAddressOne = new MatchingAddress(true,
+                standardFromDate,
+                standardToDate,
+                "E1 8QS",
+                Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
+                "INT123",
+                "UPRN");
+        MatchingAddress matchingAddressTwo = new MatchingAddress(true,
+                laterFromDate,
+                null,
+                "E1 8QX",
+                Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"),
+                null,
+                null);
         MatchingDataset matchingDataset = new MatchingDataset(
             new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
             new MatchingAttribute("Montgomery", true, standardFromDate, standardToDate),
-            Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate), new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)),
+            Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate),
+                    new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)
+            ),
             new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
             new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
-            Arrays.asList(
-                    new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null),
-                    new MatchingAddress(true, laterFromDate, null, "E1 8QX", Arrays.asList("The White Chapel Building 2" ,"11 Whitechapel High Street"), null, null)
-            ),
+            Arrays.asList( matchingAddressOne, matchingAddressTwo),
             AuthnContext.LEVEL_1,
             expectedPid
         );
@@ -155,8 +167,8 @@ public class NonMatchingAcceptanceTest {
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("datesOfBirth", 0, "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), Optional.of("E1 8QX"), Optional.empty(), true, expectedLaterFromDateString, null, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, attributes, matchingAddressTwo);
+        MdsValueChecker.checkMdsValueOfAddress(1, attributes, matchingAddressOne);
     }
 
     @Test
@@ -169,13 +181,22 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime standardToDate = LocalDateTime.parse(standardToDateString);
 
 
+        MatchingAddress matchingAddress = new MatchingAddress(
+                true,
+                standardFromDate,
+                standardToDate,
+                "E1 8QS",
+                Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
+                null,
+                null
+        );
         MatchingDataset matchingDataset = new MatchingDataset(
                 new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
                 null,
                 singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
                 new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
                 null,
-                singletonList(new MatchingAddress(true, standardFromDate, standardToDate, "E1 8QS", Arrays.asList("The White Chapel Building" ,"10 Whitechapel High Street"), null, null)),
+                singletonList(matchingAddress),
                 AuthnContext.LEVEL_1,
                 expectedPid
         );
@@ -212,7 +233,7 @@ public class NonMatchingAcceptanceTest {
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, null, attributes);
         assertThat(attributes.getJSONArray("datesOfBirth")).isEmpty();
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, attributes, matchingAddress);
     }
 
     @Test

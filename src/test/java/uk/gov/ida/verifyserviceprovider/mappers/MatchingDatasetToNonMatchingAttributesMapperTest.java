@@ -90,7 +90,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
                 .map(NonMatchingVerifiableAttribute::getValue)
                 .collect(Collectors.toList()))
                 .isEqualTo(asList(baz, foo, bar, fuu));
-        assertThat(nonMatchingAttributes.getFirstNames()).isSortedAccordingTo(comparedByFromDate());
+        assertThat(nonMatchingAttributes.getMiddleNames()).isSortedAccordingTo(comparedByFromDate());
     }
 
     @Test
@@ -158,6 +158,31 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
     }
 
     @Test
+    public void shouldMapAddressesAndNotDiscardAttributes() {
+        Address addressIn = createAddress(fromOne, baz);
+
+        MatchingDataset matchingDataset = new MatchingDataset(
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Optional.empty(),
+                Collections.emptyList(),
+                Collections.singletonList(addressIn),
+                Collections.emptyList(),
+                null
+        );
+        NonMatchingAttributes nonMatchingAttributes = new MatchingDatasetToNonMatchingAttributesMapper().mapToNonMatchingAttributes(matchingDataset);
+
+        NonMatchingAddress addressOut = nonMatchingAttributes.getAddresses().get(0).getValue();
+        assertThat(addressOut.getPostCode()).isEqualTo(addressIn.getPostCode().get());
+        assertThat(addressOut.getInternationalPostCode()).isEqualTo(addressIn.getInternationalPostCode().get());
+        assertThat(addressOut.getUprn()).isEqualTo(addressIn.getUPRN().get());
+        assertThat(addressOut.getLines()).isEqualTo(addressIn.getLines());
+
+        assertThat(nonMatchingAttributes.getAddresses()).isSortedAccordingTo(comparedByFromDate());
+    }
+
+    @Test
     public void shouldMapCurrentAddress() {
         List<Address> currentAddress = asList(
                 createAddress(fromThree, foo),
@@ -183,7 +208,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
                 .map(NonMatchingAddress::getPostCode)
                 .collect(Collectors.toList()))
                 .isEqualTo(asList(baz, foo, bar, fuu));
-        assertThat(nonMatchingAttributes.getDatesOfBirth()).isSortedAccordingTo(comparedByFromDate());
+        assertThat(nonMatchingAttributes.getAddresses()).isSortedAccordingTo(comparedByFromDate());
     }
 
     @Test
@@ -212,7 +237,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
                 .map(NonMatchingAddress::getPostCode)
                 .collect(Collectors.toList()))
                 .isEqualTo(asList(baz, foo, bar, fuu));
-        assertThat(nonMatchingAttributes.getDatesOfBirth()).isSortedAccordingTo(comparedByFromDate());
+        assertThat(nonMatchingAttributes.getAddresses()).isSortedAccordingTo(comparedByFromDate());
     }
 
     @Test
@@ -243,7 +268,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
                 .map(NonMatchingAddress::getPostCode)
                 .collect(Collectors.toList()))
                 .isEqualTo(asList(baz, foo, bar, fuu));
-        assertThat(nonMatchingAttributes.getDatesOfBirth()).isSortedAccordingTo(comparedByFromDate());
+        assertThat(nonMatchingAttributes.getAddresses()).isSortedAccordingTo(comparedByFromDate());
     }
 
     @Test
@@ -306,7 +331,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
     }
 
     private Address createAddress(DateTime from, String postCode) {
-        return new Address(Collections.emptyList(), postCode, null, null, from, null, true);
+        return new Address(Collections.emptyList(), postCode, "BAR", "BAZ", from, null, true);
     }
 
     private TransliterableMdsValue createTransliterableValue(DateTime from, String value) {

@@ -85,28 +85,31 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     }
 
     private List<NonMatchingVerifiableAttribute<NonMatchingAddress>> mapAddresses(List<Address> addresses) {
-        return addresses.stream().map((input) -> {
-            NonMatchingAddress transformedAddress = new NonMatchingAddress(
-                input.getLines(),
-                input.getPostCode().orElse(null),
-                input.getInternationalPostCode().orElse(null)
-            );
+        return addresses.stream().map(this::mapAddress).sorted(attributeComparator()).collect(Collectors.toList());
+    }
 
-            LocalDateTime from = Optional.ofNullable(input.getFrom())
-                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
-                    .orElse(null);
+    private NonMatchingVerifiableAttribute<NonMatchingAddress> mapAddress(Address input) {
+        NonMatchingAddress transformedAddress = new NonMatchingAddress(
+            input.getLines(),
+            input.getPostCode().orElse(null),
+            input.getInternationalPostCode().orElse(null),
+            input.getUPRN().orElse(null)
+        );
 
-            LocalDateTime to = input.getTo()
-                    .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
-                    .orElse(null);
+        LocalDateTime from = Optional.ofNullable(input.getFrom())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .orElse(null);
 
-            return new NonMatchingVerifiableAttribute<>(
-                transformedAddress,
-                input.isVerified(),
-                from,
-                to
-            );
-        }).sorted(attributeComparator()).collect(Collectors.toList());
+        LocalDateTime to = input.getTo()
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+                .orElse(null);
+
+        return new NonMatchingVerifiableAttribute<>(
+            transformedAddress,
+            input.isVerified(),
+            from,
+            to
+        );
     }
 
     private static LocalDateTime convertJodaDateTimeToJavaLocalDateTime(org.joda.time.DateTime jodaDateTime) {
