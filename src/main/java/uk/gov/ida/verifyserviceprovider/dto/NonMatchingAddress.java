@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -14,8 +15,8 @@ public class NonMatchingAddress {
     @JsonCreator
     public NonMatchingAddress(
         @JsonProperty("lines") List<String> lines,
-        @JsonProperty("postCode") String postCode,
-        @JsonProperty("internationalPostCode") String internationalPostCode
+        @JsonProperty("postCode") @JsonInclude(JsonInclude.Include.NON_NULL) String postCode,
+        @JsonProperty("internationalPostCode") @JsonInclude(JsonInclude.Include.NON_NULL) String internationalPostCode
     ) {
         this.lines = lines;
         this.postCode = postCode;

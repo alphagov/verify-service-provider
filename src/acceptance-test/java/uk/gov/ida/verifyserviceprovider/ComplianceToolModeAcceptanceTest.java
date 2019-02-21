@@ -15,6 +15,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bouncycastle.util.Arrays;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,10 +39,12 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.client.Entity.json;
 import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
@@ -49,11 +52,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 import static uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker.checkMdsValueInArrayAttributeWithoutDates;
-import static uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker.checkMdsValueOfAttributeWithoutDates;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID;
 
 public class ComplianceToolModeAcceptanceTest {
 
+    public static final String[] COMMON_FIELDS = {"firstNames", "middleNames", "surnames", "datesOfBirth", "addresses"};
     private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
 
     private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
@@ -161,7 +164,7 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "dateOfBirth", "gender", "addresses");
+        assertThat(attributes.keys()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
 
         checkMatchingDatasetMatches(attributes, matchingDataset);
 
@@ -222,7 +225,7 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "dateOfBirth", "gender", "addresses");
+        assertThat(attributes.keys()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
 
         checkMatchingDatasetMatches(attributes, newMatchingDataset);
 
@@ -271,10 +274,10 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "dateOfBirth", "addresses");
+        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_FIELDS);
 
-        checkMdsValueOfAttributeWithoutDates("firstName", matchingDataset.getFirstName().getValue(), matchingDataset.getFirstName().isVerified(), attributes);
-        checkMdsValueOfAttributeWithoutDates("dateOfBirth", matchingDataset.getDateOfBirth().getValue(), matchingDataset.getDateOfBirth().isVerified(), attributes);
+        checkMdsValueInArrayAttributeWithoutDates("firstNames", 0, matchingDataset.getFirstName().getValue(), matchingDataset.getFirstName().isVerified(), attributes);
+        checkMdsValueInArrayAttributeWithoutDates("datesOfBirth", 0, matchingDataset.getDateOfBirth().getValue(), matchingDataset.getDateOfBirth().isVerified(), attributes);
         checkMdsValueInArrayAttributeWithoutDates("surnames", 0, matchingDataset.getSurnames().get(0).getValue(), matchingDataset.getSurnames().get(0).isVerified(), attributes);
         checkMdsValueInArrayAttributeWithoutDates("middleNames", 0, matchingDataset.getMiddleNames().getValue(), matchingDataset.getMiddleNames().isVerified(), attributes);
         assertThat(attributes.getJSONArray("addresses")).isEmpty();
@@ -286,11 +289,15 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     private void checkMatchingDatasetMatches(JSONObject attributes, MatchingDataset matchingDataset) {
-        checkMatchingDatasetAttribute(attributes, "firstName", matchingDataset.getFirstName());
+        checkMatchingDatasetListAttribute(attributes, "firstNames", 0, matchingDataset.getFirstName());
         checkMatchingDatasetListAttribute(attributes, "middleNames", 0, matchingDataset.getMiddleNames());
-        checkMatchingDatasetListAttribute(attributes, "surnames", 0, matchingDataset.getSurnames());
-        checkMatchingDatasetListAttribute(attributes, "surnames", 1, matchingDataset.getSurnames());
-        checkMatchingDatasetAttribute(attributes, "dateOfBirth", matchingDataset.getDateOfBirth());
+        List<MatchingAttribute> sortedSurnames = matchingDataset.getSurnames()
+                .stream()
+                .sorted(Comparator.comparing(MatchingAttribute::getFrom, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+        checkMatchingDatasetListAttribute(attributes, "surnames", 0, sortedSurnames);
+        checkMatchingDatasetListAttribute(attributes, "surnames", 1, sortedSurnames);
+        checkMatchingDatasetListAttribute(attributes, "datesOfBirth", 0, matchingDataset.getDateOfBirth());
         checkMatchingDatasetAttribute(attributes, "gender", matchingDataset.getGender());
         checkMatchingDatasetAddress(attributes, 0, matchingDataset.getAddresses());
     }
@@ -300,7 +307,7 @@ public class ComplianceToolModeAcceptanceTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String fromDate = address.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String toDate = address.getTo().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        MdsValueChecker.checkMdsValueOfAddress(index, address.getLines(), address.getPostCode().orElse(null), address.getInternationalPostCode().orElse(""), address.isVerified(), fromDate, toDate, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(index, address.getLines(), address.getPostCode(), address.getInternationalPostCode(), address.isVerified(), fromDate, toDate, attributes);
     }
 
     private void checkMatchingDatasetListAttribute(JSONObject attributes, String attributeName, int index, MatchingAttribute expectedAttribute) {

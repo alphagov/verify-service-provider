@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static javax.ws.rs.client.Entity.json;
@@ -39,6 +40,7 @@ import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
 
 public class NonMatchingAcceptanceTest {
 
+    public static final String[] COMMON_ATTRIBUTES = {"firstNames", "middleNames", "surnames", "datesOfBirth", "gender", "addresses"};
     @ClassRule
     public static MockMsaServer msaServer = new MockMsaServer();
 
@@ -139,7 +141,7 @@ public class NonMatchingAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "dateOfBirth", "gender", "addresses");
+        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
@@ -147,14 +149,14 @@ public class NonMatchingAcceptanceTest {
         String expectedLaterFromDateString = laterFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String expectedLaterToDateString = laterToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
 
-        MdsValueChecker.checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("firstNames", 0, "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("middleNames", 0, "Montgomery", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAttribute("dateOfBirth", "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smythington", true, expectedLaterFromDateString, expectedLaterToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 1, "Smith", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("datesOfBirth", 0, "1970-01-01", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), "E1 8QX", "", true, expectedLaterFromDateString, null, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(1, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"), Optional.of("E1 8QX"), Optional.empty(), true, expectedLaterFromDateString, null, attributes);
     }
 
     @Test
@@ -200,17 +202,17 @@ public class NonMatchingAcceptanceTest {
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder("firstName", "middleNames", "surnames", "gender", "addresses");
+        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
         String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
 
-        MdsValueChecker.checkMdsValueOfAttribute("firstName", "Bob", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueInArrayAttribute("firstNames", 0, "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         assertThat(attributes.getJSONArray("middleNames").length()).isEqualTo(0);
         MdsValueChecker.checkMdsValueInArrayAttribute("surnames", 0, "Smith", true, expectedFromDateString, null, attributes);
-        assertThat(attributes.isNull("dateOfBirth")).isTrue();
+        assertThat(attributes.getJSONArray("datesOfBirth")).isEmpty();
         MdsValueChecker.checkMdsValueOfAttribute("gender", "NOT_SPECIFIED", true, expectedFromDateString, expectedToDateString, attributes);
-        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), "E1 8QS", "", true, expectedFromDateString, expectedToDateString, attributes);
+        MdsValueChecker.checkMdsValueOfAddress(0, Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"), Optional.of("E1 8QS"), Optional.empty(), true, expectedFromDateString, expectedToDateString, attributes);
     }
 
     @Test

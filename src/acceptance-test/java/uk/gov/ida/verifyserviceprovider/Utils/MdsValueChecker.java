@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MdsValueChecker {
 
@@ -33,8 +34,8 @@ public class MdsValueChecker {
     public static void checkMdsValueOfAddress(
             int index,
             List<String> lines,
-            String postcode,
-            String internationalPostcode,
+            Optional<String> postcode,
+            Optional<String> internationalPostcode,
             boolean expectedIsVerified,
             String expectedFromDateString,
             String expectedToDateString,
@@ -51,8 +52,17 @@ public class MdsValueChecker {
         for (index = 0; index < lines.size(); index++) {
             Assertions.assertThat(jsonLines.getString(index)).isEqualTo(lines.get(index));
         }
-        Assertions.assertThat(addressValue.getString("postCode")).isEqualTo(postcode);
-        Assertions.assertThat(addressValue.getString("internationalPostCode")).isEqualTo(internationalPostcode);
+        if(postcode.isPresent()) {
+            Assertions.assertThat(addressValue.getString("postCode")).isEqualTo(postcode.get());
+        } else {
+
+            Assertions.assertThat(addressValue.has("postCode")).isFalse();
+        }
+        if(internationalPostcode.isPresent()) {
+            Assertions.assertThat(addressValue.getString("internationalPostCode")).isEqualTo(internationalPostcode.get());
+        } else {
+            Assertions.assertThat(addressValue.has("internationalPostCode")).isFalse();
+        }
     }
 
     public static void checkMdsValueInArrayAttribute(
