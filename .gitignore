@@ -17,3 +17,7 @@ data/**
 /.mongo/*
 !/.mongo/.gitkeep
 node_modules
+.classpath
+.project
+.settings
+bin
