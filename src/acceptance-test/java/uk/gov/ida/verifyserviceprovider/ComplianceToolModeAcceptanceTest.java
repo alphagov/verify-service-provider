@@ -302,9 +302,9 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     private void checkMatchingDatasetListAttribute(JSONObject attributes, String attributeName, int index, MatchingAttribute expectedAttribute) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String fromDate = expectedAttribute.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String toDate = expectedAttribute.getTo().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String fromDate = expectedAttribute.getFrom().toLocalDate().atStartOfDay().format(formatter);
+        String toDate = expectedAttribute.getTo().toLocalDate().atStartOfDay().format(formatter);
         MdsValueChecker.checkMdsValueInArrayAttribute(attributeName, index, expectedAttribute.getValue(), expectedAttribute.isVerified(), fromDate, toDate, attributes);
     }
 
@@ -314,9 +314,9 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     private void checkMatchingDatasetAttribute(JSONObject attributes, String attributeName, MatchingAttribute expectedAttribute) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String fromDate = expectedAttribute.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String toDate = expectedAttribute.getTo().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String fromDate = expectedAttribute.getFrom().toLocalDate().atStartOfDay().format(formatter);
+        String toDate = expectedAttribute.getTo().toLocalDate().atStartOfDay().format(formatter);
         MdsValueChecker.checkMdsValueOfAttribute(attributeName, expectedAttribute.getValue(), expectedAttribute.isVerified(), fromDate, toDate, attributes);
     }
 

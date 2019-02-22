@@ -1,7 +1,6 @@
 package uk.gov.ida.verifyserviceprovider.mappers;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
@@ -13,7 +12,7 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttributeBuilder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,10 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MatchingDatasetToNonMatchingAttributesMapperTest {
 
-    private final DateTime fromTwo = DateTime.now().minusDays(30);
-    private final DateTime fromOne = DateTime.now();
-    private final DateTime fromThree = DateTime.now().minusDays(6);
-    private final DateTime fromFour = null;
+    private final org.joda.time.DateTime fromTwo = org.joda.time.DateTime.now().minusDays(30);
+    private final org.joda.time.DateTime fromOne = org.joda.time.DateTime.now();
+    private final org.joda.time.DateTime fromThree = org.joda.time.DateTime.now().minusDays(6);
+    private final org.joda.time.DateTime fromFour = null;
 
     private final String foo = "Foo";
     private final String bar = "Bar";
@@ -123,11 +122,11 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
 
     @Test
     public void shouldMapDatesOfBirth() {
-        LocalDate fooDate = LocalDate.now();
-        LocalDate barDate = LocalDate.now().minusDays(5);
-        LocalDate bazDate = LocalDate.now().minusDays(10);
-        LocalDate fuuDate = LocalDate.now().minusDays(15);
-        List<SimpleMdsValue<LocalDate>> datesOfBirth = asList(
+        org.joda.time.LocalDate fooDate = org.joda.time.LocalDate.now();
+        org.joda.time.LocalDate barDate = org.joda.time.LocalDate.now().minusDays(5);
+        org.joda.time.LocalDate bazDate = org.joda.time.LocalDate.now().minusDays(10);
+        org.joda.time.LocalDate fuuDate = org.joda.time.LocalDate.now().minusDays(15);
+        List<SimpleMdsValue<org.joda.time.LocalDate>> datesOfBirth = asList(
                 createDateValue(fromThree, fooDate),
                 createDateValue(fromTwo, barDate),
                 createDateValue(fromOne, bazDate),
@@ -147,7 +146,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
         NonMatchingAttributes nonMatchingAttributes = new MatchingDatasetToNonMatchingAttributesMapper().mapToNonMatchingAttributes(matchingDataset);
 
         List<String> expectedDates = Stream.of(bazDate, fooDate, barDate, fuuDate)
-                .map(LocalDate::toString)
+                .map(org.joda.time.LocalDate::toString)
                 .collect(Collectors.toList());
         assertThat(nonMatchingAttributes.getDatesOfBirth().stream()
                 .map(NonMatchingVerifiableAttribute::getValue)
@@ -291,9 +290,9 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
 
     @Test
     public void sortTheListByToDateThenIsVerifiedThenFromDate() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fiveDaysAgo = now.minusDays(5);
-        LocalDateTime threeDaysAgo = now.minusDays(3);
+        LocalDate now = LocalDate.now();
+        LocalDate fiveDaysAgo = now.minusDays(5);
+        LocalDate threeDaysAgo = now.minusDays(3);
         NonMatchingVerifiableAttribute<String> attributeOne = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(null).withFrom(now).build();
         NonMatchingVerifiableAttribute<String> attributeTwo = new NonMatchingVerifiableAttributeBuilder().withVerified(true).withTo(null).withFrom(fiveDaysAgo).build();
         NonMatchingVerifiableAttribute<String> attributeThree = new NonMatchingVerifiableAttributeBuilder().withVerified(false).withTo(null).withFrom(now).build();
@@ -342,7 +341,7 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
         return new SimpleMdsValue<>(value, from, null, true);
     }
 
-    private SimpleMdsValue<LocalDate> createDateValue(DateTime from, LocalDate dateTime) {
+    private SimpleMdsValue<org.joda.time.LocalDate> createDateValue(org.joda.time.DateTime from, org.joda.time.LocalDate dateTime) {
         return new SimpleMdsValue<>(dateTime, from, null, true);
     }
 }

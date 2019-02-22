@@ -155,11 +155,11 @@ public class NonMatchingAcceptanceTest {
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
         assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String expectedLaterFromDateString = laterFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String expectedLaterToDateString = laterToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter);
+        String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter);
+        String expectedLaterFromDateString = laterFromDate.toLocalDate().atStartOfDay().format(formatter);
+        String expectedLaterToDateString = laterToDate.toLocalDate().atStartOfDay().format(formatter);
 
         MdsValueChecker.checkMdsValueInArrayAttribute("firstNames", 0, "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         MdsValueChecker.checkMdsValueInArrayAttribute("middleNames", 0, "Montgomery", true, expectedFromDateString, expectedToDateString, attributes);
@@ -224,9 +224,9 @@ public class NonMatchingAcceptanceTest {
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
         assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
-        String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter);
+        String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter);
 
         MdsValueChecker.checkMdsValueInArrayAttribute("firstNames", 0, "Bob", true, expectedFromDateString, expectedToDateString, attributes);
         assertThat(attributes.getJSONArray("middleNames").length()).isEqualTo(0);
