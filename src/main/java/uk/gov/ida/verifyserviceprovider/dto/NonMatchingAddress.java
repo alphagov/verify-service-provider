@@ -59,6 +59,7 @@ public class NonMatchingAddress {
         int result = lines != null ? lines.hashCode() : 0;
         result = 31 * result + (postCode != null ? postCode.hashCode() : 0);
         result = 31 * result + (internationalPostCode != null ? internationalPostCode.hashCode() : 0);
+        result = 31 * result + (uprn != null ? uprn.hashCode() : 0);
         return result;
     }
 
