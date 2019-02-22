@@ -7,10 +7,10 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingTransliterableAttribute;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToNonMatchingAttributesMapper {
 
     public NonMatchingAttributes mapToNonMatchingAttributes(MatchingDataset matchingDataset) {
-        List<NonMatchingVerifiableAttribute<String>> firstNames = convertTransliterableNameAttributes(matchingDataset.getFirstNames());
+        List<NonMatchingTransliterableAttribute> firstNames = convertTransliterableNameAttributes(matchingDataset.getFirstNames());
         List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth = convertDateOfBirths(matchingDataset.getDateOfBirths());
         List<NonMatchingVerifiableAttribute<String>> middleNames = convertNameAttributes(matchingDataset.getMiddleNames());
-        List<NonMatchingVerifiableAttribute<String>> surnames = convertTransliterableNameAttributes(matchingDataset.getSurnames());
+        List<NonMatchingTransliterableAttribute> surnames = convertTransliterableNameAttributes(matchingDataset.getSurnames());
         NonMatchingVerifiableAttribute<Gender> gender = matchingDataset.getGender()
                 .map(this::mapToNonMatchingVerifiableAttribute)
                 .orElse(null);
@@ -53,7 +53,7 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
                 .collect(Collectors.toList());
     }
 
-    private List<NonMatchingVerifiableAttribute<String>> convertTransliterableNameAttributes(List<TransliterableMdsValue> values) {
+    private List<NonMatchingTransliterableAttribute> convertTransliterableNameAttributes(List<TransliterableMdsValue> values) {
         return values.stream()
                 .map(this::mapToNonMatchingVerifiableAttribute)
                 .sorted(attributeComparator())
@@ -61,10 +61,22 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     }
 
 
-    public static <T> Comparator<NonMatchingVerifiableAttribute<T>> attributeComparator() {
-        return Comparator.<NonMatchingVerifiableAttribute<T>, LocalDate>comparing(NonMatchingVerifiableAttribute::getTo, Comparator.nullsFirst(Comparator.reverseOrder()))
-                .thenComparing(NonMatchingVerifiableAttribute::isVerified, Comparator.reverseOrder())
-                .thenComparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
+    private NonMatchingTransliterableAttribute mapToNonMatchingVerifiableAttribute(TransliterableMdsValue transliterableMdsValue) {
+        LocalDate from = Optional.ofNullable(transliterableMdsValue.getFrom())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
+                .orElse(null);
+
+        LocalDate to = Optional.ofNullable(transliterableMdsValue.getTo())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
+                .orElse(null);
+
+        return new NonMatchingTransliterableAttribute(
+                transliterableMdsValue.getValue(),
+                transliterableMdsValue.getNonLatinScriptValue(),
+                transliterableMdsValue.isVerified(),
+                from,
+                to
+        );
     }
 
     private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
@@ -127,5 +139,11 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
     private static SimpleMdsValue<LocalDate> convertWrappedJodaLocalDateToJavaLocalDate(SimpleMdsValue<org.joda.time.LocalDate> wrappedJodaDate) {
         LocalDate javaLocalDate = convertJodaLocalDateToJavaLocalDate(wrappedJodaDate.getValue());
         return new SimpleMdsValue<>(javaLocalDate, wrappedJodaDate.getFrom(), wrappedJodaDate.getTo(), wrappedJodaDate.isVerified());
+    }
+
+    static <T> Comparator<NonMatchingVerifiableAttribute<T>> attributeComparator() {
+        return Comparator.<NonMatchingVerifiableAttribute<T>, LocalDate>comparing(NonMatchingVerifiableAttribute::getTo, Comparator.nullsFirst(Comparator.reverseOrder()))
+                .thenComparing(NonMatchingVerifiableAttribute::isVerified, Comparator.reverseOrder())
+                .thenComparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 }
