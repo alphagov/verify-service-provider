@@ -55,13 +55,13 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
 
     private List<NonMatchingTransliterableAttribute> convertTransliterableNameAttributes(List<TransliterableMdsValue> values) {
         return values.stream()
-                .map(this::mapToNonMatchingVerifiableAttribute)
+                .map(this::mapToTransliterableAttribute)
                 .sorted(attributeComparator())
                 .collect(Collectors.toList());
     }
 
 
-    private NonMatchingTransliterableAttribute mapToNonMatchingVerifiableAttribute(TransliterableMdsValue transliterableMdsValue) {
+    private NonMatchingTransliterableAttribute mapToTransliterableAttribute(TransliterableMdsValue transliterableMdsValue) {
         LocalDate from = Optional.ofNullable(transliterableMdsValue.getFrom())
                 .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
                 .orElse(null);
