@@ -52,9 +52,11 @@ europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED:-false}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
   aggregatedMetadata:
-    trustAnchorUri: ${TRUST_ANCHOR_URI:-"http://example"}
-    metadataSourceUri: ${METADATA_SOURCE_URI:-"http://example"}
+    # trustAnchorUri is the URL location of the trustAnchor (for example https://example.com)
+    trustAnchorUri: ${TRUST_ANCHOR_URI:-}
+    # metadataSourceUri is the URL location of the metadataSourceUri (for example https://example.com)
+    metadataSourceUri: ${METADATA_SOURCE_URI:-}
     trustStore:
-      path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
+      path: ${TRUSTSTORE_PATH:-}
+      password: ${TRUSTSTORE_PASSWORD:-}
     jerseyClientName: trust-anchor-client
