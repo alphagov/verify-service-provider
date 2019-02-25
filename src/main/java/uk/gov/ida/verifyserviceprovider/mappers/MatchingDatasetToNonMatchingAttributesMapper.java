@@ -62,18 +62,18 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
 
 
     public static <T> Comparator<NonMatchingVerifiableAttribute<T>> attributeComparator() {
-        return Comparator.<NonMatchingVerifiableAttribute<T>, LocalDateTime>comparing(NonMatchingVerifiableAttribute::getTo, Comparator.nullsFirst(Comparator.reverseOrder()))
+        return Comparator.<NonMatchingVerifiableAttribute<T>, LocalDate>comparing(NonMatchingVerifiableAttribute::getTo, Comparator.nullsFirst(Comparator.reverseOrder()))
                 .thenComparing(NonMatchingVerifiableAttribute::isVerified, Comparator.reverseOrder())
                 .thenComparing(NonMatchingVerifiableAttribute::getFrom, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
     private <T> NonMatchingVerifiableAttribute<T> mapToNonMatchingVerifiableAttribute(SimpleMdsValue<T> simpleMdsValueOptional) {
-        LocalDateTime from = Optional.ofNullable(simpleMdsValueOptional.getFrom())
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+        LocalDate from = Optional.ofNullable(simpleMdsValueOptional.getFrom())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
                 .orElse(null);
 
-        LocalDateTime to = Optional.ofNullable(simpleMdsValueOptional.getTo())
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+        LocalDate to = Optional.ofNullable(simpleMdsValueOptional.getTo())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
                 .orElse(null);
 
         return new NonMatchingVerifiableAttribute<>(
@@ -96,12 +96,12 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
             input.getUPRN().orElse(null)
         );
 
-        LocalDateTime from = Optional.ofNullable(input.getFrom())
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+        LocalDate from = Optional.ofNullable(input.getFrom())
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
                 .orElse(null);
 
-        LocalDateTime to = input.getTo()
-                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDateTime)
+        LocalDate to = input.getTo()
+                .map(MatchingDatasetToNonMatchingAttributesMapper::convertJodaDateTimeToJavaLocalDate)
                 .orElse(null);
 
         return new NonMatchingVerifiableAttribute<>(
@@ -112,15 +112,11 @@ public class MatchingDatasetToNonMatchingAttributesMapper {
         );
     }
 
-    private static LocalDateTime convertJodaDateTimeToJavaLocalDateTime(org.joda.time.DateTime jodaDateTime) {
-        return LocalDateTime.of(
+    private static LocalDate convertJodaDateTimeToJavaLocalDate(org.joda.time.DateTime jodaDateTime) {
+        return LocalDate.of(
             jodaDateTime.getYear(),
             jodaDateTime.getMonthOfYear(),
-            jodaDateTime.getDayOfMonth(),
-            jodaDateTime.getHourOfDay(),
-            jodaDateTime.getMinuteOfHour(),
-            jodaDateTime.getSecondOfMinute(),
-            jodaDateTime.getMillisOfSecond()
+            jodaDateTime.getDayOfMonth()
         );
     }
 

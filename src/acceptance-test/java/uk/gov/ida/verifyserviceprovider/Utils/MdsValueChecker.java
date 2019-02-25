@@ -38,10 +38,10 @@ public class MdsValueChecker {
             JSONObject attributes,
             MatchingAddress matchingAddress
     ) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String fromDate = matchingAddress.getFrom().toLocalDate().atStartOfDay().format(formatter).replace(" ", "T");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String fromDate = matchingAddress.getFrom().toLocalDate().atStartOfDay().format(formatter);
         String toDate = Optional.ofNullable(matchingAddress.getTo())
-                .map((dt) -> dt.toLocalDate().atStartOfDay().format(formatter).replace(" ", "T"))
+                .map((dt) -> dt.toLocalDate().atStartOfDay().format(formatter))
                 .orElse(null);
         checkMdsValueOfAddress(
                 index,
