@@ -120,16 +120,16 @@ public class NonMatchingEidasAcceptanceTest {
     public void shouldMapAttributesCorrectly() throws Exception {
         AttributeStatementBuilder attributeStatementBuilder = AttributeStatementBuilder.anAttributeStatement();
         
-        Attribute firstName =  anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
+        Attribute givenName =  anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
         CurrentGivenName firstNameValue = new CurrentGivenNameBuilder().buildObject();
         firstNameValue.setFirstName("Joe");
-        firstName.getAttributeValues().add(firstNameValue);
+        givenName.getAttributeValues().add(firstNameValue);
         CurrentGivenName nonLatinScriptFirstNameValue = new CurrentGivenNameBuilder().buildObject();
         nonLatinScriptFirstNameValue.setFirstName("NonLatinJoe");
         nonLatinScriptFirstNameValue.setIsLatinScript(false);
-        firstName.getAttributeValues().add(nonLatinScriptFirstNameValue);
+        givenName.getAttributeValues().add(nonLatinScriptFirstNameValue);
 
-        attributeStatementBuilder.addAttribute(firstName);
+        attributeStatementBuilder.addAttribute(givenName);
 
         Attribute familyName =  anAttribute(IdaConstants.Eidas_Attributes.FamilyName.NAME);
 
@@ -152,7 +152,9 @@ public class NonMatchingEidasAcceptanceTest {
 
         Attribute dateOfBirth =  anAttribute(IdaConstants.Eidas_Attributes.DateOfBirth.NAME);
         DateOfBirth dateOfBirthValue = new DateOfBirthBuilder().buildObject();
-        dateOfBirthValue.setDateOfBirth(LocalDate.now());
+        String dateOfBirthString = "1988-09-30";
+        LocalDate now = LocalDate.parse(dateOfBirthString);
+        dateOfBirthValue.setDateOfBirth(now);
         dateOfBirth.getAttributeValues().add(dateOfBirthValue);
         attributeStatementBuilder.addAttribute(dateOfBirth);
 
@@ -167,16 +169,32 @@ public class NonMatchingEidasAcceptanceTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
         String body = response.readEntity(String.class);
         JSONObject json = new JSONObject(body);
+
+        assertThat(json.has("pid")).isTrue();
+        assertThat(json.getString("levelOfAssurance")).isEqualTo("LEVEL_2");
+
         JSONObject attributes = json.getJSONObject("attributes");
-        JSONObject firstNames = attributes.getJSONArray("firstNames").getJSONObject(0);
 
-        assertThat(firstNames.getString("value")).isEqualTo("Joe");
-        assertThat(firstNames.getString("nonLatinScriptValue")).isEqualTo("NonLatinJoe");
+        JSONObject firstName = attributes.getJSONArray("firstNames").getJSONObject(0);
+        assertThat(firstName.getString("value")).isEqualTo("Joe");
+        assertThat(firstName.getString("nonLatinScriptValue")).isEqualTo("NonLatinJoe");
+        assertThat(firstName.getBoolean("verified")).isTrue();
+        assertThat(firstName.has("from")).isFalse();
+        assertThat(firstName.has("to")).isFalse();
 
-        JSONObject surnames = attributes.getJSONArray("surnames").getJSONObject(0);
+        JSONObject surname = attributes.getJSONArray("surnames").getJSONObject(0);
+        assertThat(surname.getString("value")).isEqualTo("Bloggs");
+        assertThat(surname.getString("nonLatinScriptValue")).isEqualTo("NonLatinBloggs");
+        assertThat(surname.getBoolean("verified")).isTrue();
+        assertThat(surname.has("from")).isFalse();
+        assertThat(surname.has("to")).isFalse();
 
-        assertThat(surnames.getString("value")).isEqualTo("Bloggs");
-        assertThat(surnames.getString("nonLatinScriptValue")).isEqualTo("NonLatinBloggs");
+        JSONObject dateOfBirthAttribute = attributes.getJSONArray("datesOfBirth").getJSONObject(0);
+        assertThat(dateOfBirthAttribute.getString("value")).isEqualTo(dateOfBirthString);
+        assertThat(dateOfBirthAttribute.has("nonLatinScriptValue")).isFalse();
+        assertThat(dateOfBirthAttribute.getBoolean("verified")).isTrue();
+        assertThat(dateOfBirthAttribute.has("from")).isFalse();
+        assertThat(dateOfBirthAttribute.has("to")).isFalse();
     }
 
     private Attribute anAttribute(String name) {
