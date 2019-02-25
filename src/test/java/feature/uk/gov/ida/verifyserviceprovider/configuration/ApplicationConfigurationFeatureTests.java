@@ -4,7 +4,6 @@ import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.logging.DefaultLoggingFactory;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import keystore.KeyStoreResource;
 import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
@@ -15,12 +14,10 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 
 import java.util.HashMap;
 
-import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.apache.xml.security.utils.Base64.decode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
-import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
 
 public class ApplicationConfigurationFeatureTests {
 
@@ -29,22 +26,10 @@ public class ApplicationConfigurationFeatureTests {
 
     @Before
     public void setUp() {
-        KeyStoreResource keyStoreResource = aKeyStoreResource()
-            .withCertificate("any-alias", aCertificate().build().getCertificate())
-            .build();
-        keyStoreResource.create();
         application = new DropwizardAppRule<>(
             VerifyServiceProviderApplication.class,
                 "verify-service-provider.yml",
-            ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", keyStoreResource.getPassword()),
-            ConfigOverride.config("europeanIdentity.enabled", "false"),
-            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", keyStoreResource.getAbsolutePath()),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", keyStoreResource.getPassword())
+            ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG")
         );
     }
 
@@ -81,6 +66,14 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getSamlPrimaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(30));
+        assertThat(configuration.getEuropeanIdentity().isPresent()).isTrue();
+        assertThat(configuration.getEuropeanIdentity().get().getMetadataSourceUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataSourceUri());
+        assertThat(configuration.getEuropeanIdentity().get().getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
+        assertThat(configuration.getEuropeanIdentity().get().getAggregatedMetadata().getTrustStore().getCertificate("idaca").toString())
+                .isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataTrustStore().getCertificate("idaca").toString());
+        assertThat(configuration.getEuropeanIdentity().get().getAggregatedMetadata().getTrustStore().getCertificate("idametadata").toString())
+                .isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataTrustStore().getCertificate("idametadata").toString());
+
     }
 
     @Test
