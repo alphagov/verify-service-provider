@@ -57,10 +57,10 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
         ConfigOverride.config("europeanIdentity.enabled", "false"),
         ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+        ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
     @Rule
@@ -76,10 +76,10 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
         ConfigOverride.config("europeanIdentity.enabled", "false"),
         ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+        ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
+        ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
+        ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
     );
 
 

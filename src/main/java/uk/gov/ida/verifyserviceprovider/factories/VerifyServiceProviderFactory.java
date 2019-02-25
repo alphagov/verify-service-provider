@@ -158,7 +158,7 @@ public class VerifyServiceProviderFactory {
         if (isEidasEnabled()) {
             return Optional.of(new EidasMetadataResolverRepository(
                 getEidasTrustAnchorResolver(),
-                configuration.getEuropeanIdentity().get().getAggregatedMetadata(),
+                configuration.getEuropeanIdentity().get(),
                 new DropwizardMetadataResolverFactory(),
                 new Timer(),
                 new MetadataSignatureTrustEngineFactory(),
@@ -171,7 +171,7 @@ public class VerifyServiceProviderFactory {
     }
 
     private EidasTrustAnchorResolver getEidasTrustAnchorResolver() {
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().get().getAggregatedMetadata();
+        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().get();
         return new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(), client, metadataConfiguration.getTrustStore());
     }
 

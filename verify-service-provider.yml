@@ -51,3 +51,4 @@ samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED:-false}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
+

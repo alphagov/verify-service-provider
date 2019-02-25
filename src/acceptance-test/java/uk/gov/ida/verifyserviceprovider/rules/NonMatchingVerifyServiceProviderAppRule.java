@@ -102,10 +102,10 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
                 ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
                 ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
                 ConfigOverride.config("europeanIdentity.enabled", isEidasEnabled ? "true" : "false"),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", countryMetadataTrustStore.getPassword())
+                ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
+                ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
+                ConfigOverride.config("europeanIdentity.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("europeanIdentity.trustStore.password", countryMetadataTrustStore.getPassword())
         );
     }
 

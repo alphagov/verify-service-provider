@@ -12,6 +12,7 @@ import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
+import javax.ws.rs.HEAD;
 import java.util.HashMap;
 
 import static org.apache.xml.security.utils.Base64.decode;
@@ -57,7 +58,7 @@ public class ApplicationConfigurationFeatureTests {
         VerifyServiceProviderConfiguration configuration = application.getConfiguration();
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
-        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
+        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel()).isEqualTo("ERROR");
         assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
@@ -69,9 +70,9 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getEuropeanIdentity().isPresent()).isTrue();
         assertThat(configuration.getEuropeanIdentity().get().getMetadataSourceUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataSourceUri());
         assertThat(configuration.getEuropeanIdentity().get().getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
-        assertThat(configuration.getEuropeanIdentity().get().getAggregatedMetadata().getTrustStore().getCertificate("idaca").toString())
+        assertThat(configuration.getEuropeanIdentity().get().getTrustStore().getCertificate("idaca").toString())
                 .isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataTrustStore().getCertificate("idaca").toString());
-        assertThat(configuration.getEuropeanIdentity().get().getAggregatedMetadata().getTrustStore().getCertificate("idametadata").toString())
+        assertThat(configuration.getEuropeanIdentity().get().getTrustStore().getCertificate("idametadata").toString())
                 .isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataTrustStore().getCertificate("idametadata").toString());
 
     }
@@ -95,7 +96,7 @@ public class ApplicationConfigurationFeatureTests {
         VerifyServiceProviderConfiguration configuration = application.getConfiguration();
 
         assertThat(application.getLocalPort()).isEqualTo(50555);
-        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel().toString()).isEqualTo("ERROR");
+        assertThat(((DefaultLoggingFactory) configuration.getLoggingFactory()).getLevel()).isEqualTo("ERROR");
         assertThat(configuration.getHubSsoLocation().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getSsoLocation().toString());
         assertThat(configuration.getVerifyHubMetadata().getUri().toString()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getMetadataUri().toString());
         assertThat(configuration.getVerifyHubMetadata().getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");

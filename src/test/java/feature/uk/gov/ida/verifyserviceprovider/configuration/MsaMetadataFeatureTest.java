@@ -87,10 +87,10 @@ public class MsaMetadataFeatureTest {
             config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             config("europeanIdentity.enabled", "false"),
             config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-            config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-            config("europeanIdentity.aggregatedMetadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
-            config("europeanIdentity.aggregatedMetadata.trustStore.password", metadataTrustStore.getPassword())
+            config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
+            config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
+            config("europeanIdentity.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            config("europeanIdentity.trustStore.password", metadataTrustStore.getPassword())
         );
 
         environmentHelper.setEnv(new HashMap<String, String>() {{

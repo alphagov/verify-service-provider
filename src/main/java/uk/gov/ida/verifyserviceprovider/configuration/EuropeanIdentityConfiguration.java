@@ -3,9 +3,9 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.client.JerseyClientConfiguration;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
-import uk.gov.ida.saml.metadata.EidasMetadataConfigurationImpl;
-import uk.gov.ida.saml.metadata.EncodedTrustStoreConfiguration;
+import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -13,24 +13,31 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
+public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
-public class EuropeanIdentityConfiguration {
-
+    private TrustStoreConfiguration trustStoreConfiguration;
     private String hubConnectorEntityId;
     private boolean enabled;
-    private EidasMetadataConfigurationImpl aggregatedMetadata;
+    private HubEnvironment environment;
 
 
     @JsonCreator
-    public EuropeanIdentityConfiguration(
-            @JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
-            @NotNull @Valid @JsonProperty("enabled") boolean enabled,
-            @Valid @JsonProperty("aggregatedMetadata") EidasMetadataConfigurationImpl aggregatedMetadata
+    public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
+                                         @NotNull @Valid @JsonProperty("enabled") boolean enabled,
+                                         @JsonProperty("trustAnchorUri") URI trustAnchorUri,
+                                         @JsonProperty("minRefreshDelay") Long minRefreshDelay,
+                                         @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
+                                         @JsonProperty("trustAnchorMaxRefreshDelay") Long trustAnchorMaxRefreshDelay,
+                                         @JsonProperty("trustAnchorMinRefreshDelay") Long trustAnchorMinRefreshDelay,
+                                         @JsonProperty("client") JerseyClientConfiguration client,
+                                         @JsonProperty("jerseyClientName") String jerseyClientName,
+                                         @JsonProperty("trustStore") TrustStoreConfiguration trustStore,
+                                         @JsonProperty("metadataSourceUri") URI metadataSourceUri
     ){
+        super(trustAnchorUri, minRefreshDelay, maxRefreshDelay, trustAnchorMaxRefreshDelay, trustAnchorMinRefreshDelay, client, jerseyClientName, trustStore, metadataSourceUri);
         this.enabled = enabled;
         this.hubConnectorEntityId = hubConnectorEntityId;
-        this.aggregatedMetadata = ofNullable(aggregatedMetadata).orElse(new EidasMetadataConfigurationImpl());
+        this.trustStoreConfiguration = trustStore;
     }
 
     public String getHubConnectorEntityId() {
@@ -39,28 +46,30 @@ public class EuropeanIdentityConfiguration {
 
     @JsonIgnore
     public void setEnvironment(HubEnvironment environment) {
-        this.aggregatedMetadata.setEnvironment(environment);
-    }
-
-    public EidasMetadataConfiguration getAggregatedMetadata() {
-        return aggregatedMetadata;
-    }
-
-    public URI getMetadataSourceUri() {
-        return aggregatedMetadata.getMetadataSourceUri();
-    }
-
-    public KeyStore getTrustStore() {
-        return aggregatedMetadata.getTrustStore();
-    }
-
-    public URI getTrustAnchorUri() {
-      return aggregatedMetadata.getTrustAnchorUri();
-
+        this.environment = environment;
     }
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public KeyStore getTrustStore() {
+        if (trustStoreConfiguration !=null){
+            return super.getTrustStore();
+        }
+        return environment.getMetadataTrustStore();
+    }
+    @Override
+    public URI getMetadataSourceUri() {
+        return Optional.ofNullable(super.getMetadataSourceUri())
+                .orElse(environment.getEidasMetadataSourceUri());
+    }
+
+    @Override
+    public URI getTrustAnchorUri() {
+        return Optional.ofNullable(super.getTrustAnchorUri())
+                .orElse(environment.getEidasMetadataTrustAnchorUri());
     }
 
 }
