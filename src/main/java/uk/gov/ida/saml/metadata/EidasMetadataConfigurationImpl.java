@@ -25,7 +25,7 @@ public class EidasMetadataConfigurationImpl extends EidasMetadataConfiguration {
                                       @JsonProperty("trustAnchorMinRefreshDelay") Long trustAnchorMinRefreshDelay,
                                       @JsonProperty("client") JerseyClientConfiguration client,
                                       @JsonProperty("jerseyClientName") String jerseyClientName,
-                                      @JsonProperty("trustStoreConfiguration") TrustStoreConfiguration trustStore,
+                                      @JsonProperty("trustStore") TrustStoreConfiguration trustStore,
                                       @JsonProperty("metadataSourceUri") URI metadataSourceUri
     )
     {

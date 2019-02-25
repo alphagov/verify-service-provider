@@ -52,7 +52,7 @@ public class EuropeanIdentityConfigurationTest {
                 .put("enabled", true)
                 .put("hubConnectorEntityId","some-entity-id")
                 .put("aggregatedMetadata", new JSONObject()
-                        .put("trustStoreConfiguration", new JSONObject()
+                        .put("trustStore", new JSONObject()
                                 .put("path", overridenKeyStoreResource.getAbsolutePath())
                                 .put("password", overridenKeyStoreResource.getPassword())
                         )
