@@ -50,9 +50,6 @@ public class NonMatchingEidasAcceptanceTest {
         openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
     }
 
-    @Before
-
-
     @Test
      public void shouldReturn400WhenAssertionContainsInvalidSignature() throws MarshallingException, SignatureException {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
