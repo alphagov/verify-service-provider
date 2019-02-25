@@ -1,6 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.builders;
 
 import org.joda.time.DateTime;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.Conditions;
@@ -40,30 +41,39 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 public class AssertionHelper {
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String requestId, String issuerId, Signature assertionSignature) {
+        return anEidasEncryptedAssertion(requestId, issuerId, assertionSignature, anEidasAttributeStatement().build());
+    }
+
+    public static EncryptedAssertion anEidasEncryptedAssertion(String requestId,
+                                                               String issuerId,
+                                                               Signature assertionSignature,
+                                                               AttributeStatement attributeStatement) {
         return anAssertion()
-            .withSubject(
-                aSubject().withSubjectConfirmation(
-                    aSubjectConfirmation().withSubjectConfirmationData(
-                        aSubjectConfirmationData()
-                            .withInResponseTo(requestId)
-                            .build())
-                        .build())
-                    .build())
+                .withSubject(
+                        aSubject().withSubjectConfirmation(
+                                aSubjectConfirmation().withSubjectConfirmationData(
+                                        aSubjectConfirmationData()
+                                                .withInResponseTo(requestId)
+                                                .build())
+                                        .build())
+                                .build())
                 .withIssuer(
-                    anIssuer()
-                        .withIssuerId(issuerId)
-                        .build())
-                .addAttributeStatement(anEidasAttributeStatement().build())
+                        anIssuer()
+                                .withIssuerId(issuerId)
+                                .build())
+                .addAttributeStatement(attributeStatement)
                 .addAuthnStatement(anEidasAuthnStatement().build())
                 .withSignature(assertionSignature)
                 .withConditions(aConditions())
                 .buildWithEncrypterCredential(
-                    new TestCredentialFactory(
-                        TEST_RP_PUBLIC_ENCRYPTION_CERT,
-                        TEST_RP_PRIVATE_ENCRYPTION_KEY
-                    ).getEncryptingCredential()
+                        new TestCredentialFactory(
+                                TEST_RP_PUBLIC_ENCRYPTION_CERT,
+                                TEST_RP_PRIVATE_ENCRYPTION_KEY
+                        ).getEncryptingCredential()
                 );
     }
+
+
 
     public static EncryptedAssertion anEidasEncryptedAssertionWithInvalidSignature(String assertionIssuerId) {
         return anAssertion()
@@ -88,17 +98,21 @@ public class AssertionHelper {
             );
     }
 
-    public static ResponseBuilder aValidEidasResponse(String requestId, String assertionIssuerId) {
+    public static ResponseBuilder aValidEidasResponse(String requestId, String assertionIssuerId, AttributeStatement attributeStatement) {
         return ResponseBuilder.aResponse()
                 .withId(requestId)
                 .withInResponseTo(requestId)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, assertionIssuerId, anEidasSignature()))
+                .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, assertionIssuerId, anEidasSignature(), attributeStatement))
                 .withSigningCredential(
-                    new TestCredentialFactory(
-                            HUB_TEST_PUBLIC_SIGNING_CERT,
-                            HUB_TEST_PRIVATE_SIGNING_KEY
-                    ).getSigningCredential());
+                        new TestCredentialFactory(
+                                HUB_TEST_PUBLIC_SIGNING_CERT,
+                                HUB_TEST_PRIVATE_SIGNING_KEY
+                        ).getSigningCredential());
+    }
+
+    public static ResponseBuilder aValidEidasResponse(String requestId, String assertionIssuerId) {
+        return aValidEidasResponse(requestId, assertionIssuerId, anEidasAttributeStatement().build());
     }
 
     public static ResponseBuilder anInvalidSignatureEidasResponse(String requestId, String assertionIssuerId) {

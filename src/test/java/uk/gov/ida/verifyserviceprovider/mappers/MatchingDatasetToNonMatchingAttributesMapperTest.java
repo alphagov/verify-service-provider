@@ -9,6 +9,7 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAddress;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingTransliterableAttribute;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttribute;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingVerifiableAttributeBuilder;
 
@@ -65,6 +66,30 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
     }
 
     @Test
+    public void shouldMapFirstNamesWithNonLatinScriptValue() {
+        String nonLatinScript = "nonLatinScript";
+        List<TransliterableMdsValue> firstNames = asList(
+                createTransliterableValue(foo, nonLatinScript)
+        );
+
+        MatchingDataset matchingDataset = new MatchingDataset(
+                firstNames,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Optional.empty(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null
+        );
+        NonMatchingAttributes nonMatchingAttributes = new MatchingDatasetToNonMatchingAttributesMapper().mapToNonMatchingAttributes(matchingDataset);
+
+        NonMatchingTransliterableAttribute nonMatchingTransliterableAttribute = nonMatchingAttributes.getFirstNames().get(0);
+        assertThat(nonMatchingTransliterableAttribute.getValue()).isEqualTo(foo);
+        assertThat(nonMatchingTransliterableAttribute.getNonLatinScriptValue()).isEqualTo(nonLatinScript);
+    }
+
+    @Test
     public void shouldMapMiddlenames() {
         List<SimpleMdsValue<String>> middleNames = asList(
                 createSimpleMdsValue(fromThree, foo),
@@ -118,6 +143,30 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
                 .collect(Collectors.toList()))
                 .isEqualTo(asList(baz, foo, bar, fuu));
         assertThat(nonMatchingAttributes.getSurnames()).isSortedAccordingTo(comparedByFromDate());
+    }
+
+    @Test
+    public void shouldMapSurnamesWithNonLatinScriptValue() {
+        String nonLatinScript = "nonLatinScript";
+        List<TransliterableMdsValue> surnames = asList(
+                createTransliterableValue(foo, nonLatinScript)
+        );
+
+        MatchingDataset matchingDataset = new MatchingDataset(
+                Collections.emptyList(),
+                Collections.emptyList(),
+                surnames,
+                Optional.empty(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null
+        );
+        NonMatchingAttributes nonMatchingAttributes = new MatchingDatasetToNonMatchingAttributesMapper().mapToNonMatchingAttributes(matchingDataset);
+
+        NonMatchingTransliterableAttribute nonMatchingTransliterableAttribute = nonMatchingAttributes.getSurnames().get(0);
+        assertThat(nonMatchingTransliterableAttribute.getValue()).isEqualTo(foo);
+        assertThat(nonMatchingTransliterableAttribute.getNonLatinScriptValue()).isEqualTo(nonLatinScript);
     }
 
     @Test
@@ -335,6 +384,10 @@ public class MatchingDatasetToNonMatchingAttributesMapperTest {
 
     private TransliterableMdsValue createTransliterableValue(DateTime from, String value) {
         return new TransliterableMdsValue(createSimpleMdsValue(from, value));
+    }
+
+    private TransliterableMdsValue createTransliterableValue(String value, String nonLatinScript) {
+        return new TransliterableMdsValue(value, nonLatinScript);
     }
 
     private SimpleMdsValue<String> createSimpleMdsValue(DateTime from, String value) {
