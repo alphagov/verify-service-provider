@@ -16,13 +16,13 @@ import java.util.Optional;
 public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     private TrustStoreConfiguration trustStoreConfiguration;
-    private String hubConnectorEntityId;
+    private URI hubConnectorEntityId;
     private boolean enabled;
     private HubEnvironment environment;
 
 
     @JsonCreator
-    public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
+    public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") URI hubConnectorEntityId,
                                          @NotNull @Valid @JsonProperty("enabled") boolean enabled,
                                          @JsonProperty("trustAnchorUri") URI trustAnchorUri,
                                          @JsonProperty("minRefreshDelay") Long minRefreshDelay,
@@ -40,10 +40,6 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.trustStoreConfiguration = trustStore;
     }
 
-    public String getHubConnectorEntityId() {
-        return hubConnectorEntityId;
-    }
-
     @JsonIgnore
     public void setEnvironment(HubEnvironment environment) {
         this.environment = environment;
@@ -51,6 +47,10 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public URI getHubConnectorEntityId() {
+        return hubConnectorEntityId != null ? hubConnectorEntityId : environment.getEidasHubConnectorEntityId();
     }
 
     @Override

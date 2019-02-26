@@ -19,26 +19,35 @@ public interface ConfigurationConstants {
     String HUB_JERSEY_CLIENT_NAME = "VerifyHubMetadataClient";
     String MSA_JERSEY_CLIENT_NAME = "MsaMetadataClient";
 
-    interface EnvironmentUrls {
-
-        String PRODUCTION_HOST ="https://www.signin.service.gov.uk";
-        String INTEGRATION_HOST ="https://www.integration.signin.service.gov.uk";
-        String COMPLIANCE_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
 
 
-        String PRODUCTION_SSO = PRODUCTION_HOST + "/SAML2/SSO";
-        String PRODUCTION_METADATA = PRODUCTION_HOST + "/SAML2/metadata/federation";
-        String PRODUCTION_TRUSTANCHOR_URI = PRODUCTION_HOST + "/SAML2/metadata/trust-anchor";
-        String PRODUCTION_METADATASOURCE_URI = PRODUCTION_HOST + "/SAML2/metadata/aggregator";
+    String PRODUCTION_HOST ="https://www.signin.service.gov.uk";
+    String INTEGRATION_HOST ="https://www.integration.signin.service.gov.uk";
+    String COMPLIANCE_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
 
-        String INTEGRATION_SSO = INTEGRATION_HOST + "/SAML2/SSO";
-        String INTEGRATION_METADATA = INTEGRATION_HOST +  "/SAML2/metadata/federation";
-        String INTEGRATION_TRUSTANCHOR_URI = INTEGRATION_HOST + "/SAML2/metadata/trust-anchor";
-        String INTEGRATION_METADATASOURCE_URI = INTEGRATION_HOST + "/SAML2/metadata/aggregator";
 
-        String COMPLIANCE_SSO = COMPLIANCE_HOST + "/SAML2/SSO";
-        String COMPLIANCE_METADATA = COMPLIANCE_HOST +  "/SAML2/metadata/federation";
-        String COMPLIANCE_TRUSTANCHOR_URI = COMPLIANCE_HOST +  "/SAML2/metadata/trust-anchor";
-        String COMPLIANCE_METADATASOURCE_URI = COMPLIANCE_HOST + "/SAML2/metadata/aggregator";
-    }
+    String SSO_PATH = "/SAML2/SSO";
+    String METADATA_PATH = "/SAML2/metadata/federation";
+    String TRUSTANCHOR_PATH = "/SAML2/metadata/trust-anchor";
+    String METADATASOURCE_PATH = "/SAML2/metadata/aggregator";
+    String HUBCONNECTOR_ENTITY_ID_PATH = "/SAML2/metadata/connector";
+
+    String PRODUCTION_SSO = PRODUCTION_HOST + SSO_PATH;
+    String PRODUCTION_METADATA = PRODUCTION_HOST + METADATA_PATH;
+    String PRODUCTION_TRUSTANCHOR_URI = PRODUCTION_HOST + TRUSTANCHOR_PATH;
+    String PRODUCTION_METADATASOURCE_URI = PRODUCTION_HOST + METADATASOURCE_PATH;
+    String PRODUCTION_HUBCONNECTOR_ENTITYID = PRODUCTION_HOST + HUBCONNECTOR_ENTITY_ID_PATH;
+
+    String INTEGRATION_SSO = INTEGRATION_HOST + SSO_PATH;
+    String INTEGRATION_METADATA = INTEGRATION_HOST +  METADATA_PATH;
+    String INTEGRATION_TRUSTANCHOR_URI = INTEGRATION_HOST + TRUSTANCHOR_PATH;
+    String INTEGRATION_METADATASOURCE_URI = INTEGRATION_HOST + METADATASOURCE_PATH;
+    String INTEGRATION_HUBCONNECTOR_ENTITYID = INTEGRATION_HOST + HUBCONNECTOR_ENTITY_ID_PATH;;
+
+    String COMPLIANCE_SSO = COMPLIANCE_HOST + SSO_PATH;
+    String COMPLIANCE_METADATA = COMPLIANCE_HOST +  METADATA_PATH;
+    String COMPLIANCE_TRUSTANCHOR_URI = COMPLIANCE_HOST +  TRUSTANCHOR_PATH;
+    String COMPLIANCE_METADATASOURCE_URI = COMPLIANCE_HOST + METADATASOURCE_PATH;
+    String COMPLIANCE_HUBCONNECTOR_ENTITYID = COMPLIANCE_HOST + HUBCONNECTOR_ENTITY_ID_PATH;;
+
 }
