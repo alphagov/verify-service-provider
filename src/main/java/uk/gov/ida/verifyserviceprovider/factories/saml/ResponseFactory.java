@@ -172,7 +172,7 @@ public class ResponseFactory {
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
-                europeanIdentityConfiguration
+                europeanIdentityConfiguration.map(EuropeanIdentityConfiguration :: getHubConnectorEntityId)
                 );
     }
 

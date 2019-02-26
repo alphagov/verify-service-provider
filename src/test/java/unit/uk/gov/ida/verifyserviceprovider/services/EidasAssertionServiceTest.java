@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_HIGH;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_SUBSTANTIAL;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
@@ -88,7 +89,7 @@ public class EidasAssertionServiceTest {
             levelOfAssuranceValidator,
             Optional.of(metadataResolverRepository),
             signatureValidatorFactory,
-            Optional.of(europeanIdentityConfiguration));
+            Optional.of(HUB_CONNECTOR_ENTITY_ID));
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());

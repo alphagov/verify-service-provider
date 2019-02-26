@@ -31,7 +31,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
     private final Optional<EidasMetadataResolverRepository> metadataResolverRepository;
     private final SignatureValidatorFactory signatureValidatorFactory;
-    private final Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration;
+    private final Optional<String> entityId;
 
 
     public EidasAssertionService(
@@ -44,7 +44,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
             LevelOfAssuranceValidator levelOfAssuranceValidator,
             Optional<EidasMetadataResolverRepository> metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
-            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration) {
+            Optional<String> entityId) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
         this.isEnabled = isEnabled;
         this.instantValidator = instantValidator;
@@ -52,7 +52,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
-        this.europeanIdentityConfiguration = europeanIdentityConfiguration;
+        this.entityId = entityId;
     }
 
 
@@ -82,8 +82,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
                 .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        String entityId = europeanIdentityConfiguration.get().getHubConnectorEntityId();
-        conditionsValidator.validate(assertion.getConditions(), entityId);
+        conditionsValidator.validate(assertion.getConditions(), entityId.get());
     }
 
     public LevelOfAssurance extractLevelOfAssuranceFrom(Assertion countryAssertion) {
