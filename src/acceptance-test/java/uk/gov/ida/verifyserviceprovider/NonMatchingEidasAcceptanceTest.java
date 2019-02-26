@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.aValidEidasResponse;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidAssertionSignatureEidasResponse;
@@ -155,9 +156,12 @@ public class NonMatchingEidasAcceptanceTest {
         dateOfBirth.getAttributeValues().add(dateOfBirthValue);
         attributeStatementBuilder.addAttribute(dateOfBirth);
 
-        org.opensaml.saml.saml2.core.Response samlResponse = aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId(),
-                attributeStatementBuilder.build()
-                ).build();
+        org.opensaml.saml.saml2.core.Response samlResponse = aValidEidasResponse(
+                "requestId",
+                appWithEidasEnabled.getCountryEntityId(),
+                attributeStatementBuilder.build())
+                .build();
+
         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(samlResponse);
         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
                 Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))

@@ -22,6 +22,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
@@ -155,7 +156,8 @@ public class ResponseFactory {
     public EidasAssertionService createEidasAssertionService(
             boolean isEnabled,
             DateTimeComparator dateTimeComparator,
-            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
+            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository,
+            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
@@ -169,7 +171,9 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
-                new SignatureValidatorFactory());
+                new SignatureValidatorFactory(),
+                europeanIdentityConfiguration
+                );
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
