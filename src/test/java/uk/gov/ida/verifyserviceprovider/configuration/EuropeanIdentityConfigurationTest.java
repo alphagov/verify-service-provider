@@ -22,56 +22,46 @@ public class EuropeanIdentityConfigurationTest {
 
     public static final String IDAMETADATA = "Idametadata";
     public static final String IDACA = "Idaca";
-    public static final String OVERRIDENMETADATACA = "overridenmetadataca";
-    public static final String OVERRIDENROOTCA = "overridenrootca";
-    private final String overridenTrustAnchorUri = "http://overriden.trustanchoruri.example.com";
-    private final String overridenMetadataSourceUri ="http://overriden.metadatsourceuri.example.com";
-    private String configEnabledOnly, configWithTrustAnchorUriOnly,configWithTrustStoreOnlyDefined, configWithWithMetadataSourceUri;
+    public static final String OVERRIDDENMETADATACA = "overriddenmetadataca";
+    public static final String OVERRIDDENROOTCA = "overriddenrootca";
+    private final String overriddenTrustAnchorUri = "http://overridden.trustanchoruri.example.com";
+    private final String overriddenMetadataSourceUri ="http://overridden.metadatsourceuri.example.com";
+    private String configEnabledOnly, configWithTrustAnchorUriOnly,configWithTrustStoreOnlyDefined, configWithMetadataSourceUri;
 
-    private static KeyStoreResource overridenKeyStoreResource;
+    private static KeyStoreResource overriddenKeyStoreResource;
 
-    private String configWithEmptyAggregataMetadata;
     public static final String IDAMETADATAG2 = "idametadatag2";
 
     @Before
     public void setUp() {
-        overridenKeyStoreResource = KeyStoreResourceBuilder.aKeyStoreResource()
-                .withCertificate(OVERRIDENMETADATACA, CACertificates.TEST_METADATA_CA)
-                .withCertificate(OVERRIDENROOTCA, CACertificates.TEST_ROOT_CA).build();
+        overriddenKeyStoreResource = KeyStoreResourceBuilder.aKeyStoreResource()
+                .withCertificate(OVERRIDDENMETADATACA, CACertificates.TEST_METADATA_CA)
+                .withCertificate(OVERRIDDENROOTCA, CACertificates.TEST_ROOT_CA).build();
 
-        overridenKeyStoreResource.create();
+        overriddenKeyStoreResource.create();
 
         configEnabledOnly = new JSONObject().put("enabled", true).toString();
 
         configWithTrustAnchorUriOnly = new JSONObject()
                 .put("enabled", true)
                 .put("hubConnectorEntityId","some-entity-id")
-                .put("aggregatedMetadata", new JSONObject()
-                    .put("trustAnchorUri", overridenTrustAnchorUri)
-                ).toString();
+                .put("trustAnchorUri", overriddenTrustAnchorUri)
+                .toString();
 
         configWithTrustStoreOnlyDefined = new JSONObject()
                 .put("enabled", true)
                 .put("hubConnectorEntityId","some-entity-id")
-                .put("aggregatedMetadata", new JSONObject()
-                        .put("trustStore", new JSONObject()
-                                .put("path", overridenKeyStoreResource.getAbsolutePath())
-                                .put("password", overridenKeyStoreResource.getPassword())
-                        )
-                ).toString();
+                .put("trustStore", new JSONObject()
+                        .put("path", overriddenKeyStoreResource.getAbsolutePath())
+                        .put("password", overriddenKeyStoreResource.getPassword())
+                )
+                .toString();
 
-        configWithWithMetadataSourceUri = new JSONObject()
+        configWithMetadataSourceUri = new JSONObject()
                 .put("enabled", true)
                 .put("hubConnectorEntityId","some-entity-id")
-                .put("aggregatedMetadata", new JSONObject()
-                        .put("metadataSourceUri",overridenMetadataSourceUri)
-                ).toString();
-
-        configWithEmptyAggregataMetadata = new JSONObject()
-                .put("enabled", true)
-                .put("hubConnectorEntityId","some-entity-id")
-                .put("aggregatedMetadata", new JSONObject()
-                ).toString();
+                .put("metadataSourceUri", overriddenMetadataSourceUri)
+                .toString();
 
     }
     @Test
@@ -103,7 +93,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getTrustAnchorUri().toString()).isEqualTo(overridenTrustAnchorUri);
+        assertThat(europeanIdentityConfiguration.getTrustAnchorUri().toString()).isEqualTo(overriddenTrustAnchorUri);
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataSourceUri());
     }
 
@@ -114,10 +104,10 @@ public class EuropeanIdentityConfigurationTest {
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithTrustStoreOnlyDefined, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(OVERRIDENMETADATACA);
+        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(OVERRIDDENMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(OVERRIDENROOTCA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(OVERRIDENMETADATACA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(OVERRIDDENROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(OVERRIDDENMETADATACA)).isTrue();
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isNotEqualTo(integrationEntryCert);
 
@@ -130,7 +120,7 @@ public class EuropeanIdentityConfigurationTest {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
         Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
 
-        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
+        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
         Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
 
@@ -140,7 +130,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataTrustAnchorUri());
-        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overridenMetadataSourceUri);
+        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overriddenMetadataSourceUri);
 
     }
 
@@ -180,7 +170,7 @@ public class EuropeanIdentityConfigurationTest {
         KeyStore productionKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(PRODUCTION_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
         Certificate productionEntryCert =  productionKeyStore.getCertificate(IDAMETADATAG2);
 
-        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
+        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.PRODUCTION);
         Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATAG2);
 
@@ -190,7 +180,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanConfigCert).isEqualTo(productionEntryCert);
 
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.PRODUCTION.getEidasMetadataTrustAnchorUri());
-        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overridenMetadataSourceUri);
+        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overriddenMetadataSourceUri);
     }
 
     @Test
@@ -198,7 +188,7 @@ public class EuropeanIdentityConfigurationTest {
         KeyStore complianceKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
         Certificate complianceEntryCert =  complianceKeyStore.getCertificate(IDAMETADATA);
 
-        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
+        EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.COMPLIANCE_TOOL);
         Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
 
@@ -208,7 +198,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanConfigCert).isEqualTo(complianceEntryCert);
 
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
-        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overridenMetadataSourceUri);
+        assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overriddenMetadataSourceUri);
 
     }
 }
