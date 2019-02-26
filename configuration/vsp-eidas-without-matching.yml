@@ -51,10 +51,9 @@ samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED:-false}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
-  aggregatedMetadata:
-    trustAnchorUri: ${TRUST_ANCHOR_URI:-"http://example"}
-    metadataSourceUri: ${METADATA_SOURCE_URI:-"http://example"}
-    trustStore:
-      path: ida_metadata_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
-    jerseyClientName: trust-anchor-client
+  trustAnchorUri: ${TRUST_ANCHOR_URI:-"http://example"}
+  metadataSourceUri: ${METADATA_SOURCE_URI:-"http://example"}
+  trustStore:
+    path: ida_metadata_truststore.ts
+    password: ${TRUSTSTORE_PASSWORD}
+  jerseyClientName: trust-anchor-client
