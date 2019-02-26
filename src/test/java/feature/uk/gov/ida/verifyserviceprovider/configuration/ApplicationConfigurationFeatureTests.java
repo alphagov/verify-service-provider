@@ -12,7 +12,6 @@ import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
 import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
-import javax.ws.rs.HEAD;
 import java.util.HashMap;
 
 import static org.apache.xml.security.utils.Base64.decode;
@@ -68,6 +67,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(30));
         assertThat(configuration.getEuropeanIdentity().isPresent()).isTrue();
+        assertThat(configuration.getEuropeanIdentity().get().getHubConnectorEntityId()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasHubConnectorEntityId());
         assertThat(configuration.getEuropeanIdentity().get().getMetadataSourceUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataSourceUri());
         assertThat(configuration.getEuropeanIdentity().get().getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
         assertThat(configuration.getEuropeanIdentity().get().getTrustStore().getCertificate("idaca").toString())

@@ -40,10 +40,6 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.trustStoreConfiguration = trustStore;
     }
 
-    public String getHubConnectorEntityId() {
-        return hubConnectorEntityId;
-    }
-
     @JsonIgnore
     public void setEnvironment(HubEnvironment environment) {
         this.environment = environment;
@@ -51,6 +47,11 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public String getHubConnectorEntityId() {
+        return Optional.ofNullable(hubConnectorEntityId)
+                .orElse(environment.getEidasHubConnectorEntityId());
     }
 
     @Override
