@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.aValidEidasResponse;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidAssertionSignatureEidasResponse;
