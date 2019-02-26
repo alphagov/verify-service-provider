@@ -126,7 +126,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
             verifyMetadataServer.register(VERIFY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, new MetadataFactory().defaultMetadata());
 
             trustAnchorServer.reset();
-            trustAnchorServer.register(TRUST_ANCHOR_PATH, 200, MediaType.APPLICATION_OCTET_STREAM, buildTrustAnchorString());
+            trustAnchorServer.register(TRUST_ANCHOR_PATH, 200, MediaType.APPLICATION_OCTET_STREAM, buildTrustAnchorString(countryEntityId));
 
             metadataAggregatorServer.reset();
             metadataAggregatorServer.register(METADATA_SOURCE_PATH + "/" + entityIdAsResource(countryEntityId), 200, Constants.APPLICATION_SAMLMETADATA_XML, testCountryMetadata);
@@ -137,7 +137,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
         super.before();
     }
 
-    private String buildTrustAnchorString() throws JOSEException, CertificateEncodingException {
+    private String buildTrustAnchorString(String countryEntityId) throws JOSEException, CertificateEncodingException {
         X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
         PrivateKey trustAnchorKey = new PrivateKeyFactory().createPrivateKey(Base64.getDecoder().decode(METADATA_SIGNING_A_PRIVATE_KEY));
         X509Certificate trustAnchorCert = x509CertificateFactory.createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);

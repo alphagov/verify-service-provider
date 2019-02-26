@@ -39,7 +39,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
         @JsonProperty("msaMetadata") @NotNull @Valid Optional<MsaMetadataConfiguration> msaMetadata,
         @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
-        @JsonProperty("europeanIdentity") @Valid EuropeanIdentityConfiguration europeanIdentity
+        @JsonProperty("europeanIdentity") @Valid Optional<EuropeanIdentityConfiguration> europeanIdentity
     ) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
@@ -49,7 +49,8 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
         this.msaMetadata = msaMetadata;
         this.clockSkew = clockSkew;
-        this.europeanIdentity = Optional.ofNullable(europeanIdentity);
+        this.europeanIdentity = europeanIdentity;
+        this.europeanIdentity.ifPresent(eid -> eid.setEnvironment(verifyHubConfiguration.getHubEnvironment()));
     }
 
     public List<String> getServiceEntityIds() {
