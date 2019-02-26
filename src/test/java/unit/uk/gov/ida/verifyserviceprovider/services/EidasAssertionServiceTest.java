@@ -11,6 +11,7 @@ import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_HIGH;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_SUBSTANTIAL;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
@@ -70,6 +72,8 @@ public class EidasAssertionServiceTest {
     private SignatureValidatorFactory signatureValidatorFactory;
     @Mock
     private SamlAssertionsSignatureValidator samlAssertionsSignatureValidator;
+    @Mock
+    private EuropeanIdentityConfiguration europeanIdentityConfiguration;
 
     @Before
     public void setUp() {
@@ -84,7 +88,8 @@ public class EidasAssertionServiceTest {
             conditionsValidator,
             levelOfAssuranceValidator,
             Optional.of(metadataResolverRepository),
-            signatureValidatorFactory);
+            signatureValidatorFactory,
+            Optional.of(HUB_CONNECTOR_ENTITY_ID));
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());

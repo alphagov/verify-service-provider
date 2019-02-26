@@ -155,9 +155,12 @@ public class NonMatchingEidasAcceptanceTest {
         dateOfBirth.getAttributeValues().add(dateOfBirthValue);
         attributeStatementBuilder.addAttribute(dateOfBirth);
 
-        org.opensaml.saml.saml2.core.Response samlResponse = aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId(),
-                attributeStatementBuilder.build()
-                ).build();
+        org.opensaml.saml.saml2.core.Response samlResponse = aValidEidasResponse(
+                "requestId",
+                appWithEidasEnabled.getCountryEntityId(),
+                attributeStatementBuilder.build())
+                .build();
+
         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(samlResponse);
         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
                 Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))

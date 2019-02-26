@@ -126,7 +126,8 @@ public class VerifyServiceProviderFactory {
         EidasAssertionService eidasAssertionService = responseFactory.createEidasAssertionService(
                 isEidasEnabled(),
                 dateTimeComparator,
-                getEidasMetadataResolverRepository()
+                getEidasMetadataResolverRepository(),
+                configuration.getEuropeanIdentity()
         );
 
         return new TranslateSamlResponseResource<>(
