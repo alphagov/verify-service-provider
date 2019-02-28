@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
+import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.AUTHENTICATION_FAILED;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
 
@@ -360,10 +361,11 @@ public class NonMatchingAcceptanceTest {
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
 
-        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
-
-        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(AUTHENTICATION_FAILED.name());
+        assertThat(jsonResponse.has("levelOfAssurance")).isFalse();
+        assertThat(jsonResponse.has("pid")).isFalse();
+        assertThat(jsonResponse.has("attributes")).isFalse();
     }
 
     @Test
