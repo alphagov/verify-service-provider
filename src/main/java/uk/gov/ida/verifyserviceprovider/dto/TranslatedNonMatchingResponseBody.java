@@ -1,17 +1,18 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody {
 
     @JsonProperty("scenario")
     private final NonMatchingScenario scenario;
-    @JsonProperty("pid")
+    @JsonProperty("pid") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final String pid;
-    @JsonProperty("levelOfAssurance")
+    @JsonProperty("levelOfAssurance") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final LevelOfAssurance levelOfAssurance;
-    @JsonProperty("attributes")
+    @JsonProperty("attributes") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final NonMatchingAttributes attributes;
 
     @JsonCreator
