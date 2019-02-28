@@ -1,0 +1,21 @@
+<!--
+    Logback Configuration for testing AuthnRequestAtrributesLogger usage of MDC.
+-->
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="AuthnRequestAttributesLogger" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%msg%X{requestId} %X{destination} %X{issueInstant} %X{issuer}%n</pattern>
+        </encoder>
+    </appender>
+    <root level="TRACE">
+        <appender-ref ref="stdout"/>
+    </root>
+    <logger name="uk.gov.ida.verifyserviceprovider.logging.AuthnRequestAttributesHelper" level="INFO">
+        <appender-ref ref="AuthnRequestAttributesLogger"/>
+    </logger>
+</configuration>

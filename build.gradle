@@ -49,14 +49,14 @@ dependencies {
     testCompile(
         'junit:junit:4.12',
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:2.23.4',
+        'org.mockito:mockito-core:2.24.5',
         "uk.gov.ida:saml-metadata-bindings-test:$samlLibVersion",
         "uk.gov.ida:saml-utils:$samlLibVersion",
         "uk.gov.ida:common-test-utils:2.0.0-44",
         "org.jsoup:jsoup:1.11.1",
-        "javax.xml.bind:jaxb-api:$jaxbapiVersion",
         "uk.gov.ida:hub-saml-test-utils:$hub_saml",
         "uk.gov.ida:saml-test-utils:$samlLibVersion",
+        "javax.activation:javax.activation-api:1.2.0",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
@@ -89,6 +89,11 @@ sourceSets {
         compileClasspath += sourceSets.main.runtimeClasspath
         compileClasspath += sourceSets.test.runtimeClasspath
         compileClasspath += sourceSets.test.output
+    }
+    test {
+        resources {
+            srcDir 'src/test/resources'
+        }
     }
 }
 
