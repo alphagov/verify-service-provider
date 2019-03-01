@@ -41,7 +41,7 @@ hashingEntityId: ${HASHING_ENTITY_ID:-}
 # Verify Hub Environment. This tells the service provider where the Verify Hub
 # authentication flow begins and where to find the hub metadata the Verify Service
 # Provider consumes to identify the hub.
-# Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
+# For example: INTEGRATION, PRODUCTION
 verifyHubConfiguration:
   environment: ${VERIFY_ENVIRONMENT:-}
 
