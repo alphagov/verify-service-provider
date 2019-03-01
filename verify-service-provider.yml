@@ -70,11 +70,3 @@ europeanIdentity:
   # `enabled: false` means your VSP won't process European identities, but
   # the section must contain valid key-value pairs.
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
-  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
-  aggregatedMetadata:
-    trustAnchorUri: ${TRUST_ANCHOR_URI}
-    metadataSourceUri: ${METADATA_SOURCE_URI}
-    trustStore:
-      path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
-    jerseyClientName: trust-anchor-client
