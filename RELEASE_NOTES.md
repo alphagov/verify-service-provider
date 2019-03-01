@@ -38,7 +38,7 @@ If your service needs to match user information from GOV.UK Verify with data you
 
 #### Metadata health check changes
 
-Changed metadata health check names to use the URI of the metadata they are trying to resolve. For example, the healthcheck title that used to be `hubMetadata` is now `https://signin.service.gov.uk`. If you are using an [MSA](https://github.com/alphagov/verify-matching-service-adapter), the healthcheck title `msaMetadata` becomes your metadata URI, for example `https://msa.govservice.internal`
+Changed metadata health check names to use the URI of the metadata they are trying to resolve. For example, the healthcheck title that used to be `hubMetadata` is now `https://signin.service.gov.uk`. If you are using a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter), the healthcheck title `msaMetadata` becomes your metadata URI, for example `https://msa.govservice.internal`.
 
 ### 1.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)
