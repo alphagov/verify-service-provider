@@ -20,6 +20,11 @@ If you want to switch off your Matching Service Adapter and only use the Verify 
 
 For more information on connecting to GOV.UK Verify using only the VSP, see the [technical documentation](https://www.docs.verify.service.gov.uk).
 
+#### Improved command line interface
+
+You can use the VSP's new `development` command when setting up your own client for the VSP.
+Find out more about [the `development` command and its options](https://github.com/alphagov/verify-service-provider/blob/master/README.md#development).
+
 #### Improved technical documentation
 
 The [new technical documentation website](https://www.docs.verify.service.gov.uk) has new guidance to help users connect to GOV.UK Verify using the VSP.
