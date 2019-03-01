@@ -1,273 +1,299 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
-  description: 'This is a description of the API for the Verify Service Provider.'
-  version: 0.3.0
+  description: >- 
+    This page provides a description of the API for the Verify Service Provider when it run while connected to a Matching Service Adapter.
+  version: 2.0.0
   title: Verify Service Provider
-basePath: /
-tags:
-- name: 'Verify Service Provider API'
 paths:
   /generate-request:
     post:
-      tags:
-      - 'Verify Service Provider API'
-      description: 'Generate a SAML Authentication Request (AuthnRequest).'
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: RequestGenerationBody
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/RequestGenerationBody'
+      summary: Generate a SAML Authentication Request
+      description:  Generate a SAML Authentication Request (AuthnRequest).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestGenerationBody'
+        required: true
       responses:
-        200:
-          description: 'Contains an object with a valid SAML Authentication request that can be consumed by the Verify service.'
-          schema:
-            $ref: '#/definitions/RequestResponseBody'
-        422:
-          description: 'An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).'
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-          examples:
-            'errorMessage':
-              code: 422
-              message: 'Some error message'
-        500:
-          description: 'An error due to an internal server error.'
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-          examples:
-            'errorMessage':
-              code: 500
-              message: 'Some error message'
+        '200':
+          description: >-
+            Contains an object with a valid SAML Authentication request that can
+            be consumed by the Verify service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestResponseBody'
+        '422':
+          description: >-
+            An error due to a JSON request in an invalid format (e.g. missing
+            mandatory parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 422
+                message: Some error message
+        '500':
+          description: An error due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 500
+                message: Some error message
   /translate-response:
     post:
-      tags:
-      - 'Verify Service Provider API'
-      description: 'Consumes a SAML Response received from the Verify service and returns JSON.'
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: TranslateSamlResponseBody
-          description: 'An object containing the SAML response returned by the Verify service.'
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/TranslateSamlResponseBody'
+      summary: Translate a SAML Response
+      description: >-
+        Translate a SAML Response received from the GOV.UK Verify Hub into JSON.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslateSamlResponseBody'
+        description: An object containing the SAML response returned by the Verify service.
+        required: true
       responses:
-        200:
+        '200':
           description: 'Contains the details of the SAML response, translated into JSON.'
-          schema:
-            $ref: '#/definitions/TranslatedResponseBody'
-        400:
-          description: 'An error due to a problem with translating the Response.'
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-          examples:
-            'errorMessage':
-              code: 400
-              message: 'Some error message'
-        422:
-          description: 'An error due to a JSON request in an invalid format (e.g. missing mandatory parameters).'
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-          examples:
-            'errorMessage':
-              code: 422
-              message: 'Some error message'
-        500:
-          description: 'An error due to an internal server error.'
-          schema:
-            $ref: '#/definitions/ErrorMessage'
-          examples:
-            'errorMessage':
-              code: 500
-              message: 'Some error message'
-definitions:
-  RequestGenerationBody:
-    type: object
-    properties:
-      levelOfAssurance:
-        $ref: '#/definitions/RequiredLevelOfAssurance'
-      entityId:
-        $ref: '#/definitions/EntityId'
-  RequestResponseBody:
-    type: object
-    required:
-      - samlRequest
-      - requestId
-      - ssoLocation
-    properties:
-      samlRequest:
-        description: 'SAML Authn Request as a base64 string.'
-        type: string
-        format: byte
-      requestId:
-        description: >-
-          A token that identifies the Authn Request. This is used later to
-          verify that the Authn Request and SAML Response have passed through the same
-          browser.
-        type: string
-        format: byte
-      ssoLocation:
-        description: 'The url for Verify Hub SSO. The entrypoint for SAML authentication flow.'
-        type: string
-        format: url
-  TranslateSamlResponseBody:
-    type: object
-    required:
-      - samlResponse
-      - requestId
-      - levelOfAssurance
-    properties:
-      samlResponse:
-        description: 'A SAML Response as a base64 string.'
-        type: string
-        format: byte
-      requestId:
-        description: >-
-          A token that was generated for the original SAML Authn Request. This is used
-          to verify that the Authn Request and SAML Response have passed  through the
-          same browser.
-        type: string
-        format: byte
-      levelOfAssurance:
-        $ref: '#/definitions/RequiredLevelOfAssurance'
-      entityId:
-        $ref: '#/definitions/EntityId'
-  TranslatedResponseBody:
-    type: object
-    required:
-      - scenario
-      - pid
-    properties:
-      scenario:
-        $ref: '#/definitions/Scenario'
-      pid:
-        description: >-
-          A unique identifier that can identify a user against an internal
-          record.
-        type: string
-        format: byte
-      levelOfAssurance:
-        $ref: '#/definitions/ReceivedLevelOfAssurance'
-      attributes:
-        $ref: '#/definitions/Attributes'
-  RequiredLevelOfAssurance:
-    description: 'The minimum level of assurance required by the Relying Party Service.'
-    type: string
-    enum:
-      - LEVEL_1
-      - LEVEL_2
-  EntityId:
-    description: >-
-      The Entity Id for the service interacting with the Verify Service Provider.
-      This is required if the Verify Service Provider is set up for multi-tenanted
-      use, otherwise it is optional. The value, if provided, must be one of those
-      listed in the configuration for the Verify Service Provider.
-    type: string
-  ReceivedLevelOfAssurance:
-    description: 'Level of assurance the user was authenticated with.'
-    type: string
-    enum:
-      - LEVEL_1
-      - LEVEL_2
-  Scenario:
-    type: string
-    enum:
-      - SUCCESS_MATCH
-      - ACCOUNT_CREATION
-      - NO_MATCH
-      - CANCELLATION
-      - AUTHENTICATION_FAILED
-      - REQUEST_ERROR
-  Attributes:
-    description: >-
-      An optional object containing attributes.
-      If user-account-creation is enabled in the Relying Party  Service, and no
-      match was possible, these attributes are used to create a new account.
-    type: object
-    properties:
-      firstName:
-        type: object
-        properties:
-          value:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SuccessfulMatchResponseBody'
+                - $ref: '#/components/schemas/AccountCreationResponseBody'
+                - $ref: '#/components/schemas/NoAuthenticationResponseBody'
+        '400':
+          description: An error due to a problem with translating the Response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 400
+                message: Some error message
+        '422':
+          description: >-
+            An error due to a JSON request in an invalid format (e.g. missing
+            mandatory parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 422
+                message: Some error message
+        '500':
+          description: An error due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 500
+                message: Some error message
+components:
+  schemas:
+    RequestGenerationBody:
+      type: object
+      required:
+        - levelOfAssurance
+      properties:
+        levelOfAssurance:
+          $ref: '#/components/schemas/RequiredLevelOfAssurance'
+        entityId:
+          $ref: '#/components/schemas/EntityId'
+    RequestResponseBody:
+      type: object
+      required:
+        - samlRequest
+        - requestId
+        - ssoLocation
+      properties:
+        samlRequest:
+          description: 'SAML Authn Request as a base64 string.'
+          type: string
+          format: byte
+        requestId:
+          description: >-
+            A token that identifies the Authn Request. This is used later to
+            verify that the Authn Request and SAML Response have passed through the same
+            browser.
+          type: string
+          format: byte
+        ssoLocation:
+          description: 'The url for Verify Hub SSO. The entrypoint for SAML authentication flow.'
+          type: string
+          format: url
+    TranslateSamlResponseBody:
+      type: object
+      required:
+        - samlResponse
+        - requestId
+        - levelOfAssurance
+      properties:
+        samlResponse:
+          description: 'A SAML Response as a base64 string.'
+          type: string
+          format: byte
+        requestId:
+          description: >-
+            A token that was generated for the original SAML Authn Request. This is used
+            to verify that the Authn Request and SAML Response have passed  through the
+            same browser.
+          type: string
+          format: byte
+        levelOfAssurance:
+          $ref: '#/components/schemas/RequiredLevelOfAssurance'
+        entityId:
+          $ref: '#/components/schemas/EntityId'
+    SuccessfulMatchResponseBody:
+      type: object
+      description: Returned when the user has been successfully matched to your local datastore.
+      properties:
+        scenario:
+          type: string
+          enum: 
+            - SUCCESS_MATCH
+          description: Returned when the user has been successfully matched to your local datastore.
+        pid:
+          description: >-
+            A unique identifier that can identify a user against an internal
+            record.
+          type: string
+          format: byte
+    AccountCreationResponseBody:
+      allOf:
+      - $ref: '#/components/schemas/SuccessfulMatchResponseBody'
+      - properties:
+          scenario:
             type: string
-          verified:
-            type: boolean
-      middleName:
-        type: object
-        properties:
-          value:
-            type: string
-          verified:
-            type: boolean
-      surname:
-        type: object
-        properties:
-          value:
-            type: string
-          verified:
-            type: boolean
-      dateOfBirth:
-        type: object
-        properties:
-          value:
-            description: Format yyyy-MM-dd
-            type: string
-          verified:
-            type: boolean
-      address:
-        type: object
-        properties:
-          value:
-            $ref: '#/definitions/Address'
-          verified:
-            type: boolean
-      addressHistory:
-        type: array
-        items:
+            enum: 
+              - ACCOUNT_CREATION
+            description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
+          levelOfAssurance:
+            $ref: '#/components/schemas/ReceivedLevelOfAssurance'
+          attributes:
+            $ref: '#/components/schemas/AccountCreationAttributes'
+        description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
+    NoAuthenticationResponseBody:
+      description: Returned when the user has not been successfully matched to your local datastore, no authentication took place, or there was a failure to authneticate.
+      type: object
+      properties:
+        scenario:
+          type: string
+          enum:
+            - NO_MATCH
+            - CANCELLATION
+            - AUTHENTICATION_FAILED
+            - REQUEST_ERROR
+          description: Returned when the user has not been successfully matched to your local datastore, no authentication took place, or there was a failure to authneticate.
+    RequiredLevelOfAssurance:
+      description: 'The minimum level of assurance required by the Relying Party Service.'
+      type: string
+      enum:
+        - LEVEL_1
+        - LEVEL_2
+    EntityId:
+      description: >-
+        The Entity Id for the service interacting with the Verify Service Provider.
+        This is required if the Verify Service Provider is set up for multi-tenanted
+        use, otherwise it is optional. The value, if provided, must be one of those
+        listed in the configuration for the Verify Service Provider.
+      type: string
+    ReceivedLevelOfAssurance:
+      description: 'Level of assurance the user was authenticated with.'
+      type: string
+      enum:
+        - LEVEL_1
+        - LEVEL_2
+    AccountCreationAttributes:
+      description: >-
+        An optional object containing attributes.
+        If user-account-creation is enabled in the Relying Party Service, and no
+        match was possible, these attributes are used to create a new account.
+      type: object
+      properties:
+        firstName:
           type: object
           properties:
             value:
-              $ref: '#/definitions/Address'
+              type: string
             verified:
               type: boolean
-      cycle3:
-        type: string
-  Address:
-    description: >-
-      An object describing the address fields of a user
-    type: object
-    properties:
-      lines:
-        type: array
-        items:
+        middleName:
+          type: object
+          properties:
+            value:
+              type: string
+            verified:
+              type: boolean
+        surname:
+          type: object
+          properties:
+            value:
+              type: string
+            verified:
+              type: boolean
+        dateOfBirth:
+          type: object
+          properties:
+            value:
+              description: Format yyyy-MM-dd
+              type: string
+            verified:
+              type: boolean
+        address:
+          type: object
+          properties:
+            value:
+              $ref: '#/components/schemas/Address'
+            verified:
+              type: boolean
+        addressHistory:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                $ref: '#/components/schemas/Address'
+              verified:
+                type: boolean
+        cycle3:
           type: string
-      postCode:
-        type: string
-      internationalPostCode:
-        type: string
-      uprn:
-        type: string
-      fromDate:
-        description: Format yyyy-MM-dd
-        type: string
-      toDate:
-        description: Format yyyy-MM-dd
-        type: string
-  ErrorMessage:
-    type: object
-    required:
-      - code
-      - message
-    properties:
-      code:
-        type: number
-      message:
-        type: string
+    Address:
+      description: >-
+        An object describing the address fields of a user
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+        postCode:
+          type: string
+        internationalPostCode:
+          type: string
+        uprn:
+          type: string
+        fromDate:
+          type: string
+          format: date
+        toDate:
+          type: string
+          format: date
+    ErrorMessage:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+        message:
+          description: A description of the error
+          type: string
