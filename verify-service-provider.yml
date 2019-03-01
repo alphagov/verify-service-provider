@@ -22,10 +22,12 @@ logging:
 clockSkew: ${CLOCK_SKEW:-PT30s}
 
 # Entity ID (or IDs) that uniquely identifies your service (or services)
-serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
-# This should be provided as a JSON array, e.g. '["service-entity-id"]'
-# To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
+#
+# `serviceEntityIds` is a JSON array, for example '["service-entity-id"]'.
+# To connect more than one service to a single VSP deployment, add all the
+# service entity IDs to the JSON array, for example:
 # '["service-one-entity-id", "service-two-entity-id"]'
+serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
 
 # This applies if you're connecting using only the VSP
 # TODO Explain what this is and how it should be configured
