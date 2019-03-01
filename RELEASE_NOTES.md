@@ -27,7 +27,7 @@ Find out more about [the `development` command and its options](https://github.c
 
 #### Improved technical documentation
 
-The [new technical documentation website](https://www.docs.verify.service.gov.uk) has new guidance to help users connect to GOV.UK Verify using the VSP.
+There is a [new technical documentation website](https://www.docs.verify.service.gov.uk) with guidance to help users connect to GOV.UK Verify using the VSP.
 
 Follow the step-by-step guides in the 'Get started' section to make sure your service correctly uses the VSP to handle:
 
