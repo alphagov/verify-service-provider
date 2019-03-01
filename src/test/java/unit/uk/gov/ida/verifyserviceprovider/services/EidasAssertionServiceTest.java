@@ -15,6 +15,7 @@ import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfigurat
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
@@ -74,6 +75,8 @@ public class EidasAssertionServiceTest {
     private SamlAssertionsSignatureValidator samlAssertionsSignatureValidator;
     @Mock
     private EuropeanIdentityConfiguration europeanIdentityConfiguration;
+    @Mock
+    private UserIdHashFactory userIdHashFactory;
 
     @Before
     public void setUp() {
@@ -89,7 +92,8 @@ public class EidasAssertionServiceTest {
             levelOfAssuranceValidator,
             Optional.of(metadataResolverRepository),
             signatureValidatorFactory,
-            Optional.of(HUB_CONNECTOR_ENTITY_ID));
+            Optional.of(HUB_CONNECTOR_ENTITY_ID),
+            userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());

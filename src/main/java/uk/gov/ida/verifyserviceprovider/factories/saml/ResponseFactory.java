@@ -157,7 +157,8 @@ public class ResponseFactory {
             boolean isEnabled,
             DateTimeComparator dateTimeComparator,
             Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository,
-            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration
+            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration,
+            String hashingEntityId
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
@@ -172,7 +173,8 @@ public class ResponseFactory {
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
-                europeanIdentityConfiguration.map(EuropeanIdentityConfiguration :: getHubConnectorEntityId)
+                europeanIdentityConfiguration.map(EuropeanIdentityConfiguration :: getHubConnectorEntityId),
+                new UserIdHashFactory(hashingEntityId)
                 );
     }
 

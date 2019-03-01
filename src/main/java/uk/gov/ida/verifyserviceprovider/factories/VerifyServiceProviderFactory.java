@@ -127,7 +127,8 @@ public class VerifyServiceProviderFactory {
                 isEidasEnabled(),
                 dateTimeComparator,
                 getEidasMetadataResolverRepository(),
-                configuration.getEuropeanIdentity()
+                configuration.getEuropeanIdentity(),
+                configuration.getHashingEntityId()
         );
 
         return new TranslateSamlResponseResource<>(
