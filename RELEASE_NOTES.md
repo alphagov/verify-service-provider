@@ -34,8 +34,7 @@ Follow the step-by-step guides in the 'Get started' section to make sure your se
 - [successful verification responses](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey)
 - [possible failure scenarios](https://www.docs.verify.service.gov.uk/get-started/handle-failure-scenarios)
 
-**TODO**
-In case your service needs to do matching, [this page](LINK) has guidelines about what to do.
+If your service needs to match user information from GOV.UK Verify with data you already hold, there is [guidance on what you should consider when setting up matching](https://www.docs.verify.service.gov.uk/legacy/matching-guidance/#matching).
 
 #### Metadata health check changes
 
