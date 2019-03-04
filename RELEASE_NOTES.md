@@ -3,7 +3,7 @@ Release notes
 
 ### Next
 
-#### Connect to Verify using only the VSP
+#### Connect to GOV.UK Verify using only the VSP
 
 This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). If needed, services can then implement matching independently from their connection to GOV.UK Verify.
 
@@ -16,18 +16,16 @@ When used alone, the VSP provides the required MSA functionality. It will:
 
 If you are already connected to GOV.UK Verify and are running an MSA, you can upgrade to VSP 2.0.0 without needing to do any configuration changes.
 
-If you want to switch off your Matching Service Adapter and only use the Verify Service Provider to connect to Verify, [contact the GOV.UK Verify Team](https://www.verify.service.gov.uk/support/).
-
-For more information on connecting to GOV.UK Verify using only the VSP, see the [technical documentation](https://www.docs.verify.service.gov.uk).
+If you want to switch off your Matching Service Adapter and only use the Verify Service Provider to connect to GOV.UK Verify, [contact the GOV.UK Verify Team](https://www.verify.service.gov.uk/support/).
 
 #### Improved command line interface
 
 You can use the VSP's new `development` command when setting up your own client for the VSP.
 Find out more about [the `development` command and its options](https://github.com/alphagov/verify-service-provider/blob/master/README.md#development).
 
-#### Improved technical documentation
+#### Updated technical documentation
 
-There is a [new technical documentation website](https://www.docs.verify.service.gov.uk) with guidance to help users connect to GOV.UK Verify using the VSP.
+We published [updated technical documentation](https://www.docs.verify.service.gov.uk/get-started) on setting up the VSP.
 
 Follow the step-by-step guides in the 'Get started' section to make sure your service correctly uses the VSP to handle:
 
