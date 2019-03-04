@@ -16,7 +16,7 @@ public class EntityIdServiceTest {
     private final String otherEntityId = "http://other.provided.entity.id";
 
     @Test
-    public void ShouldReturnDefaultEntityIdWhenNoneProvidedForSingleTenant_GenerateRequest() {
+    public void shouldReturnDefaultEntityIdWhenNoneProvidedForSingleTenantForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(null, null);
 
@@ -24,13 +24,13 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldReturnDefaultEntityIdWhenNullBodyProvidedForSingleTenant_GenerateRequest() {
+    public void shouldReturnDefaultEntityIdWhenNullBodyProvidedForSingleTenantForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         assertThat(entityIdService.getEntityId((RequestGenerationBody)null)).isEqualTo(entityId);
     }
 
     @Test
-    public void ShouldReturnDefaultEntityIdWhenNoneProvidedForSingleTenant_TranslateResponse() {
+    public void shouldReturnDefaultEntityIdWhenNoneProvidedForSingleTenantForTranslateResponse() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, null);
 
@@ -38,7 +38,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldReturnProvidedEntityIdWhenItIsInConfig_GenerateRequest() {
+    public void shouldReturnProvidedEntityIdWhenItIsInConfigForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(null, otherEntityId);
 
@@ -46,7 +46,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldReturnProvidedEntityIdWhenItIsInConfig_AuthnRequest() {
+    public void shouldReturnProvidedEntityIdWhenItIsInConfigForAuthnRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, otherEntityId);
 
@@ -54,7 +54,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldReturnProvidedEntityIdWhenItIsTheOnlyOneInConfig_GenerateRequest() {
+    public void shouldReturnProvidedEntityIdWhenItIsTheOnlyOneInConfigForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(null, entityId);
 
@@ -62,7 +62,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldReturnProvidedEntityIdWhenItIsTheOnlyOneInConfig_AuthnRequest() {
+    public void shouldReturnProvidedEntityIdWhenItIsTheOnlyOneInConfigForAuthnRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, entityId);
 
@@ -70,7 +70,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldThrowInvalidEntityIdExceptionWhenNoEntityIdIsProvidedForMultipleTenancy_GenerateRequest() {
+    public void shouldThrowInvalidEntityIdExceptionWhenNoEntityIdIsProvidedForMultipleTenancyForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(null, null);
 
@@ -80,7 +80,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldThrowInvalidEntityIdExceptionWhenNoEntityIdIsProvidedForMultipleTenancy_AuthnRequest() {
+    public void shouldThrowInvalidEntityIdExceptionWhenNoEntityIdIsProvidedForMultipleTenancyForAuthnRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, null);
 
@@ -90,7 +90,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldThrowInvalidEntityIdExceptionWhenEntityIdProvidedIsNotInConfig_GenerateRequest() {
+    public void shouldThrowInvalidEntityIdExceptionWhenEntityIdProvidedIsNotInConfigForGenerateRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(null, "http://some.other.entity.id");
 
@@ -100,7 +100,7 @@ public class EntityIdServiceTest {
     }
 
     @Test
-    public void ShouldThrowInvalidEntityIdExceptionWhenEntityIdProvidedIsNotInConfig_AuthnRequest() {
+    public void shouldThrowInvalidEntityIdExceptionWhenEntityIdProvidedIsNotInConfigForAuthnRequest() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId, otherEntityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, "http://some.other.entity.id");
 
