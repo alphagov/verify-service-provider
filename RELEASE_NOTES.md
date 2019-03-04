@@ -3,8 +3,44 @@ Release notes
 
 ### Next
 
-* Included support for compilation on Java 9 and 10. Compilation on Java 9 or 10 will produce a multi-release JAR that will run on Java 8, 9, and 10. This release was compiled on Java 8 and does not contain a multi-release JAR.
-* Changed metadata health check names to use the URI of the metadata they are trying to resolve
+#### Connect to GOV.UK Verify using only the VSP
+
+This release adds the ability to connect to GOV.UK Verify using only the Verify Service Provider (VSP). This means services can connect without needing to host a [Matching Service Adapter (MSA)](https://github.com/alphagov/verify-matching-service-adapter). If needed, services can then implement matching independently from their connection to GOV.UK Verify.
+
+Using only the VSP makes it easier to connect to GOV.UK Verify and reduces maintenance tasks once connected.
+
+When used alone, the VSP provides the required MSA functionality. It will:
+* implement security features to the same level as the MSA
+* handle both GOV.UK Verify and European identities
+* do Personal Identifier (PID) hashing
+
+If you are already connected to GOV.UK Verify and are running an MSA, you can upgrade to VSP 2.0.0 without needing to do any configuration changes.
+
+If you want to switch off your Matching Service Adapter and only use the Verify Service Provider to connect to GOV.UK Verify, [contact the GOV.UK Verify Team](https://www.verify.service.gov.uk/support/).
+
+#### Improved command line interface
+
+You can use the VSP's new `development` command when setting up your own client for the VSP.
+Find out more about [the `development` command and its options](https://github.com/alphagov/verify-service-provider/blob/master/README.md#development).
+
+#### Updated technical documentation
+
+We published [updated technical documentation](https://www.docs.verify.service.gov.uk/get-started) on setting up the VSP.
+
+Follow the step-by-step guides in the 'Get started' section to make sure your service correctly uses the VSP to handle:
+
+- [successful verification responses](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey)
+- [possible failure scenarios](https://www.docs.verify.service.gov.uk/get-started/handle-failure-scenarios)
+
+If your service needs to match user information from GOV.UK Verify with data you already hold, there is [guidance on what you should consider when setting up matching](https://www.docs.verify.service.gov.uk/legacy/matching-guidance/#matching).
+
+#### Metadata health check changes
+
+Changed metadata health check names to use the URI of the metadata they are trying to resolve. For example, the healthcheck title that used to be `hubMetadata` is now `https://signin.service.gov.uk`. If you are using a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter), the healthcheck title `msaMetadata` becomes your metadata URI, for example `https://msa.govservice.internal`.
+
+#### Dropwizard version
+
+This release uses Dropwizard 1.3.5.
 
 ### 1.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)
@@ -13,7 +49,7 @@ Release notes
 * Make the banner that prints on startup less wide
 
 #### Configuration Changes:
-* If using a custom file-based trust store configuration, replace: 
+* If using a custom file-based trust store configuration, replace:
 ```diff
 - trustStorePath: /path/to/file
 - trustStorePassword: foobar
@@ -59,4 +95,3 @@ functional SAML service provider implementation that works with GOV.UK Verify.
 ### 0.1.0-prototype-0
 
 Pre-release of verify service provider prototype-0.
-
