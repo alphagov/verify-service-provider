@@ -110,7 +110,12 @@ public class NonMatchingEidasAcceptanceTest {
              Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
          );
 
+         String body = response.readEntity(String.class);
+         JSONObject json = new JSONObject(body);
+
          assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+         assertThat(json.getString("pid")).isNotEqualTo("default-pid");
+         assertThat(json.getString("pid")).isEqualTo("428eb6096580250e9edbac60566529c2e8f9dbfe9ea88999b8996f6dbc602160");
      }
 
     @Test
