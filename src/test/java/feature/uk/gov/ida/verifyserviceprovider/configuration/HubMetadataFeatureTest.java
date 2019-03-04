@@ -25,6 +25,8 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
+import static certificates.values.CACertificates.TEST_CORE_CA;
+import static certificates.values.CACertificates.TEST_IDP_CA;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -57,30 +59,43 @@ public class HubMetadataFeatureTest {
         IdaSamlBootstrap.bootstrap();
         wireMockServer.start();
         msaServer.serveDefaultMetadata();
-        KeyStoreResource verifyHubKeystoreResource = aKeyStoreResource()
+
+        KeyStoreResource metadataTrustStore = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())
             .build();
-        verifyHubKeystoreResource.create();
+        KeyStoreResource hubTrustStore = aKeyStoreResource()
+                .withCertificate("VERIFY-HUB", aCertificate().withCertificate(TEST_CORE_CA).build().getCertificate())
+                .build();
+        KeyStoreResource idpTrustStore = aKeyStoreResource()
+                .withCertificate("VERIFY-IDP", aCertificate().withCertificate(TEST_IDP_CA).build().getCertificate())
+                .build();
+
+        metadataTrustStore.create();
+        hubTrustStore.create();
+        idpTrustStore.create();
+
         applicationTestSupport = new DropwizardTestSupport<>(
             VerifyServiceProviderApplication.class,
             "verify-service-provider.yml",
             config("server.connector.port", "0"),
             config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             config("verifyHubConfiguration.metadata.uri", getHubMetadataUrl()),
-            config("msaMetadata.uri", msaServer::getUri),
-            config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
             config("verifyHubConfiguration.metadata.expectedEntityId", HUB_ENTITY_ID),
-            config("verifyHubConfiguration.metadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.trustStore.password", verifyHubKeystoreResource.getPassword()),
+            config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
+            config("verifyHubConfiguration.metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+            config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+            config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             config("serviceEntityIds", "[\"http://some-service-entity-id\"]"),
             config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
             config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
             config("europeanIdentity.enabled", "false"),
             config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://dummy.com"),
-            config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://dummy.com"),
-            config("europeanIdentity.aggregatedMetadata.trustStore.path", verifyHubKeystoreResource.getAbsolutePath()),
-            config("europeanIdentity.aggregatedMetadata.trustStore.password", verifyHubKeystoreResource.getPassword())
+            config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
+            config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
+            config("europeanIdentity.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            config("europeanIdentity.trustStore.password", metadataTrustStore.getPassword())
         );
     }
 

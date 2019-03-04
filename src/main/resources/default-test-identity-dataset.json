@@ -1,0 +1,56 @@
+{
+  "firstName": {
+    "value": "Default",
+    "from": "2013-02-22T14:32:14.064",
+    "to": "2015-10-02T09:32:14.967",
+    "verified": true
+  },
+  "middleNames": {
+    "value": "Person",
+    "from": "2013-02-22T14:32:14.064",
+    "to": "2015-10-02T09:32:14.967",
+    "verified": true
+  },
+  "surnames": [
+    {
+      "value": "Smith",
+      "from": "2013-02-22T14:32:14.064",
+      "to": "2015-10-02T09:32:14.967",
+      "verified": true
+    },
+    {
+      "value": "Smythington",
+      "from": "2015-10-02T09:32:14.967",
+      "to": "2018-03-03T10:20:50.163",
+      "verified": true
+    }
+  ],
+  "gender": {
+    "value": "NOT_SPECIFIED",
+    "from": "2013-02-22T14:32:14.064",
+    "to": "2015-10-02T09:32:14.967",
+    "verified": true
+  },
+  "dateOfBirth": {
+    "value": "1970-01-01",
+    "from": "2013-02-22T14:32:14.064",
+    "to": "2015-10-02T09:32:14.967",
+    "verified": true
+  },
+  "addresses": [
+    {
+      "verified": true,
+      "from": "2013-02-22T14:32:14.064",
+      "to": "2015-10-02T09:32:14.967",
+      "postCode": "E1 8QS",
+      "lines": [
+        "The White Chapel Building",
+        "10 Whitechapel High Street"
+      ],
+      "internationalPostCode": null,
+      "uprn": null
+    }
+  ],
+  "levelOfAssurance": "LEVEL_1",
+  "persistentId": "ff5de5e2-6070-44e7-985b-2079637b878e"
+}

@@ -1,6 +1,6 @@
 package uk.gov.ida.verifyserviceprovider;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -9,6 +9,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
+import uk.gov.ida.verifyserviceprovider.compliance.ComplianceToolMode;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
@@ -19,16 +20,16 @@ import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
 import javax.ws.rs.client.Client;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class VerifyServiceProviderApplication extends Application<VerifyServiceProviderConfiguration> {
 
     private MetadataResolverBundle<VerifyServiceProviderConfiguration> hubMetadataBundle;
     private MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle;
 
-    @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
-        hubMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getVerifyHubMetadata));
-        msaMetadataBundle = new MetadataResolverBundle<>((VerifyServiceProviderConfiguration::getMsaMetadata), false);
+        hubMetadataBundle = new MetadataResolverBundle<>(configuration -> Optional.ofNullable(configuration.getVerifyHubMetadata()));
+        msaMetadataBundle = new MetadataResolverBundle<>(VerifyServiceProviderConfiguration::getMsaMetadata, false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,9 +50,10 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
             )
         );
         IdaSamlBootstrap.bootstrap();
-        bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
+        bootstrap.getObjectMapper().setDateFormat(StdDateFormat.getInstance());
         bootstrap.addBundle(hubMetadataBundle);
         bootstrap.addBundle(msaMetadataBundle);
+        bootstrap.addCommand(new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), this));
     }
 
     @Override
@@ -69,9 +71,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(new InvalidEntityIdExceptionMapper());
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
-        environment.jersey().register(factory.getTranslateMatchingSamlResponseResource());
-        environment.jersey().register(factory.getTranslateNonMatchingSamlResponseResource());
-
+        environment.jersey().register(factory.getTranslateSamlResponseResource());
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }
 }

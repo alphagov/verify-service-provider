@@ -23,7 +23,6 @@ import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 
@@ -74,7 +73,7 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void containsCorrectAttributes() throws KeyException {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
 
         assertThat(authnRequest.getID()).isNotEmpty();
         assertThat(authnRequest.getIssueInstant()).isNotNull();
@@ -85,25 +84,25 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void shouldNotForceAuthn() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
         assertThat(authnRequest.isForceAuthn()).isFalse();
     }
 
     @Test
     public void signatureIDReferencesAuthnRequestID() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
         assertThat(authnRequest.getSignatureReferenceID()).isEqualTo(authnRequest.getID());
     }
 
     @Test
     public void destinationShouldMatchConfiguredSSOLocation() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
         assertThat(authnRequest.getDestination()).isEqualTo(DESTINATION.toString());
     }
 
     @Test
     public void issuerShouldMatchConfiguredEntityID() {
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
         assertThat(authnRequest.getIssuer().getValue()).isEqualTo(SERVICE_ENTITY_ID);
     }
 
@@ -111,7 +110,7 @@ public class AuthnRequestFactoryTest {
     public void shouldAddApplicationVersionInExtension() throws Exception {
         when(manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version")).thenReturn("some-version");
 
-        AuthnRequest authnRequest = factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        AuthnRequest authnRequest = factory.build(SERVICE_ENTITY_ID);
 
         Extensions extensions = authnRequest.getExtensions();
         EncryptedAttribute encryptedAttribute = (EncryptedAttribute) extensions.getUnknownXMLObjects().get(0);
@@ -125,7 +124,7 @@ public class AuthnRequestFactoryTest {
 
     @Test
     public void shouldGetVersionNumberFromManifestReader() throws IOException, KeyException {
-        factory.build(LevelOfAssurance.LEVEL_2, SERVICE_ENTITY_ID);
+        factory.build(SERVICE_ENTITY_ID);
 
         verify(manifestReader, times(1)).getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
     }

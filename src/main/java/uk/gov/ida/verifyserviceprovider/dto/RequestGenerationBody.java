@@ -1,14 +1,18 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
 
 public class RequestGenerationBody {
 
     private final LevelOfAssurance levelOfAssurance;
     private final String entityId;
+
+    public RequestGenerationBody(String entityId) {
+        this.levelOfAssurance = null;
+        this.entityId = entityId;
+    }
 
     @JsonCreator
     public RequestGenerationBody(
@@ -18,7 +22,7 @@ public class RequestGenerationBody {
         this.entityId = entityId;
     }
 
-    @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public LevelOfAssurance getLevelOfAssurance() {
         return levelOfAssurance;
     }

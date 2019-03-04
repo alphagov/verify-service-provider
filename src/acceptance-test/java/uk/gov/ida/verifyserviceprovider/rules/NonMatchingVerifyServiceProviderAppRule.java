@@ -2,14 +2,12 @@ package uk.gov.ida.verifyserviceprovider.rules;
 
 import certificates.values.CACertificates;
 import com.nimbusds.jose.JOSEException;
-import common.uk.gov.ida.verifyserviceprovider.servers.MockMsaServer;
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.KeyStoreResource;
 import keystore.builders.KeyStoreResourceBuilder;
 import org.joda.time.DateTime;
-import org.junit.After;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
@@ -60,34 +58,54 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
     private static final HttpStubRule metadataAggregatorServer = new HttpStubRule();
     private static final HttpStubRule trustAnchorServer = new HttpStubRule();
     private static final HttpStubRule verifyMetadataServer = new HttpStubRule();
-    private static final MockMsaServer msaServer = new MockMsaServer();
     private String countryEntityId;
 
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource hubTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("hubCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource idpTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
 
     public NonMatchingVerifyServiceProviderAppRule() {
         super(
-            VerifyServiceProviderApplication.class,
-            "verify-service-provider.yml",
-            ConfigOverride.config("serviceEntityIds", TEST_RP),
-            ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
-            ConfigOverride.config("server.connector.port", String.valueOf(0)),
-            ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
-            ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
-            ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
-            ConfigOverride.config("verifyHubConfiguration.metadata.uri", () -> "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
-            ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
-            ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-            ConfigOverride.config("msaMetadata.uri", msaServer::getUri),
-            ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
-            ConfigOverride.config("europeanIdentity.enabled", "true"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.store", countryMetadataTrustStore.getAbsolutePath()),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.trustStorePassword", countryMetadataTrustStore.getPassword())
+                VerifyServiceProviderApplication.class,
+                "configuration/vsp-no-eidas.yml",
+                ConfigOverride.config("serviceEntityIds", TEST_RP),
+                ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
+                ConfigOverride.config("server.connector.port", String.valueOf(0)),
+                ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
+                ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+                ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
+                ConfigOverride.config("verifyHubConfiguration.metadata.uri", () -> "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
+                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
+                ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+        );
+    }
+
+    public NonMatchingVerifyServiceProviderAppRule(boolean isEidasEnabled) {
+        super(
+                VerifyServiceProviderApplication.class,
+                "verify-service-provider.yml",
+                ConfigOverride.config("serviceEntityIds", TEST_RP),
+                ConfigOverride.config("hashingEntityId", "some-hashing-entity-id"),
+                ConfigOverride.config("server.connector.port", String.valueOf(0)),
+                ConfigOverride.config("logging.loggers.uk\\.gov", "DEBUG"),
+                ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
+                ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
+                ConfigOverride.config("verifyHubConfiguration.metadata.uri", () -> "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
+                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.trustStore.password", metadataTrustStore.getPassword()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+                ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
+                ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
+                ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
+                ConfigOverride.config("europeanIdentity.enabled", isEidasEnabled ? "true" : "false"),
+                ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
+                ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
+                ConfigOverride.config("europeanIdentity.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("europeanIdentity.trustStore.password", countryMetadataTrustStore.getPassword())
         );
     }
 
@@ -95,6 +113,8 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
     protected void before() {
         countryMetadataTrustStore.create();
         metadataTrustStore.create();
+        hubTrustStore.create();
+        idpTrustStore.create();
 
         countryEntityId = "https://localhost:12345" + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
 
@@ -102,14 +122,11 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
             InitializationService.initialize();
             String testCountryMetadata = new MetadataFactory().singleEntityMetadata(buildTestCountryEntityDescriptor());
 
-            msaServer.start();
-            msaServer.serveDefaultMetadata();
-
             verifyMetadataServer.reset();
             verifyMetadataServer.register(VERIFY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, new MetadataFactory().defaultMetadata());
 
             trustAnchorServer.reset();
-            trustAnchorServer.register(TRUST_ANCHOR_PATH, 200, MediaType.APPLICATION_OCTET_STREAM, buildTrustAnchorString());
+            trustAnchorServer.register(TRUST_ANCHOR_PATH, 200, MediaType.APPLICATION_OCTET_STREAM, buildTrustAnchorString(countryEntityId));
 
             metadataAggregatorServer.reset();
             metadataAggregatorServer.register(METADATA_SOURCE_PATH + "/" + entityIdAsResource(countryEntityId), 200, Constants.APPLICATION_SAMLMETADATA_XML, testCountryMetadata);
@@ -120,7 +137,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
         super.before();
     }
 
-    private String buildTrustAnchorString() throws JOSEException, CertificateEncodingException {
+    private String buildTrustAnchorString(String countryEntityId) throws JOSEException, CertificateEncodingException {
         X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
         PrivateKey trustAnchorKey = new PrivateKeyFactory().createPrivateKey(Base64.getDecoder().decode(METADATA_SIGNING_A_PRIVATE_KEY));
         X509Certificate trustAnchorCert = x509CertificateFactory.createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);

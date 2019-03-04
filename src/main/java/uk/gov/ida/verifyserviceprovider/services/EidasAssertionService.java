@@ -4,7 +4,8 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
-import uk.gov.ida.saml.metadata.MetadataResolverRepository;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
@@ -17,34 +18,41 @@ import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
 public class EidasAssertionService extends AssertionServiceV2 {
 
+    private final boolean isEnabled;
     private final InstantValidator instantValidator;
     private final ConditionsValidator conditionsValidator;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
-    private final MetadataResolverRepository metadataResolverRepository;
+    private final Optional<EidasMetadataResolverRepository> metadataResolverRepository;
     private final SignatureValidatorFactory signatureValidatorFactory;
+    private final Optional<String> entityId;
 
 
     public EidasAssertionService(
+            boolean isEnabled,
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
             InstantValidator instantValidator,
             ConditionsValidator conditionsValidator,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
-            MetadataResolverRepository metadataResolverRepository,
-            SignatureValidatorFactory signatureValidatorFactory) {
+            Optional<EidasMetadataResolverRepository> metadataResolverRepository,
+            SignatureValidatorFactory signatureValidatorFactory,
+            Optional<String> entityId) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
+        this.isEnabled = isEnabled;
         this.instantValidator = instantValidator;
         this.conditionsValidator = conditionsValidator;
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
+        this.entityId = entityId;
     }
 
 
@@ -56,7 +64,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
 
         Assertion countryAssertion = assertions.get(0);
 
-        validateCountryAssertion(countryAssertion, expectedInResponseTo, entityId);
+        validateCountryAssertion(countryAssertion, expectedInResponseTo);
 
         LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(countryAssertion);
         levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
@@ -68,13 +76,13 @@ public class EidasAssertionService extends AssertionServiceV2 {
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, nameID, levelOfAssurance, attributes);
     }
 
-    private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo, String entityId) {
-        signatureValidatorFactory.getSignatureValidator(metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue()))
+    private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
+        signatureValidatorFactory.getSignatureValidator(metadataResolverRepository.get().getSignatureTrustEngine(assertion.getIssuer().getValue()))
                 .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
                 .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        conditionsValidator.validate(assertion.getConditions(), entityId);
+        conditionsValidator.validate(assertion.getConditions(), entityId.get());
     }
 
     public LevelOfAssurance extractLevelOfAssuranceFrom(Assertion countryAssertion) {
@@ -88,7 +96,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
     }
 
     public Boolean isCountryAssertion(Assertion assertion) {
-        return metadataResolverRepository.getResolverEntityIds().contains(assertion.getIssuer().getValue());
+        return isEnabled && metadataResolverRepository.get().getResolverEntityIds().contains(assertion.getIssuer().getValue());
     }
 
 }

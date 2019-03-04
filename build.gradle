@@ -22,7 +22,7 @@ project.ext {
     version_number = '1.0.0'
     openSamlVersion = '3.4.0'
     verifyCommonUtils = '2.0.0-337'
-    samlLibVersion = "$openSamlVersion-166"
+    samlLibVersion = "$openSamlVersion-174"
     dropwizardVersion = '1.3.5'
     jaxbapiVersion = '2.2.9'
     hub_saml="$openSamlVersion-15709"
@@ -40,7 +40,10 @@ dependencies {
         "uk.gov.ida:saml-serializers:$samlLibVersion",
         "uk.gov.ida:saml-security:$samlLibVersion",
         "uk.gov.ida:saml-extensions:$samlLibVersion",
-        "uk.gov.ida:hub-saml:$hub_saml"
+        "uk.gov.ida:hub-saml:$hub_saml",
+        "org.bouncycastle:bcprov-jdk15on:1.60",
+        "org.bouncycastle:bcpkix-jdk15on:1.60",
+        "javax.activation:javax.activation-api:1.2.0"
     )
     compile("commons-collections:commons-collections:3.2.2") { force = true }
     testCompile(
@@ -53,6 +56,7 @@ dependencies {
         "org.jsoup:jsoup:1.11.1",
         "javax.xml.bind:jaxb-api:$jaxbapiVersion",
         "uk.gov.ida:hub-saml-test-utils:$hub_saml",
+        "uk.gov.ida:saml-test-utils:$samlLibVersion",
     )
     testCompile('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
 }
@@ -112,8 +116,29 @@ distributions {
     main {
         contents {
             from {
-                ['README.md', 'RELEASE_NOTES.md', 'verify-service-provider.yml']
+              [
+                  'README.md',
+                  'RELEASE_NOTES.md',
+                  'verify-service-provider.yml'
+              ]
             }
+        }
+    }
+}
+distributions {
+    testing {
+        contents {
+            from {
+                [
+                    'configuration/vsp-with-matching.yml',
+                    'configuration/vsp-no-eidas.yml',
+                    'configuration/vsp-eidas-without-matching.yml',
+                    'verify-service-provider.yml',
+                    'src/main/resources/ida_metadata_truststore.ts'
+
+                ]
+            }
+            with distributions.main.contents
         }
     }
 }
@@ -138,6 +163,36 @@ jar {
 task testAcceptance(type: Test) {
     testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
     classpath += sourceSets.acceptanceTest.runtimeClasspath
+}
+
+task buildDockerImage(type: Exec) {
+    commandLine = [
+        "docker", "build",
+        "-t", "govukverify/verify-service-provider:${version_number}",
+        "-f", "Dockerfile.internal",
+        "."
+    ]
+}
+
+task dockerRun(type: Exec) {
+    commandLine = [
+        "docker", "run", "--detach", "--rm",
+        "--name", "verify-service-provider",
+        "--env", "SERVICE_ENTITY_IDS",
+        "--env", "VERIFY_ENVIRONMENT",
+        "--env", "MSA_METADATA_URL",
+        "--env", "MSA_ENTITY_ID",
+        "--env", "SAML_SIGNING_KEY",
+        "--env", "SAML_PRIMARY_ENCRYPTION_KEY",
+        "--publish", "50400:50400",
+        "govukverify/verify-service-provider:${version_number}",
+    ]
+}
+
+task dockerStop(type: Exec) {
+    commandLine = [
+        "docker", "stop", "verify-service-provider"
+    ]
 }
 
 run {

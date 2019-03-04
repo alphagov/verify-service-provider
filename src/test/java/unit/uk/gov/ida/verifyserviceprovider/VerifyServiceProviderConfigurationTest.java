@@ -6,12 +6,12 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
+import io.dropwizard.testing.ResourceHelpers;
 import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
-import uk.gov.ida.verifyserviceprovider.configuration.MsaMetadataConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
@@ -71,7 +72,7 @@ public class VerifyServiceProviderConfigurationTest {
                 new FileConfigurationSourceProvider(),
                 new EnvironmentVariableSubstitutor(false)
             ),
-            "verify-service-provider.yml"
+                ResourceHelpers.resourceFilePath("verify-service-provider-with-msa.yml")
         );
         environmentHelper.cleanEnv();
     }
@@ -132,9 +133,9 @@ public class VerifyServiceProviderConfigurationTest {
                 mock(PrivateKey.class),
                 mock(PrivateKey.class),
                 mock(PrivateKey.class),
-                mock(MsaMetadataConfiguration.class),
+                Optional.empty(),
                 new Duration(1000L),
-                mock(EuropeanIdentityConfiguration.class)
+                Optional.ofNullable(mock(EuropeanIdentityConfiguration.class))
         );
     }
 

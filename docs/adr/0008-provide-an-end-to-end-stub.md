@@ -6,6 +6,8 @@ Date: 2017-06-12
 
 Accepted
 
+Superseded by [26. Development mode for the Verify Service Provider](0026-development-mode-for-the-verify-service-provider.md)
+
 ## Context
 
 We wish to run regular user research and testing against the prototype Service Provider.

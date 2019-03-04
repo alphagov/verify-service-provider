@@ -2,7 +2,8 @@ package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 
 public class NonMatchingVerifiableAttribute<T> {
 
@@ -11,15 +12,15 @@ public class NonMatchingVerifiableAttribute<T> {
     @JsonProperty("verified")
     private final boolean verified;
     @JsonProperty("from") @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final LocalDateTime from;
+    private final LocalDate from;
     @JsonProperty("to") @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final LocalDateTime to;
+    private final LocalDate to;
 
     public NonMatchingVerifiableAttribute(
            T value,
            boolean verified,
-           LocalDateTime from,
-           LocalDateTime to) {
+           LocalDate from,
+           LocalDate to) {
         this.value = value;
         this.verified = verified;
         this.from = from;
@@ -34,9 +35,9 @@ public class NonMatchingVerifiableAttribute<T> {
         return verified;
     }
 
-    public LocalDateTime getFrom() { return from; }
+    public LocalDate getFrom() { return from; }
 
-    public LocalDateTime getTo() { return to; }
+    public LocalDate getTo() { return to; }
 
     @Override
     public boolean equals(Object o) {
