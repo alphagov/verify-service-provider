@@ -1,6 +1,6 @@
 package uk.gov.ida.verifyserviceprovider;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -27,10 +27,9 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
     private MetadataResolverBundle<VerifyServiceProviderConfiguration> hubMetadataBundle;
     private MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle;
 
-    @SuppressWarnings("WeakerAccess") // Needed for DropwizardAppRules
     public VerifyServiceProviderApplication() {
         hubMetadataBundle = new MetadataResolverBundle<>(configuration -> Optional.ofNullable(configuration.getVerifyHubMetadata()));
-        msaMetadataBundle = new MetadataResolverBundle<>(configuration -> configuration.getMsaMetadata(), false);
+        msaMetadataBundle = new MetadataResolverBundle<>(VerifyServiceProviderConfiguration::getMsaMetadata, false);
     }
 
     public static void main(String[] args) throws Exception {
@@ -51,7 +50,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
             )
         );
         IdaSamlBootstrap.bootstrap();
-        bootstrap.getObjectMapper().setDateFormat(ISO8601DateFormat.getInstance());
+        bootstrap.getObjectMapper().setDateFormat(StdDateFormat.getInstance());
         bootstrap.addBundle(hubMetadataBundle);
         bootstrap.addBundle(msaMetadataBundle);
         bootstrap.addCommand(new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), this));

@@ -67,7 +67,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldUseResponseServiceToTranslateSaml() throws Exception {
+    public void shouldUseResponseServiceToTranslateSaml() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
             .put("requestId", "some-request-id")
             .put("levelOfAssurance", LEVEL_2.name());
@@ -87,7 +87,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenSamlValidationExceptionThrown() throws Exception {
+    public void shouldReturn400WhenSamlValidationExceptionThrown() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
@@ -108,7 +108,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() throws Exception {
+    public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
@@ -129,7 +129,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenCalledWithEmptyJson() throws Exception {
+    public void shouldReturn400WhenCalledWithEmptyJson() {
         Response response = resources.client()
             .target("/translate-response")
             .request()
