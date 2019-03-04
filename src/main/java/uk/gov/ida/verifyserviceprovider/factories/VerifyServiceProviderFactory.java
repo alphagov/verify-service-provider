@@ -13,27 +13,29 @@ import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
-import uk.gov.ida.verifyserviceprovider.resources.TranslateNonMatchingSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-
 import javax.ws.rs.client.Client;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -44,15 +46,15 @@ public class VerifyServiceProviderFactory {
 
     private final DateTimeComparator dateTimeComparator;
     private final EntityIdService entityIdService;
-    private final MetadataResolverBundle verifyMetadataBundler;
-    private final MetadataResolverBundle msaMetadataBundle;
+    private final MetadataResolverBundle<VerifyServiceProviderConfiguration> verifyMetadataBundler;
+    private final MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle;
     private final ManifestReader manifestReader;
     private final Client client;
 
     public VerifyServiceProviderFactory(
             VerifyServiceProviderConfiguration configuration,
-            MetadataResolverBundle verifyMetadataBundler,
-            MetadataResolverBundle msaMetadataBundle,
+            MetadataResolverBundle<VerifyServiceProviderConfiguration> verifyMetadataBundler,
+            MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle,
             Client client) throws KeyException {
         this.configuration = configuration;
         this.responseFactory = new ResponseFactory(getDecryptionKeyPairs(configuration.getSamlPrimaryEncryptionKey(), configuration.getSamlSecondaryEncryptionKey()));
@@ -96,18 +98,24 @@ public class VerifyServiceProviderFactory {
         );
     }
 
-    public TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
-        return new TranslateSamlResponseResource(
-            responseFactory.createMatchingResponseService(
+    public TranslateSamlResponseResource getTranslateSamlResponseResource() {
+        if(configuration.getMsaMetadata().isPresent()) {
+            return getTranslateMatchingSamlResponseResource();
+        } else{
+            return getTranslateNonMatchingSamlResponseResource();
+        }
+    }
+
+    private TranslateSamlResponseResource<TranslatedMatchingResponseBody> getTranslateMatchingSamlResponseResource() {
+        ResponseService<TranslatedMatchingResponseBody> matchingResponseService = responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
                 responseFactory.createMsaAssertionService(getMsaSignatureTrustEngine(), new SignatureValidatorFactory(), dateTimeComparator),
                 dateTimeComparator
-            ),
-            entityIdService
         );
+        return new TranslateSamlResponseResource<>(matchingResponseService, entityIdService);
     }
 
-    public TranslateNonMatchingSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+    private TranslateSamlResponseResource<TranslatedNonMatchingResponseBody> getTranslateNonMatchingSamlResponseResource() {
         IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
@@ -116,18 +124,19 @@ public class VerifyServiceProviderFactory {
         );
 
         EidasAssertionService eidasAssertionService = responseFactory.createEidasAssertionService(
+                isEidasEnabled(),
                 dateTimeComparator,
-                getEidasMetadataResolverRepository()
+                getEidasMetadataResolverRepository(),
+                configuration.getEuropeanIdentity()
         );
 
-        return new TranslateNonMatchingSamlResponseResource(
+        return new TranslateSamlResponseResource<>(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         new ClassifyingAssertionService(idpAssertionService, eidasAssertionService),
                         dateTimeComparator
                 ),
-                entityIdService
-        );
+                entityIdService);
     }
 
     public VersionNumberResource getVersionNumberResource() {
@@ -146,20 +155,29 @@ public class VerifyServiceProviderFactory {
         return msaMetadataBundle.getSignatureTrustEngine();
     }
 
-    private EidasMetadataResolverRepository getEidasMetadataResolverRepository() {
-        return new EidasMetadataResolverRepository(
-            getEidasTrustAnchorResolver(),
-            configuration.getEuropeanIdentity().getAggregatedMetadata(),
-            new DropwizardMetadataResolverFactory(),
-            new Timer(),
-            new MetadataSignatureTrustEngineFactory(),
-            new MetadataResolverConfigBuilder(),
-            client
-        );
+    private Optional<EidasMetadataResolverRepository> getEidasMetadataResolverRepository() {
+        if (isEidasEnabled()) {
+            return Optional.of(new EidasMetadataResolverRepository(
+                getEidasTrustAnchorResolver(),
+                configuration.getEuropeanIdentity().get(),
+                new DropwizardMetadataResolverFactory(),
+                new Timer(),
+                new MetadataSignatureTrustEngineFactory(),
+                new MetadataResolverConfigBuilder(),
+                client
+            ));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private EidasTrustAnchorResolver getEidasTrustAnchorResolver() {
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
+        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().get();
         return new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(), client, metadataConfiguration.getTrustStore());
+    }
+
+    private boolean isEidasEnabled() {
+        Optional<EuropeanIdentityConfiguration> eidasConfig = configuration.getEuropeanIdentity();
+        return eidasConfig.map(EuropeanIdentityConfiguration::isEnabled).orElse(false);
     }
 }

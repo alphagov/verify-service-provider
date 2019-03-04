@@ -1,23 +1,29 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Optional;
 
-public class TranslatedNonMatchingResponseBody {
+public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody {
 
     @JsonProperty("scenario")
     private final NonMatchingScenario scenario;
-    @JsonProperty("pid")
+    @JsonProperty("pid") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final String pid;
-    @JsonProperty("levelOfAssurance")
+    @JsonProperty("levelOfAssurance") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final LevelOfAssurance levelOfAssurance;
-    @JsonProperty("attributes")
+    @JsonProperty("attributes") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final NonMatchingAttributes attributes;
 
+    @JsonCreator
     public TranslatedNonMatchingResponseBody(
+            @JsonProperty("scenario")
             NonMatchingScenario scenario,
+            @JsonProperty("pid")
             String pid,
+            @JsonProperty("levelOfAssurance")
             LevelOfAssurance levelOfAssurance,
+            @JsonProperty("attributes")
             NonMatchingAttributes attributes
     ) {
         this.scenario = scenario;
@@ -26,8 +32,21 @@ public class TranslatedNonMatchingResponseBody {
         this.attributes = attributes;
     }
 
-    public NonMatchingScenario getScenario() {
+    @Override
+    public Scenario getScenario() {
         return scenario;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public LevelOfAssurance getLevelOfAssurance() {
+        return levelOfAssurance;
+    }
+
+    public NonMatchingAttributes getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -54,7 +73,7 @@ public class TranslatedNonMatchingResponseBody {
 
     @Override
     public String toString() {
-        return "TranslatedResponseBody{" +
+        return "TranslatedMatchingResponseBody{" +
                 "scenario='" + scenario + '\'' +
                 ", pid='" + pid + '\'' +
                 ", levelOfAssurance=" + levelOfAssurance +

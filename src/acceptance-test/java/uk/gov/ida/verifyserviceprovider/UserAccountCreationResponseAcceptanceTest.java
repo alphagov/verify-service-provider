@@ -28,7 +28,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_EN
 import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1InitialisationRequestBuilder.aComplianceToolV1InitialisationRequest;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.dto.Scenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA1_ID;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.ACCOUNT_CREATION_LOA2_ID;
 

@@ -9,22 +9,28 @@ import static java.util.Optional.ofNullable;
 
 public class VerifyHubConfiguration {
 
+    private HubEnvironment hubEnvironment;
     private URI hubSsoLocation;
     private HubMetadataConfiguration hubMetadataConfiguration;
 
+    public VerifyHubConfiguration(HubEnvironment hubEnvironment) {
+        this(hubEnvironment, null, null);
+    }
+
     @JsonCreator
     public VerifyHubConfiguration(
-        @JsonProperty("environment") HubEnvironment hubEnvironment,
-        @JsonProperty("ssoLocation") URI hubSsoLocation,
-        @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
+            @JsonProperty("environment") HubEnvironment hubEnvironment,
+            @JsonProperty("ssoLocation") URI hubSsoLocation,
+            @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
     ) {
+        this.hubEnvironment = hubEnvironment;
         this.hubSsoLocation = ofNullable(hubSsoLocation).orElse(hubEnvironment.getSsoLocation());
         this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElse(createHubMetadataConfigurationWithDefaults());
         this.hubMetadataConfiguration.setEnvironment(hubEnvironment);
     }
 
-    private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
-        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null);
+    public HubEnvironment getHubEnvironment() {
+        return hubEnvironment;
     }
 
     public URI getHubSsoLocation() {
@@ -33,5 +39,9 @@ public class VerifyHubConfiguration {
 
     public HubMetadataConfiguration getHubMetadataConfiguration() {
         return hubMetadataConfiguration;
+    }
+
+    private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
+        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null, null, null);
     }
 }

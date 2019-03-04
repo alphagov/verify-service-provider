@@ -30,7 +30,6 @@ import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SignatureFactory;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.VerifyServiceProviderApplication;
-import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.factories.EncrypterFactory;
 
 import java.io.IOException;
@@ -60,7 +59,7 @@ public class AuthnRequestFactory {
         this.signingKeyPair = signingKeyPair;
     }
 
-    public AuthnRequest build(LevelOfAssurance levelOfAssurance, String serviceEntityId) {
+    public AuthnRequest build(String serviceEntityId) {
         AuthnRequest authnRequest = new AuthnRequestBuilder().buildObject();
         authnRequest.setID(String.format("_%s", UUID.randomUUID()));
         authnRequest.setIssueInstant(DateTime.now());
@@ -108,7 +107,7 @@ public class AuthnRequestFactory {
         try {
             applicationManifestVersion = manifestReader.getAttributeValueFor(VerifyServiceProviderApplication.class, "Version");
         } catch (IOException e) {
-            LOG.error("Failed to read version number from the manifest", e);
+            LOG.warn("Failed to read version number from the manifest");
         }
 
         applicationVersion.setValue(applicationManifestVersion);

@@ -1,0 +1,16 @@
+applications:
+  - name: ((app))
+    memory: 1G
+    routes:
+      - route: ((app)).apps.internal
+    buildpack: java_buildpack
+    command: (cd ((dist))-* && bin/((dist)) server ((config_file)) )
+    env:
+      JAVA_HOME: "../.java-buildpack/open_jdk_jre"
+      CLOCK_SKEW: PT30s
+      VERIFY_ENVIRONMENT: INTEGRATION
+      EUROPEAN_IDENTITY_ENABLED: true
+      HUB_CONNECTOR_ENTITY_ID: https://www.integration.signin.service.gov.uk/SAML2/metadata/connector
+      TRUST_ANCHOR_URI: https://www.integration.signin.service.gov.uk/SAML2/metadata/trust-anchor
+      METADATA_SOURCE_URI: https://www.integration.signin.service.gov.uk/SAML2/metadata/aggregator
+      TRUSTSTORE_PASSWORD: puppet

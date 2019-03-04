@@ -22,8 +22,9 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
@@ -78,9 +79,9 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedResponseBody> createMatchingResponseService(
+    public ResponseService<TranslatedMatchingResponseBody> createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedResponseBody> matchingAssertionService,
+            AssertionService<TranslatedMatchingResponseBody> matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -153,13 +154,16 @@ public class ResponseFactory {
     }
 
     public EidasAssertionService createEidasAssertionService(
+            boolean isEnabled,
             DateTimeComparator dateTimeComparator,
-            EidasMetadataResolverRepository eidasMetadataResolverRepository
+            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository,
+            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
         return new EidasAssertionService(
+                isEnabled,
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
@@ -167,7 +171,9 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
-                new SignatureValidatorFactory());
+                new SignatureValidatorFactory(),
+                europeanIdentityConfiguration.map(EuropeanIdentityConfiguration :: getHubConnectorEntityId)
+                );
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {

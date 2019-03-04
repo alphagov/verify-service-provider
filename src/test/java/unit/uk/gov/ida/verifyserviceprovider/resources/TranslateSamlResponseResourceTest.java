@@ -13,9 +13,9 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.event.Level;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
-import uk.gov.ida.verifyserviceprovider.dto.Scenario;
+import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
@@ -67,13 +67,13 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldUseResponseServiceToTranslateSaml() throws Exception {
+    public void shouldUseResponseServiceToTranslateSaml() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
             .put("requestId", "some-request-id")
             .put("levelOfAssurance", LEVEL_2.name());
 
         when(responseService.convertTranslatedResponseBody(any(), eq("some-request-id"), eq(LEVEL_2), eq(defaultEntityId)))
-            .thenReturn(new TranslatedResponseBody(Scenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
+            .thenReturn(new TranslatedMatchingResponseBody(MatchingScenario.SUCCESS_MATCH, "some-request-id", LEVEL_2, null));
 
         Response response = resources.client()
             .target("/translate-response")
@@ -87,7 +87,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenSamlValidationExceptionThrown() throws Exception {
+    public void shouldReturn400WhenSamlValidationExceptionThrown() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
@@ -108,7 +108,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() throws Exception {
+    public void shouldReturn400WhenSamlTransformationErrorExceptionThrown() {
         JSONObject translateResponseRequest = new JSONObject().put("samlResponse", "some-saml-response")
                 .put("requestId", "some-request-id")
                 .put("levelOfAssurance", LEVEL_2.name());
@@ -129,7 +129,7 @@ public class TranslateSamlResponseResourceTest {
     }
 
     @Test
-    public void shouldReturn400WhenCalledWithEmptyJson() throws Exception {
+    public void shouldReturn400WhenCalledWithEmptyJson() {
         Response response = resources.client()
             .target("/translate-response")
             .request()
