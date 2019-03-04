@@ -3,8 +3,6 @@ package uk.gov.ida.verifyserviceprovider.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotNull;
-
 public class RequestGenerationBody {
 
     private final LevelOfAssurance levelOfAssurance;
@@ -18,7 +16,6 @@ public class RequestGenerationBody {
         this.entityId = entityId;
     }
 
-    @NotNull
     public LevelOfAssurance getLevelOfAssurance() {
         return levelOfAssurance;
     }

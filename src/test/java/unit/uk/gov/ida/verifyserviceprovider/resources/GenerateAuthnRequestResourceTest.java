@@ -1,5 +1,6 @@
 package unit.uk.gov.ida.verifyserviceprovider.resources;
 
+import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.assertj.core.api.Assertions;
@@ -71,6 +72,13 @@ public class GenerateAuthnRequestResourceTest {
     }
 
     @Test
+    public void returnsAnOKResponseWithoutLoaParam() {
+        when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
+        Response response = resources.target("/generate-request").request().post(Entity.entity(ImmutableMap.of(), MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    @Test
     public void returnsAnOKResponse() {
         when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
@@ -106,16 +114,16 @@ public class GenerateAuthnRequestResourceTest {
         }
     }
 
+
     @Test
     public void returns422ForBadJson() {
         Response response = resources.target("/generate-request")
-            .request()
-            .post(Entity.entity("{}", MediaType.APPLICATION_JSON_TYPE));
+                .request()
+                .post(Entity.entity(ImmutableMap.of("bad", "json"), MediaType.APPLICATION_JSON_TYPE));
         assertThat(response.getStatus()).isEqualTo(422);
-        assertThat(response.readEntity(ErrorMessage.class)).isEqualTo(new ErrorMessage(
-            422,
-            "levelOfAssurance may not be null")
-        );
+        ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
+        assertThat(errorMessage.getCode()).isEqualTo(422);
+        assertThat(errorMessage.getMessage()).startsWith("Unrecognized field \"bad\"");
     }
 
     @Test
