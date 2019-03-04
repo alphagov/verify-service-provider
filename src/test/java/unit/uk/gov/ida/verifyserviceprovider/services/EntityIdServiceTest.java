@@ -24,6 +24,12 @@ public class EntityIdServiceTest {
     }
 
     @Test
+    public void ShouldReturnDefaultEntityIdWhenNullBodyProvidedForSingleTenant_GenerateRequest() {
+        EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
+        assertThat(entityIdService.getEntityId((RequestGenerationBody)null)).isEqualTo(entityId);
+    }
+
+    @Test
     public void ShouldReturnDefaultEntityIdWhenNoneProvidedForSingleTenant_TranslateResponse() {
         EntityIdService entityIdService = new EntityIdService(Arrays.asList(entityId));
         TranslateSamlResponseBody translateSamlResponseBody = new TranslateSamlResponseBody(null, null, null, null);

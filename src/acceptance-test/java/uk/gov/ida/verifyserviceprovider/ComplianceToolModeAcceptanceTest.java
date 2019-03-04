@@ -141,7 +141,7 @@ public class ComplianceToolModeAcceptanceTest {
         Response authnRequest = client
                 .target(appUri("generate-request"))
                 .request()
-                .post(json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null)));
+                .post(json(null));
 
         RequestResponseBody authnSaml = authnRequest.readEntity(RequestResponseBody.class);
 
@@ -201,7 +201,7 @@ public class ComplianceToolModeAcceptanceTest {
         Response authnRequest = client
                 .target(appUri("generate-request"))
                 .request()
-                .post(json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null)));
+                .post(json(new RequestGenerationBody(null)));
 
         assertThat(authnRequest.getStatus()).isEqualTo(200);
         RequestResponseBody authnSaml = authnRequest.readEntity(RequestResponseBody.class);
@@ -250,7 +250,7 @@ public class ComplianceToolModeAcceptanceTest {
         Response authnRequest = client
                 .target(appUri("generate-request"))
                 .request()
-                .post(json(new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null)));
+                .post(json(new RequestGenerationBody(null)));
 
         assertThat(authnRequest.getStatus()).isEqualTo(200);
         RequestResponseBody authnSaml = authnRequest.readEntity(RequestResponseBody.class);
