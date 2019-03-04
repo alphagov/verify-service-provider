@@ -18,7 +18,6 @@ import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,7 +105,7 @@ public class EidasAssertionService extends AssertionServiceV2 {
         }
     }
 
-    private Optional<uk.gov.ida.saml.core.domain.AuthnContext> getAuthnContext(String uri) {
+    private Optional<AuthnContext> getAuthnContext(String uri) {
         AuthnContext authnContext = authnContextFactory.mapFromEidasToLoA(uri);
 
         return Optional.of(authnContext);
