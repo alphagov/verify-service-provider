@@ -5,11 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Subject;
-import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
@@ -47,8 +44,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_HIGH;
 import static uk.gov.ida.saml.core.extensions.EidasAuthnContext.EIDAS_LOA_SUBSTANTIAL;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
@@ -56,10 +51,8 @@ import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAtt
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
-import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
-import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
@@ -120,7 +113,7 @@ public class EidasAssertionServiceTest {
         List<Assertion> assertions = asList(
             anAssertionWithAuthnStatement(EIDAS_LOA_HIGH, "requestId").buildUnencrypted());
 
-        eidasAssertionService.translateSuccessResponse(assertions, "requestId", LevelOfAssurance.LEVEL_2, null);
+        eidasAssertionService.translateSuccessResponse(assertions, "requestId", LEVEL_2, null);
         verify(instantValidator, times(1)).validate(any(), any());
         verify(subjectValidator, times(1)).validate(any(), any());
         verify(conditionsValidator, times(1)).validate(any(), any());
@@ -130,7 +123,7 @@ public class EidasAssertionServiceTest {
     @Test
     public void shouldTranslateEidasAssertion() {
         Assertion eidasAssertion = anAssertionWithAuthnStatement(EIDAS_LOA_SUBSTANTIAL, "requestId").buildUnencrypted();
-        eidasAssertionService.translateSuccessResponse(singletonList(eidasAssertion), "requestId", LevelOfAssurance.LEVEL_2, null);
+        eidasAssertionService.translateSuccessResponse(singletonList(eidasAssertion), "requestId", LEVEL_2, null);
 
         verify(eidasMatchingDatasetUnmarshaller, times(1)).fromAssertion(eidasAssertion);
     }
@@ -141,7 +134,7 @@ public class EidasAssertionServiceTest {
 
         LevelOfAssurance loa = eidasAssertionService.extractLevelOfAssuranceFrom(eidasAssertion);
 
-        assertThat(loa).isEqualTo(LevelOfAssurance.LEVEL_2);
+        assertThat(loa).isEqualTo(LEVEL_2);
     }
 
     @Test
@@ -168,7 +161,7 @@ public class EidasAssertionServiceTest {
     public void shouldThrowAnExceptionIfMultipleAssertionsReceived() {
         Assertion eidasAssertion1 = anAssertionWithAuthnStatement(EIDAS_LOA_SUBSTANTIAL, "requestId").buildUnencrypted();
         Assertion eidasAssertion2 = anAssertionWithAuthnStatement(EIDAS_LOA_SUBSTANTIAL, "requestId").buildUnencrypted();
-        eidasAssertionService.translateSuccessResponse(asList(eidasAssertion1, eidasAssertion2), "requestId", LevelOfAssurance.LEVEL_2, null);
+        eidasAssertionService.translateSuccessResponse(asList(eidasAssertion1, eidasAssertion2), "requestId", LEVEL_2, null);
     }
 
     @Test
