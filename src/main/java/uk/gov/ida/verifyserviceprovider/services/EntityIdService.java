@@ -6,7 +6,9 @@ import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.InvalidEntityIdException;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class EntityIdService {
     private final List<String> configuredEntityIds;
@@ -18,8 +20,8 @@ public class EntityIdService {
         this.defaultEntityId = configuredEntityIds.size() == 1 ? configuredEntityIds.get(0) : null;
     }
 
-    public String getEntityId(RequestGenerationBody requestGenerationBody) {
-        String entityId = requestGenerationBody.getEntityId();
+    public String getEntityId(@Nullable RequestGenerationBody requestGenerationBody) {
+        String entityId = Optional.ofNullable(requestGenerationBody).map(RequestGenerationBody::getEntityId).orElse(null);
         LOG.info(String.format("Received request to generate authn request with entityId %s", entityId != null ? entityId : "from config"));
         return getEntityId(entityId);
     }

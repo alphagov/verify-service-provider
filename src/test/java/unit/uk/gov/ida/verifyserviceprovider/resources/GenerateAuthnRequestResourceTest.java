@@ -1,5 +1,6 @@
 package unit.uk.gov.ida.verifyserviceprovider.resources;
 
+import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.assertj.core.api.Assertions;
@@ -71,8 +72,22 @@ public class GenerateAuthnRequestResourceTest {
     }
 
     @Test
+    public void returnsAnOKResponseWithoutLoaParam() {
+        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
+        Response response = resources.target("/generate-request").request().post(Entity.entity(ImmutableMap.of(), MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    @Test
+    public void returnsAnOKResponseWhenNoParams() {
+        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
+        Response response = resources.target("/generate-request").request().post(Entity.entity(null, MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    @Test
     public void returnsAnOKResponse() {
-        when(authnRequestFactory.build(any(), any())).thenReturn(authnRequest);
+        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
 
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
@@ -81,7 +96,7 @@ public class GenerateAuthnRequestResourceTest {
 
     @Test
     public void responseContainsExpectedFields() {
-        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
+        when(authnRequestFactory.build(eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         assertThat(requestResponseBody.getSamlRequest()).isNotEmpty();
         assertThat(requestResponseBody.getRequestId()).isNotEmpty();
@@ -90,14 +105,14 @@ public class GenerateAuthnRequestResourceTest {
 
     @Test
     public void ssoLocationIsSameAsConfiguration() {
-        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
+        when(authnRequestFactory.build(eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         assertThat(requestResponseBody.getSsoLocation()).isEqualTo(HUB_SSO_LOCATION);
     }
 
     @Test
     public void samlRequestIsBase64EncodedAuthnRequest() {
-        when(authnRequestFactory.build(any(), eq(defaultEntityId))).thenReturn(authnRequest);
+        when(authnRequestFactory.build(eq(defaultEntityId))).thenReturn(authnRequest);
         RequestResponseBody requestResponseBody = generateRequest();
         try {
             Base64.getDecoder().decode(requestResponseBody.getSamlRequest());
@@ -106,16 +121,16 @@ public class GenerateAuthnRequestResourceTest {
         }
     }
 
+
     @Test
     public void returns422ForBadJson() {
         Response response = resources.target("/generate-request")
-            .request()
-            .post(Entity.entity("{}", MediaType.APPLICATION_JSON_TYPE));
+                .request()
+                .post(Entity.entity(ImmutableMap.of("bad", "json"), MediaType.APPLICATION_JSON_TYPE));
         assertThat(response.getStatus()).isEqualTo(422);
-        assertThat(response.readEntity(ErrorMessage.class)).isEqualTo(new ErrorMessage(
-            422,
-            "levelOfAssurance may not be null")
-        );
+        ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
+        assertThat(errorMessage.getCode()).isEqualTo(422);
+        assertThat(errorMessage.getMessage()).startsWith("Unrecognized field \"bad\"");
     }
 
     @Test
@@ -132,7 +147,7 @@ public class GenerateAuthnRequestResourceTest {
 
     @Test
     public void returns500IfARuntimeExceptionIsThrown() {
-        when(authnRequestFactory.build(any(), any())).thenThrow(RuntimeException.class);
+        when(authnRequestFactory.build(any())).thenThrow(RuntimeException.class);
 
         RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
         Response response = resources.target("/generate-request").request().post(Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE));
