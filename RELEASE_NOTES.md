@@ -40,7 +40,7 @@ Changed metadata health check names to use the URI of the metadata they are tryi
 
 #### Dropwizard version
 
-This release uses Dropwizard 1.3.5.
+This release uses [Dropwizard 1.3.9](https://github.com/dropwizard/dropwizard/blob/v1.3.9/docs/source/about/release-notes.rst).
 
 ### 1.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/0.4.0...1.0.0)
