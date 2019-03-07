@@ -6,6 +6,7 @@ import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
+import uk.gov.ida.verifyserviceprovider.logging.AuthnRequestAttributesHelper;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 
 import javax.annotation.Nullable;
@@ -44,6 +45,7 @@ public class GenerateAuthnRequestResource {
         RequestResponseBody requestResponseBody = new RequestResponseBody(samlRequest, authnRequest.getID(), ssoLocation);
 
         LOG.info(String.format("AuthnRequest generated for entityId: %s with requestId: %s", entityId, requestResponseBody.getRequestId()));
+        AuthnRequestAttributesHelper.logAuthnRequestAttributes(authnRequest);
         LOG.debug(String.format("AuthnRequest generated for entityId: %s with saml: %s", entityId, requestResponseBody.getSamlRequest()));
 
         return Response.ok(requestResponseBody).build();

@@ -7,6 +7,7 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import uk.gov.ida.dropwizard.logstash.LogstashBundle;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
 import uk.gov.ida.verifyserviceprovider.compliance.ComplianceToolMode;
@@ -54,6 +55,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         bootstrap.addBundle(hubMetadataBundle);
         bootstrap.addBundle(msaMetadataBundle);
         bootstrap.addCommand(new ComplianceToolMode(bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(), this));
+        bootstrap.addBundle(new LogstashBundle());
     }
 
     @Override
