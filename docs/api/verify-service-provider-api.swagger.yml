@@ -34,7 +34,7 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
               example:
                 code: 422
-                message: Some error message
+                message: A description of the error
         '500':
           description: An error due to an internal server error.
           content:
@@ -43,7 +43,7 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
               example:
                 code: 500
-                message: Some error message
+                message: A description of the error
   /translate-response:
     post:
       summary: Translate a SAML Response
@@ -65,7 +65,10 @@ paths:
                 oneOf:
                 - $ref: '#/components/schemas/SuccessfulMatchResponseBody'
                 - $ref: '#/components/schemas/AccountCreationResponseBody'
-                - $ref: '#/components/schemas/NoAuthenticationResponseBody'
+                - $ref: '#/components/schemas/NoMatchResponseBody'
+                - $ref: '#/components/schemas/CancellationResponseBody'
+                - $ref: '#/components/schemas/AuthenticationFailedResponseBody'
+                - $ref: '#/components/schemas/RequestErrorResponseBody'
         '400':
           description: An error due to a problem with translating the Response.
           content:
@@ -75,7 +78,7 @@ paths:
                   - $ref: '#/components/schemas/ErrorMessage'
               example:
                 code: 400
-                message: Some error message
+                message: A description of the error
         '422':
           description: >-
             An error due to a JSON request in an invalid format (e.g. missing
@@ -86,7 +89,7 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
               example:
                 code: 422
-                message: Some error message
+                message: A description of the error
         '500':
           description: An error due to an internal server error.
           content:
@@ -95,16 +98,12 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
               example:
                 code: 500
-                message: Some error message
+                message: A description of the error
 components:
   schemas:
     RequestGenerationBody:
       type: object
-      required:
-        - levelOfAssurance
       properties:
-        levelOfAssurance:
-          $ref: '#/components/schemas/RequiredLevelOfAssurance'
         entityId:
           $ref: '#/components/schemas/EntityId'
     RequestResponseBody:
@@ -166,32 +165,63 @@ components:
             record.
           type: string
           format: byte
+        levelOfAssurance:
+          $ref: '#/components/schemas/ReceivedLevelOfAssurance'
     AccountCreationResponseBody:
-      allOf:
-      - $ref: '#/components/schemas/SuccessfulMatchResponseBody'
-      - properties:
-          scenario:
-            type: string
-            enum: 
-              - ACCOUNT_CREATION
-            description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
-          levelOfAssurance:
-            $ref: '#/components/schemas/ReceivedLevelOfAssurance'
-          attributes:
-            $ref: '#/components/schemas/AccountCreationAttributes'
-        description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
-    NoAuthenticationResponseBody:
-      description: Returned when the user has not been successfully matched to your local datastore, no authentication took place, or there was a failure to authneticate.
+      type: object
+      description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
+      properties:
+        scenario:
+          type: string
+          enum: 
+            - ACCOUNT_CREATION
+          description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
+        pid:
+          description: >-
+            A unique identifier that can identify a user against an internal
+            record.
+          type: string
+          format: byte
+        levelOfAssurance:
+          $ref: '#/components/schemas/ReceivedLevelOfAssurance'
+        attributes:
+          $ref: '#/components/schemas/AccountCreationAttributes'
+    NoMatchResponseBody:
+      description: Returned when the user has not been successfully matched to your local datastore
       type: object
       properties:
         scenario:
           type: string
           enum:
             - NO_MATCH
+          description: Returned when the user has not been successfully matched to your local datastore
+    CancellationResponseBody:
+      description: Returned when the user has cancelled 
+      type: object
+      properties:
+        scenario:
+          type: string
+          enum:
             - CANCELLATION
-            - AUTHENTICATION_FAILED
+          description: Returned when the user has cancelled 
+    RequestErrorResponseBody:
+      description: Returned when there was an error in the request.
+      type: object
+      properties:
+        scenario:
+          type: string
+          enum:
             - REQUEST_ERROR
-          description: Returned when the user has not been successfully matched to your local datastore, no authentication took place, or there was a failure to authneticate.
+          description: Returned when there was an error in the request.
+    AuthenticationFailedResponseBody:
+      description: Returned when there was a failure to authenticate.
+      type: object
+      properties:
+        scenario:
+          type: string
+          enum:
+            - AUTHENTICATION_FAILED
+          description: Returned when there was a failure to authenticate.
     RequiredLevelOfAssurance:
       description: 'The minimum level of assurance required by the Relying Party Service.'
       type: string
@@ -213,8 +243,7 @@ components:
         - LEVEL_2
     AccountCreationAttributes:
       description: >-
-        An optional object containing attributes.
-        If user-account-creation is enabled in the Relying Party Service, and no
+        When user-account-creation is supported by the service, and no
         match was possible, these attributes are used to create a new account.
       type: object
       properties:
@@ -243,8 +272,8 @@ components:
           type: object
           properties:
             value:
-              description: Format yyyy-MM-dd
               type: string
+              format: date
             verified:
               type: boolean
         address:
@@ -294,6 +323,7 @@ components:
       properties:
         code:
           type: number
+          description: The HTTP status code
         message:
           description: A description of the error
           type: string

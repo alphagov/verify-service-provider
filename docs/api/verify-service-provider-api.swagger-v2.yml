@@ -40,7 +40,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
-            errorMessage:
               example:
                 code: 500
                 message: Some error message
@@ -64,7 +63,9 @@ paths:
               schema:
                oneOf:
                   - $ref: '#/components/schemas/IdentityVerificationScenario'
-                  - $ref: '#/components/schemas/OtherScenario'
+                  - $ref: '#/components/schemas/AuthenticationFailedScenario'
+                  - $ref: '#/components/schemas/NoAuthenticationScenario'
+                  - $ref: '#/components/schemas/RequestErrorScenario'
         '400':
           description: An error due to a problem with translating the Response.
           content:
@@ -91,7 +92,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
-            errorMessage:
               example:
                 code: 500
                 message: Some error message
@@ -146,11 +146,8 @@ components:
           format: byte
         levelOfAssurance:
           $ref: '#/components/schemas/RequiredLevelOfAssurance'
-    TranslatedResponseBody:
-      oneOf:
-        - $ref: '#/components/schemas/IdentityVerificationScenario'
-        - $ref: '#/components/schemas/OtherScenario'
-    OtherScenario:
+    RequestErrorScenario:
+      description: Returned when there was an error in the request.
       type: object
       required:
         - scenario
@@ -158,10 +155,32 @@ components:
         scenario:
           type: string
           enum:
-            - CANCELLATION
-            - AUTHENTICATION_FAILED
             - REQUEST_ERROR
+          description: Returned when there was an error in the request.
+    AuthenticationFailedScenario:
+      description: Returned when there was a failure to authenticate.
+      type: object
+      required:
+        - scenario
+      properties:
+        scenario:
+          type: string
+          enum:
+            - AUTHENTICATION_FAILED
+          description: Returned when there was a failure to authenticate.
+    NoAuthenticationScenario:
+      description: Returned when there wasn't an authentication
+      type: object
+      required:
+        - scenario
+      properties:
+        scenario:
+          type: string
+          enum:
+            - NO_AUTHENTICATION
+          description: Returned when there wasn't an authentication
     IdentityVerificationScenario:
+      description: Returned when the user's identity was successfully verified
       type: object
       required:
         - scenario
@@ -173,6 +192,7 @@ components:
           type: string
           enum: 
           - IDENTITY_VERIFIED
+          description: Returned when the user's identity was successfully verified
         pid:
           description: >-
             A unique identifier that can identify a user against an internal
@@ -209,8 +229,7 @@ components:
         - LEVEL_4
     Attributes:
       description: >-
-        An object containing a pre-agreed subset of the attributes passed to the
-        VSP from the chosen IDP via the hub. 
+        An object containing the attributes returned from the IDP.
       type: object
       properties:
         firstNames:
@@ -248,22 +267,7 @@ components:
         addresses:
           type: array
           items:
-            $ref: '#/components/schemas/Address'
-    Address:
-      allOf:
-        - $ref: '#/components/schemas/VerifiableAttribute'
-        - description: An object describing the address fields of a user
-          properties:
-            lines:
-              type: array
-              items:
-                type: string
-            postCode:
-              type: string
-            internationalPostCode:
-              type: string
-            uprn:
-              type: string
+            $ref: '#/components/schemas/VerifiableAddress'
     Date:
       type: string
       format: date
@@ -285,6 +289,27 @@ components:
             type: string
           nonLatinScriptValue:
             type: string
+    VerifiableAddress:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableAttribute'
+        - description: An object describing the address fields of a user
+          properties:
+            value:
+              $ref: '#/components/schemas/Address'
+    Address:
+      type: object
+      description: An object describing the address fields of a user
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+        postCode:
+          type: string
+        internationalPostCode:
+          type: string
+        uprn:
+          type: string
     ErrorMessage:
       type: object
       required:
