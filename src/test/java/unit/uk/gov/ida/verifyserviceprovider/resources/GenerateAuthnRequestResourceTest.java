@@ -66,8 +66,6 @@ public class GenerateAuthnRequestResourceTest {
     private static AuthnRequestFactory authnRequestFactory = mock(AuthnRequestFactory.class);
     private static EntityIdService entityIdService = mock(EntityIdService.class);
 
-    private static final String publicBuild = System.getenv("VERIFY_USE_PUBLIC_BINARIES");
-
     private AuthnRequest authnRequest;
 
     @ClassRule
@@ -214,37 +212,6 @@ public class GenerateAuthnRequestResourceTest {
         assertThat(mdcPropertyMap.get(AuthnRequestAttibuteNames.DESTINATION)).isEqualTo(TEST_DESTINATION);
         assertThat(mdcPropertyMap.get(AuthnRequestAttibuteNames.ISSUE_INSTANT)).isEqualTo(TEST_ISSUE_INSTANT);
         assertThat(mdcPropertyMap.get(AuthnRequestAttibuteNames.ISSUER)).isEqualTo(TEST_ISSUER);
-    }
-
-    @Test
-    public void shouldLogAuthnRequestAttributesToConsole() throws Exception {
-
-        ByteArrayOutputStream consoleOutput = new ByteArrayOutputStream();
-        PrintStream defaultConsolePrintStream = System.out;
-        System.setOut(new PrintStream(consoleOutput));
-
-        when(authnRequestFactory.build(any())).thenReturn(authnRequest);
-        RequestGenerationBody requestGenerationBody = new RequestGenerationBody(LevelOfAssurance.LEVEL_2, null);
-
-        Response response =
-                resources.target(GENERATE_REQUEST_RESOURCE_PATH).request().post(
-                        Entity.entity(requestGenerationBody, MediaType.APPLICATION_JSON_TYPE)
-                );
-        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-
-        // Checking System.out does not work in a Travis build.  Only run this assertion outside of Travis.
-        if (! "true".equals(publicBuild)) {
-            assertThat(consoleOutput.toString()).contains(
-                    String.format("%s %s %s %s %s",
-                            AUTHN_REQUEST_ATTRIBUTES_LOG_MESSAGE,
-                            TEST_REQUEST_ID,
-                            TEST_DESTINATION,
-                            TEST_ISSUE_INSTANT,
-                            TEST_ISSUER
-                    )
-            );
-        }
-        System.setOut(defaultConsolePrintStream);
     }
 
     @Test
