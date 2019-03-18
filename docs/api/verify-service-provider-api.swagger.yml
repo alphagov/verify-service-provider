@@ -1,13 +1,16 @@
-openapi: 3.0.0
+swagger: '2.0'
 info:
-  description: This is a description of the API for the Verify Service Provider.
+  description: This is a description of the API for the Verify Service Provider. The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
+basePath: /
+tags:
+- name: 'Verify Service Provider API'
 paths:
   /generate-request:
     post:
-      summary: Generate a SAML Authentication Request
-      description:  Generate a SAML Authentication Request (AuthnRequest).
+      summary: Generate a SAML authentication request
+      description:  Generate a SAML authentication request, known as an AuthnRequest, to send to Verify Hub. See the GOV.UK Verify technical  documentation for more information on [how to generate an authentication request](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#send-a-request).
       requestBody:
         content:
           application/json:
@@ -17,16 +20,14 @@ paths:
       responses:
         '200':
           description: >-
-            Contains an object with a valid SAML Authentication request that can
-            be consumed by the Verify service.
+            Contains an object with a valid SAML Authentication request that can be consumed by the Verify service.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestResponseBody'
         '422':
           description: >-
-            An error due to a JSON request in an invalid format (e.g. missing
-            mandatory parameters).
+            An error due to a JSON request in an invalid format, for example missing mandatory parameters.
           content:
             application/json:
               schema:
@@ -45,9 +46,9 @@ paths:
                 message: Some error message
   /translate-response:
     post:
-      summary: Translate a SAML Response
+      summary: Translate a SAML response
       description: >-
-        Translate a SAML Response received from the GOV.UK Verify Hub into JSON.
+        Translate a SAML response received from the GOV.UK Verify Hub into JSON. See the GOV.UK Verify technical documentation for more information on [how to handle the response](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#handle-a-response)
       requestBody:
         content:
           application/json:
@@ -56,7 +57,7 @@ paths:
         description: An object containing the SAML response returned by the Verify service.
         required: true
       responses:
-        '200':
+        200:
           description: 'Contains the details of the SAML response, translated into JSON.'
           content:
             application/json:
@@ -67,7 +68,7 @@ paths:
                   - $ref: '#/components/schemas/NoAuthenticationScenario'
                   - $ref: '#/components/schemas/RequestErrorScenario'
         '400':
-          description: An error due to a problem with translating the Response.
+          description: An error due to a problem with translating the response.
           content:
             application/json:
               schema:
@@ -77,8 +78,8 @@ paths:
                 message: Some error message
         '422':
           description: >-
-            An error due to a JSON request in an invalid format (e.g. missing
-            mandatory parameters).
+            An error due to a JSON request in an invalid format, for example missing
+            mandatory parameters.
           content:
             application/json:
               schema:
@@ -110,20 +111,17 @@ components:
         - ssoLocation
       properties:
         samlRequest:
-          description: SAML Authn Request as a base64 string.
+          description: SAML authentication request as a base64 string.
           type: string
           format: byte
         requestId:
           description: >-
-            A token that identifies the Authn Request. This is used later to
-            verify that the Authn Request and SAML Response have passed through
-            the same browser.
+            A token that identifies the Authn Request. This is used later to verify that the Authn Request and SAML Response have passed through the same browser.
           type: string
           format: byte
         ssoLocation:
           description: >-
-            The url for Verify Hub SSO. The entrypoint for SAML authentication
-            flow.
+            The URL where your service sends the authentication request to the GOV.UK Verify Hub.
           type: string
           format: url
     TranslateSamlResponseBody:
@@ -134,14 +132,12 @@ components:
         - levelOfAssurance
       properties:
         samlResponse:
-          description: A SAML Response as a base64 encoded string.
+          description: A SAML response as a base64 encoded string.
           type: string
           format: byte
         requestId:
           description: >-
-            A token that was generated for the original SAML Authn Request. This
-            is used to verify that the Authn Request and SAML Response have
-            passed  through the same browser.
+            A token that was generated for the original SAML Authn Request. This is used to verify that the Authn Request and SAML Response have passed  through the same browser.
           type: string
           format: byte
         levelOfAssurance:
@@ -158,7 +154,7 @@ components:
             - REQUEST_ERROR
           description: Returned when there was an error in the request.
     AuthenticationFailedScenario:
-      description: Returned when there was a failure to authenticate.
+      description: Returned when the following status code `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` is included in the SAML response from the GOV.UK Verify Hub.
       type: object
       required:
         - scenario
@@ -167,9 +163,9 @@ components:
           type: string
           enum:
             - AUTHENTICATION_FAILED
-          description: Returned when there was a failure to authenticate.
+          description: Returned when the following status code `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` is included in the SAML response from the GOV.UK Verify Hub.
     NoAuthenticationScenario:
-      description: Returned when there wasn't an authentication
+      description: Returned when the user chose to cancel at some point in their journey.
       type: object
       required:
         - scenario
@@ -178,7 +174,7 @@ components:
           type: string
           enum:
             - NO_AUTHENTICATION
-          description: Returned when there wasn't an authentication
+          description: Returned when the user chose to cancel at some point in their journey.
     IdentityVerificationScenario:
       description: Returned when the user's identity was successfully verified
       type: object
@@ -190,7 +186,7 @@ components:
       properties:
         scenario:
           type: string
-          enum: 
+          enum:
           - IDENTITY_VERIFIED
           description: Returned when the user's identity was successfully verified
         pid:
@@ -204,7 +200,7 @@ components:
         attributes:
           $ref: '#/components/schemas/Attributes'
     RequiredLevelOfAssurance:
-      description: The minimum level of assurance required by the Relying Party Service.
+      description: The minimum level of assurance required by the service.
       type: string
       enum:
         - LEVEL_1
@@ -213,14 +209,10 @@ components:
         - LEVEL_4
     EntityId:
       description: >-
-        The Entity Id for the service interacting with the Verify Service
-        Provider. This is required if the Verify Service Provider is set up for
-        multi-tenanted use, otherwise it is optional. The value, if provided,
-        must be one of those listed in the configuration for the Verify Service
-        Provider.
+        The EntityId for the service interacting with the Verify Service Provider. This is required if there is more than one service connected to the same Verify Service Provider deployment, otherwise it is optional. The value, if provided, must be one of those listed in the configuration for the Verify Service Provider.
       type: string
     ReceivedLevelOfAssurance:
-      description: Level of assurance the user was authenticated with.
+      description: Level of assurance the user's identity was verified with.
       type: string
       enum:
         - LEVEL_1
@@ -229,7 +221,7 @@ components:
         - LEVEL_4
     Attributes:
       description: >-
-        An object containing the attributes returned from the IDP.
+        An object containing the user attributes returned from the identity provider.
       type: object
       properties:
         firstNames:
@@ -283,40 +275,64 @@ components:
     PersonalName:
       allOf:
       - $ref: '#/components/schemas/VerifiableAttribute'
-      - description: 'An object describing a forename, middlename or surname'
+      - description: An object describing a forename, middlename or surname
         properties:
           value:
             type: string
-          nonLatinScriptValue:
+          verified:
+            type: boolean
+      surname:
+        type: object
+        properties:
+          value:
             type: string
-    VerifiableAddress:
-      allOf:
-        - $ref: '#/components/schemas/VerifiableAttribute'
-        - description: An object describing the address fields of a user
-          properties:
-            value:
-              $ref: '#/components/schemas/Address'
-    Address:
-      type: object
-      description: An object describing the address fields of a user
-      properties:
-        lines:
-          type: array
-          items:
+          verified:
+            type: boolean
+      dateOfBirth:
+        type: object
+        properties:
+          value:
+            description: Format yyyy-MM-dd
             type: string
-        postCode:
+          verified:
+            type: boolean
+      address:
+        type: object
+        properties:
+          value:
+            $ref: '#/definitions/Address'
+          verified:
+            type: boolean
+      cycle3:
+        type: string
+  Address:
+    description: >-
+      An object describing the address fields of a user
+    type: object
+    properties:
+      lines:
+        type: array
+        items:
           type: string
-        internationalPostCode:
-          type: string
-        uprn:
-          type: string
-    ErrorMessage:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: number
-        message:
-          type: string
+      postCode:
+        type: string
+      internationalPostCode:
+        type: string
+      uprn:
+        type: string
+      fromDate:
+        description: Format yyyy-MM-dd
+        type: string
+      toDate:
+        description: Format yyyy-MM-dd
+        type: string
+  ErrorMessage:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: number
+      message:
+        type: string
