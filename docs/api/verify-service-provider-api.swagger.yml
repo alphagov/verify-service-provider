@@ -1,4 +1,4 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
   description: This is a description of the API for the Verify Service Provider. The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
@@ -20,14 +20,14 @@ paths:
       responses:
         '200':
           description: >-
-            Contains an object with a valid SAML Authentication request that can be consumed by the Verify service.
+            Contains an object with a valid SAML authentication request that can be consumed by the GOV.UK Verify Hub.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestResponseBody'
         '422':
           description: >-
-            An error due to a JSON request in an invalid format, for example missing mandatory parameters.
+            An error due to a JSON request in an invalid format, for example missing required parameters.
           content:
             application/json:
               schema:
@@ -54,7 +54,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TranslateSamlResponseBody'
-        description: An object containing the SAML response returned by the Verify service.
+        description: An object containing the SAML response returned by the GOV.UK Verify Hub.
         required: true
       responses:
         200:
@@ -78,8 +78,7 @@ paths:
                 message: Some error message
         '422':
           description: >-
-            An error due to a JSON request in an invalid format, for example missing
-            mandatory parameters.
+            An error due to a JSON request in an invalid format, for example missing required parameters.
           content:
             application/json:
               schema:
@@ -116,12 +115,12 @@ components:
           format: byte
         requestId:
           description: >-
-            A token that identifies the Authn Request. This is used later to verify that the Authn Request and SAML Response have passed through the same browser.
+            A token that identifies the authentication request. This is used later to verify that the authentication request and SAML response have passed through the same browser.
           type: string
           format: byte
         ssoLocation:
           description: >-
-            The URL where your service sends the authentication request to the GOV.UK Verify Hub.
+            The GOV.UK Verify Hub URL where your service sends the authentication request.
           type: string
           format: url
     TranslateSamlResponseBody:
@@ -137,7 +136,7 @@ components:
           format: byte
         requestId:
           description: >-
-            A token that was generated for the original SAML Authn Request. This is used to verify that the Authn Request and SAML Response have passed  through the same browser.
+            A token that was generated for the original SAML Authn Request. This is used to verify that the Authn Request and SAML response have passed  through the same browser.
           type: string
           format: byte
         levelOfAssurance:

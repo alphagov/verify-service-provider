@@ -1,14 +1,15 @@
 openapi: 3.0.0
 info:
-  description: >- 
+  description: >-
     This page provides a description of the API for the Verify Service Provider when it run while connected to a Matching Service Adapter.
+    This is a description of the API for the Verify Service Provider when it's connected to a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter). The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
 paths:
   /generate-request:
     post:
       summary: Generate a SAML Authentication Request
-      description:  Generate a SAML Authentication Request (AuthnRequest).
+      description:  Generate a SAML authentication request, known as an AuthnRequest, to send to Verify Hub.
       requestBody:
         content:
           application/json:
@@ -19,15 +20,14 @@ paths:
         '200':
           description: >-
             Contains an object with a valid SAML Authentication request that can
-            be consumed by the Verify service.
+            be consumed by the GOV.UK Verify Hub.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestResponseBody'
         '422':
           description: >-
-            An error due to a JSON request in an invalid format (e.g. missing
-            mandatory parameters).
+            An error due to a JSON request in an invalid format for example, missing required parameters.
           content:
             application/json:
               schema:
@@ -46,15 +46,15 @@ paths:
                 message: A description of the error
   /translate-response:
     post:
-      summary: Translate a SAML Response
+      summary: Translate a SAML response
       description: >-
-        Translate a SAML Response received from the GOV.UK Verify Hub into JSON.
+        Translate a SAML response received from the GOV.UK Verify Hub into JSON.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TranslateSamlResponseBody'
-        description: An object containing the SAML response returned by the Verify service.
+        description: An object containing the SAML response returned by the GOV.UK Verify Hub.
         required: true
       responses:
         '200':
@@ -81,8 +81,8 @@ paths:
                 message: A description of the error
         '422':
           description: >-
-            An error due to a JSON request in an invalid format (e.g. missing
-            mandatory parameters).
+            An error due to a JSON request in an invalid format, for example missing
+            required parameters).
           content:
             application/json:
               schema:
@@ -114,18 +114,17 @@ components:
         - ssoLocation
       properties:
         samlRequest:
-          description: 'SAML Authn Request as a base64 string.'
+          description: 'SAML authentication request as a base64 string.'
           type: string
           format: byte
         requestId:
           description: >-
-            A token that identifies the Authn Request. This is used later to
-            verify that the Authn Request and SAML Response have passed through the same
-            browser.
+            A token that identifies the authentication request. This is used later to verify that the authentication request and SAML response have passed through the same browser.
           type: string
           format: byte
         ssoLocation:
-          description: 'The url for Verify Hub SSO. The entrypoint for SAML authentication flow.'
+          description: >-
+            The GOV.UK Verify Hub URL where your service sends the authentication request.
           type: string
           format: url
     TranslateSamlResponseBody:
@@ -136,14 +135,12 @@ components:
         - levelOfAssurance
       properties:
         samlResponse:
-          description: 'A SAML Response as a base64 string.'
+          description: 'A SAML response as a base64 string.'
           type: string
           format: byte
         requestId:
           description: >-
-            A token that was generated for the original SAML Authn Request. This is used
-            to verify that the Authn Request and SAML Response have passed  through the
-            same browser.
+            A token that was generated for the original SAML authentication request. This is used to verify that the authentication request and SAML response have passed through the same browser.
           type: string
           format: byte
         levelOfAssurance:
@@ -156,7 +153,7 @@ components:
       properties:
         scenario:
           type: string
-          enum: 
+          enum:
             - SUCCESS_MATCH
           description: Returned when the user has been successfully matched to your local datastore.
         pid:
@@ -173,7 +170,7 @@ components:
       properties:
         scenario:
           type: string
-          enum: 
+          enum:
             - ACCOUNT_CREATION
           description: Returned when the user has not been successfully matched to your local datastore, but your service supports the creation of accounts.
         pid:
@@ -196,14 +193,14 @@ components:
             - NO_MATCH
           description: Returned when the user has not been successfully matched to your local datastore
     CancellationResponseBody:
-      description: Returned when the user has cancelled 
+      description: Returned when the user has cancelled
       type: object
       properties:
         scenario:
           type: string
           enum:
             - CANCELLATION
-          description: Returned when the user has cancelled 
+          description: Returned when the user has cancelled
     RequestErrorResponseBody:
       description: Returned when there was an error in the request.
       type: object
@@ -230,10 +227,7 @@ components:
         - LEVEL_2
     EntityId:
       description: >-
-        The Entity Id for the service interacting with the Verify Service Provider.
-        This is required if the Verify Service Provider is set up for multi-tenanted
-        use, otherwise it is optional. The value, if provided, must be one of those
-        listed in the configuration for the Verify Service Provider.
+        The EntityId for the service interacting with the Verify Service Provider. This is required if there is more than one service connected to the same Verify Service Provider deployment, otherwise it is optional. The value, if provided, must be one of those listed in the configuration for the Verify Service Provider.
       type: string
     ReceivedLevelOfAssurance:
       description: 'Level of assurance the user was authenticated with.'
