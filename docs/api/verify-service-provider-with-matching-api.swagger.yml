@@ -12,7 +12,7 @@ info:
 paths:
   /generate-request:
     post:
-      summary: Generate a SAML Authentication Request
+      summary: Generate a SAML authentication request
       description:  Generate a SAML authentication request, known as an AuthnRequest, to send to Verify Hub.
       requestBody:
         content:
@@ -224,7 +224,7 @@ components:
             - AUTHENTICATION_FAILED
           description: Returned when there was a failure to authenticate.
     RequiredLevelOfAssurance:
-      description: 'The minimum level of assurance required by the Relying Party Service.'
+      description: The minimum level of assurance required by the service.
       type: string
       enum:
         - LEVEL_1
@@ -234,7 +234,7 @@ components:
         The EntityId for the service interacting with the Verify Service Provider. This is required if there is more than one service connected to the same Verify Service Provider deployment, otherwise it is optional. The value, if provided, must be one of those listed in the configuration for the Verify Service Provider.
       type: string
     ReceivedLevelOfAssurance:
-      description: 'Level of assurance the user was authenticated with.'
+      description: Level of assurance the user's identity was verified with.
       type: string
       enum:
         - LEVEL_1

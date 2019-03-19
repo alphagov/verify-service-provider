@@ -6,9 +6,6 @@ info:
     The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
-basePath: /
-tags:
-- name: 'Verify Service Provider API'
   x-logo:
     url: 'https://github.com/alphagov/verify-service-provider/blob/update-api-docs/docs/api/verify-logo-redoc.png?raw=true'
     altText: GOV.UK Verify logo
@@ -71,7 +68,7 @@ paths:
         description: An object containing the SAML response returned by the GOV.UK Verify Hub.
         required: true
       responses:
-        200:
+        '200':
           description: 'Contains the details of the SAML response, translated into JSON.'
           content:
             application/json:
@@ -167,7 +164,7 @@ components:
             - REQUEST_ERROR
           description: Returned when there was an error in the request.
     AuthenticationFailedScenario:
-      description: Returned when the following status code `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` is included in the SAML response from the GOV.UK Verify Hub.
+      description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` status code is included in the SAML response from the GOV.UK Verify Hub.
       type: object
       required:
         - scenario
@@ -176,7 +173,7 @@ components:
           type: string
           enum:
             - AUTHENTICATION_FAILED
-          description: Returned when the following status code `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` is included in the SAML response from the GOV.UK Verify Hub.
+          description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` status code is included in the SAML response from the GOV.UK Verify Hub.
     NoAuthenticationScenario:
       description: Returned when the user chose to cancel at some point in their journey.
       type: object
@@ -288,64 +285,40 @@ components:
     PersonalName:
       allOf:
       - $ref: '#/components/schemas/VerifiableAttribute'
-      - description: An object describing a forename, middlename or surname
+      - description: 'An object describing a forename, middlename or surname'
         properties:
           value:
             type: string
-          verified:
-            type: boolean
-      surname:
-        type: object
-        properties:
-          value:
+          nonLatinScriptValue:
             type: string
-          verified:
-            type: boolean
-      dateOfBirth:
-        type: object
-        properties:
-          value:
-            description: Format yyyy-MM-dd
+    VerifiableAddress:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableAttribute'
+        - description: An object describing the address fields of a user
+          properties:
+            value:
+              $ref: '#/components/schemas/Address'
+    Address:
+      type: object
+      description: An object describing the address fields of a user
+      properties:
+        lines:
+          type: array
+          items:
             type: string
-          verified:
-            type: boolean
-      address:
-        type: object
-        properties:
-          value:
-            $ref: '#/definitions/Address'
-          verified:
-            type: boolean
-      cycle3:
-        type: string
-  Address:
-    description: >-
-      An object describing the address fields of a user
-    type: object
-    properties:
-      lines:
-        type: array
-        items:
+        postCode:
           type: string
-      postCode:
-        type: string
-      internationalPostCode:
-        type: string
-      uprn:
-        type: string
-      fromDate:
-        description: Format yyyy-MM-dd
-        type: string
-      toDate:
-        description: Format yyyy-MM-dd
-        type: string
-  ErrorMessage:
-    type: object
-    required:
-      - code
-      - message
-    properties:
-      code:
-        type: number
-      message:
-        type: string
+        internationalPostCode:
+          type: string
+        uprn:
+          type: string
+    ErrorMessage:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+        message:
+          type: string
