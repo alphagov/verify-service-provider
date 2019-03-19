@@ -6,6 +6,9 @@ info:
     The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
+  x-logo:
+    url: 'https://github.com/alphagov/verify-service-provider/blob/update-api-docs/docs/api/verify-logo-redoc.png?raw=true'
+    altText: GOV.UK Verify logo
 paths:
   /generate-request:
     post:

@@ -9,6 +9,9 @@ info:
 basePath: /
 tags:
 - name: 'Verify Service Provider API'
+  x-logo:
+    url: 'https://github.com/alphagov/verify-service-provider/blob/update-api-docs/docs/api/verify-logo-redoc.png?raw=true'
+    altText: GOV.UK Verify logo
 paths:
   /generate-request:
     post:
