@@ -1,6 +1,9 @@
 openapi: 3.0.0
 info:
-  description: This is a description of the API for the Verify Service Provider. The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
+  description: |
+    This is a description of the API for the Verify Service Provider.
+
+    The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
 basePath: /
@@ -10,7 +13,10 @@ paths:
   /generate-request:
     post:
       summary: Generate a SAML authentication request
-      description:  Generate a SAML authentication request, known as an AuthnRequest, to send to Verify Hub. See the GOV.UK Verify technical  documentation for more information on [how to generate an authentication request](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#send-a-request).
+      description: |
+        Generate a SAML authentication request, known as an AuthnRequest, to send to Verify Hub.
+
+        See the GOV.UK Verify technical  documentation for more information on [how to generate an authentication request](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#send-a-request).
       requestBody:
         content:
           application/json:
@@ -47,8 +53,10 @@ paths:
   /translate-response:
     post:
       summary: Translate a SAML response
-      description: >-
-        Translate a SAML response received from the GOV.UK Verify Hub into JSON. See the GOV.UK Verify technical documentation for more information on [how to handle the response](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#handle-a-response)
+      description: |
+        Translate a SAML response received from the GOV.UK Verify Hub into JSON.
+
+        See the GOV.UK Verify technical documentation for more information on [how to handle the response](https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#handle-a-response)
       requestBody:
         content:
           application/json:
