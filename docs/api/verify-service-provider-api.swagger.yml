@@ -12,6 +12,9 @@ tags:
   x-logo:
     url: 'https://github.com/alphagov/verify-service-provider/blob/update-api-docs/docs/api/verify-logo-redoc.png?raw=true'
     altText: GOV.UK Verify logo
+externalDocs:
+  description: Find out more about setting up the Verify Service Provider.
+  url: 'https://www.docs.verify.service.gov.uk/get-started/set-up-successful-verification-journey/#set-up-the-successful-verification-user-journey'
 paths:
   /generate-request:
     post:
