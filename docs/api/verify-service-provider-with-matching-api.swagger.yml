@@ -3,6 +3,8 @@ info:
   description: |
     This is a description of the API for the Verify Service Provider when it's connected to a [Matching Service Adapter](https://github.com/alphagov/verify-matching-service-adapter).
 
+    If you don't have a Matching Service Adapter, see the [API documentation for services connecting using only the Verify Service Provider](https://alphagov.github.io/verify-service-provider/api/verify-service-provider-with-matching-api.swagger.html).
+
     The API allows you to generate a SAML authentication request and to translate a SAML response into JSON. To access Verify Service Provider, you must [download your own version](https://github.com/alphagov/verify-service-provider/releases).
   version: 2.0.0
   title: Verify Service Provider
