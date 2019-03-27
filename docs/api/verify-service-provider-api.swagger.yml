@@ -149,7 +149,7 @@ components:
           format: byte
         requestId:
           description: >-
-            A token that was generated for the original SAML Authn Request. This is used to verify that the Authn Request and SAML response have passed  through the same browser.
+            A token that was generated for the original SAML authentication request. This is used to verify that the SAML authentication request and SAML response have passed  through the same browser.
           type: string
           format: byte
         levelOfAssurance:
@@ -177,7 +177,7 @@ components:
             - AUTHENTICATION_FAILED
           description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:AuthnFailed` status code is included in the SAML response from the GOV.UK Verify Hub.
     NoAuthenticationScenario:
-      description: Returned when the user chose to cancel at some point in their journey.
+      description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext` status code is included in the SAML response from the GOV.UK Verify Hub.
       type: object
       required:
         - scenario
