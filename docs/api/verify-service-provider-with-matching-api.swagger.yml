@@ -206,7 +206,7 @@ components:
           type: string
           enum:
             - CANCELLATION
-          description: Returned when the user has cancelled
+          description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext` status code is included in the SAML response from the GOV.UK Verify Hub.
     RequestErrorResponseBody:
       description: Returned when there was an error in the request.
       type: object
