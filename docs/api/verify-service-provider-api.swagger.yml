@@ -186,7 +186,7 @@ components:
           type: string
           enum:
             - NO_AUTHENTICATION
-          description: Returned when the user chose to cancel at some point in their journey.
+          description: Returned when the `urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext` status code is included in the SAML response from the GOV.UK Verify Hub.
     IdentityVerificationScenario:
       description: Returned when the user's identity was successfully verified
       type: object
