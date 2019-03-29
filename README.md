@@ -19,7 +19,8 @@ The VSP allows you to:
 See also:
 * [Technical documentation for connecting services][tech-docs]
 * [Setting up the VSP][vsp-get-started]
-* [VSP API reference][vsp-api]
+* [VSP API reference documentation][vsp-api-reference]
+* [OpenAPI v3 VSP API specification][vsp-api-spec]
 
 
 ## Setup
@@ -173,7 +174,8 @@ For non-security related bugs and feature requests please [raise an issue](https
 [tech-docs]: https://www.docs.verify.service.gov.uk
 [key-rotation]: https://www.docs.verify.service.gov.uk/maintain-your-connection/rotate-keys/
 [vsp-get-started]: https://www.docs.verify.service.gov.uk/get-started/
-[vsp-api]: https://github.com/alphagov/verify-service-provider/blob/master/architecture-decisions/verify-service-provider-api.swagger.yml
+[vsp-api-reference]: https://alphagov.github.io/verify-service-provider/api/verify-service-provider-api.swagger.html
+[vsp-api-spec]: /docs/api/verify-service-provider-api.swagger.yml
 [identity-dataset]: /src/main/resources/default-test-identity-dataset.json
 [release-notes]: /RELEASE_NOTES.md
 [contact-verify]: https://www.verify.service.gov.uk/support/
