@@ -9,7 +9,7 @@ info:
   version: 2.0.0
   title: Verify Service Provider
   x-logo:
-    url: 'https://github.com/alphagov/verify-service-provider/blob/update-api-docs/docs/api/verify-logo-redoc.png?raw=true'
+    url: 'https://github.com/alphagov/verify-service-provider/blob/master/docs/api/verify-logo-redoc.png?raw=true'
     altText: GOV.UK Verify logo
 externalDocs:
   description: Find out more about setting up the Verify Service Provider.
