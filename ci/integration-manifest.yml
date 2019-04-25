@@ -3,6 +3,7 @@ applications:
     memory: 1G
     routes:
       - route: ((app)).apps.internal
+    stack: cflinuxfs3
     buildpack: java_buildpack
     command: (cd ((dist))-* && bin/((dist)) server ((config_file)) )
     env:
