@@ -1,6 +1,7 @@
 memory: 1024M
 applications:
   - name: verify-service-provider-dev
+    stack: cflinuxfs3
     buildpack: java_buildpack
     env:
       CLOCK_SKEW: PT30s
