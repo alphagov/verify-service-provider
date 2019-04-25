@@ -2,4 +2,5 @@
 applications:
 - name: verify-service-provider-stub-msa-metadata
   memory: 64M
+  stack: cflinuxfs3
   buildpack: staticfile_buildpack
