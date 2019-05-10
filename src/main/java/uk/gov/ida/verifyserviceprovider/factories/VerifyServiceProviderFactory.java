@@ -106,16 +106,16 @@ public class VerifyServiceProviderFactory {
         }
     }
 
-    private TranslateSamlResponseResource<TranslatedMatchingResponseBody> getTranslateMatchingSamlResponseResource() {
-        ResponseService<TranslatedMatchingResponseBody> matchingResponseService = responseFactory.createMatchingResponseService(
+    private TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
+        ResponseService matchingResponseService = responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
                 responseFactory.createMsaAssertionService(getMsaSignatureTrustEngine(), new SignatureValidatorFactory(), dateTimeComparator),
                 dateTimeComparator
         );
-        return new TranslateSamlResponseResource<>(matchingResponseService, entityIdService);
+        return new TranslateSamlResponseResource(matchingResponseService, entityIdService);
     }
 
-    private TranslateSamlResponseResource<TranslatedNonMatchingResponseBody> getTranslateNonMatchingSamlResponseResource() {
+    private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
         IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
@@ -131,7 +131,7 @@ public class VerifyServiceProviderFactory {
                 configuration.getHashingEntityId()
         );
 
-        return new TranslateSamlResponseResource<>(
+        return new TranslateSamlResponseResource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         new ClassifyingAssertionService(idpAssertionService, eidasAssertionService),

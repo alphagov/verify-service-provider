@@ -34,6 +34,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
@@ -89,7 +90,7 @@ public class MatchingResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
 
-    private ResponseService<TranslatedMatchingResponseBody> responseService;
+    private ResponseService responseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
 
@@ -147,7 +148,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -172,7 +173,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -197,7 +198,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -221,7 +222,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -245,7 +246,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -269,7 +270,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,

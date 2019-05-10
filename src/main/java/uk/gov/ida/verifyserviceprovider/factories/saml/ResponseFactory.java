@@ -79,15 +79,15 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedMatchingResponseBody> createMatchingResponseService(
+    public ResponseService createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedMatchingResponseBody> matchingAssertionService,
+            AssertionService matchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
-        return new ResponseService<>(
+        return new ResponseService(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
                 matchingAssertionService,
@@ -96,15 +96,15 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService<TranslatedNonMatchingResponseBody> createNonMatchingResponseService(
+    public ResponseService createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService<TranslatedNonMatchingResponseBody> nonMatchingAssertionService,
+            AssertionService nonMatchingAssertionService,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
-        return new ResponseService<>(
+        return new ResponseService(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
                 nonMatchingAssertionService,

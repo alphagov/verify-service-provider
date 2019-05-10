@@ -5,12 +5,13 @@ import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ClassifyingAssertionService implements AssertionService<TranslatedNonMatchingResponseBody> {
+public class ClassifyingAssertionService implements AssertionService {
 
     private final IdpAssertionService idpAssertionService;
     private final EidasAssertionService eidasAssertionService;
@@ -26,7 +27,7 @@ public class ClassifyingAssertionService implements AssertionService<TranslatedN
 
 
     @Override
-    public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
+    public TranslatedResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
         AssertionServiceV2 assertionService = isCountryAttributeQuery(assertions) ? eidasAssertionService : idpAssertionService;
 
         return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
