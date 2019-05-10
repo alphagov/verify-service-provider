@@ -101,7 +101,7 @@ public class MsaAssertionServiceTest {
 
     @Test
     public void shouldTranslateValidAssertion() {
-        TranslatedMatchingResponseBody result = msaAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionService.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
@@ -114,7 +114,7 @@ public class MsaAssertionServiceTest {
 
     @Test
     public void shouldAllowHigherLevelOfAssuranceThanRequested() throws Exception {
-        TranslatedMatchingResponseBody result = msaAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionService.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_1, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(

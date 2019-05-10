@@ -54,7 +54,7 @@ public class ClassifyingAssertionServiceTest {
         when(idpAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);
@@ -75,7 +75,7 @@ public class ClassifyingAssertionServiceTest {
         when(eidasAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);

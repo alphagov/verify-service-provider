@@ -24,7 +24,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Path("/translate-response")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TranslateSamlResponseResource<T extends TranslatedResponseBody> {
+public class TranslateSamlResponseResource {
 
     private final ResponseService responseService;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TranslateSamlResponseResource.class);
@@ -40,7 +40,7 @@ public class TranslateSamlResponseResource<T extends TranslatedResponseBody> {
     public Response translateResponse(@NotNull @Valid TranslateSamlResponseBody translateSamlResponseBody) throws IOException {
         String entityId = entityIdService.getEntityId(translateSamlResponseBody);
         try {
-            TranslatedResponseBody translatedResponseBody = (TranslatedResponseBody) responseService.convertTranslatedResponseBody(
+            TranslatedResponseBody translatedResponseBody = responseService.convertTranslatedResponseBody(
                 translateSamlResponseBody.getSamlResponse(),
                 translateSamlResponseBody.getRequestId(),
                 translateSamlResponseBody.getLevelOfAssurance(),
