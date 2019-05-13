@@ -1,0 +1,15 @@
+applications:
+  - name: ((app))
+    memory: 1G
+    routes:
+      - route: ((app)).apps.internal
+    stack: cflinuxfs3
+    buildpack: java_buildpack
+    command: (cd ((dist))-* && bin/((dist)) server ((config_file)) )
+    env:
+      JAVA_HOME: "../.java-buildpack/open_jdk_jre"
+      CLOCK_SKEW: PT30s
+      EUROPEAN_IDENTITY_ENABLED: false
+      HUB_SSO_LOCATION: "https://www.staging.signin.service.gov.uk/SAML2/SSO"
+      HUB_METADATA_URL: "https://www.staging.signin.service.gov.uk/SAML2/metadata/federation"
+      TRUSTSTORE_PASSWORD: puppet
