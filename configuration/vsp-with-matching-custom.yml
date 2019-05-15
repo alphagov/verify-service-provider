@@ -1,0 +1,57 @@
+# This is an example configuration file to show how to configure
+# the application using a YAML file.
+
+# Dropwizard server connector configuration
+# see: http://www.dropwizard.io/1.3.5/docs/manual/configuration.html#servers
+server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${PORT:-50400}
+
+# Logging configuration
+# see: http://www.dropwizard.io/1.3.5/docs/manual/configuration.html#logging
+logging:
+  level: ${LOG_LEVEL:-INFO}
+  appenders:
+    - type: console
+    - type: file
+      currentLogFilename: logs/verify-service-provider.log
+      archivedLogFilenamePattern: logs/verify-service-provider.log.%d.gz
+
+clockSkew: ${CLOCK_SKEW:-PT30s}
+
+# Entity ID (or IDs) that uniquely identifies your service (or services)
+serviceEntityIds: ${SERVICE_ENTITY_IDS:-[]}
+# This should be provided as a JSON array, e.g. '["service-entity-id"]'
+# To use the Verify Service Provider with multiple services, add their entity IDs here, e.g.
+# '["service-one-entity-id", "service-two-entity-id"]'
+
+# Verify Hub Environment. This tells the service provider where the Verify Hub
+# authentication flow begins and where to find the hub metadata the Verify Service
+# Provider consumes to identify the hub.
+# Valid values: COMPLIANCE_TOOL, INTEGRATION, PRODUCTION
+verifyHubConfiguration:
+  environment: ${VERIFY_ENVIRONMENT:-}
+  ssoLocation: ${HUB_SSO_LOCATION:-}
+  metadata:
+    uri: ${HUB_METADATA_URL:-}
+
+# Location of Matching Service Metadata
+# Verify Service Provider consumes the metadata and uses
+# public certificates from it to identify the msa
+msaMetadata:
+  uri: ${MSA_METADATA_URL:-}
+  expectedEntityId: ${MSA_ENTITY_ID:-}
+
+# Private key that is used to sign an AuthnRequest
+samlSigningKey: ${SAML_SIGNING_KEY:-}
+
+# Private key used to decrypt Assertions in the Response
+samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
+
+# Secondary private key used to decrypt Assertions in the Response
+# This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
+samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
