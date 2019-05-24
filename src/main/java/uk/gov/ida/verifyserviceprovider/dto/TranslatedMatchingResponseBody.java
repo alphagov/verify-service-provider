@@ -72,5 +72,4 @@ public class TranslatedMatchingResponseBody implements TranslatedResponseBody {
             ", attributes=" + attributes +
             '}';
     }
-
 }
