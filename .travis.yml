@@ -1,11 +1,17 @@
 language: java
 env:
-  - VERIFY_USE_PUBLIC_BINARIES=true
+  global:
+    - VERIFY_USE_PUBLIC_BINARIES=true
+    - secure: "LnyxOGBMF4uvDRSnq/A6j7CLH0bIysrZC3J4EzvsjyvMsSltlxUCcCS/72gSz8O4Eo1NPz/gmLNwPDeYKKrIWIP7puNZy2ex8hoXIz+mYWdjYBBnmcIMvYzcPySwGzIV0GL1EFFOnHKE5jhzuzSjkV7hvazYOOJErIkkR8nSk6cqZA1+zBsXmhtOM56tpgh1W3q4SVs1qneQEZPqweJfAGG/Np+KESHyrr76arMKL+b88W6yjsr7n3g6eEnOJNxzIqHSxBzwg7GUGA/iHrUjvayt7PrOr+TbSOl44xRMFUlGajraCsDqR5SkMZwojpG3Lsy1IokmJGwYCczSowhHC1HMTHvf0ZxREfWL8wdermf8lUquu7419zGy0vonE6oZ6+wx+r1YM8sbt2dRsf4Gwch1tKUb3UuSRqeI7qYpRSX56ApOve0uBb5WlmcqVsOQdk6/MObTxP4T/QvzFpLoVk8KEI3cY1GsyIDD6gVkbIacTtoSPFLKFahPnn7ub2vKNSeJjZ4QznPH9euS3NiBXhN723/j+Fa8Ts3md16IbxWcXfO3XEQGbQVAo3S5IBOQTWrebgnSWhJzmtb1faOxRJPrmfhGFYUsIO60czHXkJBQ6bPDrzrY3WcPYK5fubUypuisp2Yql+8USWTgCPffApUBwu5ReK9aa1KitAVSTCs="
+    - secure: "i7fUsivTwP6rQ+CNEP+Kvf34aeJ8bP4WXqJzBQWuV4fLBeVzaJcPe9dF1KnnDO1ndXRXt7X8kNlRl2zN/9mIejxkz4K7S/xiVEHw90fGsjMneDi0LWx4svYzpZ7iCBILcPGoygu7GrdBxqr84MpgUcRc1ytxOEZRkgxu61zZrtM8/C+Trfl6ijxN0q7fKoPjX56WONp7JWTaFpBn6FV6FgATK31uKErpaa0LYrUdebN59ShftLF0k0FQAR3K0qgtjGfHiC6RL7FC+Gqy6uu08+3EQjTbucz5jPg118hh2TymDWpFlwv5NgR7js5pPyXYZUxvzDjt2acRe8lpYcpwKUmFwfRXvX4pANd5/kPrdUqMpn61uiZpICDUrIZq+NLEMxCb9B43Limi2miuRhUgP4NdFz/a3rgeEk3vvYxXhtLlc19X9VORT9reWEoBtbj6NSTMExqL0mOLpEW2qQ8n+YrY5er1LWe/h7q+zzkNUzJf9KRRGtIPb1L//bXIOmr1LH7/8AhVTRgF9YMUkALzPon8I2zHJxuNgbf/uLVV2uVsq8fcIvgEfF80cGAgtUoTQuR4JOd3hvaJQuEqjzWL75qPLoH4C3ELGSrNJ5tHDZGZhjWZ0ek5an7gzsodVylsQwTV1Q/A6M59R2OlKIE29gg2T2RGpUPFvX3ZFlIEBjw="
 jdk:
   - oraclejdk8
   - openjdk8
   - openjdk11
 matrix:
+before_install:
+  - sudo apt-get install jq
+  - curl -u ida-codacy-bot:$GITHUB_PAT -LSs $(curl -u ida-codacy-bot:$GITHUB_PAT -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({content_type, browser_download_url} | select(.content_type | contains("java-archive"))) | .[0].browser_download_url') -o codacy-coverage-reporter-assembly.jar
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -13,4 +19,6 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-
+after_success:
+  - "./gradlew jacocoTestReport"
+  - java -jar codacy-coverage-reporter-assembly.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
