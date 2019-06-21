@@ -140,7 +140,7 @@ The VSP is a Dropwizard application, so you can also configure it with the [opti
 ## Contribute to the Verify Service Provider
 
 If you wish to contribute to the development of the VSP then follow the [development
-guide](DEVELOPMENT.md).
+guide](CONTRIBUTING.md).
 
 ## Support and raising issues
 
