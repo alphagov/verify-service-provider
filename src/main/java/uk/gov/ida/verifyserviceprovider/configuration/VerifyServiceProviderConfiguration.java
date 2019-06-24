@@ -1,9 +1,11 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
+import io.dropwizard.validation.ValidationMethod;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.joda.time.Duration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
@@ -29,7 +31,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private Duration clockSkew;
     private Optional<EuropeanIdentityConfiguration> europeanIdentity;
 
-    @JsonCreator
+    protected VerifyServiceProviderConfiguration() {}
     public VerifyServiceProviderConfiguration(
         @JsonProperty("serviceEntityIds") @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid List<String> serviceEntityIds,
         @JsonProperty("hashingEntityId") @Valid String hashingEntityId,
@@ -37,9 +39,9 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
         @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
         @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-        @JsonProperty("msaMetadata") @NotNull @Valid Optional<MsaMetadataConfiguration> msaMetadata,
+        @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
         @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
-        @JsonProperty("europeanIdentity") @Valid Optional<EuropeanIdentityConfiguration> europeanIdentity
+        @JsonProperty("europeanIdentity") @Valid @UnwrapValidatedValue Optional<EuropeanIdentityConfiguration> europeanIdentity
     ) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
@@ -97,5 +99,11 @@ public class VerifyServiceProviderConfiguration extends Configuration {
 
     public Optional<EuropeanIdentityConfiguration> getEuropeanIdentity() {
         return europeanIdentity;
+    }
+
+    @ValidationMethod(message = "eIDAS and MSA support cannot be set together. The VSP's eIDAS support is only available when it operates without the MSA")
+    @JsonIgnore
+    public boolean isNotMsaAndEidas() {
+        return !(msaMetadata.isPresent() && europeanIdentity.isPresent());
     }
 }
