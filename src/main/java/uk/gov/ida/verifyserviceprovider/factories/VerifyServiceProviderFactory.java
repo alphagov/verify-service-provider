@@ -15,8 +15,6 @@ import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.AuthnRequestFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
@@ -26,9 +24,10 @@ import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+
 import javax.ws.rs.client.Client;
 import java.security.KeyException;
 import java.security.KeyPair;
@@ -36,6 +35,7 @@ import java.security.PrivateKey;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -116,7 +116,7 @@ public class VerifyServiceProviderFactory {
     }
 
     private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
-        IdpAssertionService idpAssertionService = responseFactory.createIdpAssertionService(
+        VerifyAssertionService verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
                 dateTimeComparator,
@@ -134,7 +134,7 @@ public class VerifyServiceProviderFactory {
         return new TranslateSamlResponseResource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
-                        new ClassifyingAssertionService(idpAssertionService, eidasAssertionService),
+                        new ClassifyingAssertionService(verifyAssertionService, eidasAssertionService),
                         dateTimeComparator
                 ),
                 entityIdService);

@@ -24,7 +24,7 @@ import java.util.Optional;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class EidasAssertionService extends AssertionServiceV2 {
+public class EidasAssertionService extends IdentityAssertionService {
 
     private final boolean isEnabled;
     private final InstantValidator instantValidator;
