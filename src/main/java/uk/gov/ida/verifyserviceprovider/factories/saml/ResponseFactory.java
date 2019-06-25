@@ -23,14 +23,12 @@ import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
@@ -134,14 +132,14 @@ public class ResponseFactory {
         );
     }
 
-    public IdpAssertionService createIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                         SignatureValidatorFactory signatureValidatorFactory,
-                                                         DateTimeComparator dateTimeComparator,
-                                                         String hashingEntityId) {
+    public VerifyAssertionService createVerifyIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                                  SignatureValidatorFactory signatureValidatorFactory,
+                                                                  DateTimeComparator dateTimeComparator,
+                                                                  String hashingEntityId) {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-        return new IdpAssertionService(
+        return new VerifyAssertionService(
                 signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),

@@ -13,22 +13,22 @@ import java.util.Optional;
 
 public class ClassifyingAssertionService implements AssertionService {
 
-    private final IdpAssertionService idpAssertionService;
+    private final VerifyAssertionService verifyAssertionService;
     private final EidasAssertionService eidasAssertionService;
 
 
     public ClassifyingAssertionService(
-            IdpAssertionService idpAssertionService,
+            VerifyAssertionService verifyAssertionService,
             EidasAssertionService eidasAssertionService
     ) {
-        this.idpAssertionService = idpAssertionService;
+        this.verifyAssertionService = verifyAssertionService;
         this.eidasAssertionService = eidasAssertionService;
     }
 
 
     @Override
     public TranslatedResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        AssertionServiceV2 assertionService = isCountryAttributeQuery(assertions) ? eidasAssertionService : idpAssertionService;
+        IdentityAssertionService assertionService = isEidasIdentity(assertions) ? eidasAssertionService : verifyAssertionService;
 
         return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
     }
@@ -52,7 +52,7 @@ public class ClassifyingAssertionService implements AssertionService {
     }
 
 
-    private boolean isCountryAttributeQuery(List<Assertion> assertions) {
+    private boolean isEidasIdentity(List<Assertion> assertions) {
         return assertions.stream().anyMatch(eidasAssertionService::isCountryAssertion);
     }
 
