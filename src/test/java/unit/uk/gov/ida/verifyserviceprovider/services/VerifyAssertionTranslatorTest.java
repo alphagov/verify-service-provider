@@ -66,7 +66,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
-public class VerifyAssertionServiceTest {
+public class VerifyAssertionTranslatorTest {
 
     private VerifyAssertionTranslator verifyAssertionService;
 

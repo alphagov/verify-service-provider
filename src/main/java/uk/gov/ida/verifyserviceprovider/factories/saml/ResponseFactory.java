@@ -25,10 +25,10 @@ import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValida
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
-import uk.gov.ida.verifyserviceprovider.services.AssertionService;
+import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.IdentityResponderResponseTranslator;
-import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MsaResponderResponseTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
@@ -80,7 +80,7 @@ public class ResponseFactory {
 
     public ResponseService createMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService matchingAssertionService,
+            AssertionTranslator matchingAssertionTranslator,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -89,7 +89,7 @@ public class ResponseFactory {
         return new ResponseService(
             createStringToResponseTransformer(),
             assertionDecrypter,
-            matchingAssertionService,
+            matchingAssertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
             new InstantValidator(dateTimeComparator),
             new MsaResponderResponseTranslator()
@@ -98,7 +98,7 @@ public class ResponseFactory {
 
     public ResponseService createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
-            AssertionService nonMatchingAssertionService,
+            AssertionTranslator nonMatchingAssertionTranslator,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
@@ -107,14 +107,14 @@ public class ResponseFactory {
         return new ResponseService(
                 createStringToResponseTransformer(),
                 assertionDecrypter,
-                nonMatchingAssertionService,
+            nonMatchingAssertionTranslator,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator),
                 new IdentityResponderResponseTranslator()
         );
     }
 
-    public MsaAssertionService createMsaAssertionService(
+    public MsaAssertionTranslator createMsaAssertionService(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
             SignatureValidatorFactory signatureValidatorFactory,
             DateTimeComparator dateTimeComparator
@@ -128,7 +128,7 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new MsaAssertionService(
+        return new MsaAssertionTranslator(
                 assertionValidator,
                 new LevelOfAssuranceValidator(),
                 signatureValidator

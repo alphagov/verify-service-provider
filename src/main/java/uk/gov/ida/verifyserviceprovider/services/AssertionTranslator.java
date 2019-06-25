@@ -6,7 +6,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
 import java.util.List;
 
-public interface AssertionService {
+public interface AssertionTranslator {
 
     TranslatedResponseBody translateSuccessResponse(
             List<Assertion> assertions,

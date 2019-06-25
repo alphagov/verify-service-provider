@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 
@@ -19,9 +19,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ClassifyingAssertionServiceTest {
+public class ClassifyingAssertionTranslatorTest {
 
-    private ClassifyingAssertionService classifyingAssertionService;
+    private ClassifyingAssertionTranslator classifyingAssertionService;
 
     @Mock
     private VerifyAssertionTranslator verifyAssertionService;
@@ -34,7 +34,7 @@ public class ClassifyingAssertionServiceTest {
     public void setUp() {
         initMocks(this);
 
-        classifyingAssertionService = new ClassifyingAssertionService(
+        classifyingAssertionService = new ClassifyingAssertionTranslator(
             verifyAssertionService,
                 eidasAssertionService
         );

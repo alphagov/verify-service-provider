@@ -17,7 +17,7 @@ import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
-public abstract class IdentityAssertionTranslator implements AssertionService {
+public abstract class IdentityAssertionTranslator implements AssertionTranslator {
 
     final SubjectValidator subjectValidator;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;

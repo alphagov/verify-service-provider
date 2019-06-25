@@ -21,8 +21,8 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
-import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
@@ -124,7 +124,7 @@ public class VerifyServiceProviderFactory {
                 configuration.getHashingEntityId()
         );
 
-        AssertionService nonMatchingAssertionService;
+        AssertionTranslator nonMatchingAssertionTranslator;
         if(isEidasEnabled()) {
             EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
                 dateTimeComparator,
@@ -132,16 +132,15 @@ public class VerifyServiceProviderFactory {
                 configuration.getEuropeanIdentity().get(),
                 configuration.getHashingEntityId()
             );
-
-            nonMatchingAssertionService = new ClassifyingAssertionService(verifyAssertionService, eidasAssertionService);
+            nonMatchingAssertionTranslator = new ClassifyingAssertionTranslator(verifyAssertionService, eidasAssertionService);
         } else {
-            nonMatchingAssertionService = verifyAssertionService;
+            nonMatchingAssertionTranslator = verifyAssertionService;
         }
 
         return new TranslateSamlResponseResource(
             responseFactory.createNonMatchingResponseService(
                 getHubSignatureTrustEngine(),
-                nonMatchingAssertionService,
+                nonMatchingAssertionTranslator,
                 dateTimeComparator
             ),
             entityIdService);

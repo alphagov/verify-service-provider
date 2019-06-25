@@ -55,7 +55,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSub
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
-public class EidasAssertionServiceTest {
+public class EidasAssertionTranslatorTest {
 
     private EidasAssertionTranslator eidasAssertionService;
     @Mock
