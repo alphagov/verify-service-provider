@@ -23,7 +23,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -57,7 +57,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class EidasAssertionServiceTest {
 
-    private EidasAssertionService eidasAssertionService;
+    private EidasAssertionTranslator eidasAssertionService;
     @Mock
     private SubjectValidator subjectValidator;
     @Mock
@@ -83,17 +83,16 @@ public class EidasAssertionServiceTest {
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
-        eidasAssertionService = new EidasAssertionService(
-            true,
+        eidasAssertionService = new EidasAssertionTranslator(
             subjectValidator,
             eidasMatchingDatasetUnmarshaller,
             mdsMapper,
             instantValidator,
             conditionsValidator,
             levelOfAssuranceValidator,
-            Optional.of(metadataResolverRepository),
+            metadataResolverRepository,
             signatureValidatorFactory,
-            Optional.of(HUB_CONNECTOR_ENTITY_ID),
+            HUB_CONNECTOR_ENTITY_ID,
             userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
