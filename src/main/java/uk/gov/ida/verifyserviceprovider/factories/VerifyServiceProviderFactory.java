@@ -21,13 +21,12 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory
 import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
+import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
-import uk.gov.ida.verifyserviceprovider.services.IdentityAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.SingleAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import javax.ws.rs.client.Client;
@@ -125,7 +124,7 @@ public class VerifyServiceProviderFactory {
                 configuration.getHashingEntityId()
         );
 
-        IdentityAssertionService nonMatchingAssertionService;
+        AssertionService nonMatchingAssertionService;
         if(isEidasEnabled()) {
             EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
                 dateTimeComparator,
@@ -136,7 +135,7 @@ public class VerifyServiceProviderFactory {
 
             nonMatchingAssertionService = new ClassifyingAssertionService(verifyAssertionService, eidasAssertionService);
         } else {
-            nonMatchingAssertionService = new SingleAssertionService(verifyAssertionService);
+            nonMatchingAssertionService = verifyAssertionService;
         }
 
         return new TranslateSamlResponseResource(

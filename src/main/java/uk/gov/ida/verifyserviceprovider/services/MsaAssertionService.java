@@ -5,12 +5,9 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.AuthnContext;
 import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
@@ -18,7 +15,6 @@ import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
@@ -71,26 +67,6 @@ public class MsaAssertionService implements AssertionService {
         }
         return new TranslatedMatchingResponseBody(SUCCESS_MATCH, nameID, levelOfAssurance, null);
 
-    }
-
-    @Override
-    public TranslatedMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
-        Optional.ofNullable(statusCode.getStatusCode())
-                .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
-        String subStatus = statusCode.getStatusCode().getValue();
-
-        switch (subStatus) {
-            case SamlStatusCode.NO_MATCH:
-                return new TranslatedMatchingResponseBody(MatchingScenario.NO_MATCH, null, null, null);
-            case StatusCode.REQUESTER:
-                return new TranslatedMatchingResponseBody(MatchingScenario.REQUEST_ERROR, null, null, null);
-            case StatusCode.NO_AUTHN_CONTEXT:
-                return new TranslatedMatchingResponseBody(MatchingScenario.CANCELLATION, null, null, null);
-            case StatusCode.AUTHN_FAILED:
-                return new TranslatedMatchingResponseBody(MatchingScenario.AUTHENTICATION_FAILED, null, null, null);
-            default:
-                throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
-        }
     }
 
     private boolean isUserAccountCreation(List<AttributeStatement> attributeStatements) {

@@ -22,19 +22,22 @@ public class ResponseService {
     private final AssertionService assertionService;
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
+    private final ResponderResponseTranslator responderResponseTranslator;
 
     public ResponseService(
         StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
         AssertionDecrypter assertionDecrypter,
         AssertionService assertionService,
         SamlResponseSignatureValidator responseSignatureValidator,
-        InstantValidator instantValidator
+        InstantValidator instantValidator,
+        ResponderResponseTranslator responderResponseTranslator
     ) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionService = assertionService;
         this.responseSignatureValidator = responseSignatureValidator;
         this.instantValidator = instantValidator;
+        this.responderResponseTranslator = responderResponseTranslator;
     }
 
     public TranslatedResponseBody convertTranslatedResponseBody(
@@ -59,7 +62,7 @@ public class ResponseService {
 
         switch (statusCode.getValue()) {
             case StatusCode.RESPONDER:
-                return assertionService.translateNonSuccessResponse(statusCode);
+                return responderResponseTranslator.translateResponderResponse(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
                 return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);

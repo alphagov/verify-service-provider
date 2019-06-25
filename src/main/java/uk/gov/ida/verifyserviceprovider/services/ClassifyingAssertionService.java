@@ -6,7 +6,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
 import java.util.List;
 
-public class ClassifyingAssertionService extends IdentityAssertionService {
+public class ClassifyingAssertionService implements AssertionService {
 
     private final VerifyAssertionTranslator verifyAssertionTranslator;
     private final EidasAssertionTranslator eidasAssertionTranslator;
