@@ -87,9 +87,11 @@ public class EidasAssertionService extends AssertionServiceV2 {
     }
 
     private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
-        signatureValidatorFactory.getSignatureValidator(metadataResolverRepository.get().getSignatureTrustEngine(assertion.getIssuer().getValue()))
-                .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
-                .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        String issuerEntityId = assertion.getIssuer().getValue();
+        metadataResolverRepository.flatMap((resolver) -> resolver.getSignatureTrustEngine(issuerEntityId))
+            .map(signatureValidatorFactory::getSignatureValidator)
+            .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + issuerEntityId))
+            .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), entityId.get());
