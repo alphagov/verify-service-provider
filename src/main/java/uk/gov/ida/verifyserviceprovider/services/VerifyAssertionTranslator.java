@@ -16,20 +16,21 @@ import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttr
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+
 import javax.xml.namespace.QName;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class VerifyAssertionService extends IdentityAssertionService {
+public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
@@ -37,7 +38,7 @@ public class VerifyAssertionService extends IdentityAssertionService {
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
     private UserIdHashFactory userIdHashFactory;
 
-    public VerifyAssertionService(
+    public VerifyAssertionTranslator(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
             SubjectValidator subjectValidator,
             AssertionAttributeStatementValidator attributeStatementValidator,

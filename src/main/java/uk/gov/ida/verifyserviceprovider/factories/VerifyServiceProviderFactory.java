@@ -22,9 +22,11 @@ import uk.gov.ida.verifyserviceprovider.resources.GenerateAuthnRequestResource;
 import uk.gov.ida.verifyserviceprovider.resources.TranslateSamlResponseResource;
 import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
-import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.IdentityAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.SingleAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
@@ -116,28 +118,34 @@ public class VerifyServiceProviderFactory {
     }
 
     private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
-        VerifyAssertionService verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
+        VerifyAssertionTranslator verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
                 dateTimeComparator,
                 configuration.getHashingEntityId()
         );
 
-        EidasAssertionService eidasAssertionService = responseFactory.createEidasAssertionService(
-                isEidasEnabled(),
+        IdentityAssertionService nonMatchingAssertionService;
+        if(isEidasEnabled()) {
+            EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
                 dateTimeComparator,
                 getEidasMetadataResolverRepository(),
-                configuration.getEuropeanIdentity(),
+                configuration.getEuropeanIdentity().get(),
                 configuration.getHashingEntityId()
-        );
+            );
+
+            nonMatchingAssertionService = new ClassifyingAssertionService(verifyAssertionService, eidasAssertionService);
+        } else {
+            nonMatchingAssertionService = new SingleAssertionService(verifyAssertionService);
+        }
 
         return new TranslateSamlResponseResource(
-                responseFactory.createNonMatchingResponseService(
-                        getHubSignatureTrustEngine(),
-                        new ClassifyingAssertionService(verifyAssertionService, eidasAssertionService),
-                        dateTimeComparator
-                ),
-                entityIdService);
+            responseFactory.createNonMatchingResponseService(
+                getHubSignatureTrustEngine(),
+                nonMatchingAssertionService,
+                dateTimeComparator
+            ),
+            entityIdService);
     }
 
     public VersionNumberResource getVersionNumberResource() {
@@ -156,9 +164,8 @@ public class VerifyServiceProviderFactory {
         return msaMetadataBundle.getSignatureTrustEngine();
     }
 
-    private Optional<EidasMetadataResolverRepository> getEidasMetadataResolverRepository() {
-        if (isEidasEnabled()) {
-            return Optional.of(new EidasMetadataResolverRepository(
+    private EidasMetadataResolverRepository getEidasMetadataResolverRepository() {
+        return new EidasMetadataResolverRepository(
                 getEidasTrustAnchorResolver(),
                 configuration.getEuropeanIdentity().get(),
                 new DropwizardMetadataResolverFactory(),
@@ -166,10 +173,7 @@ public class VerifyServiceProviderFactory {
                 new MetadataSignatureTrustEngineFactory(),
                 new MetadataResolverConfigBuilder(),
                 client
-            ));
-        } else {
-            return Optional.empty();
-        }
+            );
     }
 
     private EidasTrustAnchorResolver getEidasTrustAnchorResolver() {

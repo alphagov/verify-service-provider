@@ -26,10 +26,10 @@ import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfigurat
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
@@ -132,14 +132,14 @@ public class ResponseFactory {
         );
     }
 
-    public VerifyAssertionService createVerifyIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                                  SignatureValidatorFactory signatureValidatorFactory,
-                                                                  DateTimeComparator dateTimeComparator,
-                                                                  String hashingEntityId) {
+    public VerifyAssertionTranslator createVerifyIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
+                                                                     SignatureValidatorFactory signatureValidatorFactory,
+                                                                     DateTimeComparator dateTimeComparator,
+                                                                     String hashingEntityId) {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-        return new VerifyAssertionService(
+        return new VerifyAssertionTranslator(
                 signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
@@ -151,18 +151,16 @@ public class ResponseFactory {
             );
     }
 
-    public EidasAssertionService createEidasAssertionService(
-            boolean isEnabled,
+    public EidasAssertionTranslator createEidasAssertionService(
             DateTimeComparator dateTimeComparator,
-            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository,
-            Optional<EuropeanIdentityConfiguration> europeanIdentityConfiguration,
+            EidasMetadataResolverRepository eidasMetadataResolverRepository,
+            EuropeanIdentityConfiguration europeanIdentityConfiguration,
             String hashingEntityId
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
-        return new EidasAssertionService(
-                isEnabled,
+        return new EidasAssertionTranslator(
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
@@ -171,7 +169,7 @@ public class ResponseFactory {
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
-                europeanIdentityConfiguration.map(EuropeanIdentityConfiguration :: getHubConnectorEntityId),
+                europeanIdentityConfiguration.getHubConnectorEntityId(),
                 new UserIdHashFactory(hashingEntityId)
                 );
     }
