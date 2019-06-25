@@ -120,7 +120,7 @@ public class ResponseFactory {
     ) {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
-        Optional<SamlAssertionsSignatureValidator> assertionsSignatureValidator = signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine));
+        SamlAssertionsSignatureValidator signatureValidator = signatureValidatorFactory.getSignatureValidator(signatureTrustEngine);
         AssertionValidator assertionValidator = new AssertionValidator(
                 new InstantValidator(dateTimeComparator),
                 new SubjectValidator(timeRestrictionValidator),
@@ -130,7 +130,7 @@ public class ResponseFactory {
         return new MsaAssertionService(
                 assertionValidator,
                 new LevelOfAssuranceValidator(),
-                assertionsSignatureValidator.orElseThrow(() -> new RuntimeException("Cannot create MSA signature validator"))
+                signatureValidator
         );
     }
 
@@ -142,7 +142,7 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
         return new IdpAssertionService(
-                signatureValidatorFactory.getSignatureValidator(Optional.of(signatureTrustEngine)).orElseThrow(() -> new RuntimeException("cannot create")),
+                signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
