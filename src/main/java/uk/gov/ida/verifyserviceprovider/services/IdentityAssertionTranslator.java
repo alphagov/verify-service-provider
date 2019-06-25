@@ -17,7 +17,7 @@ import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
-public abstract class IdentityAssertionTranslator {
+public abstract class IdentityAssertionTranslator implements AssertionService {
 
     final SubjectValidator subjectValidator;
     private final MatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
@@ -63,5 +63,4 @@ public abstract class IdentityAssertionTranslator {
             .map(AuthnContextClassRef::getAuthnContextClassRef)
             .orElseThrow(() -> new SamlResponseValidationException("Expected a level of assurance."));
     }
-
 }

@@ -7,9 +7,9 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 
 import java.util.Optional;
 
-public abstract class IdentityAssertionService implements AssertionService {
+public class IdentityResponderResponseTranslator implements ResponderResponseTranslator {
     @Override
-    public TranslatedNonMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
+    public TranslatedNonMatchingResponseBody translateResponderResponse(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
             .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
         String subStatus = statusCode.getStatusCode().getValue();
@@ -25,4 +25,5 @@ public abstract class IdentityAssertionService implements AssertionService {
                 throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
         }
     }
+
 }

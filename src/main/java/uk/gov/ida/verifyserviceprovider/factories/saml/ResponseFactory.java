@@ -27,7 +27,9 @@ import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttr
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionService;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.IdentityResponderResponseTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MsaAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.MsaResponderResponseTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -42,7 +44,6 @@ import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
 import java.util.List;
-import java.util.Optional;
 
 public class ResponseFactory {
 
@@ -86,11 +87,12 @@ public class ResponseFactory {
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
         return new ResponseService(
-                createStringToResponseTransformer(),
-                assertionDecrypter,
-                matchingAssertionService,
-                new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-                new InstantValidator(dateTimeComparator)
+            createStringToResponseTransformer(),
+            assertionDecrypter,
+            matchingAssertionService,
+            new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
+            new InstantValidator(dateTimeComparator),
+            new MsaResponderResponseTranslator()
         );
     }
 
@@ -107,7 +109,8 @@ public class ResponseFactory {
                 assertionDecrypter,
                 nonMatchingAssertionService,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-                new InstantValidator(dateTimeComparator)
+                new InstantValidator(dateTimeComparator),
+                new IdentityResponderResponseTranslator()
         );
     }
 
