@@ -6,13 +6,13 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
 import java.util.List;
 
-public class ClassifyingAssertionService implements AssertionService {
+public class ClassifyingAssertionTranslator implements AssertionTranslator {
 
     private final VerifyAssertionTranslator verifyAssertionTranslator;
     private final EidasAssertionTranslator eidasAssertionTranslator;
 
 
-    public ClassifyingAssertionService(
+    public ClassifyingAssertionTranslator(
             VerifyAssertionTranslator verifyAssertionTranslator,
             EidasAssertionTranslator eidasAssertionTranslator
     ) {

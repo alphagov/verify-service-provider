@@ -19,7 +19,7 @@ public class ResponseService {
 
     private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
-    private final AssertionService assertionService;
+    private final AssertionTranslator assertionTranslator;
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
     private final ResponderResponseTranslator responderResponseTranslator;
@@ -27,14 +27,14 @@ public class ResponseService {
     public ResponseService(
         StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
         AssertionDecrypter assertionDecrypter,
-        AssertionService assertionService,
+        AssertionTranslator assertionTranslator,
         SamlResponseSignatureValidator responseSignatureValidator,
         InstantValidator instantValidator,
         ResponderResponseTranslator responderResponseTranslator
     ) {
         this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
-        this.assertionService = assertionService;
+        this.assertionTranslator = assertionTranslator;
         this.responseSignatureValidator = responseSignatureValidator;
         this.instantValidator = instantValidator;
         this.responderResponseTranslator = responderResponseTranslator;
@@ -65,7 +65,7 @@ public class ResponseService {
                 return responderResponseTranslator.translateResponderResponse(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
-                return assertionService.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
+                return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
         }
