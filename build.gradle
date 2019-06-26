@@ -32,7 +32,8 @@ project.ext {
 dependencies {
     compile(
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
-        'org.json:json:20171018',
+        "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}",
+        "org.json:json:20171018",
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:saml-metadata-bindings:$samlLibVersion",
