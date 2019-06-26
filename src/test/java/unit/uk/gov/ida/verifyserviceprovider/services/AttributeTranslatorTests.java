@@ -12,7 +12,7 @@ import uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder;
 import uk.gov.ida.verifyserviceprovider.dto.Attributes;
 import uk.gov.ida.verifyserviceprovider.exceptions.FailedToRequestVerifiedException;
 import uk.gov.ida.verifyserviceprovider.exceptions.RequestedOnlyVerifiedException;
-import uk.gov.ida.verifyserviceprovider.services.AttributeTranslationService;
+import uk.gov.ida.verifyserviceprovider.services.AttributeTranslator;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.c
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 
-public class AttributeTranslationServiceTests {
+public class AttributeTranslatorTests {
 
     @Before
     public void bootStrapOpenSaml() {
@@ -39,7 +39,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("firstname_verified", false))
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getFirstName()).isNotNull();
     }
@@ -73,7 +73,7 @@ public class AttributeTranslationServiceTests {
                 .build())
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getFirstName()).isNotNull();
         assertThat(result.getMiddleName()).isNotNull();
@@ -99,7 +99,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("currentaddress_verified", true))
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getAddress()).isNotNull();
     }
@@ -128,7 +128,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(addressHistoryAttribute)
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getAddressHistory()).isNotNull();
         assertThat(result.getAddressHistory().size()).isEqualTo(2);
@@ -144,7 +144,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getFirstName().getValue()).isEmpty();
     }
@@ -159,7 +159,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getSurname()).isNull();
     }
@@ -198,7 +198,7 @@ public class AttributeTranslationServiceTests {
                 .build())
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -231,7 +231,7 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("currentaddress_verified", true))
             .build();
 
-        Attributes result = AttributeTranslationService.translateAttributes(attributeStatement);
+        Attributes result = AttributeTranslator.translateAttributes(attributeStatement);
 
         assertThat(result.getAddress().getValue().getLines()).isEqualTo(lines);
         assertThat(result.getAddress().getValue().getPostCode()).isEqualTo(postCode);
@@ -248,7 +248,7 @@ public class AttributeTranslationServiceTests {
                 .build())
             .build();
 
-        AttributeTranslationService.translateAttributes(attributeStatement);
+        AttributeTranslator.translateAttributes(attributeStatement);
     }
 
     @Test(expected = RequestedOnlyVerifiedException.class)
@@ -257,6 +257,6 @@ public class AttributeTranslationServiceTests {
             .addAttribute(createVerifiedAttribute("firstname_verified", true))
             .build();
 
-        AttributeTranslationService.translateAttributes(attributeStatement);
+        AttributeTranslator.translateAttributes(attributeStatement);
     }
 }

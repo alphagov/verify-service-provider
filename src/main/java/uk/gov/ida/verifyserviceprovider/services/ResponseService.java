@@ -17,27 +17,27 @@ import java.util.List;
 
 public class ResponseService {
 
-    private final StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer;
+    private final StringToOpenSamlObjectTransformer<Response> samlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
     private final AssertionTranslator assertionTranslator;
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
-    private final ResponderResponseTranslator responderResponseTranslator;
+    private final ResponderCodeTranslator responderCodeTranslator;
 
     public ResponseService(
-        StringToOpenSamlObjectTransformer<Response> stringToOpenSamlObjectTransformer,
+        StringToOpenSamlObjectTransformer<Response> samlObjectTransformer,
         AssertionDecrypter assertionDecrypter,
         AssertionTranslator assertionTranslator,
         SamlResponseSignatureValidator responseSignatureValidator,
         InstantValidator instantValidator,
-        ResponderResponseTranslator responderResponseTranslator
+        ResponderCodeTranslator responderCodeTranslator
     ) {
-        this.stringToOpenSamlObjectTransformer = stringToOpenSamlObjectTransformer;
+        this.samlObjectTransformer = samlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
         this.assertionTranslator = assertionTranslator;
         this.responseSignatureValidator = responseSignatureValidator;
         this.instantValidator = instantValidator;
-        this.responderResponseTranslator = responderResponseTranslator;
+        this.responderCodeTranslator = responderCodeTranslator;
     }
 
     public TranslatedResponseBody convertTranslatedResponseBody(
@@ -46,7 +46,7 @@ public class ResponseService {
         LevelOfAssurance expectedLevelOfAssurance,
         String entityId
     ) {
-        Response response = stringToOpenSamlObjectTransformer.apply(decodedSamlResponse);
+        Response response = samlObjectTransformer.apply(decodedSamlResponse);
 
         ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
@@ -62,7 +62,7 @@ public class ResponseService {
 
         switch (statusCode.getValue()) {
             case StatusCode.RESPONDER:
-                return responderResponseTranslator.translateResponderResponse(statusCode);
+                return responderCodeTranslator.translateResponderCode(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
                 return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);

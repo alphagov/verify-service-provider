@@ -27,9 +27,9 @@ import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttr
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
-import uk.gov.ida.verifyserviceprovider.services.IdentityResponderResponseTranslator;
-import uk.gov.ida.verifyserviceprovider.services.MsaAssertionTranslator;
-import uk.gov.ida.verifyserviceprovider.services.MsaResponderResponseTranslator;
+import uk.gov.ida.verifyserviceprovider.services.IdentityResponderCodeTranslator;
+import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.MatchingResponderCodeTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -92,7 +92,7 @@ public class ResponseFactory {
             matchingAssertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
             new InstantValidator(dateTimeComparator),
-            new MsaResponderResponseTranslator()
+            new MatchingResponderCodeTranslator()
         );
     }
 
@@ -110,11 +110,11 @@ public class ResponseFactory {
             nonMatchingAssertionTranslator,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator),
-                new IdentityResponderResponseTranslator()
+                new IdentityResponderCodeTranslator()
         );
     }
 
-    public MsaAssertionTranslator createMsaAssertionService(
+    public MatchingAssertionTranslator createMsaAssertionService(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
             SignatureValidatorFactory signatureValidatorFactory,
             DateTimeComparator dateTimeComparator
@@ -128,7 +128,7 @@ public class ResponseFactory {
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
         );
 
-        return new MsaAssertionTranslator(
+        return new MatchingAssertionTranslator(
                 assertionValidator,
                 new LevelOfAssuranceValidator(),
                 signatureValidator

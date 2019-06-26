@@ -13,10 +13,10 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
 
-public class IdentityResponderResponseTranslatorTest {
+public class IdentityResponderCodeTranslatorTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private IdentityResponderResponseTranslator responderResponseTranslator = new IdentityResponderResponseTranslator();
+    private IdentityResponderCodeTranslator responderResponseTranslator = new IdentityResponderCodeTranslator();
 
     @Before
     public void bootStrapOpenSaml() {
@@ -29,7 +29,7 @@ public class IdentityResponderResponseTranslatorTest {
         expectedException.expectMessage("Missing status code for non-Success response");
 
         StatusCode statusCode = aStatusCode().withValue(StatusCode.RESPONDER).build();
-        responderResponseTranslator.translateResponderResponse(statusCode);
+        responderResponseTranslator.translateResponderCode(statusCode);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class IdentityResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AUTHN_CONTEXT).build())
             .build();
-        TranslatedResponseBody response = responderResponseTranslator.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.NO_AUTHENTICATION);
     }
 
@@ -48,7 +48,7 @@ public class IdentityResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.AUTHN_FAILED).build())
             .build();
-        TranslatedResponseBody response = responderResponseTranslator.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
     }
 
@@ -58,7 +58,7 @@ public class IdentityResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.REQUESTER).build())
             .build();
-        TranslatedResponseBody response = responderResponseTranslator.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.REQUEST_ERROR);
     }
 
@@ -71,7 +71,7 @@ public class IdentityResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AVAILABLE_IDP).build())
             .build();
-        responderResponseTranslator.translateResponderResponse(statusCode);
+        responderResponseTranslator.translateResponderCode(statusCode);
     }
 
 }
