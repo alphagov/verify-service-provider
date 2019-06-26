@@ -20,16 +20,16 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
-public class MsaAssertionTranslator implements AssertionTranslator {
+public class MatchingAssertionTranslator implements AssertionTranslator {
 
 
     private AssertionValidator assertionValidator;
     private LevelOfAssuranceValidator levelOfAssuranceValidator;
     private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
-    public MsaAssertionTranslator(AssertionValidator assertionValidator,
-                                  LevelOfAssuranceValidator levelOfAssuranceValidator,
-                                  SamlAssertionsSignatureValidator assertionsSignatureValidator) {
+    public MatchingAssertionTranslator(AssertionValidator assertionValidator,
+                                       LevelOfAssuranceValidator levelOfAssuranceValidator,
+                                       SamlAssertionsSignatureValidator assertionsSignatureValidator) {
         this.assertionValidator = assertionValidator;
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.assertionsSignatureValidator = assertionsSignatureValidator;
@@ -61,7 +61,7 @@ public class MsaAssertionTranslator implements AssertionTranslator {
                 ACCOUNT_CREATION,
                 nameID,
                 levelOfAssurance,
-                AttributeTranslationService.translateAttributes(attributeStatements.get(0))
+                AttributeTranslator.translateAttributes(attributeStatements.get(0))
             );
 
         }

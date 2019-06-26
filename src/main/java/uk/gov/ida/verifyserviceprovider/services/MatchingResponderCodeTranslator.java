@@ -9,9 +9,9 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 
 import java.util.Optional;
 
-public class MsaResponderResponseTranslator implements ResponderResponseTranslator {
+public class MatchingResponderCodeTranslator implements ResponderCodeTranslator {
     @Override
-    public TranslatedResponseBody translateResponderResponse(StatusCode statusCode) {
+    public TranslatedResponseBody translateResponderCode(StatusCode statusCode) {
         Optional.ofNullable(statusCode.getStatusCode())
             .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
         String subStatus = statusCode.getStatusCode().getValue();

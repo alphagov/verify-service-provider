@@ -14,11 +14,11 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
 
-public class MsaResponderResponseTranslatorTest {
+public class MatchingResponderCodeTranslatorTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private MsaResponderResponseTranslator msaAssertionService = new MsaResponderResponseTranslator();
+    private MatchingResponderCodeTranslator msaAssertionService = new MatchingResponderCodeTranslator();
 
     @Before
     public void bootStrapOpenSaml() {
@@ -31,7 +31,7 @@ public class MsaResponderResponseTranslatorTest {
         expectedException.expectMessage("Missing status code for non-Success response");
 
         StatusCode statusCode = aStatusCode().withValue(StatusCode.RESPONDER).build();
-        msaAssertionService.translateResponderResponse(statusCode);
+        msaAssertionService.translateResponderCode(statusCode);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class MsaResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AUTHN_CONTEXT).build())
             .build();
-        TranslatedResponseBody response = msaAssertionService.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = msaAssertionService.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(MatchingScenario.CANCELLATION);
     }
 
@@ -50,7 +50,7 @@ public class MsaResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(SamlStatusCode.NO_MATCH).build())
             .build();
-        TranslatedResponseBody response = msaAssertionService.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = msaAssertionService.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(MatchingScenario.NO_MATCH);
     }
 
@@ -60,7 +60,7 @@ public class MsaResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.AUTHN_FAILED).build())
             .build();
-        TranslatedResponseBody response = msaAssertionService.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = msaAssertionService.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(MatchingScenario.AUTHENTICATION_FAILED);
     }
 
@@ -70,7 +70,7 @@ public class MsaResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.REQUESTER).build())
             .build();
-        TranslatedResponseBody response = msaAssertionService.translateResponderResponse(statusCode);
+        TranslatedResponseBody response = msaAssertionService.translateResponderCode(statusCode);
         assertThat(response.getScenario()).isEqualTo(MatchingScenario.REQUEST_ERROR);
     }
 
@@ -83,7 +83,7 @@ public class MsaResponderResponseTranslatorTest {
             .withValue(StatusCode.RESPONDER)
             .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AVAILABLE_IDP).build())
             .build();
-        msaAssertionService.translateResponderResponse(statusCode);
+        msaAssertionService.translateResponderCode(statusCode);
     }
 
 }

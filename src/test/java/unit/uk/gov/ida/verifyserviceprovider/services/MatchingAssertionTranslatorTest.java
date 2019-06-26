@@ -29,7 +29,7 @@ import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
-import uk.gov.ida.verifyserviceprovider.services.MsaAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import java.security.KeyPair;
@@ -56,11 +56,11 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
-public class MsaAssertionTranslatorTest {
+public class MatchingAssertionTranslatorTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
-    private MsaAssertionTranslator msaAssertionService;
+    private MatchingAssertionTranslator msaAssertionService;
     private Credential testRpMsaSigningCredential = createMSSigningCredential();
 
     private Credential createMSSigningCredential() {
