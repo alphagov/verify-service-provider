@@ -59,7 +59,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.*;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
@@ -75,7 +79,12 @@ import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder.anEntityDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder.aKeyDescriptor;
 import static uk.gov.ida.saml.core.test.builders.metadata.SPSSODescriptorBuilder.anSpServiceDescriptor;
-import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.*;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.ACCOUNT_CREATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.AUTHENTICATION_FAILED;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.CANCELLATION;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.NO_MATCH;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.REQUEST_ERROR;
+import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
 public class MatchingResponseServiceTest {
 
