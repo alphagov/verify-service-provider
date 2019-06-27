@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/refresh-matching-dataset")
+@Path("/refresh-{a:matching|identity}-dataset")
 public class RefreshDatasetResource {
     private final ComplianceToolClient complianceToolClient;
 
@@ -23,8 +23,7 @@ public class RefreshDatasetResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response execute(@Valid @NotNull MatchingDataset matchingDataset) throws Exception {
-        Response response = complianceToolClient.initializeComplianceTool(matchingDataset);
-        return response;
+        return complianceToolClient.initializeComplianceTool(matchingDataset);
 
     }
 

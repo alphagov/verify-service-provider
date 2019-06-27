@@ -28,7 +28,10 @@ public class RefreshDatasetResourceTest {
 
     @Test
     public void itWillErrorIfTheMatchingDatasetIsNotValid() {
-        Response response = refreshDatasetResource.client().target("/refresh-matching-dataset").request().post(json("{}"));
+        Response response = refreshDatasetResource.client()
+            .target("/refresh-matching-dataset")
+            .request()
+            .post(json("{}"));
         assertThat(response.getStatus()).isEqualTo(422);
         ValidationErrorMessage errorMessage = response.readEntity(ValidationErrorMessage.class);
         assertThat(errorMessage.getErrors()).isNotEmpty();
@@ -38,7 +41,21 @@ public class RefreshDatasetResourceTest {
     @Test
     public void willCallOnTheComplianceToolIfTheMatchingDatasetIsValid() throws CertificateEncodingException {
         when(complianceToolClient.initializeComplianceTool(any(MatchingDataset.class))).thenReturn(Response.ok().build());
-        Response response = refreshDatasetResource.client().target("/refresh-matching-dataset").request().post(json(new MatchingDatasetBuilder().build()));
+        Response response = refreshDatasetResource.client()
+            .target("/refresh-matching-dataset")
+            .request()
+            .post(json(new MatchingDatasetBuilder().build()));
+        assertThat(response.getStatus()).isEqualTo(200);
+        verify(complianceToolClient).initializeComplianceTool(any(MatchingDataset.class));
+    }
+
+    @Test
+    public void willAlsoLetYouUseRefreshIdentityDataset() throws CertificateEncodingException {
+        when(complianceToolClient.initializeComplianceTool(any(MatchingDataset.class))).thenReturn(Response.ok().build());
+        Response response = refreshDatasetResource.client()
+            .target("/refresh-identity-dataset")
+            .request()
+            .post(json(new MatchingDatasetBuilder().build()));
         assertThat(response.getStatus()).isEqualTo(200);
         verify(complianceToolClient).initializeComplianceTool(any(MatchingDataset.class));
     }
