@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 
-public class NonMatchingVerifiableAttribute<T> {
+public class HistoricalVerifiableAttribute<T> {
 
     @JsonProperty("value")
     private final T value;
@@ -16,7 +16,7 @@ public class NonMatchingVerifiableAttribute<T> {
     @JsonProperty("to") @JsonInclude(JsonInclude.Include.NON_NULL)
     private final LocalDate to;
 
-    public NonMatchingVerifiableAttribute(
+    public HistoricalVerifiableAttribute(
            T value,
            boolean verified,
            LocalDate from,
@@ -44,7 +44,7 @@ public class NonMatchingVerifiableAttribute<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NonMatchingVerifiableAttribute<?> that = (NonMatchingVerifiableAttribute<?>) o;
+        HistoricalVerifiableAttribute<?> that = (HistoricalVerifiableAttribute<?>) o;
 
         return isVerified() == that.isVerified() &&
                 getValue().equals(that.getValue()) &&
@@ -63,7 +63,7 @@ public class NonMatchingVerifiableAttribute<T> {
 
     @Override
     public String toString() {
-        return String.format("NonMatchingVerifiableAttribute{ value=%s, verified=%s, from=%s, to=%s }", value, verified, from, to);
+        return String.format("HistoricalVerifiableAttribute{ value=%s, verified=%s, from=%s, to=%s }", value, verified, from, to);
     }
 
 }

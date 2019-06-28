@@ -7,12 +7,12 @@ import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToIdentityAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
+import static uk.gov.ida.verifyserviceprovider.dto.IdentityScenario.IDENTITY_VERIFIED;
 
 public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
@@ -44,7 +44,7 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
             AssertionAttributeStatementValidator attributeStatementValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             AssertionClassifier assertionClassifierService,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
+            MatchingDatasetToIdentityAttributesMapper mdsMapper,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
             UserIdHashFactory userIdHashFactory
     ) {
@@ -58,7 +58,7 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
 
     @Override
-    public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
+    public TranslatedIdentityResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
         Assertion authnAssertion = getAuthnAssertion(assertions);
         Assertion mdsAssertion = getMatchingDatasetAssertion(assertions);
 
@@ -73,9 +73,9 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
         String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
 
-        NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
+        IdentityAttributes attributes = translateAttributes(mdsAssertion);
 
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
+        return new TranslatedIdentityResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }
 
 

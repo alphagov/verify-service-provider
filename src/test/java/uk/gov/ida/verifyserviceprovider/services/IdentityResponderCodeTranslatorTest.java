@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
@@ -39,7 +39,7 @@ public class IdentityResponderCodeTranslatorTest {
             .withSubStatusCode(aStatusCode().withValue(StatusCode.NO_AUTHN_CONTEXT).build())
             .build();
         TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
-        assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.NO_AUTHENTICATION);
+        assertThat(response.getScenario()).isEqualTo(IdentityScenario.NO_AUTHENTICATION);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class IdentityResponderCodeTranslatorTest {
             .withSubStatusCode(aStatusCode().withValue(StatusCode.AUTHN_FAILED).build())
             .build();
         TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
-        assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.AUTHENTICATION_FAILED);
+        assertThat(response.getScenario()).isEqualTo(IdentityScenario.AUTHENTICATION_FAILED);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class IdentityResponderCodeTranslatorTest {
             .withSubStatusCode(aStatusCode().withValue(StatusCode.REQUESTER).build())
             .build();
         TranslatedResponseBody response = responderResponseTranslator.translateResponderCode(statusCode);
-        assertThat(response.getScenario()).isEqualTo(NonMatchingScenario.REQUEST_ERROR);
+        assertThat(response.getScenario()).isEqualTo(IdentityScenario.REQUEST_ERROR);
     }
 
     @Test

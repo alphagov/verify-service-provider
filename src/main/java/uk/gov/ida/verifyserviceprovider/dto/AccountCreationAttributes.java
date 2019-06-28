@@ -11,24 +11,24 @@ import java.util.List;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Attributes {
+public class AccountCreationAttributes {
 
     private final VerifiableAttribute<String> firstName;
     private final VerifiableAttribute<String>  middleName;
     private final VerifiableAttribute<String>  surname;
     private final VerifiableAttribute<LocalDate> dateOfBirth;
-    private final VerifiableAttribute<Address> address;
-    private final List<VerifiableAttribute<Address>> addressHistory;
+    private final VerifiableAttribute<AccountCreationAddress> address;
+    private final List<VerifiableAttribute<AccountCreationAddress>> addressHistory;
     private final String cycle3;
 
     @JsonCreator
-    public Attributes(
+    public AccountCreationAttributes(
         @JsonProperty("firstName") VerifiableAttribute<String> firstName,
         @JsonProperty("middleName") VerifiableAttribute<String> middleName,
         @JsonProperty("surname") VerifiableAttribute<String> surname,
         @JsonProperty("dateOfBirth") VerifiableAttribute<LocalDate> dateOfBirth,
-        @JsonProperty("address") VerifiableAttribute<Address> address,
-        @JsonProperty("addressHistory") List<VerifiableAttribute<Address>> addressHistory,
+        @JsonProperty("address") VerifiableAttribute<AccountCreationAddress> address,
+        @JsonProperty("addressHistory") List<VerifiableAttribute<AccountCreationAddress>> addressHistory,
         @JsonProperty("cycle3") String cycle3
     ) {
         this.firstName = firstName;
@@ -56,11 +56,11 @@ public class Attributes {
         return dateOfBirth;
     }
 
-    public VerifiableAttribute<Address> getAddress() {
+    public VerifiableAttribute<AccountCreationAddress> getAddress() {
         return address;
     }
 
-    public List<VerifiableAttribute<Address>> getAddressHistory() {
+    public List<VerifiableAttribute<AccountCreationAddress>> getAddressHistory() {
         return addressHistory;
     }
 
@@ -73,7 +73,7 @@ public class Attributes {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Attributes that = (Attributes) o;
+        AccountCreationAttributes that = (AccountCreationAttributes) o;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (middleName != null ? !middleName.equals(that.middleName) : that.middleName != null) return false;
         if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
@@ -98,7 +98,7 @@ public class Attributes {
     @Override
     public String toString() {
         return String.format(
-            "Attributes{ firstName=%s, middleName=%s, surname=%s, dateOfBirth=%s, address=%s, addressHistory=%s, cycle3=%s}",
+            "AccountCreationAttributes{ firstName=%s, middleName=%s, surname=%s, dateOfBirth=%s, address=%s, addressHistory=%s, cycle3=%s}",
             firstName, middleName, surname, dateOfBirth, address, addressHistory, cycle3);
     }
 

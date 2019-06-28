@@ -61,7 +61,7 @@ public class MatchingAssertionTranslator implements AssertionTranslator {
                 ACCOUNT_CREATION,
                 nameID,
                 levelOfAssurance,
-                AttributeTranslator.translateAttributes(attributeStatements.get(0))
+                AccountCreationAttributeTranslator.translateAttributes(attributeStatements.get(0))
             );
 
         }

@@ -12,9 +12,9 @@ import uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityScenario;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 import uk.gov.ida.verifyserviceprovider.services.ComplianceToolService;
 import uk.gov.ida.verifyserviceprovider.services.GenerateRequestService;
@@ -34,8 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.verifyserviceprovider.builders.VerifyServiceProviderAppRuleBuilder.aVerifyServiceProviderAppRule;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_1;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.AUTHENTICATION_FAILED;
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
+import static uk.gov.ida.verifyserviceprovider.dto.IdentityScenario.AUTHENTICATION_FAILED;
+import static uk.gov.ida.verifyserviceprovider.dto.IdentityScenario.IDENTITY_VERIFIED;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.*;
 
 public class NonMatchingAcceptanceTest {
@@ -411,9 +411,9 @@ public class NonMatchingAcceptanceTest {
                 .buildPost(json(translateResponseRequestData))
                 .invoke();
 
-        TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
+        TestTranslatedIdentityResponseBody responseContent = response.readEntity(TestTranslatedIdentityResponseBody.class);
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
-        assertThat(responseContent.getScenario()).isEqualTo(NonMatchingScenario.NO_AUTHENTICATION);
+        assertThat(responseContent.getScenario()).isEqualTo(IdentityScenario.NO_AUTHENTICATION);
     }
 }

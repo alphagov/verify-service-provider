@@ -1,35 +1,28 @@
 package uk.gov.ida.verifyserviceprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class Address {
-
     private final List<String> lines;
     private final String postCode;
     private final String internationalPostCode;
     private final String uprn;
-    private final LocalDate fromDate;
-    private final LocalDate toDate;
 
     @JsonCreator
     public Address(
         @JsonProperty("lines") List<String> lines,
-        @JsonProperty("postCode") String postCode,
-        @JsonProperty("internationalPostCode") String internationalPostCode,
-        @JsonProperty("uprn") String uprn,
-        @JsonProperty("fromDate") LocalDate fromDate,
-        @JsonProperty("toDate") LocalDate toDate
+        @JsonProperty("postCode") @JsonInclude(JsonInclude.Include.NON_NULL) String postCode,
+        @JsonProperty("internationalPostCode") @JsonInclude(JsonInclude.Include.NON_NULL) String internationalPostCode,
+        @JsonProperty("uprn") @JsonInclude(JsonInclude.Include.NON_NULL) String uprn
     ) {
         this.lines = lines;
         this.postCode = postCode;
         this.internationalPostCode = internationalPostCode;
         this.uprn = uprn;
-        this.fromDate = fromDate;
-        this.toDate = toDate;
     }
 
     public List<String> getLines() {
@@ -48,28 +41,17 @@ public class Address {
         return uprn;
     }
 
-    public LocalDate getFromDate() {
-        return fromDate;
-    }
-
-    public LocalDate getToDate() {
-        return toDate;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Address address = (Address) o;
+        Address other = (Address) o;
 
-        if (lines != null ? !lines.equals(address.lines) : address.lines != null) return false;
-        if (postCode != null ? !postCode.equals(address.postCode) : address.postCode != null) return false;
-        if (internationalPostCode != null ? !internationalPostCode.equals(address.internationalPostCode) : address.internationalPostCode != null)
-            return false;
-        if (uprn != null ? !uprn.equals(address.uprn) : address.uprn != null) return false;
-        if (fromDate != null ? !fromDate.equals(address.fromDate) : address.fromDate != null) return false;
-        return toDate != null ? toDate.equals(address.toDate) : address.toDate == null;
+        if (lines != null ? !lines.equals(other.lines) : other.lines != null) return false;
+        if (postCode != null ? !postCode.equals(other.postCode) : other.postCode != null) return false;
+        if (uprn != null ? !uprn.equals(other.uprn) : other.uprn != null) return false;
+        return (internationalPostCode != null ? !internationalPostCode.equals(other.internationalPostCode) : other.internationalPostCode != null);
     }
 
     @Override
@@ -78,20 +60,16 @@ public class Address {
         result = 31 * result + (postCode != null ? postCode.hashCode() : 0);
         result = 31 * result + (internationalPostCode != null ? internationalPostCode.hashCode() : 0);
         result = 31 * result + (uprn != null ? uprn.hashCode() : 0);
-        result = 31 * result + (fromDate != null ? fromDate.hashCode() : 0);
-        result = 31 * result + (toDate != null ? toDate.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Address{" +
+        return "AccountCreationAddress{" +
             ", lines=" + lines +
             ", postCode='" + postCode + '\'' +
             ", internationalPostCode='" + internationalPostCode + '\'' +
             ", uprn='" + uprn + '\'' +
-            ", fromDate=" + fromDate +
-            ", toDate=" + toDate +
             '}';
     }
 

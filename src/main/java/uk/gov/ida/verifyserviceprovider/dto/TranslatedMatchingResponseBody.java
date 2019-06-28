@@ -10,14 +10,14 @@ public class TranslatedMatchingResponseBody implements TranslatedResponseBody {
     private final MatchingScenario scenario;
     private final String pid;
     private final LevelOfAssurance levelOfAssurance;
-    private final Attributes attributes;
+    private final AccountCreationAttributes attributes;
 
     @JsonCreator
     public TranslatedMatchingResponseBody(
         @JsonProperty("scenario") MatchingScenario scenario,
         @JsonProperty("pid") String pid,
         @JsonProperty("levelOfAssurance") LevelOfAssurance levelOfAssurance,
-        @JsonProperty("attributes") Attributes attributes
+        @JsonProperty("attributes") AccountCreationAttributes attributes
     ) {
         this.scenario = scenario;
         this.pid = pid;
@@ -37,7 +37,7 @@ public class TranslatedMatchingResponseBody implements TranslatedResponseBody {
         return levelOfAssurance;
     }
 
-    public Optional<Attributes> getAttributes() {
+    public Optional<AccountCreationAttributes> getAttributes() {
         return Optional.ofNullable(attributes);
     }
 

@@ -23,7 +23,7 @@ public class NonMatchingVerifiableAttributeBuilder {
         return this;
     }
 
-    public NonMatchingVerifiableAttribute<String> build() {
-        return new NonMatchingVerifiableAttribute<>(value, verified, from, to);
+    public HistoricalVerifiableAttribute<String> build() {
+        return new HistoricalVerifiableAttribute<>(value, verified, from, to);
     }
 }

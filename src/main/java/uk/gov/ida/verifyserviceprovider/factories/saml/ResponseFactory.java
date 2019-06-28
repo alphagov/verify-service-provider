@@ -23,7 +23,7 @@ import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToIdentityAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
@@ -96,7 +96,7 @@ public class ResponseFactory {
         );
     }
 
-    public ResponseService createNonMatchingResponseService(
+    public ResponseService createIdentityResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionTranslator nonMatchingAssertionTranslator,
             DateTimeComparator dateTimeComparator
@@ -148,7 +148,7 @@ public class ResponseFactory {
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
                 new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new MatchingDatasetToIdentityAttributesMapper(),
                 new LevelOfAssuranceValidator(),
                 new UserIdHashFactory(hashingEntityId)
             );
@@ -166,7 +166,7 @@ public class ResponseFactory {
         return new EidasAssertionTranslator(
                 new SubjectValidator(timeRestrictionValidator),
                 new EidasMatchingDatasetUnmarshaller(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
+                new MatchingDatasetToIdentityAttributesMapper(),
                 new InstantValidator(dateTimeComparator),
                 new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
                 new LevelOfAssuranceValidator(),
