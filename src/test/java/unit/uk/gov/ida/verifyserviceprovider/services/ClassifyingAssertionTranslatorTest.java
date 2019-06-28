@@ -15,10 +15,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+//@RunWith(MockitoJUnitRunner.class)
 public class ClassifyingAssertionTranslatorTest {
 
     private ClassifyingAssertionTranslator classifyingAssertionService;
@@ -36,7 +40,7 @@ public class ClassifyingAssertionTranslatorTest {
 
         classifyingAssertionService = new ClassifyingAssertionTranslator(
             verifyAssertionService,
-                eidasAssertionService
+            eidasAssertionService
         );
     }
 
@@ -51,33 +55,32 @@ public class ClassifyingAssertionTranslatorTest {
         TranslatedNonMatchingResponseBody expectedResult = mock(TranslatedNonMatchingResponseBody.class);
 
         when(eidasAssertionService.isCountryAssertion(any())).thenReturn(false);
-        when(verifyAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
+        when(
+            verifyAssertionService.translateSuccessResponse(eq(assertions), eq(expectedInResponseTo), eq(loa), eq(entityId))
+        ).thenReturn(expectedResult);
 
-
-        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
-
-
-        assertThat(actualResult).isEqualTo(expectedResult);
+        assertThat(
+            classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)
+        ).isSameAs(expectedResult);
+        verify(eidasAssertionService, never()).translateSuccessResponse(any(), any(), any(), any());
     }
 
     @Test
     public void shouldUseEidasAssertionServiceIfAnyAssertionIsACountryAttributeQuery() {
-        Assertion assertion1 = mock(Assertion.class);
-        Assertion assertion2 = mock(Assertion.class);
-        List<Assertion> assertions = Arrays.asList(assertion1, assertion2);
+        Assertion assertion = mock(Assertion.class);
+        List<Assertion> assertions = Arrays.asList(assertion);
         String expectedInResponseTo = "somesuch";
         LevelOfAssurance loa = LevelOfAssurance.LEVEL_2;
         String entityId = "someEntityId";
         TranslatedNonMatchingResponseBody expectedResult = mock(TranslatedNonMatchingResponseBody.class);
 
-        when(eidasAssertionService.isCountryAssertion(assertion1)).thenReturn(false);
-        when(eidasAssertionService.isCountryAssertion(assertion2)).thenReturn(true);
-        when(eidasAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
+        when(eidasAssertionService.isCountryAssertion(eq(assertion))).thenReturn(true);
+        when(eidasAssertionService.translateSuccessResponse(eq(assertions), eq(expectedInResponseTo), eq(loa), eq(entityId))).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
-
-
-        assertThat(actualResult).isEqualTo(expectedResult);
+        assertThat(
+            classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId))
+            .isSameAs(expectedResult);
+        verify(verifyAssertionService, never()).translateSuccessResponse(any(), any(), any(), any());
     }
 }

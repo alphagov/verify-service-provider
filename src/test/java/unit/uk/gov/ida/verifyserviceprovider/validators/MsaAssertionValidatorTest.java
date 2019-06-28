@@ -13,7 +13,7 @@ import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.MsaAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -25,9 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 
-public class AssertionValidatorTest {
+public class MsaAssertionValidatorTest {
 
-    private AssertionValidator validator;
+    private MsaAssertionValidator validator;
 
     private InstantValidator instantValidator;
     private SubjectValidator subjectValidator;
@@ -45,7 +45,7 @@ public class AssertionValidatorTest {
         assertion = mock(Assertion.class);
         AuthnStatement authnStatement = mock(AuthnStatement.class);
 
-        validator = new AssertionValidator(
+        validator = new MsaAssertionValidator(
             instantValidator,
             subjectValidator,
             conditionsValidator

@@ -6,14 +6,14 @@ import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationExcepti
 
 import java.util.List;
 
-public class AssertionValidator {
+public class MsaAssertionValidator {
 
     private final InstantValidator instantValidator;
     private final SubjectValidator subjectValidator;
     private final ConditionsValidator conditionsValidator;
 
 
-    public AssertionValidator(
+    public MsaAssertionValidator(
         InstantValidator instantValidator,
         SubjectValidator subjectValidator,
         ConditionsValidator conditionsValidator

@@ -27,13 +27,16 @@ import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttr
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.services.IdentityResponderCodeTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingResponderCodeTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.validators.VerifyAssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.VerifyAssertionsValidator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.MsaAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
@@ -122,7 +125,7 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
         SamlAssertionsSignatureValidator signatureValidator = signatureValidatorFactory.getSignatureValidator(signatureTrustEngine);
-        AssertionValidator assertionValidator = new AssertionValidator(
+        MsaAssertionValidator assertionValidator = new MsaAssertionValidator(
                 new InstantValidator(dateTimeComparator),
                 new SubjectValidator(timeRestrictionValidator),
                 new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator())
@@ -142,15 +145,20 @@ public class ResponseFactory {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
+        VerifyAssertionsValidator verifyAssertionsValidator = new VerifyAssertionsValidator(
+            new VerifyAssertionValidator(
+            signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
+            new AssertionAttributeStatementValidator(),
+            new SubjectValidator(timeRestrictionValidator)
+            )
+        );
         return new VerifyAssertionTranslator(
-                signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
-                new SubjectValidator(timeRestrictionValidator),
-                new AssertionAttributeStatementValidator(),
-                new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
-                new AssertionClassifier(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                new LevelOfAssuranceValidator(),
-                new UserIdHashFactory(hashingEntityId)
+            new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),
+            new AssertionClassifier(),
+            new MatchingDatasetToNonMatchingAttributesMapper(),
+            new UserIdHashFactory(hashingEntityId),
+            verifyAssertionsValidator,
+            new LevelOfAssuranceValidator()
             );
     }
 
@@ -163,18 +171,27 @@ public class ResponseFactory {
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
         AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
 
+        final InstantValidator instantValidator = new InstantValidator(dateTimeComparator);
+        final ConditionsValidator conditionsValidator = new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator);
+        final SignatureValidatorFactory signatureValidatorFactory = new SignatureValidatorFactory();
+
+        EidasAssertionValidator eidasAssertionValidator = new EidasAssertionValidator(
+            instantValidator,
+            conditionsValidator,
+            signatureValidatorFactory,
+            europeanIdentityConfiguration.getHubConnectorEntityId(),
+            eidasMetadataResolverRepository,
+            new SubjectValidator(timeRestrictionValidator)
+        );
+
         return new EidasAssertionTranslator(
-                new SubjectValidator(timeRestrictionValidator),
-                new EidasMatchingDatasetUnmarshaller(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                new InstantValidator(dateTimeComparator),
-                new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
-                new LevelOfAssuranceValidator(),
-                eidasMetadataResolverRepository,
-                new SignatureValidatorFactory(),
-                europeanIdentityConfiguration.getHubConnectorEntityId(),
-                new UserIdHashFactory(hashingEntityId)
-                );
+            new EidasMatchingDatasetUnmarshaller(),
+            new MatchingDatasetToNonMatchingAttributesMapper(),
+            eidasMetadataResolverRepository,
+            new UserIdHashFactory(hashingEntityId),
+            eidasAssertionValidator,
+            new LevelOfAssuranceValidator()
+        );
     }
 
     private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {

@@ -40,7 +40,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
-import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.MsaAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
@@ -120,7 +120,7 @@ public class MatchingResponseServiceTest {
         InstantValidator instantValidator = new InstantValidator(dateTimeComparator);
         SubjectValidator subjectValidator = new SubjectValidator(timeRestrictionValidator);
         ConditionsValidator conditionsValidator = new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator());
-        AssertionValidator assertionValidator = new AssertionValidator(instantValidator, subjectValidator, conditionsValidator);
+        MsaAssertionValidator assertionValidator = new MsaAssertionValidator(instantValidator, subjectValidator, conditionsValidator);
         LevelOfAssuranceValidator levelOfAssuranceValidator = new LevelOfAssuranceValidator();
         MatchingAssertionTranslator msaAssertionService = new MatchingAssertionTranslator(assertionValidator, levelOfAssuranceValidator, samlAssertionsSignatureValidator);
 

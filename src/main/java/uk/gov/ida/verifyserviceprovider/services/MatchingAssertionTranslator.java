@@ -11,7 +11,7 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
-import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
+import uk.gov.ida.verifyserviceprovider.validators.MsaAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 
 import java.util.List;
@@ -23,11 +23,11 @@ import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATC
 public class MatchingAssertionTranslator implements AssertionTranslator {
 
 
-    private AssertionValidator assertionValidator;
+    private MsaAssertionValidator assertionValidator;
     private LevelOfAssuranceValidator levelOfAssuranceValidator;
     private SamlAssertionsSignatureValidator assertionsSignatureValidator;
 
-    public MatchingAssertionTranslator(AssertionValidator assertionValidator,
+    public MatchingAssertionTranslator(MsaAssertionValidator assertionValidator,
                                        LevelOfAssuranceValidator levelOfAssuranceValidator,
                                        SamlAssertionsSignatureValidator assertionsSignatureValidator) {
         this.assertionValidator = assertionValidator;

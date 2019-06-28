@@ -24,6 +24,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -88,17 +89,20 @@ public class EidasAssertionTranslatorTest {
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
-        eidasAssertionService = new EidasAssertionTranslator(
-            subjectValidator,
-            eidasMatchingDatasetUnmarshaller,
-            mdsMapper,
+        EidasAssertionValidator eidasAssertionValidator = new EidasAssertionValidator(
             instantValidator,
             conditionsValidator,
-            levelOfAssuranceValidator,
-            metadataResolverRepository,
             signatureValidatorFactory,
             HUB_CONNECTOR_ENTITY_ID,
-            userIdHashFactory);
+            metadataResolverRepository,
+            subjectValidator);
+        eidasAssertionService = new EidasAssertionTranslator(
+            eidasMatchingDatasetUnmarshaller,
+            mdsMapper,
+            metadataResolverRepository,
+            userIdHashFactory,
+            eidasAssertionValidator,
+            levelOfAssuranceValidator);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());
