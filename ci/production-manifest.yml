@@ -1,11 +1,11 @@
 applications:
-  - name: ((app))
+  - name: verify-service-provider-production
     memory: 1G
     routes:
-      - route: ((app)).apps.internal
+      - route: verify-service-provider-production.apps.internal
     stack: cflinuxfs3
     buildpack: java_buildpack
-    command: (cd ((dist))-* && bin/((dist)) server ((config_file)) )
+    command: (cd verify-service-provider-* && bin/verify-service-provider server vsp-eidas-without-matching.yml )
     env:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       CLOCK_SKEW: PT30s
