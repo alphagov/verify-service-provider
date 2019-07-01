@@ -1,12 +1,15 @@
 package unit.uk.gov.ida.verifyserviceprovider;
 
+import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
+import io.dropwizard.configuration.ConfigurationException;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.testing.ResourceHelpers;
+import org.apache.commons.text.StrSubstitutor;
 import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,11 +27,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
@@ -123,6 +128,40 @@ public class VerifyServiceProviderConfigurationTest {
         expectedException.expectMessage("No HashingEntityId is provided");
 
         verifyServiceProviderConfiguration.getHashingEntityId();
+    }
+
+    @Test
+    public void shouldNotAllowMsaAndEidasConfigTogether() throws Exception {
+        Map<String, String> map = ImmutableMap.<String,String>builder()
+            .put("PORT", "50555")
+            .put("LOG_LEVEL", "ERROR")
+            .put("VERIFY_ENVIRONMENT", "COMPLIANCE_TOOL")
+            .put("MSA_METADATA_URL", "some-msa-metadata-url")
+            .put("MSA_ENTITY_ID", "some-msa-entity-id")
+            .put("SERVICE_ENTITY_IDS", "[\"http://some-service-entity-id\"]")
+            .put("SAML_SIGNING_KEY", TEST_RP_PRIVATE_SIGNING_KEY)
+            .put("SAML_PRIMARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+            .put("SAML_SECONDARY_ENCRYPTION_KEY", TEST_RP_PRIVATE_ENCRYPTION_KEY)
+            .put("CLOCK_SKEW", "PT30s")
+            .put("EUROPEAN_IDENTITY_ENABLED", "false")
+            .put("HUB_CONNECTOR_ENTITY_ID", "etc")
+            .put("TRUST_ANCHOR_URI", "etc")
+            .put("METADATA_SOURCE_URI", "etc")
+            .put("TRUSTSTORE_PATH", "etc")
+            .put("TRUSTSTORE_PASSWORD", "etc")
+            .build();
+
+        String newErrorMessage = "eIDAS and MSA support cannot be set together." +
+            " The VSP's eIDAS support is only available when it operates without the MSA";
+        assertThatThrownBy(() -> {
+                factory.build(
+                    new SubstitutingSourceProvider(
+                        new FileConfigurationSourceProvider(),
+                        new StrSubstitutor(map)
+                    ),
+                    ResourceHelpers.resourceFilePath("verify-service-provider-with-msa-and-eidas.yml")
+                );
+            }).isInstanceOf(ConfigurationException.class).hasMessageContaining(newErrorMessage);
     }
 
     private VerifyServiceProviderConfiguration aVerifyServiceProviderConfiguration(List<String> serviceEntityIds, String hashingEntityId) {

@@ -63,13 +63,7 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
                 msaServer.serveDefaultMetadata();
                 return msaServer.getUri();
             }),
-            ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID),
-            ConfigOverride.config("europeanIdentity.enabled", isEidasEnabled ? "true" : "false"),
-            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-            ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+            ConfigOverride.config("msaMetadata.expectedEntityId", MockMsaServer.MSA_ENTITY_ID)
         );
     }
 

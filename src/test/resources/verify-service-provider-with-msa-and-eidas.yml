@@ -54,3 +54,13 @@ samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 msaMetadata:
   uri: ${MSA_METADATA_URL:-}
   expectedEntityId: ${MSA_ENTITY_ID:-}
+
+europeanIdentity:
+  enabled: ${EUROPEAN_IDENTITY_ENABLED}
+  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
+  trustAnchorUri: ${TRUST_ANCHOR_URI}
+  metadataSourceUri: ${METADATA_SOURCE_URI}
+  trustStore:
+    path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
+    password: ${TRUSTSTORE_PASSWORD}
+  jerseyClientName: trust-anchor-client

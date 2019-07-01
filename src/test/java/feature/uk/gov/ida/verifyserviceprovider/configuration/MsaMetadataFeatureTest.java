@@ -84,13 +84,7 @@ public class MsaMetadataFeatureTest {
             config("verifyHubConfiguration.metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
             config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
             config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
-            config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
-            config("europeanIdentity.enabled", "false"),
-            config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
-            config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
-            config("europeanIdentity.trustStore.path", metadataTrustStore.getAbsolutePath()),
-            config("europeanIdentity.trustStore.password", metadataTrustStore.getPassword())
+            config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword())
         );
 
         environmentHelper.setEnv(new HashMap<String, String>() {{
