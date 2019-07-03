@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import common.uk.gov.ida.verifyserviceprovider.utils.EnvironmentHelper;
 import io.dropwizard.configuration.ConfigurationException;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
+import io.dropwizard.configuration.ConfigurationValidationException;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -15,6 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
+import uk.gov.ida.verifyserviceprovider.configuration.TransparentPrivateKeyFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
@@ -33,6 +35,7 @@ import java.util.Optional;
 import static io.dropwizard.jackson.Jackson.newObjectMapper;
 import static io.dropwizard.jersey.validation.Validators.newValidator;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
@@ -43,7 +46,7 @@ public class VerifyServiceProviderConfigurationTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-    private final YamlConfigurationFactory factory = new YamlConfigurationFactory<>(
+    private final YamlConfigurationFactory<VerifyServiceProviderConfiguration> factory = new YamlConfigurationFactory<>(
         VerifyServiceProviderConfiguration.class,
         newValidator(),
         newObjectMapper(),
@@ -169,9 +172,9 @@ public class VerifyServiceProviderConfigurationTest {
                 serviceEntityIds,
                 hashingEntityId,
                 mock(VerifyHubConfiguration.class),
-                mock(PrivateKey.class),
-                mock(PrivateKey.class),
-                mock(PrivateKey.class),
+                new TransparentPrivateKeyFactory(mock(PrivateKey.class)),
+                new TransparentPrivateKeyFactory(mock(PrivateKey.class)),
+                new TransparentPrivateKeyFactory(mock(PrivateKey.class)),
                 Optional.empty(),
                 new Duration(1000L),
                 Optional.ofNullable(mock(EuropeanIdentityConfiguration.class))
@@ -183,20 +186,101 @@ public class VerifyServiceProviderConfigurationTest {
     public void shouldNotAllowNullValues() throws Exception {
         expectedException.expectMessage("server may not be null");
 
-        factory.build(new StringConfigurationSourceProvider("server: "), "");
+        loadConfigurationString("server: ");
     }
 
     @Test
     public void shouldNotAllowEmptySamlSigningKey() throws Exception {
-        expectedException.expectMessage("Failed to parse configuration at: samlSigningKey");
-        factory.build(new StringConfigurationSourceProvider("samlSigningKey: \"\""), "");
+        String containedMessage = "A private key is not loadable. Keys must be provided as base64 encoded PKCS8 RSA private keys";
+        assertThatThrownBy(() ->
+            loadConfigurationString("samlSigningKey: \"\"")
+        ).hasMessageContaining(containedMessage);
+    }
+
+    @Test
+    public void shouldAllowInlineSamlSigningKey() throws Exception {
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString("samlSigningKey: " + TEST_RP_PRIVATE_SIGNING_KEY))
+            .matches(e -> noConstraintForProperty(e, "samlSigningKey"));
+    }
+
+    @Test
+    public void shouldAllowFileSystemSamlSigningKey() throws Exception {
+        String filePath = "test-keys-and-certs/vsp-signing.pk8";
+        String configurationString = "samlSigningKey:\n  type: \"file\"\n  file: \"" + filePath + "\"";
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString(configurationString))
+            .matches(e -> noConstraintForProperty(e, "samlSigningKey")
+        );
     }
 
     @Test
     public void shouldNotAllowEmptySamlPrimaryEncryptionKey() throws Exception {
-        expectedException.expectMessage("Failed to parse configuration at: samlPrimaryEncryptionKey");
-        factory.build(new StringConfigurationSourceProvider("samlPrimaryEncryptionKey: \"\""), "");
+        String containedMessage = "A private key is not loadable. Keys must be provided as base64 encoded PKCS8 RSA private keys";
+        assertThatThrownBy(() ->
+            loadConfigurationString("samlPrimaryEncryptionKey: \"\"")
+        ).hasMessageContaining(containedMessage);
     }
+
+    @Test
+    public void shouldAllowInlineSamlPrimaryEncryptionKey() throws Exception {
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString("samlPrimaryEncryptionKey: " + TEST_RP_PRIVATE_SIGNING_KEY))
+            .matches(e -> noConstraintForProperty(e, "samlPrimaryEncryptionKey"));
+    }
+
+    @Test
+    public void shouldAllowFileSystemSamlPrimaryEncryptionKey() throws Exception {
+        String filePath = "test-keys-and-certs/vsp-signing.pk8";
+        String configurationString = "samlPrimaryEncryptionKey:\n  type: \"file\"\n  file: \"" + filePath + "\"";
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString(configurationString))
+            .matches(e -> noConstraintForProperty(e, "samlPrimaryEncryptionKey")
+            );
+    }
+
+    @Test
+    public void shouldNotAllowEmptySamlSecondaryEncryptionKey() throws Exception {
+        String containedMessage = "A private key is not loadable. Keys must be provided as base64 encoded PKCS8 RSA private keys";
+        assertThatThrownBy(() ->
+            loadConfigurationString("samlSecondaryEncryptionKey: \"\"")
+        ).hasMessageContaining(containedMessage);
+    }
+
+    @Test
+    public void shouldAllowMissingSamlSecondaryEncryptionKey() throws Exception {
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString("server: null"))
+            .matches(e -> noConstraintForProperty(e, "samlSecondaryEncryptionKey"));
+    }
+
+    @Test
+    public void shouldAllowInlineSamlSecondaryEncryptionKey() throws Exception {
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString("samlSecondaryEncryptionKey: " + TEST_RP_PRIVATE_SIGNING_KEY))
+            .matches(e -> noConstraintForProperty(e, "samlSecondaryEncryptionKey"));
+    }
+
+    @Test
+    public void shouldAllowFileSystemSamlSecondaryEncryptionKey() throws Exception {
+        String filePath = "test-keys-and-certs/vsp-signing.pk8";
+        String configurationString = "samlSecondaryEncryptionKey:\n  type: \"file\"\n  file: \"" + filePath + "\"";
+        assertThatExceptionOfType(ConfigurationValidationException.class)
+            .isThrownBy(() -> loadConfigurationString(configurationString))
+            .matches(e -> noConstraintForProperty(e, "samlSecondaryEncryptionKey")
+            );
+    }
+
+    private boolean noConstraintForProperty(ConfigurationValidationException e, String samlSigningKey) {
+        return e.getConstraintViolations().stream().noneMatch(
+            (violation) -> violation.getPropertyPath().toString().contains(samlSigningKey)
+        );
+    }
+
+    private VerifyServiceProviderConfiguration loadConfigurationString(String s) throws IOException, ConfigurationException {
+        return factory.build(new StringConfigurationSourceProvider(s), "");
+    }
+
 
     class StringConfigurationSourceProvider implements ConfigurationSourceProvider {
 

@@ -17,13 +17,15 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     private TrustStoreConfiguration trustStoreConfiguration;
     private String hubConnectorEntityId;
+
+    @NotNull @Valid
     private boolean enabled;
     private HubEnvironment environment;
 
 
     @JsonCreator
     public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
-                                         @NotNull @Valid @JsonProperty("enabled") boolean enabled,
+                                         @JsonProperty("enabled") boolean enabled,
                                          @JsonProperty("trustAnchorUri") URI trustAnchorUri,
                                          @JsonProperty("minRefreshDelay") Long minRefreshDelay,
                                          @JsonProperty("maxRefreshDelay") Long maxRefreshDelay,
