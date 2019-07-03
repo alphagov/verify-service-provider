@@ -6,9 +6,9 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionService;
-import uk.gov.ida.verifyserviceprovider.services.IdpAssertionService;
+import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,23 +19,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ClassifyingAssertionServiceTest {
+public class ClassifyingAssertionTranslatorTest {
 
-    private ClassifyingAssertionService classifyingAssertionService;
-
-    @Mock
-    private IdpAssertionService idpAssertionService;
+    private ClassifyingAssertionTranslator classifyingAssertionService;
 
     @Mock
-    private EidasAssertionService eidasAssertionService;
+    private VerifyAssertionTranslator verifyAssertionService;
+
+    @Mock
+    private EidasAssertionTranslator eidasAssertionService;
 
 
     @Before
     public void setUp() {
         initMocks(this);
 
-        classifyingAssertionService = new ClassifyingAssertionService(
-                idpAssertionService,
+        classifyingAssertionService = new ClassifyingAssertionTranslator(
+            verifyAssertionService,
                 eidasAssertionService
         );
     }
@@ -51,7 +51,7 @@ public class ClassifyingAssertionServiceTest {
         TranslatedNonMatchingResponseBody expectedResult = mock(TranslatedNonMatchingResponseBody.class);
 
         when(eidasAssertionService.isCountryAssertion(any())).thenReturn(false);
-        when(idpAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
+        when(verifyAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
         TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);

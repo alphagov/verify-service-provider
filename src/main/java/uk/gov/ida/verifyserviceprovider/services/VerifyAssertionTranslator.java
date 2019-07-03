@@ -2,7 +2,6 @@ package uk.gov.ida.verifyserviceprovider.services;
 
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
@@ -10,7 +9,6 @@ import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementVali
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
@@ -18,20 +16,21 @@ import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttr
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+
 import javax.xml.namespace.QName;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
 import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
-public class IdpAssertionService extends AssertionServiceV2 {
+public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
     private final SamlAssertionsSignatureValidator assertionsSignatureValidator;
     private final AssertionAttributeStatementValidator attributeStatementValidator;
@@ -39,7 +38,7 @@ public class IdpAssertionService extends AssertionServiceV2 {
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
     private UserIdHashFactory userIdHashFactory;
 
-    public IdpAssertionService(
+    public VerifyAssertionTranslator(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
             SubjectValidator subjectValidator,
             AssertionAttributeStatementValidator attributeStatementValidator,
@@ -77,24 +76,6 @@ public class IdpAssertionService extends AssertionServiceV2 {
         NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
-    }
-
-    @Override
-    public TranslatedNonMatchingResponseBody translateNonSuccessResponse(StatusCode statusCode) {
-        Optional.ofNullable(statusCode.getStatusCode())
-            .orElseThrow(() -> new SamlResponseValidationException("Missing status code for non-Success response"));
-        String subStatus = statusCode.getStatusCode().getValue();
-
-        switch (subStatus) {
-            case StatusCode.REQUESTER:
-                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.REQUEST_ERROR, null, null, null);
-            case StatusCode.NO_AUTHN_CONTEXT:
-                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.NO_AUTHENTICATION, null, null, null);
-            case StatusCode.AUTHN_FAILED:
-                return new TranslatedNonMatchingResponseBody(NonMatchingScenario.AUTHENTICATION_FAILED, null, null, null);
-            default:
-                throw new SamlResponseValidationException(String.format("Unknown SAML sub-status: %s", subStatus));
-        }
     }
 
 
