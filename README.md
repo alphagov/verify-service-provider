@@ -1,6 +1,8 @@
-# Verify Service Provider
+[![Build Status](https://travis-ci.com/alphagov/verify-service-provider.svg?branch=master)](https://travis-ci.com/alphagov/verify-service-provider)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/accd9189851c4f1a9830105a0349c535)](https://www.codacy.com/app/alphagov/verify-service-provider?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=alphagov/verify-service-provider&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/accd9189851c4f1a9830105a0349c535)](https://www.codacy.com/app/alphagov/verify-service-provider?utm_source=github.com&utm_medium=referral&utm_content=alphagov/verify-service-provider&utm_campaign=Badge_Coverage)
 
-[![Build Status](https://travis-ci.org/alphagov/verify-service-provider.svg?branch=master)](https://travis-ci.org/alphagov/verify-service-provider)
+# Verify Service Provider
 
 The Verify Service Provider (VSP) generates and translates Security Assertion Markup Language (SAML) messages to and from the GOV.UK Verify Hub. SAML is an open standard for secure message exchange which GOV.UK Verify uses when handling information about identities.
 
