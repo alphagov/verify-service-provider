@@ -6,6 +6,17 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
 
+if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
+    apply plugin: 'jacoco'
+
+    jacocoTestReport {
+        reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+}
+
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
