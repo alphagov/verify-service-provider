@@ -97,12 +97,12 @@ public class ResponseFactory {
     }
 
     public ResponseService createNonMatchingResponseService(
-            ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
+            ExplicitKeySignatureTrustEngine signatureTrustEngine,
             AssertionTranslator nonMatchingAssertionTranslator,
             DateTimeComparator dateTimeComparator
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
 
         return new ResponseService(
                 createStringToResponseTransformer(),
@@ -177,7 +177,7 @@ public class ResponseFactory {
                 );
     }
 
-    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator( ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
+    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
         return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
     }
 
