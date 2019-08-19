@@ -14,6 +14,9 @@ import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Extends ExplicitKeySignatureTrustEngine to match requests against Verify Hub and eIDAS signatures.
+ */
 public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEngine {
 
     public UnifyingKeySignatureTrustEngine(ExplicitKeySignatureTrustEngine hubTrustEngine, EidasMetadataResolverRepository eidasMetadataResolverRepository) {
@@ -36,6 +39,7 @@ public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEn
         @Override
         public Iterable<Credential> resolve(@Nullable CriteriaSet criteria) throws ResolverException {
             List<Credential> credentialsFound = new LinkedList<>();
+            if (criteria == null) { return credentialsFound; }
 
             for (String eidasEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
                 KeyInfoCredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasEntityId).get().getKeyInfoResolver();
@@ -76,6 +80,7 @@ public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEn
         @Override
         public Iterable<Credential> resolve(@Nullable CriteriaSet criteria) throws ResolverException {
             List<Credential> credentialsFound = new LinkedList<>();
+            if (criteria == null) { return credentialsFound; }
 
             for (String eidasEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
                 CredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasEntityId).get().getCredentialResolver();
