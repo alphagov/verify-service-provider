@@ -15,7 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Extends ExplicitKeySignatureTrustEngine to match requests against Verify Hub and eIDAS signatures.
+ * Extends ExplicitKeySignatureTrustEngine to match requests against Verify Hub signatures (from the
+ * ExplicitKeySignatureTrustEngine for the hub), and eIDAS signatures (from the provided EidasMetadataResolverRepository).
  */
 public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEngine {
 
@@ -41,14 +42,13 @@ public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEn
             List<Credential> credentialsFound = new LinkedList<>();
             if (criteria == null) { return credentialsFound; }
 
-            for (String eidasEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
-                KeyInfoCredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasEntityId).get().getKeyInfoResolver();
+            for (String eidasResolverEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
+                KeyInfoCredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasResolverEntityId).get().getKeyInfoResolver();
                 credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
             }
 
             KeyInfoCredentialResolver hubCredentialResolver = hubTrustEngine.getKeyInfoResolver();
             credentialsFound.addAll(Lists.newLinkedList(hubCredentialResolver.resolve(criteria)));
-
             return credentialsFound;
         }
 
@@ -82,14 +82,13 @@ public class UnifyingKeySignatureTrustEngine extends ExplicitKeySignatureTrustEn
             List<Credential> credentialsFound = new LinkedList<>();
             if (criteria == null) { return credentialsFound; }
 
-            for (String eidasEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
-                CredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasEntityId).get().getCredentialResolver();
+            for (String eidasResolverEntityId : eidasMetadataResolverRepository.getResolverEntityIds()) {
+                CredentialResolver eidasCredentialResolver = eidasMetadataResolverRepository.getSignatureTrustEngine(eidasResolverEntityId).get().getCredentialResolver();
                 credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
             }
 
             CredentialResolver hubCredentialResolver = hubTrustEngine.getCredentialResolver();
             credentialsFound.addAll(Lists.newLinkedList(hubCredentialResolver.resolve(criteria)));
-
             return credentialsFound;
         }
 

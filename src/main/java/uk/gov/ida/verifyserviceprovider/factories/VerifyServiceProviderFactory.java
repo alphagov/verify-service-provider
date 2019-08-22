@@ -118,13 +118,13 @@ public class VerifyServiceProviderFactory {
     }
 
     private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+        ExplicitKeySignatureTrustEngine signatureTrustEngine = isEidasEnabled()
+            ? createVerifyAndEidasUnifyingSignatureTrustEngine()
+            : getHubSignatureTrustEngine();
+
         AssertionTranslator assertionTranslator = isEidasEnabled()
             ? createVerifyAndEidasClassifyingAssertionTranslator()
             : createVerifyAssertionTranslator();
-
-        ExplicitKeySignatureTrustEngine signatureTrustEngine = isEidasEnabled()
-            ? createVerifyAndEidasClassifyingSignatureTrustEngine()
-            : getHubSignatureTrustEngine();
 
         return new TranslateSamlResponseResource(
             responseFactory.createNonMatchingResponseService(
@@ -135,8 +135,8 @@ public class VerifyServiceProviderFactory {
             entityIdService);
     }
 
-    private ExplicitKeySignatureTrustEngine createVerifyAndEidasClassifyingSignatureTrustEngine() {
-        return new UnifyingKeySignatureTrustEngine(getHubSignatureTrustEngine(), getEidasMetadataResolverRepository());
+    private ExplicitKeySignatureTrustEngine createVerifyAndEidasUnifyingSignatureTrustEngine() {
+        return new UnifyingKeySignatureTrustEngine(getHubSignatureTrustEngine(), createEidasMetadataResolverRepository());
     }
 
     private ClassifyingAssertionTranslator createVerifyAndEidasClassifyingAssertionTranslator() {
@@ -153,9 +153,11 @@ public class VerifyServiceProviderFactory {
     }
 
     private EidasAssertionTranslator createEidasAssertionTranslator() {
+        EidasMetadataResolverRepository metadataResolverRepository = createEidasMetadataResolverRepository();
+
         return responseFactory.createEidasAssertionService(
             dateTimeComparator,
-            getEidasMetadataResolverRepository(),
+            metadataResolverRepository,
             configuration.getEuropeanIdentity().get(),
             configuration.getHashingEntityId()
         );
@@ -177,7 +179,7 @@ public class VerifyServiceProviderFactory {
         return msaMetadataBundle.getSignatureTrustEngine();
     }
 
-    private EidasMetadataResolverRepository getEidasMetadataResolverRepository() {
+    private EidasMetadataResolverRepository createEidasMetadataResolverRepository() {
         return new EidasMetadataResolverRepository(
                 getEidasTrustAnchorResolver(),
                 configuration.getEuropeanIdentity().get(),

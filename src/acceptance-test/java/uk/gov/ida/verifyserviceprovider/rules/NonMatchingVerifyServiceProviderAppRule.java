@@ -23,12 +23,13 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP;
 public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
 
     private static final String METADATA_AGGREGATOR_PATH = "/metadata-aggregator";
-    private static final String COUNTRY_METADATA_PATH = "/test-country";
+    private static final String TEST_COUNTRY_METADATA_PATH = "/test-country";
 
     private static final MockMetadataAggregatorServer metadataAggregatorServer = new MockMetadataAggregatorServer();
     private static final MockTrustAnchorServer trustAnchorServer = new MockTrustAnchorServer();
     private static final MockVerifyHubServer verifyMetadataServer = new MockVerifyHubServer();
-    private String countryEntityId;
+    private String testCountryEntityId;
+    private String stubCountryEntityId;
 
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
@@ -87,16 +88,20 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
         hubTrustStore.create();
         idpTrustStore.create();
 
-        countryEntityId = "https://localhost:12345" + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
+        testCountryEntityId = "https://localhost:12345" + METADATA_AGGREGATOR_PATH + TEST_COUNTRY_METADATA_PATH;
+        stubCountryEntityId = "https://stub_country.acme.eu/stub-country-one/ServiceMetadata";
 
         try {
             InitializationService.initialize();
 
             verifyMetadataServer.serveDefaultMetadata();
 
-            trustAnchorServer.serveTrustAnchor(countryEntityId);
+            trustAnchorServer.serveTrustAnchor(testCountryEntityId);
+            trustAnchorServer.serveTrustAnchor(stubCountryEntityId);
 
-            metadataAggregatorServer.serveAggregatedMetadata(countryEntityId);
+            metadataAggregatorServer.serveAggregatedHubMetadata();
+            metadataAggregatorServer.serveAggregatedStubCountryMetadata();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,7 +116,9 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
             .around(super::apply).apply(base, description);
     }
 
-    public String getCountryEntityId() {
-        return countryEntityId;
+    public String getTestCountryEntityId() {
+        return testCountryEntityId;
     }
+
+    public String getStubCountryEntityId() { return stubCountryEntityId; }
 }
