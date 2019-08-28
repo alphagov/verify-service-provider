@@ -4,27 +4,27 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody {
+public class TranslatedIdentityResponseBody implements TranslatedResponseBody {
 
     @JsonProperty("scenario")
-    private final NonMatchingScenario scenario;
+    private final IdentityScenario scenario;
     @JsonProperty("pid") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final String pid;
     @JsonProperty("levelOfAssurance") @JsonInclude(value = JsonInclude.Include.NON_NULL)
     protected final LevelOfAssurance levelOfAssurance;
     @JsonProperty("attributes") @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    protected final NonMatchingAttributes attributes;
+    protected final IdentityAttributes attributes;
 
     @JsonCreator
-    public TranslatedNonMatchingResponseBody(
+    public TranslatedIdentityResponseBody(
             @JsonProperty("scenario")
-            NonMatchingScenario scenario,
+                IdentityScenario scenario,
             @JsonProperty("pid")
             String pid,
             @JsonProperty("levelOfAssurance")
             LevelOfAssurance levelOfAssurance,
             @JsonProperty("attributes")
-            NonMatchingAttributes attributes
+                IdentityAttributes attributes
     ) {
         this.scenario = scenario;
         this.pid = pid;
@@ -45,7 +45,7 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
         return levelOfAssurance;
     }
 
-    public NonMatchingAttributes getAttributes() {
+    public IdentityAttributes getAttributes() {
         return attributes;
     }
 
@@ -54,7 +54,7 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TranslatedNonMatchingResponseBody that = (TranslatedNonMatchingResponseBody) o;
+        TranslatedIdentityResponseBody that = (TranslatedIdentityResponseBody) o;
 
         if (scenario != that.scenario) return false;
         if (pid != null ? !pid.equals(that.pid) : that.pid != null) return false;

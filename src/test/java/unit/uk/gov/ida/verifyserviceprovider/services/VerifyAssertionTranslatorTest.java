@@ -24,12 +24,12 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
-import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedIdentityResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToIdentityAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -89,7 +89,7 @@ public class VerifyAssertionTranslatorTest {
     private UserIdHashFactory userIdHashFactory;
 
     @Mock
-    private MatchingDatasetToNonMatchingAttributesMapper matchingDatasetToNonMatchingAttributesMapper;
+    private MatchingDatasetToIdentityAttributesMapper matchingDatasetToIdentityAttributesMapper;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -105,7 +105,7 @@ public class VerifyAssertionTranslatorTest {
                 attributeStatementValidator,
                 verifyMatchingDatasetUnmarshaller,
                 new AssertionClassifier(),
-                matchingDatasetToNonMatchingAttributesMapper,
+                matchingDatasetToIdentityAttributesMapper,
                 levelOfAssuranceValidator,
                 userIdHashFactory);
         doNothing().when(subjectValidator).validate(any(), any());
@@ -248,7 +248,7 @@ public class VerifyAssertionTranslatorTest {
 
         String requestId = "requestId";
         String expectedHashed = "a5fbea969c3837a712cbe9e188804796828f369106478e623a436fa07e8fd298";
-        TestTranslatedNonMatchingResponseBody expectedNonMatchingResponseBody = new TestTranslatedNonMatchingResponseBody(NonMatchingScenario.IDENTITY_VERIFIED, expectedHashed, LEVEL_2, null);
+        TestTranslatedIdentityResponseBody expectedIdentityResponseBody = new TestTranslatedIdentityResponseBody(IdentityScenario.IDENTITY_VERIFIED, expectedHashed, LEVEL_2, null);
 
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, requestId).buildUnencrypted();
         Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), requestId).buildUnencrypted();
@@ -259,10 +259,10 @@ public class VerifyAssertionTranslatorTest {
         when(userIdHashFactory.hashId(eq(issuerId), eq(nameId), eq(Optional.of(AuthnContext.LEVEL_2))))
                 .thenReturn(expectedHashed);
 
-        TranslatedNonMatchingResponseBody responseBody = verifyAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
+        TranslatedIdentityResponseBody responseBody = verifyAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
 
         verify(userIdHashFactory, times(1)).hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2));
-        assertThat(responseBody.toString()).contains(expectedNonMatchingResponseBody.getPid());
+        assertThat(responseBody.toString()).contains(expectedIdentityResponseBody.getPid());
     }
 
     public static AssertionBuilder aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, String requestId) {

@@ -61,7 +61,7 @@ public class GenerateAuthnRequestResourceTest {
     private static final String TEST_DESTINATION = "http://acme.service/authnRequest";
     private static final String TEST_ISSUE_INSTANT = "2015-04-30T19:25:14.273Z";
     private static final String TEST_ISSUER = "http://acme.service";
-    private static final String AUTHN_REQUEST_ATTRIBUTES_LOG_MESSAGE = "AuthnRequest Attributes:";
+    private static final String AUTHN_REQUEST_ATTRIBUTES_LOG_MESSAGE = "AuthnRequest AccountCreationAttributes:";
 
     private static AuthnRequestFactory authnRequestFactory = mock(AuthnRequestFactory.class);
     private static EntityIdService entityIdService = mock(EntityIdService.class);

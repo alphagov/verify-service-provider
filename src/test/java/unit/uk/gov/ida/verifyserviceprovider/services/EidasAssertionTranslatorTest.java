@@ -15,14 +15,14 @@ import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
-import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityScenario;
+import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedIdentityResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToIdentityAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
@@ -68,7 +68,7 @@ public class EidasAssertionTranslatorTest {
     @Mock
     private EidasMatchingDatasetUnmarshaller eidasMatchingDatasetUnmarshaller;
     @Mock
-    private MatchingDatasetToNonMatchingAttributesMapper mdsMapper;
+    private MatchingDatasetToIdentityAttributesMapper mdsMapper;
     @Mock
     private InstantValidator instantValidator;
     @Mock
@@ -108,7 +108,7 @@ public class EidasAssertionTranslatorTest {
         when(metadataResolverRepository.getSignatureTrustEngine(same(STUB_COUNTRY_ONE))).thenReturn(Optional.of(mock));
         when(signatureValidatorFactory.getSignatureValidator(same(mock))).thenReturn(samlAssertionsSignatureValidator);
         when(samlAssertionsSignatureValidator.validate(any(), any())).thenReturn(null);
-        when(mdsMapper.mapToNonMatchingAttributes(any())).thenReturn(mock(NonMatchingAttributes.class));
+        when(mdsMapper.mapToIdentityAttributes(any())).thenReturn(mock(IdentityAttributes.class));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class EidasAssertionTranslatorTest {
     public void expectedHashContainedInResponseBodyWhenUserIdFactoryIsCalledOnce() {
         String requestId = "requestId";
         String expectedHashed = "a5fbea969c3837a712cbe9e188804796828f369106478e623a436fa07e8fd298";
-        TestTranslatedNonMatchingResponseBody expectedNonMatchingResponseBody = new TestTranslatedNonMatchingResponseBody(NonMatchingScenario.IDENTITY_VERIFIED, expectedHashed, LEVEL_2, null);
+        TestTranslatedIdentityResponseBody expectedIdentityResponseBody = new TestTranslatedIdentityResponseBody(IdentityScenario.IDENTITY_VERIFIED, expectedHashed, LEVEL_2, null);
 
         Assertion eidasAssertion = anAssertionWithAuthnStatement(EIDAS_LOA_SUBSTANTIAL, requestId).buildUnencrypted();
 
@@ -154,10 +154,10 @@ public class EidasAssertionTranslatorTest {
         when(userIdHashFactory.hashId(eq(issuerId), eq(nameId), eq(Optional.of(AuthnContext.LEVEL_2))))
                 .thenReturn(expectedHashed);
 
-        TranslatedNonMatchingResponseBody responseBody = eidasAssertionService.translateSuccessResponse(ImmutableList.of(eidasAssertion), "requestId", LEVEL_2, "default-entity-id");
+        TranslatedIdentityResponseBody responseBody = eidasAssertionService.translateSuccessResponse(ImmutableList.of(eidasAssertion), "requestId", LEVEL_2, "default-entity-id");
 
         verify(userIdHashFactory, times(1)).hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2));
-        assertThat(responseBody.toString()).contains(expectedNonMatchingResponseBody.getPid());
+        assertThat(responseBody.toString()).contains(expectedIdentityResponseBody.getPid());
     }
 
     @Test(expected = SamlResponseValidationException.class)

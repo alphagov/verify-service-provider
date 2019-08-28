@@ -7,12 +7,12 @@ import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.IdentityAttributes;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
+import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToIdentityAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
+import static uk.gov.ida.verifyserviceprovider.dto.IdentityScenario.IDENTITY_VERIFIED;
 
 public class EidasAssertionTranslator extends IdentityAssertionTranslator {
 
@@ -39,7 +39,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
     public EidasAssertionTranslator(
             SubjectValidator subjectValidator,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
+            MatchingDatasetToIdentityAttributesMapper mdsMapper,
             InstantValidator instantValidator,
             ConditionsValidator conditionsValidator,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
@@ -59,7 +59,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
 
 
     @Override
-    public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
+    public TranslatedIdentityResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
         if (assertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one country assertion is expected.");
         }
@@ -78,9 +78,9 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
         
         String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
 
-        NonMatchingAttributes attributes = translateAttributes(countryAssertion);
+        IdentityAttributes attributes = translateAttributes(countryAssertion);
 
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
+        return new TranslatedIdentityResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }
 
     private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {

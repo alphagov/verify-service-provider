@@ -9,36 +9,36 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class NonMatchingAttributes {
+public class IdentityAttributes {
 
     @JsonProperty("firstNames")
-    private final List<NonMatchingTransliterableAttribute> firstNames;
+    private final List<TransliterableAttribute> firstNames;
     @JsonProperty("middleNames")
-    private final List<NonMatchingVerifiableAttribute<String>> middleNames;
+    private final List<HistoricalVerifiableAttribute<String>> middleNames;
     @JsonProperty("surnames")
-    private final List<NonMatchingTransliterableAttribute> surnames;
+    private final List<TransliterableAttribute> surnames;
     @JsonProperty("datesOfBirth")
-    private final List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth;
+    private final List<HistoricalVerifiableAttribute<LocalDate>> datesOfBirth;
     @JsonProperty("gender")
-    private final NonMatchingVerifiableAttribute<Gender> gender;
+    private final HistoricalVerifiableAttribute<Gender> gender;
     @JsonProperty("addresses")
-    private final List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses;
+    private final List<HistoricalVerifiableAttribute<Address>> addresses;
 
 
     @JsonCreator
-    public NonMatchingAttributes(
+    public IdentityAttributes(
             @JsonProperty("firstNames")
-            List<NonMatchingTransliterableAttribute> firstNames,
+            List<TransliterableAttribute> firstNames,
             @JsonProperty("middleNames")
-            List<NonMatchingVerifiableAttribute<String>> middleNames,
+            List<HistoricalVerifiableAttribute<String>> middleNames,
             @JsonProperty("surnames")
-            List<NonMatchingTransliterableAttribute> surnames,
+            List<TransliterableAttribute> surnames,
             @JsonProperty("datesOfBirth")
-            List<NonMatchingVerifiableAttribute<LocalDate>> datesOfBirth,
+            List<HistoricalVerifiableAttribute<LocalDate>> datesOfBirth,
             @JsonProperty("gender")
-            NonMatchingVerifiableAttribute<Gender> gender,
+                HistoricalVerifiableAttribute<Gender> gender,
             @JsonProperty("addresses")
-            List<NonMatchingVerifiableAttribute<NonMatchingAddress>> addresses
+            List<HistoricalVerifiableAttribute<Address>> addresses
     ) {
         this.firstNames = firstNames;
         this.middleNames = middleNames;
@@ -48,27 +48,27 @@ public class NonMatchingAttributes {
         this.addresses = addresses;
     }
 
-    public List<NonMatchingTransliterableAttribute> getFirstNames() {
+    public List<TransliterableAttribute> getFirstNames() {
         return firstNames;
     }
 
-    public List<NonMatchingVerifiableAttribute<String>> getMiddleNames() {
+    public List<HistoricalVerifiableAttribute<String>> getMiddleNames() {
         return middleNames;
     }
 
-    public List<NonMatchingTransliterableAttribute> getSurnames() {
+    public List<TransliterableAttribute> getSurnames() {
         return surnames;
     }
 
-    public List<NonMatchingVerifiableAttribute<LocalDate>> getDatesOfBirth() {
+    public List<HistoricalVerifiableAttribute<LocalDate>> getDatesOfBirth() {
         return datesOfBirth;
     }
 
-    public NonMatchingVerifiableAttribute<Gender> getGender() {
+    public HistoricalVerifiableAttribute<Gender> getGender() {
         return gender;
     }
 
-    public List<NonMatchingVerifiableAttribute<NonMatchingAddress>> getAddresses() {
+    public List<HistoricalVerifiableAttribute<Address>> getAddresses() {
         return addresses;
     }
 
@@ -77,7 +77,7 @@ public class NonMatchingAttributes {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NonMatchingAttributes that = (NonMatchingAttributes) o;
+        IdentityAttributes that = (IdentityAttributes) o;
         if (firstNames != null ? !firstNames.equals(that.firstNames) : that.firstNames != null) return false;
         if (middleNames != null ? !(that.middleNames != null && CollectionUtils.isEqualCollection(middleNames, that.middleNames)) : that.middleNames != null) return false;
         if (surnames != null ? !(that.surnames != null && CollectionUtils.isEqualCollection(surnames, that.surnames)) : that.surnames != null) return false;
@@ -100,7 +100,7 @@ public class NonMatchingAttributes {
     @Override
     public String toString() {
         return String.format(
-                "Attributes{ firstNames=%s, middleNames=%s, surnames=%s, datesOfBirth=%s, gender=%s, addresses=%s}",
+                "AccountCreationAttributes{ firstNames=%s, middleNames=%s, surnames=%s, datesOfBirth=%s, gender=%s, addresses=%s}",
                 firstNames, middleNames, surnames, datesOfBirth, gender, addresses);
     }
 

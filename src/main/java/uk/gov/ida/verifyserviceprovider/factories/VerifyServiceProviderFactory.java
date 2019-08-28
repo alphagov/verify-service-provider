@@ -103,7 +103,7 @@ public class VerifyServiceProviderFactory {
         if(configuration.getMsaMetadata().isPresent()) {
             return getTranslateMatchingSamlResponseResource();
         } else{
-            return getTranslateNonMatchingSamlResponseResource();
+            return getTranslateIdentitySamlResponseResource();
         }
     }
 
@@ -116,7 +116,7 @@ public class VerifyServiceProviderFactory {
         return new TranslateSamlResponseResource(matchingResponseService, entityIdService);
     }
 
-    private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
+    private TranslateSamlResponseResource getTranslateIdentitySamlResponseResource() {
         VerifyAssertionTranslator verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
                 getHubSignatureTrustEngine(),
                 new SignatureValidatorFactory(),
@@ -138,7 +138,7 @@ public class VerifyServiceProviderFactory {
         }
 
         return new TranslateSamlResponseResource(
-            responseFactory.createNonMatchingResponseService(
+            responseFactory.createIdentityResponseService(
                 getHubSignatureTrustEngine(),
                 nonMatchingAssertionTranslator,
                 dateTimeComparator

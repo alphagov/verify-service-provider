@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedIdentityResponseBody;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
@@ -48,13 +48,13 @@ public class ClassifyingAssertionTranslatorTest {
         String expectedInResponseTo = "somesuch";
         LevelOfAssurance loa = LevelOfAssurance.LEVEL_2;
         String entityId = "someEntityId";
-        TranslatedNonMatchingResponseBody expectedResult = mock(TranslatedNonMatchingResponseBody.class);
+        TranslatedIdentityResponseBody expectedResult = mock(TranslatedIdentityResponseBody.class);
 
         when(eidasAssertionService.isCountryAssertion(any())).thenReturn(false);
         when(verifyAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedIdentityResponseBody actualResult = (TranslatedIdentityResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);
@@ -68,14 +68,14 @@ public class ClassifyingAssertionTranslatorTest {
         String expectedInResponseTo = "somesuch";
         LevelOfAssurance loa = LevelOfAssurance.LEVEL_2;
         String entityId = "someEntityId";
-        TranslatedNonMatchingResponseBody expectedResult = mock(TranslatedNonMatchingResponseBody.class);
+        TranslatedIdentityResponseBody expectedResult = mock(TranslatedIdentityResponseBody.class);
 
         when(eidasAssertionService.isCountryAssertion(assertion1)).thenReturn(false);
         when(eidasAssertionService.isCountryAssertion(assertion2)).thenReturn(true);
         when(eidasAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId)).thenReturn(expectedResult);
 
 
-        TranslatedNonMatchingResponseBody actualResult = (TranslatedNonMatchingResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
+        TranslatedIdentityResponseBody actualResult = (TranslatedIdentityResponseBody) classifyingAssertionService.translateSuccessResponse(assertions, expectedInResponseTo, loa, entityId);
 
 
         assertThat(actualResult).isEqualTo(expectedResult);

@@ -22,7 +22,7 @@ public class AuthnRequestAttributesHelper {
             MDC.put(AuthnRequestAttibuteNames.DESTINATION, authnRequest.getDestination() != null ? authnRequest.getDestination() : "");
             MDC.put(AuthnRequestAttibuteNames.ISSUE_INSTANT, authnRequest.getIssueInstant() != null ? authnRequest.getIssueInstant().toString() : "");
             MDC.put(AuthnRequestAttibuteNames.ISSUER, authnRequest.getIssuer() != null ? authnRequest.getIssuer().getValue() : "");
-            log.info("AuthnRequest Attributes: ");
+            log.info("AuthnRequest AccountCreationAttributes: ");
         } finally {
             MDC.remove(AuthnRequestAttibuteNames.REQUEST_ID);
             MDC.remove(AuthnRequestAttibuteNames.DESTINATION);
