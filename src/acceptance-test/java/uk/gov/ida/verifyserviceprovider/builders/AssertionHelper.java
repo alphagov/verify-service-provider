@@ -6,6 +6,7 @@ import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
+import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
@@ -13,7 +14,6 @@ import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
-import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.core.test.builders.ResponseBuilder;
 
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_CONNECTOR_TEST_PRIVATE_SIGNING_KEY;
@@ -25,7 +25,6 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_P
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
-
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
@@ -45,11 +44,12 @@ public class AssertionHelper {
         return new TestCredentialFactory(TEST_RP_PUBLIC_ENCRYPTION_CERT, TEST_RP_PRIVATE_ENCRYPTION_KEY).getEncryptingCredential();
     }
 
+    @Deprecated
     public static EncryptedAssertion anEidasEncryptedAssertion(String requestId, String issuerId, Signature assertionSignature) {
-        return anEidasEncryptedAssertionForTheTestRP(requestId, issuerId, assertionSignature, anEidasAttributeStatement().build());
+        return anEidasEncryptedAssertionForTestRP(requestId, issuerId, assertionSignature, anEidasAttributeStatement().build());
     }
 
-    public static EncryptedAssertion anEidasEncryptedAssertionForTheTestRP(String requestId, String issuerId, Signature assertionSignature, AttributeStatement attributeStatement) {
+    public static EncryptedAssertion anEidasEncryptedAssertionForTestRP(String requestId, String issuerId, Signature assertionSignature, AttributeStatement attributeStatement) {
         return anEidasEncryptedAssertion(requestId, issuerId, assertionSignature, attributeStatement, anEncryptingCredentialForTestRP());
     }
 
@@ -59,90 +59,78 @@ public class AssertionHelper {
                                                                AttributeStatement attributeStatement,
                                                                Credential target) {
         return anAssertion()
-                .withSubject(
-                        aSubject().withSubjectConfirmation(
-                                aSubjectConfirmation().withSubjectConfirmationData(
-                                        aSubjectConfirmationData()
-                                                .withInResponseTo(requestId)
-                                                .build())
-                                        .build())
-                                .build())
-                .withIssuer(anIssuer().withIssuerId(issuerId).build())
-                .addAttributeStatement(attributeStatement)
-                .addAuthnStatement(anEidasAuthnStatement().build())
-                .withSignature(assertionSignature)
-                .withConditions(aConditionsForEidas())
-                .buildWithEncrypterCredential(target);
+            .withSubject(
+                aSubject().withSubjectConfirmation(
+                    aSubjectConfirmation().withSubjectConfirmationData(
+                        aSubjectConfirmationData()
+                            .withInResponseTo(requestId)
+                            .build())
+                        .build())
+                    .build())
+            .withIssuer(anIssuer().withIssuerId(issuerId).build())
+            .addAttributeStatement(attributeStatement)
+            .addAuthnStatement(anEidasAuthnStatement().build())
+            .withSignature(assertionSignature)
+            .withConditions(aConditionsForEidas())
+            .buildWithEncrypterCredential(target);
     }
 
-    public static ResponseBuilder aValidEidasresponseSignedByHubWithAnAssertionSignedByStubCountry(String requestId, String assertionIssuerId) {
-        return aValidEidasresponseSignedByHubWithAnAssertionSignedByStubCountry(requestId, assertionIssuerId, anEidasAttributeStatement().build());
+    public enum SamlSigningEntity { Hub, StubCountry }
+    public enum AssertionSigningEntity { StubCountry, StubCountryBrokenSignature}
+
+    public static ResponseBuilder aSignedEidasResponseWithAssertion(String requestId, SamlSigningEntity samlSig, AssertionSigningEntity assertionSig) {
+        return aSignedEidasResponseWithAssertion(requestId, samlSig, assertionSig, null, null);
     }
 
-    public static ResponseBuilder aValidEidasresponseSignedByHubWithAnAssertionSignedByStubCountry(String requestId, String assertionIssuerId, AttributeStatement attributeStatement) {
-        return ResponseBuilder.aResponse()
-                .withId(requestId)
-                .withInResponseTo(requestId)
-                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .addEncryptedAssertion(anEidasEncryptedAssertionForTheTestRP(requestId, assertionIssuerId, aStubCountryEidasSignature(), attributeStatement))
-                .withSigningCredential(
-                        new TestCredentialFactory(
-                                HUB_TEST_PUBLIC_SIGNING_CERT,
-                                HUB_TEST_PRIVATE_SIGNING_KEY
-                        ).getSigningCredential());
-    }
+    public static ResponseBuilder aSignedEidasResponseWithAssertion(String requestId, SamlSigningEntity samlSig, AssertionSigningEntity assertionSig, String assertionIssuerId, AttributeStatement attributeStatement) {
 
-    public static ResponseBuilder aValidEidasResponseSignedByStubCountryWithAnAssertionSignedByTheCountry(String requestId) {
-        return ResponseBuilder.aResponse()
-            .withId(requestId)
-            .withInResponseTo(requestId)
-            .withIssuer(anIssuer().withIssuerId(STUB_COUNTRY_ONE).build())
-            .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, STUB_COUNTRY_ONE, aStubCountryEidasSignature()))
-            .withSigningCredential(
-                new TestCredentialFactory(
-                    STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
-                    STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY
-                ).getSigningCredential());
-    }
+        Credential credential;
+        Issuer issuer;
+        Signature assertionSignature;
+        String assertionEntityId;
+        EncryptedAssertion assertion;
 
-    public static ResponseBuilder aValidEidasResponseSignedByStubCountryWithAnAssertionSignedByTheCountry(String requestId, AttributeStatementBuilder attributeStatementBuilder) {
-        return ResponseBuilder.aResponse()
-            .withId(requestId)
-            .withInResponseTo(requestId)
-            .withIssuer(anIssuer().withIssuerId(STUB_COUNTRY_ONE).build())
-            .addEncryptedAssertion(anEidasEncryptedAssertionForTheTestRP(requestId, STUB_COUNTRY_ONE, aStubCountryEidasSignature(), attributeStatementBuilder.build()))
-            .withSigningCredential(
-                new TestCredentialFactory(
-                    STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
-                    STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY
-                ).getSigningCredential());
-    }
+        switch (samlSig) {
+            case Hub:
+                issuer = anIssuer().withIssuerId(HUB_ENTITY_ID).build();
+                credential = new TestCredentialFactory(HUB_TEST_PUBLIC_SIGNING_CERT, HUB_TEST_PRIVATE_SIGNING_KEY).getSigningCredential();
+                break;
 
-    @Deprecated
-    public static ResponseBuilder aValidEidasResponseSignedByHubWithAnAssertionSignedByAnIDP(String requestId) {
-        return ResponseBuilder.aResponse()
-            .withId(requestId)
-            .withInResponseTo(requestId)
-            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, HUB_ENTITY_ID, anIdpSignature()))
-            .withSigningCredential(
-                new TestCredentialFactory(
-                    HUB_TEST_PUBLIC_SIGNING_CERT,
-                    HUB_TEST_PRIVATE_SIGNING_KEY
-                ).getSigningCredential());
-    }
+            case StubCountry:
+                issuer = anIssuer().withIssuerId(STUB_COUNTRY_ONE).build();
+                credential = new TestCredentialFactory(STUB_COUNTRY_PUBLIC_PRIMARY_CERT, STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY).getSigningCredential();
+                break;
 
-    public static ResponseBuilder aValidEidasResponseSignedByStubCountryWithAnInvalidSignatureOnTheAssertion(String requestId) {
+            default:
+                throw new IllegalArgumentException();
+        }
+
+
+        switch (assertionSig) {
+
+            case StubCountry:
+                assertionSignature = aStubCountryEidasSignature();
+                assertionEntityId = assertionIssuerId == null ? STUB_COUNTRY_ONE : assertionIssuerId;
+                break;
+
+            case StubCountryBrokenSignature:
+                assertionSignature = aBadStubCountryEidasSignature();
+                assertionEntityId = assertionIssuerId == null ? STUB_COUNTRY_ONE : assertionIssuerId;
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        AttributeStatement statement = attributeStatement == null ? anEidasAttributeStatement().build() : attributeStatement;
+        assertion = anEidasEncryptedAssertionForTestRP(requestId, assertionEntityId, assertionSignature, statement);
+
         return ResponseBuilder.aResponse()
             .withId(requestId)
             .withInResponseTo(requestId)
-            .withIssuer(anIssuer().withIssuerId(STUB_COUNTRY_ONE).build())
-            .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, STUB_COUNTRY_ONE, aBadStubCountryEidasSignature()))
-            .withSigningCredential(
-                new TestCredentialFactory(
-                    STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
-                    STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY
-                ).getSigningCredential());
+            .withIssuer(issuer)
+            .addEncryptedAssertion(assertion)
+            .withSigningCredential(credential);
     }
 
     public static Signature aBadStubCountryEidasSignature() {
@@ -183,22 +171,22 @@ public class AssertionHelper {
             notOnOrAfter = DateTime.now().plus(1000000);
         }
         return aSubject()
-                .withSubjectConfirmation(
-                        aSubjectConfirmation()
-                                .withSubjectConfirmationData(
-                                        aSubjectConfirmationData()
-                                                .withNotOnOrAfter(notOnOrAfter)
-                                                .withInResponseTo(inResponseTo)
-                                                .build()
-                                ).build()
-                ).build();
+            .withSubjectConfirmation(
+                aSubjectConfirmation()
+                    .withSubjectConfirmationData(
+                        aSubjectConfirmationData()
+                            .withNotOnOrAfter(notOnOrAfter)
+                            .withInResponseTo(inResponseTo)
+                            .build()
+                    ).build()
+            ).build();
     }
 
     private static Conditions aConditions() {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(TEST_RP);
         audienceRestriction.getAudiences().add(audience);
@@ -210,7 +198,7 @@ public class AssertionHelper {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
         audienceRestriction.getAudiences().add(audience);
