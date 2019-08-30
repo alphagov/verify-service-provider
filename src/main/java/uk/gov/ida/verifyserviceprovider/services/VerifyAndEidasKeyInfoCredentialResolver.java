@@ -35,14 +35,19 @@ public class VerifyAndEidasKeyInfoCredentialResolver implements KeyInfoCredentia
             eidasMetadataResolverRepository.getSignatureTrustEngine(eidasResolverEntityId).ifPresent(engine -> {
                 try {
                     KeyInfoCredentialResolver eidasCredentialResolver = engine.getKeyInfoResolver();
-                    credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
+                    if (eidasCredentialResolver != null) {
+                        credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
+                    }
                 } catch (ResolverException ignored) {
                 }
             });
         }
 
         KeyInfoCredentialResolver hubCredentialResolver = hubTrustEngine.getKeyInfoResolver();
-        credentialsFound.addAll(Lists.newLinkedList(hubCredentialResolver.resolve(criteria)));
+        if (hubCredentialResolver != null) {
+            credentialsFound.addAll(Lists.newLinkedList(hubCredentialResolver.resolve(criteria)));
+        }
+
         return credentialsFound;
     }
 
