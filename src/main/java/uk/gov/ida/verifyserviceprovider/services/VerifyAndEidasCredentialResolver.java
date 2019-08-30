@@ -35,9 +35,10 @@ public class VerifyAndEidasCredentialResolver implements CredentialResolver {
             eidasMetadataResolverRepository.getSignatureTrustEngine(eidasResolverEntityId).ifPresent(engine -> {
                 try {
                     CredentialResolver eidasCredentialResolver = engine.getCredentialResolver();
-                    credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
-                } catch (ResolverException e) {
-                    // NOP - could not resolve the criteria
+                    if (eidasCredentialResolver != null) {
+                        credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
+                    }
+                } catch (ResolverException ignored) {
                 }
             });
         }

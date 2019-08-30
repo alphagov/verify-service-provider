@@ -36,8 +36,7 @@ public class VerifyAndEidasKeyInfoCredentialResolver implements KeyInfoCredentia
                 try {
                     KeyInfoCredentialResolver eidasCredentialResolver = engine.getKeyInfoResolver();
                     credentialsFound.addAll(Lists.newLinkedList(eidasCredentialResolver.resolve(criteria)));
-                } catch (ResolverException e) {
-                    // NOP - could not resolve the criteria
+                } catch (ResolverException ignored) {
                 }
             });
         }
