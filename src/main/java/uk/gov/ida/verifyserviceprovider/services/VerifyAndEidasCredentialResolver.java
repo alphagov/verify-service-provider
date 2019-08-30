@@ -5,7 +5,6 @@ import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.CredentialResolver;
-import org.opensaml.xmlsec.keyinfo.KeyInfoCredentialResolver;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 
