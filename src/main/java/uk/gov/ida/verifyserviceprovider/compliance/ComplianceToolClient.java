@@ -1,7 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.compliance;
 
-import com.amazonaws.util.Base64;
 import com.google.common.collect.ImmutableMap;
+import org.glassfish.jersey.internal.util.Base64;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 
 import javax.ws.rs.client.Client;

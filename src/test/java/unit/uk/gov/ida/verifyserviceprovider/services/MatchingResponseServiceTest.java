@@ -72,6 +72,7 @@ import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anA
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
+import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.DEFAULT_REQUEST_ID;
 import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 import static uk.gov.ida.saml.core.test.builders.StatusBuilder.aStatus;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
@@ -374,7 +375,7 @@ public class MatchingResponseServiceTest {
     @Test
     public void shouldFailWhenInResponseToDoesNotMatchRequestId() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Expected InResponseTo to be some-incorrect-request-id, but was default-request-id");
+        expectedException.expectMessage(String.format("Expected InResponseTo to be some-incorrect-request-id, but was %s", DEFAULT_REQUEST_ID));
 
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
