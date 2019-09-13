@@ -39,6 +39,7 @@ import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
+import static uk.gov.ida.verifyserviceprovider.rules.NonMatchingVerifyServiceProviderAppRule.COUNTRY_ENTITY_ID;
 
 public class AssertionHelper {
 
@@ -130,6 +131,32 @@ public class AssertionHelper {
                         ).getSigningCredential());
     }
 
+    public static ResponseBuilder anEidasResponseIssuedByACountry(String requestId, String assertionIssuerId) {
+        return ResponseBuilder.aResponse()
+                .withId(requestId)
+                .withIssuer(anIssuer().withIssuerId(COUNTRY_ENTITY_ID).build())
+                .withInResponseTo(requestId)
+                .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, assertionIssuerId, anEidasSignature()))
+                .withSigningCredential(
+                        new TestCredentialFactory(
+                                STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
+                                STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY
+                        ).getSigningCredential());
+    }
+
+    public static ResponseBuilder anInvalidSignatureEidasResponseIssuedByACountry(String requestId, String assertionIssuerId) {
+        return ResponseBuilder.aResponse()
+                .withId(requestId)
+                .withInResponseTo(requestId)
+                .withIssuer(anIssuer().withIssuerId(COUNTRY_ENTITY_ID).build())
+                .addEncryptedAssertion(anEidasEncryptedAssertion(requestId, assertionIssuerId, anEidasSignature()))
+                .withSigningCredential(
+                        new TestCredentialFactory(
+                                STUB_IDP_PUBLIC_PRIMARY_CERT,
+                                STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                        ).getSigningCredential());
+    }
+
     public static ResponseBuilder anInvalidAssertionSignatureEidasResponse(String requestId, String assertionIssuerId) {
         return ResponseBuilder.aResponse()
                 .withId(requestId)
@@ -186,7 +213,7 @@ public class AssertionHelper {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(TEST_RP);
         audienceRestriction.getAudiences().add(audience);
@@ -198,7 +225,7 @@ public class AssertionHelper {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
         audienceRestriction.getAudiences().add(audience);

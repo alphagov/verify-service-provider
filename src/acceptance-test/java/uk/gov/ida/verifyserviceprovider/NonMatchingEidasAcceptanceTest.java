@@ -30,8 +30,12 @@ import javax.ws.rs.core.Response;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
+import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_TWO;
+import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anEidasResponseIssuedByACountry;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.aValidEidasResponse;
 import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidAssertionSignatureEidasResponse;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidSignatureEidasResponseIssuedByACountry;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class NonMatchingEidasAcceptanceTest {
@@ -119,10 +123,54 @@ public class NonMatchingEidasAcceptanceTest {
      }
 
     @Test
+    public void shouldValidateACountryIssuedEidasResponseCorrectlyWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId()).build()
+        );
+        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+        );
+
+        String body = response.readEntity(String.class);
+        JSONObject json = new JSONObject(body);
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(json.getString("pid")).isNotEqualTo("default-pid");
+        assertThat(json.getString("pid")).isEqualTo("428eb6096580250e9edbac60566529c2e8f9dbfe9ea88999b8996f6dbc602160");
+    }
+
+    @Test
+    public void shouldReturn400ForCountryIssuedEidasResponseIfMetadataNotFoundInMetadataAggregatorWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId())
+                        .withIssuer(anIssuer().withIssuerId(STUB_COUNTRY_TWO).build())
+                        .build()
+        );
+        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+        );
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void shouldReturn400ForCountryIssuedEidasResponseIfBadSignatureWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anInvalidSignatureEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId())
+                        .build()
+        );
+        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+        );
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
     public void shouldMapAttributesCorrectly() throws Exception {
         AttributeStatementBuilder attributeStatementBuilder = AttributeStatementBuilder.anAttributeStatement();
         
-        Attribute givenName =  anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
+        Attribute givenName = anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
         CurrentGivenName firstNameValue = new CurrentGivenNameBuilder().buildObject();
         firstNameValue.setFirstName("Joe");
         givenName.getAttributeValues().add(firstNameValue);
@@ -133,7 +181,7 @@ public class NonMatchingEidasAcceptanceTest {
 
         attributeStatementBuilder.addAttribute(givenName);
 
-        Attribute familyName =  anAttribute(IdaConstants.Eidas_Attributes.FamilyName.NAME);
+        Attribute familyName = anAttribute(IdaConstants.Eidas_Attributes.FamilyName.NAME);
 
         CurrentFamilyName familyNameValue = new CurrentFamilyNameBuilder().buildObject();
         familyNameValue.setFamilyName("Bloggs");
@@ -146,13 +194,13 @@ public class NonMatchingEidasAcceptanceTest {
 
         attributeStatementBuilder.addAttribute(familyName);
 
-        Attribute personIdentifier =  anAttribute(IdaConstants.Eidas_Attributes.PersonIdentifier.NAME);
+        Attribute personIdentifier = anAttribute(IdaConstants.Eidas_Attributes.PersonIdentifier.NAME);
         PersonIdentifier personIdentifierValue = new PersonIdentifierBuilder().buildObject();
         personIdentifierValue.setPersonIdentifier("JB12345");
         personIdentifier.getAttributeValues().add(personIdentifierValue);
         attributeStatementBuilder.addAttribute(personIdentifier);
 
-        Attribute dateOfBirth =  anAttribute(IdaConstants.Eidas_Attributes.DateOfBirth.NAME);
+        Attribute dateOfBirth = anAttribute(IdaConstants.Eidas_Attributes.DateOfBirth.NAME);
         DateOfBirth dateOfBirthValue = new DateOfBirthBuilder().buildObject();
         String dateOfBirthString = "1988-09-30";
         LocalDate now = LocalDate.parse(dateOfBirthString);

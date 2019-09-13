@@ -131,7 +131,7 @@ public class NonMatchingAcceptanceTest {
             ),
             new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
             new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
-            Arrays.asList( matchingAddressOne, matchingAddressTwo),
+            Arrays.asList(matchingAddressOne, matchingAddressTwo),
             AuthnContext.LEVEL_1,
             expectedPid
         );

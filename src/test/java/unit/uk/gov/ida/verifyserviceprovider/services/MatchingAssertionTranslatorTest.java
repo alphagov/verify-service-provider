@@ -63,6 +63,7 @@ public class MatchingAssertionTranslatorTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
+    private static final String VERIFY_HUB_ENTITY_ID = "hub-entity-id";
     private MatchingAssertionTranslator msaAssertionService;
     private Credential testRpMsaSigningCredential = createMSSigningCredential();
 
@@ -77,7 +78,7 @@ public class MatchingAssertionTranslatorTest {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
         KeyPair keyPair = new KeyPair(KeySupport.derivePublicKey(privateKey), privateKey);
         List<KeyPair> keyPairs = asList(keyPair, keyPair);
-        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs, VERIFY_HUB_ENTITY_ID);
 
         CollectionCredentialResolver resolver = new CollectionCredentialResolver(asList(testRpMsaSigningCredential));
         ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(resolver, DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
