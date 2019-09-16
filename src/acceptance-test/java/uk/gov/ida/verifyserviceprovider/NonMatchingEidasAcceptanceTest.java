@@ -55,7 +55,7 @@ public class NonMatchingEidasAcceptanceTest {
     }
 
     @Test
-     public void shouldReturn400WhenAssertionContainsInvalidSignature() throws MarshallingException, SignatureException {
+     public void shouldReturn400WhenAssertionContainsAnInvalidSignature() throws MarshallingException, SignatureException {
          String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
                  anInvalidAssertionSignatureEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
          );
