@@ -6,7 +6,7 @@ import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngin
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
-import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
@@ -15,6 +15,7 @@ import uk.gov.ida.saml.deserializers.validators.NotNullSamlStringValidator;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
+import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
@@ -44,6 +45,7 @@ import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
 import java.util.List;
+import java.util.Optional;
 
 public class ResponseFactory {
 
@@ -55,10 +57,12 @@ public class ResponseFactory {
     private static final EncryptionAlgorithmValidator encryptionAlgorithmValidator = new EncryptionAlgorithmValidator();
     private static final DecrypterFactory decrypterFactory = new DecrypterFactory();
 
+    private final String hubEntityId;
     private List<KeyPair> encryptionKeyPairs;
 
-    public ResponseFactory(List<KeyPair> encryptionKeyPairs) {
+    public ResponseFactory(List<KeyPair> encryptionKeyPairs, String hubEntityId) {
         this.encryptionKeyPairs = encryptionKeyPairs;
+        this.hubEntityId = hubEntityId;
     }
 
     public static StringToOpenSamlObjectTransformer<Response> createStringToResponseTransformer() {
@@ -92,25 +96,29 @@ public class ResponseFactory {
             matchingAssertionTranslator,
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
             new InstantValidator(dateTimeComparator),
-            new MatchingResponderCodeTranslator()
-        );
+            new MatchingResponderCodeTranslator(),
+            hubEntityId,
+            Optional.empty());
     }
 
     public ResponseService createNonMatchingResponseService(
-            ExplicitKeySignatureTrustEngine signatureTrustEngine,
+            ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionTranslator nonMatchingAssertionTranslator,
-            DateTimeComparator dateTimeComparator
+            DateTimeComparator dateTimeComparator,
+            Optional<EidasValidatorFactory> eidasValidatorFactory
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
-        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(signatureTrustEngine);
+        MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
 
         return new ResponseService(
-                createStringToResponseTransformer(),
-                assertionDecrypter,
+            createStringToResponseTransformer(),
+            assertionDecrypter,
             nonMatchingAssertionTranslator,
-                new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
-                new InstantValidator(dateTimeComparator),
-                new IdentityResponderCodeTranslator()
+            new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
+            new InstantValidator(dateTimeComparator),
+            new IdentityResponderCodeTranslator(),
+            hubEntityId,
+            eidasValidatorFactory
         );
     }
 
@@ -177,7 +185,7 @@ public class ResponseFactory {
                 );
     }
 
-    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine ) {
+    private MetadataBackedSignatureValidator createMetadataBackedSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {
         return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
     }
 

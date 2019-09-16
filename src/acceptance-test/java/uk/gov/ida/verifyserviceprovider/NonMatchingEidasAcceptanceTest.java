@@ -21,7 +21,6 @@ import uk.gov.ida.saml.core.extensions.eidas.impl.DateOfBirthBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.PersonIdentifierBuilder;
 import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
-import uk.gov.ida.verifyserviceprovider.builders.AssertionHelper;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.rules.NonMatchingVerifyServiceProviderAppRule;
 
@@ -30,7 +29,13 @@ import javax.ws.rs.core.Response;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.aSignedEidasResponseWithAssertion;
+import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
+import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_TWO;
+import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anEidasResponseIssuedByACountry;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.aValidEidasResponse;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidAssertionSignatureEidasResponse;
+import static uk.gov.ida.verifyserviceprovider.builders.AssertionHelper.anInvalidSignatureEidasResponseIssuedByACountry;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public class NonMatchingEidasAcceptanceTest {
@@ -50,102 +55,80 @@ public class NonMatchingEidasAcceptanceTest {
     }
 
     @Test
-    public void shouldAcceptSamlSignedByStubCountryWithAssertionSignedByStubCountry() throws MarshallingException, SignatureException {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountry
-        ).build();
+     public void shouldReturn400WhenAssertionContainsAnInvalidSignature() throws MarshallingException, SignatureException {
+         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                 anInvalidAssertionSignatureEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
+         );
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                 Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+         );
 
-        String base64EidasAuthnResponse = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-        Response translationResponse = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64EidasAuthnResponse, "requestId", LEVEL_2, null))
-        );
+         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
 
-        assertThat(translationResponse.getStatus()).isEqualTo(HttpStatus.SC_OK);
+         String responseBody = response.readEntity(String.class);
+         assertThat(responseBody).contains("Signature was not valid.");
+     }
 
-        String responseBody = translationResponse.readEntity(String.class);
-        assertThat(responseBody).doesNotContain("Signature was not valid.");
-        assertThat(responseBody).doesNotContain("Exactly one matching dataset assertion is expected.");
-    }
+     @Test
+     public void shouldReturn400WhenAssertionSignedByCountryNotInTrustAnchor() throws MarshallingException, SignatureException {
+         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                 aValidEidasResponse("requestId", STUB_COUNTRY_ONE).build()
+         );
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                 Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+         );
+
+         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+     }
+
+     @Test
+     public void shouldReturn400ForEidasResponseWhenEuropeanIdentityConfigAbsent() throws Exception {
+         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+             aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
+         );
+         Response response = appWithoutEidasConfig.client().target(format("http://localhost:%s/translate-response", appWithoutEidasConfig.getLocalPort())).request().post(
+             Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+         );
+
+         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+     }
+
+     @Test
+     public void shouldReturn400ForEidasResponseWhenEuropeanIdentityDisabled() throws Exception {
+         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+             aValidEidasResponse("requestId", appWithEidasDisabled.getCountryEntityId()).build()
+         );
+         Response response = appWithEidasDisabled.client().target(format("http://localhost:%s/translate-response", appWithEidasDisabled.getLocalPort())).request().post(
+             Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+         );
+
+         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+     }
+
+     @Test
+     public void shouldProcessEidasResponseCorrectlyWhenEuropeanIdentityEnabled() throws Exception {
+         String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+             aValidEidasResponse("requestId", appWithEidasEnabled.getCountryEntityId()).build()
+         );
+         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+             Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+         );
+
+         String body = response.readEntity(String.class);
+         JSONObject json = new JSONObject(body);
+
+         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+         assertThat(json.getString("pid")).isNotEqualTo("default-pid");
+         assertThat(json.getString("pid")).isEqualTo("428eb6096580250e9edbac60566529c2e8f9dbfe9ea88999b8996f6dbc602160");
+     }
 
     @Test
-    public void shouldReturn400WhenAssertionContainsInvalidSignature() throws MarshallingException, SignatureException {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountryBrokenSignature
-        ).build();
-
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-
+    public void shouldValidateACountryIssuedEidasResponseCorrectlyWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId()).build()
+        );
         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
-        );
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
-
-        String responseBody = response.readEntity(String.class);
-        assertThat(responseBody).contains("Signature was not valid.");
-    }
-
-    @Test
-    public void shouldReturn400WhenAssertionSignedByCountryNotInTrustAnchor() throws MarshallingException, SignatureException {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.Hub,
-            AssertionHelper.AssertionSigningEntity.StubCountry,
-            appWithEidasEnabled.getTestCountryEntityId(),
-            null
-        ).build();
-
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
-        );
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
-        String responseBody = response.readEntity(String.class);
-        assertThat(responseBody).contains("Exactly one matching dataset assertion is expected.");
-    }
-
-    @Test
-    public void shouldReturn400ForEidasResponseWhenEuropeanIdentityConfigAbsent() throws Exception {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountry
-        ).build();
-
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-        Response response = appWithoutEidasConfig.client().target(format("http://localhost:%s/translate-response", appWithoutEidasConfig.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
-        );
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
-    }
-
-    @Test
-    public void shouldReturn400ForEidasResponseWhenEuropeanIdentityDisabled() throws Exception {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountry
-        ).build();
-
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-        Response response = appWithEidasDisabled.client().target(format("http://localhost:%s/translate-response", appWithEidasDisabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
-        );
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
-    }
-
-    @Test
-    public void shouldProcessEidasResponseCorrectlyWhenEuropeanIdentityEnabled() throws Exception {
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountry
-        ).build();
-
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
-        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
         );
 
         String body = response.readEntity(String.class);
@@ -153,13 +136,40 @@ public class NonMatchingEidasAcceptanceTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
         assertThat(json.getString("pid")).isNotEqualTo("default-pid");
-        assertThat(json.getString("pid")).isEqualTo("dea8485619ffab26a888c8d48a25c946b27417bfd306bfb5b4495d35d9dc5b25");
+        assertThat(json.getString("pid")).isEqualTo("428eb6096580250e9edbac60566529c2e8f9dbfe9ea88999b8996f6dbc602160");
+    }
+
+    @Test
+    public void shouldReturn400ForCountryIssuedEidasResponseIfMetadataNotFoundInMetadataAggregatorWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId())
+                        .withIssuer(anIssuer().withIssuerId(STUB_COUNTRY_TWO).build())
+                        .build()
+        );
+        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+        );
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void shouldReturn400ForCountryIssuedEidasResponseIfBadSignatureWhenEuropeanIdentityEnabled() throws Exception {
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(
+                anInvalidSignatureEidasResponseIssuedByACountry("requestId", appWithEidasEnabled.getCountryEntityId())
+                        .build()
+        );
+        Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+        );
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void shouldMapAttributesCorrectly() throws Exception {
         AttributeStatementBuilder attributeStatementBuilder = AttributeStatementBuilder.anAttributeStatement();
-
+        
         Attribute givenName = anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
         CurrentGivenName firstNameValue = new CurrentGivenNameBuilder().buildObject();
         firstNameValue.setFirstName("Joe");
@@ -198,16 +208,15 @@ public class NonMatchingEidasAcceptanceTest {
         dateOfBirth.getAttributeValues().add(dateOfBirthValue);
         attributeStatementBuilder.addAttribute(dateOfBirth);
 
-        org.opensaml.saml.saml2.core.Response eidasAuthnResponse = aSignedEidasResponseWithAssertion("requestId",
-            AssertionHelper.SamlSigningEntity.StubCountry,
-            AssertionHelper.AssertionSigningEntity.StubCountry,
-            null,
-            attributeStatementBuilder.build()
-        ).build();
+        org.opensaml.saml.saml2.core.Response samlResponse = aValidEidasResponse(
+                "requestId",
+                appWithEidasEnabled.getCountryEntityId(),
+                attributeStatementBuilder.build())
+                .build();
 
-        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(eidasAuthnResponse);
+        String base64Response = new XmlObjectToBase64EncodedStringTransformer().apply(samlResponse);
         Response response = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
-            Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
+                Entity.json(new TranslateSamlResponseBody(base64Response, "requestId", LEVEL_2, null))
         );
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);

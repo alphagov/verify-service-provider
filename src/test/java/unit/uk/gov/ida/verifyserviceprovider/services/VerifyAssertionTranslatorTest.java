@@ -19,7 +19,7 @@ import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
-import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;

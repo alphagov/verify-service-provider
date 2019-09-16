@@ -46,18 +46,18 @@ public class NonMatchingAcceptanceTest {
 
     @ClassRule
     public static VerifyServiceProviderAppRule application = aVerifyServiceProviderAppRule()
-        .withMockMsaServer(msaServer)
-        .build();
+            .withMockMsaServer(msaServer)
+            .build();
+            
+    @ClassRule
+    public static VerifyServiceProviderAppRule applicationWithEidasEnabled  = aVerifyServiceProviderAppRule()
+            .withEidasEnabledFlag(true)
+            .build();
 
     @ClassRule
-    public static VerifyServiceProviderAppRule applicationWithEidasEnabled = aVerifyServiceProviderAppRule()
-        .withEidasEnabledFlag(true)
-        .build();
-
-    @ClassRule
-    public static VerifyServiceProviderAppRule applicationWithEidasDisabled = aVerifyServiceProviderAppRule()
-        .withEidasEnabledFlag(false)
-        .build();
+    public static VerifyServiceProviderAppRule applicationWithEidasDisabled  = aVerifyServiceProviderAppRule()
+            .withEidasEnabledFlag(false)
+            .build();
 
 
     private static Client client;
@@ -110,24 +110,24 @@ public class NonMatchingAcceptanceTest {
         LocalDateTime laterToDate = LocalDateTime.parse(laterToDateString);
 
         MatchingAddress matchingAddressOne = new MatchingAddress(true,
-            standardFromDate,
-            standardToDate,
-            "E1 8QS",
-            Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
-            "INT123",
-            "UPRN");
+                standardFromDate,
+                standardToDate,
+                "E1 8QS",
+                Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
+                "INT123",
+                "UPRN");
         MatchingAddress matchingAddressTwo = new MatchingAddress(true,
-            laterFromDate,
-            null,
-            "E1 8QX",
-            Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"),
-            null,
-            null);
+                laterFromDate,
+                null,
+                "E1 8QX",
+                Arrays.asList("The White Chapel Building 2", "11 Whitechapel High Street"),
+                null,
+                null);
         MatchingDataset matchingDataset = new MatchingDataset(
             new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
             new MatchingAttribute("Montgomery", true, standardFromDate, standardToDate),
             Arrays.asList(new MatchingAttribute("Smith", true, standardFromDate, standardToDate),
-                new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)
+                    new MatchingAttribute("Smythington", true, laterFromDate, laterToDate)
             ),
             new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
             new MatchingAttribute("1970-01-01", true, standardFromDate, standardToDate),
@@ -183,23 +183,23 @@ public class NonMatchingAcceptanceTest {
 
 
         MatchingAddress matchingAddress = new MatchingAddress(
-            true,
-            standardFromDate,
-            standardToDate,
-            "E1 8QS",
-            Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
-            null,
-            null
+                true,
+                standardFromDate,
+                standardToDate,
+                "E1 8QS",
+                Arrays.asList("The White Chapel Building", "10 Whitechapel High Street"),
+                null,
+                null
         );
         MatchingDataset matchingDataset = new MatchingDataset(
-            new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
-            null,
-            singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
-            new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
-            null,
-            singletonList(matchingAddress),
-            AuthnContext.LEVEL_1,
-            expectedPid
+                new MatchingAttribute("Bob", true, standardFromDate, standardToDate),
+                null,
+                singletonList(new MatchingAttribute("Smith", true, standardFromDate, null)),
+                new MatchingAttribute("NOT_SPECIFIED", true, standardFromDate, standardToDate),
+                null,
+                singletonList(matchingAddress),
+                AuthnContext.LEVEL_1,
+                expectedPid
         );
 
         complianceTool.initialiseWithMatchingDatasetForV2(matchingDataset);
@@ -238,21 +238,21 @@ public class NonMatchingAcceptanceTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfLoAReturnedByIdpIsTooLow() {
+    public void shouldThrowExceptionIfLoAReturnedByIdpIsTooLow () {
         complianceTool.initialiseWithDefaultsForV2();
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
@@ -270,16 +270,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(applicationWithEidasEnabled.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_1.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", applicationWithEidasEnabled.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", applicationWithEidasEnabled.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -298,16 +298,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(applicationWithEidasDisabled.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_1.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", applicationWithEidasDisabled.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", applicationWithEidasDisabled.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -326,16 +326,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_1.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -350,16 +350,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), AUTHENTICATION_FAILED_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         assertThat(jsonResponse.getString("scenario")).isEqualTo(AUTHENTICATION_FAILED.name());
@@ -375,16 +375,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), FRAUDULENT_MATCH_RESPONSE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         ErrorMessage errorBody = response.readEntity(ErrorMessage.class);
 
@@ -400,16 +400,16 @@ public class NonMatchingAcceptanceTest {
 
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
         Map<String, String> translateResponseRequestData = ImmutableMap.of(
-            "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID),
-            "requestId", requestResponseBody.getRequestId(),
-            "levelOfAssurance", LEVEL_2.name()
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), NO_AUTHENTICATION_CONTEXT_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_2.name()
         );
 
         Response response = client
-            .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
-            .request()
-            .buildPost(json(translateResponseRequestData))
-            .invoke();
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
 
         TestTranslatedNonMatchingResponseBody responseContent = response.readEntity(TestTranslatedNonMatchingResponseBody.class);
 

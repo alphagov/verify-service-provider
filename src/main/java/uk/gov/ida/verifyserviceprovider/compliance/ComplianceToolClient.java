@@ -1,6 +1,5 @@
 package uk.gov.ida.verifyserviceprovider.compliance;
 
-import com.amazonaws.util.Base64;
 import com.google.common.collect.ImmutableMap;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 
@@ -10,6 +9,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 
 public class ComplianceToolClient {
 
@@ -40,8 +40,8 @@ public class ComplianceToolClient {
     }
 
     private Entity buildRequestBody(MatchingDataset matchingDataset) throws CertificateEncodingException {
-        String encodedSigningCertificate = Base64.encodeAsString(signingCertificate.getEncoded());
-        String encodedEncryptionCertificate = Base64.encodeAsString(encryptionCertificate.getEncoded());
+        String encodedSigningCertificate = Base64.getEncoder().encodeToString(signingCertificate.getEncoded());
+        String encodedEncryptionCertificate = Base64.getEncoder().encodeToString(encryptionCertificate.getEncoded());
         ImmutableMap.Builder<Object, Object> builder = ImmutableMap.builder();
         builder.put("serviceEntityId", serviceEntityId);
         builder.put("assertionConsumerServiceUrl", url);

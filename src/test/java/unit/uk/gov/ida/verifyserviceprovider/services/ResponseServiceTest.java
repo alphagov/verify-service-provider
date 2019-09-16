@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
@@ -30,13 +31,17 @@ import uk.gov.ida.saml.core.test.builders.ResponseBuilder;
 import uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
+import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
+import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -52,12 +57,14 @@ import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.List;
+import java.util.Optional;
 
 import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
@@ -72,6 +79,7 @@ import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anA
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
+import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.DEFAULT_REQUEST_ID;
 import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 import static uk.gov.ida.saml.core.test.builders.StatusBuilder.aStatus;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
@@ -86,13 +94,16 @@ import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.NO_MATCH;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.REQUEST_ERROR;
 import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATCH;
 
-public class MatchingResponseServiceTest {
+public class ResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
+    private static final String VERIFY_HUB_ENTITY_ID = "some-entity-id-for-hub";
 
-    private ResponseService responseService;
+    private ResponseService matchingResponseService;
+    private ResponseService eidasNonMatchingResponseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
+    private EidasValidatorFactory mockEidasValidatorFactory = mock(EidasValidatorFactory.class);
 
     private MetadataResolver hubMetadataResolver;
 
@@ -112,7 +123,7 @@ public class MatchingResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs, VERIFY_HUB_ENTITY_ID);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -126,10 +137,20 @@ public class MatchingResponseServiceTest {
 
         ExplicitKeySignatureTrustEngine signatureTrustEngine = new MetadataSignatureTrustEngineFactory().createSignatureTrustEngine(hubMetadataResolver);
 
-        responseService = responseFactory.createMatchingResponseService(
+        matchingResponseService = responseFactory.createMatchingResponseService(
             signatureTrustEngine,
             msaAssertionService,
             dateTimeComparator
+        );
+
+        AssertionTranslator mockAssertionTranslator = mock(ClassifyingAssertionTranslator.class);
+        Optional<EidasValidatorFactory> eidasValidatorFactory = Optional.of(mockEidasValidatorFactory);
+
+        eidasNonMatchingResponseService = responseFactory.createNonMatchingResponseService(
+                signatureTrustEngine,
+                mockAssertionTranslator,
+                dateTimeComparator,
+                eidasValidatorFactory
         );
     }
 
@@ -139,7 +160,7 @@ public class MatchingResponseServiceTest {
     }
 
     @Test
-    public void shouldHandleSuccessMatchSaml() throws Exception {
+    public void matchingResponseServiceShouldHandleSuccessMatchSaml() throws Exception {
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
@@ -148,7 +169,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedResponseBody result = responseService.convertTranslatedResponseBody(
+        TranslatedResponseBody result = matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -164,7 +185,7 @@ public class MatchingResponseServiceTest {
     }
 
     @Test
-    public void shouldHandleAccountCreationSaml() throws Exception {
+    public void matchingResponseServiceshouldHandleAccountCreationSaml() throws Exception {
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
@@ -173,7 +194,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -198,7 +219,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -222,7 +243,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -246,7 +267,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -270,7 +291,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) responseService.convertTranslatedResponseBody(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -296,7 +317,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -321,7 +342,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(noMatchStatus), testRpSigningCredential);
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -330,7 +351,7 @@ public class MatchingResponseServiceTest {
     }
 
     @Test
-    public void shouldFailValidationWhenMetadataDoesNotContainCorrectCertificate() throws Exception {
+    public void shouldFailValidationWhenHubMetadataDoesNotContainCorrectCertificate() throws Exception {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
 
@@ -342,7 +363,7 @@ public class MatchingResponseServiceTest {
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -351,7 +372,7 @@ public class MatchingResponseServiceTest {
     }
 
     @Test
-    public void shouldFailValidationWhenResponseIsNotSigned() throws Exception {
+    public void shouldFailValidationWhenHubResponseIsNotSigned() throws Exception {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
 
@@ -363,7 +384,7 @@ public class MatchingResponseServiceTest {
 
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -374,7 +395,7 @@ public class MatchingResponseServiceTest {
     @Test
     public void shouldFailWhenInResponseToDoesNotMatchRequestId() throws Exception {
         expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Expected InResponseTo to be some-incorrect-request-id, but was default-request-id");
+        expectedException.expectMessage(String.format("Expected InResponseTo to be some-incorrect-request-id, but was %s", DEFAULT_REQUEST_ID));
 
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
@@ -384,7 +405,7 @@ public class MatchingResponseServiceTest {
             .build();
         Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             "some-incorrect-request-id",
             LevelOfAssurance.LEVEL_2,
@@ -403,7 +424,7 @@ public class MatchingResponseServiceTest {
         ResponseBuilder responseBuilder = aResponse().withIssueInstant(DateTime.now().minusMinutes(10));
         Response response = signResponse(responseBuilder, testRpSigningCredential);
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
@@ -422,12 +443,35 @@ public class MatchingResponseServiceTest {
         ResponseBuilder responseBuilder = aResponse().withIssueInstant(DateTime.now().plusMinutes(1));
         Response response = signResponse(responseBuilder, testRpSigningCredential);
 
-        responseService.convertTranslatedResponseBody(
+        matchingResponseService.convertTranslatedResponseBody(
             responseToBase64StringTransformer.apply(response),
             response.getInResponseTo(),
             LevelOfAssurance.LEVEL_2,
             VERIFY_SERVICE_PROVIDER_ENTITY_ID
         );
+    }
+
+    @Test
+    public void shouldUseEidasValidatorFactoryIfResponseSignedByCountry() throws MarshallingException, SignatureException {
+        Credential testRpSigningCredential = new TestCredentialFactory(TEST_RP_PUBLIC_SIGNING_CERT, TEST_RP_PRIVATE_SIGNING_KEY).getSigningCredential();
+
+        Status successStatus = aStatus().
+                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                .build();
+        Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
+
+        when(mockEidasValidatorFactory.getValidatedResponse(any())).thenReturn(new ValidatedResponse(response));
+
+        eidasNonMatchingResponseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2,
+                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+        );
+
+        ArgumentCaptor<Response> responseArgumentCaptor = ArgumentCaptor.forClass(Response.class);
+        verify(mockEidasValidatorFactory).getValidatedResponse(responseArgumentCaptor.capture());
+        assertThat(response.getID()).isEqualTo(responseArgumentCaptor.getValue().getID());
     }
 
     private EntityDescriptor createEntityDescriptorWithSigningCertificate(String signingCert) throws MarshallingException, SignatureException {
