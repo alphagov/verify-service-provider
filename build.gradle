@@ -42,6 +42,7 @@ project.ext {
 
 dependencies {
     compile(
+        "com.nimbusds:oauth2-oidc-sdk:6.14",
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
         "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}",
         "org.json:json:20171018",
