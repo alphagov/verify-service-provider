@@ -5,6 +5,7 @@ import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.util.Duration;
 import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
+import uk.gov.ida.verifyserviceprovider.configuration.TransparentPrivateKeyFactory;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyHubConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 
@@ -23,14 +24,15 @@ public class ComplianceToolModeConfiguration extends VerifyServiceProviderConfig
 
     public ComplianceToolModeConfiguration(String serviceEntityId, KeysAndCert signingKeysAndCert, KeysAndCert encryptionKeysAndCert) {
         super(asList(serviceEntityId),
-              serviceEntityId,
-              new VerifyHubConfiguration(HubEnvironment.COMPLIANCE_TOOL),
-              signingKeysAndCert.getPrivate(),
-              encryptionKeysAndCert.getPrivate(),
-              encryptionKeysAndCert.getPrivate(),
-              Optional.empty(),
-              org.joda.time.Duration.standardMinutes(2),
-              Optional.empty());
+            serviceEntityId,
+            new VerifyHubConfiguration(HubEnvironment.COMPLIANCE_TOOL),
+            new TransparentPrivateKeyFactory(signingKeysAndCert.getPrivate()),
+            new TransparentPrivateKeyFactory(encryptionKeysAndCert.getPrivate()),
+            new TransparentPrivateKeyFactory(encryptionKeysAndCert.getPrivate()),
+            Optional.empty(),
+            org.joda.time.Duration.standardMinutes(2),
+            Optional.empty()
+        );
 
         this.serviceEntityId = serviceEntityId;
         this.signingKeysAndCert = signingKeysAndCert;

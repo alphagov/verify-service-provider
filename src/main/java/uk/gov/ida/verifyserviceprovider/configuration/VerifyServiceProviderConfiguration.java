@@ -2,7 +2,6 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
 import io.dropwizard.validation.ValidationMethod;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
@@ -18,30 +17,49 @@ import java.security.PrivateKey;
 import java.util.List;
 import java.util.Optional;
 
+
 public class VerifyServiceProviderConfiguration extends Configuration {
 
     public static final String NOT_EMPTY_MESSAGE = "may not be empty";
+
+    @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid
     private List<String> serviceEntityIds;
+
+    @Valid
     private String hashingEntityId;
+
+    @NotNull @Valid
     private VerifyHubConfiguration verifyHubConfiguration;
-    private PrivateKey samlSigningKey;
-    private PrivateKey samlPrimaryEncryptionKey;
-    private PrivateKey samlSecondaryEncryptionKey;
+
+    @Valid @NotNull
+    private PrivateKeyFactory samlSigningKey;
+
+    @Valid @NotNull
+    private PrivateKeyFactory samlPrimaryEncryptionKey;
+
+    @Valid
+    private PrivateKeyFactory samlSecondaryEncryptionKey;
+
+    @Valid @UnwrapValidatedValue
     private Optional<MsaMetadataConfiguration> msaMetadata;
+
+    @NotNull @Valid
     private Duration clockSkew;
+
+    @Valid @UnwrapValidatedValue
     private Optional<EuropeanIdentityConfiguration> europeanIdentity;
 
     protected VerifyServiceProviderConfiguration() {}
     public VerifyServiceProviderConfiguration(
-        @JsonProperty("serviceEntityIds") @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid List<String> serviceEntityIds,
-        @JsonProperty("hashingEntityId") @Valid String hashingEntityId,
-        @JsonProperty("verifyHubConfiguration") @NotNull @Valid VerifyHubConfiguration verifyHubConfiguration,
-        @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
-        @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
-        @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-        @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
-        @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
-        @JsonProperty("europeanIdentity") @Valid @UnwrapValidatedValue Optional<EuropeanIdentityConfiguration> europeanIdentity
+        @JsonProperty("serviceEntityIds")List<String> serviceEntityIds,
+        @JsonProperty("hashingEntityId") String hashingEntityId,
+        @JsonProperty("verifyHubConfiguration") VerifyHubConfiguration verifyHubConfiguration,
+        @JsonProperty("samlSigningKey") PrivateKeyFactory samlSigningKey,
+        @JsonProperty("samlPrimaryEncryptionKey") PrivateKeyFactory samlPrimaryEncryptionKey,
+        @JsonProperty("samlSecondaryEncryptionKey") PrivateKeyFactory samlSecondaryEncryptionKey,
+        @JsonProperty("msaMetadata") Optional<MsaMetadataConfiguration> msaMetadata,
+        @JsonProperty("clockSkew") Duration clockSkew,
+        @JsonProperty("europeanIdentity") Optional<EuropeanIdentityConfiguration> europeanIdentity
     ) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
@@ -74,15 +92,15 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     }
 
     public PrivateKey getSamlSigningKey() {
-        return samlSigningKey;
+        return samlSigningKey.getPrivateKey();
     }
 
     public PrivateKey getSamlPrimaryEncryptionKey() {
-        return samlPrimaryEncryptionKey;
+        return samlPrimaryEncryptionKey.getPrivateKey();
     }
 
     public PrivateKey getSamlSecondaryEncryptionKey() {
-        return samlSecondaryEncryptionKey;
+        return Optional.ofNullable(samlSecondaryEncryptionKey).map(PrivateKeyFactory::getPrivateKey).orElse(null);
     }
 
     public Optional<MetadataResolverConfiguration> getMsaMetadata() {
