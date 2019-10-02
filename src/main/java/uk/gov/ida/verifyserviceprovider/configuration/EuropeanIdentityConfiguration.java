@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
-import org.apache.commons.lang.ArrayUtils;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 
@@ -12,20 +11,24 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.security.KeyStore;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     private TrustStoreConfiguration trustStoreConfiguration;
     private String hubConnectorEntityId;
-    private String[] acceptableHubConnectorEntityIds;
+    private List<String> acceptableHubConnectorEntityIds;
     private boolean enabled;
     private HubEnvironment environment;
 
 
     @JsonCreator
     public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
-                                         @JsonProperty("acceptableHubConnectorEntityIds") String[] acceptableHubConnectorEntityIds,
+                                         @JsonProperty("acceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
                                          @NotNull @Valid @JsonProperty("enabled") boolean enabled,
                                          @JsonProperty("trustAnchorUri") URI trustAnchorUri,
                                          @JsonProperty("minRefreshDelay") Long minRefreshDelay,
@@ -42,12 +45,10 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.hubConnectorEntityId = hubConnectorEntityId;
         this.trustStoreConfiguration = trustStore;
 
-        this.acceptableHubConnectorEntityIds =
-            ArrayUtils.isEmpty(acceptableHubConnectorEntityIds)
-                ? new String[] { hubConnectorEntityId }
-                : ArrayUtils.contains(acceptableHubConnectorEntityIds, hubConnectorEntityId)
-                    ? acceptableHubConnectorEntityIds
-                    : (String[])ArrayUtils.add(acceptableHubConnectorEntityIds, hubConnectorEntityId);
+        Set<String> hubConnectorEntityIds = new LinkedHashSet<>();
+        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(hubConnectorEntityIds::addAll);
+        Optional.ofNullable(hubConnectorEntityId).ifPresent(hubConnectorEntityIds::add);
+        this.acceptableHubConnectorEntityIds = new LinkedList<>(hubConnectorEntityIds);
     }
 
     @JsonIgnore
@@ -64,7 +65,7 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
                 .orElse(environment.getEidasHubConnectorEntityId());
     }
 
-    public String[] getAcceptableHubConnectorEntityIds() {
+    public List<String> getAcceptableHubConnectorEntityIds() {
         return Optional.ofNullable(acceptableHubConnectorEntityIds)
             .orElse(environment.getEidasAcceptableHubConnectorEntityIds());
     }

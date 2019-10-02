@@ -32,7 +32,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
     private final EidasMetadataResolverRepository metadataResolverRepository;
     private final SignatureValidatorFactory signatureValidatorFactory;
     private final String hubConnectorEntityId;
-    private final String[] acceptableHubConnectorEntityIds;
+    private final List<String> acceptableHubConnectorEntityIds;
     private UserIdHashFactory userIdHashFactory;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
@@ -46,7 +46,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
             EidasMetadataResolverRepository metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
             String hubConnectorEntityId,
-            String[] acceptableHubConnectorEntityIds,
+            List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
         this.instantValidator = instantValidator;
@@ -92,7 +92,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
             .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds);
+        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
     }
 
     public LevelOfAssurance extractLevelOfAssuranceFrom(Assertion countryAssertion) {

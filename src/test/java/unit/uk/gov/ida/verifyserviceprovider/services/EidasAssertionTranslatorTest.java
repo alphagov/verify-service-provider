@@ -98,13 +98,13 @@ public class EidasAssertionTranslatorTest {
             metadataResolverRepository,
             signatureValidatorFactory,
             HUB_CONNECTOR_ENTITY_ID,
-            new String[] { HUB_CONNECTOR_ENTITY_ID },
+            singletonList(HUB_CONNECTOR_ENTITY_ID),
             userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());
         doNothing().when(levelOfAssuranceValidator).validate(any(), any());
-        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(asList(STUB_COUNTRY_ONE));
+        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(singletonList(STUB_COUNTRY_ONE));
         ExplicitKeySignatureTrustEngine mock = mock(ExplicitKeySignatureTrustEngine.class);
         when(metadataResolverRepository.getSignatureTrustEngine(same(STUB_COUNTRY_ONE))).thenReturn(Optional.of(mock));
         when(signatureValidatorFactory.getSignatureValidator(same(mock))).thenReturn(samlAssertionsSignatureValidator);
@@ -114,7 +114,7 @@ public class EidasAssertionTranslatorTest {
 
     @Test
     public void shouldCallValidatorsCorrectly() {
-        List<Assertion> assertions = asList(
+        List<Assertion> assertions = singletonList(
             anAssertionWithAuthnStatement(EIDAS_LOA_HIGH, "requestId").buildUnencrypted());
 
         eidasAssertionService.translateSuccessResponse(assertions, "requestId", LEVEL_2, null);

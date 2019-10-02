@@ -2,7 +2,6 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
-import org.apache.commons.lang.ArrayUtils;
 import uk.gov.ida.saml.metadata.KeyStoreLoader;
 
 import java.io.FileNotFoundException;
@@ -10,6 +9,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_HUBCONNECTOR_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_METADATA;
@@ -41,6 +46,7 @@ public enum HubEnvironment {
             URI.create(PRODUCTION_METADATASOURCE_URI),
             URI.create(PRODUCTION_TRUSTANCHOR_URI),
             PRODUCTION_HUBCONNECTOR_ENTITY_ID,
+            Collections.singletonList(PRODUCTION_HUBCONNECTOR_ENTITY_ID),
             PRODUCTION_METADATA_TRUSTSTORE, PRODUCTION_HUB_TRUSTSTORE, PRODUCTION_IDP_TRUSTSTORE),
     INTEGRATION(
             URI.create(INTEGRATION_SSO),
@@ -48,6 +54,7 @@ public enum HubEnvironment {
             URI.create(INTEGRATION_METADATASOURCE_URI),
             URI.create(INTEGRATION_TRUSTANCHOR_URI),
             INTEGRATION_HUBCONNECTOR_ENTITY_ID,
+            Collections.singletonList(INTEGRATION_HUBCONNECTOR_ENTITY_ID),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE),
     COMPLIANCE_TOOL(
             URI.create(COMPLIANCE_SSO),
@@ -55,6 +62,7 @@ public enum HubEnvironment {
             URI.create(COMPLIANCE_METADATASOURCE_URI),
             URI.create(COMPLIANCE_TRUSTANCHOR_URI),
             COMPLIANCE_HUBCONNECTOR_ENTITY_ID,
+            Collections.singletonList(COMPLIANCE_HUBCONNECTOR_ENTITY_ID),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE);
 
 
@@ -64,7 +72,7 @@ public enum HubEnvironment {
     private URI eidasMetaDataSourceUri;
     private URI eidasMetadataTrustAnchorUri;
     private String eidasHubConnectorEntityId;
-    private String[] eidasAcceptableHubConnectorEntityIds;
+    private List<String> eidasAcceptableHubConnectorEntityIds;
     private String metadataTrustStore;
     private String hubTrustStore;
     private String idpTrustStore;
@@ -80,12 +88,13 @@ public enum HubEnvironment {
             ));
     }
 
-    HubEnvironment(URI ssoLocation, URI metadataUri, URI eidasMetadataSourceUri, URI eidasMetadataTrustAnchorUri, String eidasHubConnectorEntityId, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
+    HubEnvironment(URI ssoLocation, URI metadataUri, URI eidasMetadataSourceUri, URI eidasMetadataTrustAnchorUri, String eidasHubConnectorEntityId, List<String> eidasAcceptableHubConnectorEntityIds, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
         this.ssoLocation = ssoLocation;
         this.metadataUri = metadataUri;
         this.eidasMetaDataSourceUri = eidasMetadataSourceUri;
         this.eidasMetadataTrustAnchorUri = eidasMetadataTrustAnchorUri;
         this.eidasHubConnectorEntityId = eidasHubConnectorEntityId;
+        this.eidasAcceptableHubConnectorEntityIds = eidasAcceptableHubConnectorEntityIds;
         this.metadataTrustStore = metadataTrustStore;
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
@@ -111,12 +120,11 @@ public enum HubEnvironment {
         return this.eidasHubConnectorEntityId;
     }
 
-    public String[] getEidasAcceptableHubConnectorEntityIds() {
-        return ArrayUtils.isEmpty(eidasAcceptableHubConnectorEntityIds)
-            ? new String[] { eidasHubConnectorEntityId }
-            : ArrayUtils.contains(eidasAcceptableHubConnectorEntityIds, eidasHubConnectorEntityId)
-                ? eidasAcceptableHubConnectorEntityIds
-                : (String[])ArrayUtils.add(eidasAcceptableHubConnectorEntityIds, eidasHubConnectorEntityId);
+    public List<String> getEidasAcceptableHubConnectorEntityIds() {
+        Set<String> entityIds = new LinkedHashSet<>();
+        Optional.ofNullable(eidasAcceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
+        Optional.ofNullable(eidasHubConnectorEntityId).ifPresent(entityIds::add);
+        return new LinkedList<>(entityIds);
     }
 
     public KeyStore getMetadataTrustStore() {
