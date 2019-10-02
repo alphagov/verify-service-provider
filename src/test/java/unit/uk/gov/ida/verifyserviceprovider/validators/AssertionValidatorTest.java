@@ -12,7 +12,7 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;

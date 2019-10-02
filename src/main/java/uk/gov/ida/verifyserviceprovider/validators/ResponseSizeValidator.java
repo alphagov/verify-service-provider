@@ -1,7 +1,7 @@
 package uk.gov.ida.verifyserviceprovider.validators;
 
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.deserializers.validators.SizeValidator;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 public class ResponseSizeValidator implements SizeValidator {
 

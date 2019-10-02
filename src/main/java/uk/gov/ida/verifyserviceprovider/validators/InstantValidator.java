@@ -3,7 +3,7 @@ package uk.gov.ida.verifyserviceprovider.validators;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormat;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 
 import static org.joda.time.DateTimeZone.UTC;

@@ -2,10 +2,10 @@ package uk.gov.ida.verifyserviceprovider.resources;
 
 import io.dropwizard.jersey.errors.ErrorMessage;
 import org.slf4j.LoggerFactory;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.verifyserviceprovider.dto.TranslateSamlResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 

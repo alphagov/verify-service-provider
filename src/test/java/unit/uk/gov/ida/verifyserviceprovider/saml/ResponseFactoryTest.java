@@ -4,9 +4,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opensaml.saml.saml2.core.Response;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 
 import java.util.Base64;

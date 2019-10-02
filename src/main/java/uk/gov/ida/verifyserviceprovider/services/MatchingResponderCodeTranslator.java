@@ -2,10 +2,10 @@ package uk.gov.ida.verifyserviceprovider.services;
 
 import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.util.Optional;
 

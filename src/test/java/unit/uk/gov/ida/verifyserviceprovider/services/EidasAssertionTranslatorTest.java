@@ -12,6 +12,7 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -19,7 +20,6 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
@@ -98,6 +98,7 @@ public class EidasAssertionTranslatorTest {
             metadataResolverRepository,
             signatureValidatorFactory,
             HUB_CONNECTOR_ENTITY_ID,
+            new String[] { HUB_CONNECTOR_ENTITY_ID },
             userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());

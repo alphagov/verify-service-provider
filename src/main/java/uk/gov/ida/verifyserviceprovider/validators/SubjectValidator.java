@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 

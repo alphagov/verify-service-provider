@@ -5,11 +5,11 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
@@ -32,9 +32,9 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
     private final EidasMetadataResolverRepository metadataResolverRepository;
     private final SignatureValidatorFactory signatureValidatorFactory;
     private final String hubConnectorEntityId;
+    private final String[] acceptableHubConnectorEntityIds;
     private UserIdHashFactory userIdHashFactory;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
-
 
     public EidasAssertionTranslator(
             SubjectValidator subjectValidator,
@@ -46,6 +46,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
             EidasMetadataResolverRepository metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
             String hubConnectorEntityId,
+            String[] acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
         this.instantValidator = instantValidator;
@@ -54,9 +55,9 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
         this.hubConnectorEntityId = hubConnectorEntityId;
+        this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
         this.userIdHashFactory = userIdHashFactory;
     }
-
 
     @Override
     public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
@@ -91,7 +92,7 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
             .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        conditionsValidator.validate(assertion.getConditions(), hubConnectorEntityId);
+        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds);
     }
 
     public LevelOfAssurance extractLevelOfAssuranceFrom(Assertion countryAssertion) {

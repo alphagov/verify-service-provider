@@ -2,7 +2,8 @@ package uk.gov.ida.verifyserviceprovider.validators;
 
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Conditions;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 
 public class ConditionsValidator {
 
@@ -17,7 +18,7 @@ public class ConditionsValidator {
         this.audienceRestrictionValidator = audienceRestrictionValidator;
     }
 
-    public void validate(Conditions conditionsElement, String entityId) {
+    public void validate(Conditions conditionsElement, String... acceptableEntityIds) {
         if (conditionsElement == null) {
             throw new SamlResponseValidationException("Conditions is missing from the assertion.");
         }
@@ -36,6 +37,6 @@ public class ConditionsValidator {
         }
 
         timeRestrictionValidator.validateNotBefore(conditionsElement.getNotBefore());
-        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), entityId);
+        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), acceptableEntityIds);
     }
 }

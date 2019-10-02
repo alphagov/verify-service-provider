@@ -6,10 +6,10 @@ import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 

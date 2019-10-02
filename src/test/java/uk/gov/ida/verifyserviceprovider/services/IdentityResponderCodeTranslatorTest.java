@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opensaml.saml.saml2.core.StatusCode;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;

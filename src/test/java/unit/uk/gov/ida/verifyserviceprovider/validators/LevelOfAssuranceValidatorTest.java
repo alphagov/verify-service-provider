@@ -3,8 +3,8 @@ package unit.uk.gov.ida.verifyserviceprovider.validators;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 
 public class LevelOfAssuranceValidatorTest {

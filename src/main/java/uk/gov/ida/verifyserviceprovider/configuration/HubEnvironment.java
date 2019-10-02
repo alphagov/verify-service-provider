@@ -2,6 +2,7 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
+import org.apache.commons.lang.ArrayUtils;
 import uk.gov.ida.saml.metadata.KeyStoreLoader;
 
 import java.io.FileNotFoundException;
@@ -63,6 +64,7 @@ public enum HubEnvironment {
     private URI eidasMetaDataSourceUri;
     private URI eidasMetadataTrustAnchorUri;
     private String eidasHubConnectorEntityId;
+    private String[] eidasAcceptableHubConnectorEntityIds;
     private String metadataTrustStore;
     private String hubTrustStore;
     private String idpTrustStore;
@@ -107,6 +109,14 @@ public enum HubEnvironment {
 
     public String getEidasHubConnectorEntityId(){
         return this.eidasHubConnectorEntityId;
+    }
+
+    public String[] getEidasAcceptableHubConnectorEntityIds() {
+        return ArrayUtils.isEmpty(eidasAcceptableHubConnectorEntityIds)
+            ? new String[] { eidasHubConnectorEntityId }
+            : ArrayUtils.contains(eidasAcceptableHubConnectorEntityIds, eidasHubConnectorEntityId)
+                ? eidasAcceptableHubConnectorEntityIds
+                : (String[])ArrayUtils.add(eidasAcceptableHubConnectorEntityIds, eidasHubConnectorEntityId);
     }
 
     public KeyStore getMetadataTrustStore() {

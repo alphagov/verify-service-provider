@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
+import org.apache.commons.lang.ArrayUtils;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 
@@ -17,12 +18,14 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     private TrustStoreConfiguration trustStoreConfiguration;
     private String hubConnectorEntityId;
+    private String[] acceptableHubConnectorEntityIds;
     private boolean enabled;
     private HubEnvironment environment;
 
 
     @JsonCreator
     public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
+                                         @JsonProperty("acceptableHubConnectorEntityIds") String[] acceptableHubConnectorEntityIds,
                                          @NotNull @Valid @JsonProperty("enabled") boolean enabled,
                                          @JsonProperty("trustAnchorUri") URI trustAnchorUri,
                                          @JsonProperty("minRefreshDelay") Long minRefreshDelay,
@@ -38,6 +41,13 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.enabled = enabled;
         this.hubConnectorEntityId = hubConnectorEntityId;
         this.trustStoreConfiguration = trustStore;
+
+        this.acceptableHubConnectorEntityIds =
+            ArrayUtils.isEmpty(acceptableHubConnectorEntityIds)
+                ? new String[] { hubConnectorEntityId }
+                : ArrayUtils.contains(acceptableHubConnectorEntityIds, hubConnectorEntityId)
+                    ? acceptableHubConnectorEntityIds
+                    : (String[])ArrayUtils.add(acceptableHubConnectorEntityIds, hubConnectorEntityId);
     }
 
     @JsonIgnore
@@ -52,6 +62,11 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
     public String getHubConnectorEntityId() {
         return Optional.ofNullable(hubConnectorEntityId)
                 .orElse(environment.getEidasHubConnectorEntityId());
+    }
+
+    public String[] getAcceptableHubConnectorEntityIds() {
+        return Optional.ofNullable(acceptableHubConnectorEntityIds)
+            .orElse(environment.getEidasAcceptableHubConnectorEntityIds());
     }
 
     @Override
