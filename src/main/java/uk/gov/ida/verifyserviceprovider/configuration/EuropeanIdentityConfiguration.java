@@ -11,8 +11,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.security.KeyStore;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,10 +45,10 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.hubConnectorEntityId = hubConnectorEntityId;
         this.trustStoreConfiguration = trustStore;
 
-        Set<String> hubConnectorEntityIds = new LinkedHashSet<>();
+        Set<String> hubConnectorEntityIds = new HashSet<>();
         Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(hubConnectorEntityIds::addAll);
         Optional.ofNullable(hubConnectorEntityId).ifPresent(hubConnectorEntityIds::add);
-        this.acceptableHubConnectorEntityIds = new LinkedList<>(hubConnectorEntityIds);
+        this.acceptableHubConnectorEntityIds = new ArrayList<>(hubConnectorEntityIds);
     }
 
     @JsonIgnore
