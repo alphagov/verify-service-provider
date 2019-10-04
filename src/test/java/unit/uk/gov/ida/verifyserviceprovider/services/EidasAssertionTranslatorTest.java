@@ -12,6 +12,7 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -19,7 +20,6 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
@@ -98,12 +98,13 @@ public class EidasAssertionTranslatorTest {
             metadataResolverRepository,
             signatureValidatorFactory,
             HUB_CONNECTOR_ENTITY_ID,
+            singletonList(HUB_CONNECTOR_ENTITY_ID),
             userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());
         doNothing().when(levelOfAssuranceValidator).validate(any(), any());
-        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(asList(STUB_COUNTRY_ONE));
+        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(singletonList(STUB_COUNTRY_ONE));
         ExplicitKeySignatureTrustEngine mock = mock(ExplicitKeySignatureTrustEngine.class);
         when(metadataResolverRepository.getSignatureTrustEngine(same(STUB_COUNTRY_ONE))).thenReturn(Optional.of(mock));
         when(signatureValidatorFactory.getSignatureValidator(same(mock))).thenReturn(samlAssertionsSignatureValidator);
@@ -113,7 +114,7 @@ public class EidasAssertionTranslatorTest {
 
     @Test
     public void shouldCallValidatorsCorrectly() {
-        List<Assertion> assertions = asList(
+        List<Assertion> assertions = singletonList(
             anAssertionWithAuthnStatement(EIDAS_LOA_HIGH, "requestId").buildUnencrypted());
 
         eidasAssertionService.translateSuccessResponse(assertions, "requestId", LEVEL_2, null);

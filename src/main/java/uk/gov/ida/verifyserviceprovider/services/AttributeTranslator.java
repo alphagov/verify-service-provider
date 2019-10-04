@@ -5,10 +5,10 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.Verified;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.Address;
 import uk.gov.ida.verifyserviceprovider.dto.Attributes;
 import uk.gov.ida.verifyserviceprovider.dto.VerifiableAttribute;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

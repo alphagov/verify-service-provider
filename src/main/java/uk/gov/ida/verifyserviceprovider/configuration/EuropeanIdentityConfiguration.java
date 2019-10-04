@@ -11,18 +11,24 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
 
     private TrustStoreConfiguration trustStoreConfiguration;
     private String hubConnectorEntityId;
+    private List<String> acceptableHubConnectorEntityIds;
     private boolean enabled;
     private HubEnvironment environment;
 
 
     @JsonCreator
     public EuropeanIdentityConfiguration(@JsonProperty("hubConnectorEntityId") String hubConnectorEntityId,
+                                         @JsonProperty("acceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
                                          @NotNull @Valid @JsonProperty("enabled") boolean enabled,
                                          @JsonProperty("trustAnchorUri") URI trustAnchorUri,
                                          @JsonProperty("minRefreshDelay") Long minRefreshDelay,
@@ -38,6 +44,11 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
         this.enabled = enabled;
         this.hubConnectorEntityId = hubConnectorEntityId;
         this.trustStoreConfiguration = trustStore;
+
+        Set<String> hubConnectorEntityIds = new HashSet<>();
+        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(hubConnectorEntityIds::addAll);
+        Optional.ofNullable(hubConnectorEntityId).ifPresent(hubConnectorEntityIds::add);
+        this.acceptableHubConnectorEntityIds = new ArrayList<>(hubConnectorEntityIds);
     }
 
     @JsonIgnore
@@ -52,6 +63,11 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
     public String getHubConnectorEntityId() {
         return Optional.ofNullable(hubConnectorEntityId)
                 .orElse(environment.getEidasHubConnectorEntityId());
+    }
+
+    public List<String> getAcceptableHubConnectorEntityIds() {
+        return Optional.ofNullable(acceptableHubConnectorEntityIds)
+            .orElse(environment.getEidasAcceptableHubConnectorEntityIds());
     }
 
     @Override

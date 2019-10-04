@@ -7,6 +7,7 @@ import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.OpenSamlXMLObjectUnmarshaller;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
@@ -35,7 +36,6 @@ import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
-import uk.gov.ida.verifyserviceprovider.validators.AudienceRestrictionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
@@ -181,6 +181,7 @@ public class ResponseFactory {
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
                 europeanIdentityConfiguration.getHubConnectorEntityId(),
+                europeanIdentityConfiguration.getAcceptableHubConnectorEntityIds(),
                 new UserIdHashFactory(hashingEntityId)
                 );
     }

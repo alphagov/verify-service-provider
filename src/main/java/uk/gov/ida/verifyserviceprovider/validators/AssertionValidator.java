@@ -2,7 +2,7 @@ package uk.gov.ida.verifyserviceprovider.validators;
 
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import uk.gov.ida.verifyserviceprovider.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import java.util.List;
 
