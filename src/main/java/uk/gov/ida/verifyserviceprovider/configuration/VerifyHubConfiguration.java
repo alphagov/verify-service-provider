@@ -42,6 +42,7 @@ public class VerifyHubConfiguration {
     }
 
     private HubMetadataConfiguration createHubMetadataConfigurationWithDefaults() {
-        return new HubMetadataConfiguration(null, null, null, null, null, null, null, null, null, null);
+        String expectedEntityId = hubEnvironment.name().equals("LOCAL") ? "https://local.signin.service.gov.uk" : null;
+        return new HubMetadataConfiguration(null, null, null, expectedEntityId, null, null, null, null, null, null);
     }
 }

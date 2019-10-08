@@ -22,6 +22,7 @@ public interface ConfigurationConstants {
     String PRODUCTION_HOST ="https://www.signin.service.gov.uk";
     String INTEGRATION_HOST ="https://www.integration.signin.service.gov.uk";
     String COMPLIANCE_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    String LOCAL_HOST = "http://localhost";
 
     String SSO_PATH = "/SAML2/SSO";
     String METADATA_PATH = "/SAML2/metadata/federation";
@@ -65,6 +66,16 @@ public interface ConfigurationConstants {
         "https://eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",                      // (potential new #1)
         "https://connector.eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",            // (potential new #2)
         "https://compliance-tool-reference-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+    };
+
+    String LOCAL_SSO = LOCAL_HOST + ":55000/SAML2/SSO";
+    String LOCAL_METADATA = LOCAL_HOST +  ":55000/local/metadata.xml";
+    String LOCAL_TRUSTANCHOR_URI = LOCAL_HOST + ":55000/local/trust-anchor.jws";
+    String LOCAL_METADATASOURCE_URI = LOCAL_HOST + ":55001";
+    String LOCAL_HUBCONNECTOR_ENTITY_ID = LOCAL_HOST + ":55000/local-connector/metadata.xml";
+
+    String[] LOCAL_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
+            LOCAL_HUBCONNECTOR_ENTITY_ID
     };
 
 

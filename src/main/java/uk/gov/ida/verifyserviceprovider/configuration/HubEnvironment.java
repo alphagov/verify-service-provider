@@ -24,6 +24,12 @@ import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConsta
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_METADATASOURCE_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_SSO;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_TRUSTANCHOR_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_HUBCONNECTOR_ENTITY_ID;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_METADATA;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_METADATASOURCE_URI;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_SSO;
+import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.LOCAL_TRUSTANCHOR_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_HUB_TRUSTSTORE;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_IDP_TRUSTSTORE;
@@ -57,6 +63,13 @@ public enum HubEnvironment {
             URI.create(COMPLIANCE_METADATASOURCE_URI),
             URI.create(COMPLIANCE_TRUSTANCHOR_URI),
             asList(COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS),
+            TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE),
+    LOCAL(
+            URI.create(LOCAL_SSO),
+            URI.create(LOCAL_METADATA),
+            URI.create(LOCAL_METADATASOURCE_URI),
+            URI.create(LOCAL_TRUSTANCHOR_URI),
+            asList(LOCAL_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE);
 
     private URI ssoLocation;
