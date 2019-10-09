@@ -10,27 +10,21 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_HUBCONNECTOR_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_METADATA;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_METADATASOURCE_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_SSO;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.COMPLIANCE_TRUSTANCHOR_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.DEFAULT_TRUST_STORE_PASSWORD;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_HUBCONNECTOR_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_METADATA;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_METADATASOURCE_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_SSO;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.INTEGRATION_TRUSTANCHOR_URI;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS;
-import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_HUBCONNECTOR_ENTITY_ID;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_HUB_TRUSTSTORE;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_IDP_TRUSTSTORE;
 import static uk.gov.ida.verifyserviceprovider.configuration.ConfigurationConstants.PRODUCTION_METADATA;
@@ -48,7 +42,6 @@ public enum HubEnvironment {
             URI.create(PRODUCTION_METADATA),
             URI.create(PRODUCTION_METADATASOURCE_URI),
             URI.create(PRODUCTION_TRUSTANCHOR_URI),
-            PRODUCTION_HUBCONNECTOR_ENTITY_ID,
             asList(PRODUCTION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS),
             PRODUCTION_METADATA_TRUSTSTORE, PRODUCTION_HUB_TRUSTSTORE, PRODUCTION_IDP_TRUSTSTORE),
     INTEGRATION(
@@ -56,7 +49,6 @@ public enum HubEnvironment {
             URI.create(INTEGRATION_METADATA),
             URI.create(INTEGRATION_METADATASOURCE_URI),
             URI.create(INTEGRATION_TRUSTANCHOR_URI),
-            INTEGRATION_HUBCONNECTOR_ENTITY_ID,
             asList(INTEGRATION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE),
     COMPLIANCE_TOOL(
@@ -64,7 +56,6 @@ public enum HubEnvironment {
             URI.create(COMPLIANCE_METADATA),
             URI.create(COMPLIANCE_METADATASOURCE_URI),
             URI.create(COMPLIANCE_TRUSTANCHOR_URI),
-            COMPLIANCE_HUBCONNECTOR_ENTITY_ID,
             asList(COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS),
             TEST_METADATA_TRUSTSTORE, TEST_HUB_TRUSTSTORE, TEST_IDP_TRUSTSTORE);
 
@@ -73,8 +64,7 @@ public enum HubEnvironment {
 
     private URI eidasMetaDataSourceUri;
     private URI eidasMetadataTrustAnchorUri;
-    private String eidasHubConnectorEntityId;
-    private List<String> eidasAcceptableHubConnectorEntityIds;
+    private List<String> eidasDefaultAcceptableHubConnectorEntityIds;
     private String metadataTrustStore;
     private String hubTrustStore;
     private String idpTrustStore;
@@ -90,20 +80,16 @@ public enum HubEnvironment {
             ));
     }
 
-    HubEnvironment(URI ssoLocation, URI metadataUri, URI eidasMetadataSourceUri, URI eidasMetadataTrustAnchorUri, String eidasHubConnectorEntityId, List<String> eidasAcceptableHubConnectorEntityIds, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
+    HubEnvironment(URI ssoLocation, URI metadataUri, URI eidasMetadataSourceUri, URI eidasMetadataTrustAnchorUri, List<String> eidasDefaultAcceptableHubConnectorEntityIds, String metadataTrustStore, String hubTrustStore, String idpTrustStore) {
         this.ssoLocation = ssoLocation;
         this.metadataUri = metadataUri;
         this.eidasMetaDataSourceUri = eidasMetadataSourceUri;
         this.eidasMetadataTrustAnchorUri = eidasMetadataTrustAnchorUri;
-        this.eidasHubConnectorEntityId = eidasHubConnectorEntityId;
         this.metadataTrustStore = metadataTrustStore;
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
 
-        Set<String> entityIds = new HashSet<>();
-        Optional.ofNullable(eidasAcceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
-        Optional.ofNullable(eidasHubConnectorEntityId).ifPresent(entityIds::add);
-        this.eidasAcceptableHubConnectorEntityIds = new ArrayList<>(entityIds);
+        this.eidasDefaultAcceptableHubConnectorEntityIds = new ArrayList<>(eidasDefaultAcceptableHubConnectorEntityIds);
     }
 
     public URI getSsoLocation() {
@@ -122,12 +108,8 @@ public enum HubEnvironment {
         return this.eidasMetadataTrustAnchorUri;
     }
 
-    public String getEidasHubConnectorEntityId(){
-        return this.eidasHubConnectorEntityId;
-    }
-
-    public List<String> getEidasAcceptableHubConnectorEntityIds() {
-        return this.eidasAcceptableHubConnectorEntityIds;
+    public List<String> getEidasDefaultAcceptableHubConnectorEntityIds() {
+        return this.eidasDefaultAcceptableHubConnectorEntityIds;
     }
 
     public KeyStore getMetadataTrustStore() {
