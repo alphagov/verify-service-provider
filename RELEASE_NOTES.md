@@ -3,6 +3,9 @@ Release notes
 
 ### Next
 
+* Handle unsigned eIDAS assertions in a secure manner. At the moment, unsigned assertions are not allowed. The eIDAS specification does not require signed assertions, whereas the Verify specification does. This release adds logic to accept unsigned eIDAS assertions. Signed eIDAS and Verify assertions are still verified as previously. This change will allow the VSP to accept eIDs from more European countries.
+* Configuration parameter `hubConnectorEntityId` in the `europeanIdentity` section is now optional and can be removed from the configuration file.
+
 ### 2.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/1.0.0...2.0.0)
 
