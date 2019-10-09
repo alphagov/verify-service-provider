@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
@@ -20,6 +21,7 @@ import org.opensaml.security.credential.Credential;
 import org.opensaml.security.crypto.KeySupport;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
@@ -38,13 +40,16 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
+import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
+import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.services.UnsignedAssertionsResponseHandler;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
@@ -56,6 +61,7 @@ import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,7 +69,9 @@ import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.c
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_PUBLIC_CERT;
@@ -97,13 +105,13 @@ import static uk.gov.ida.verifyserviceprovider.dto.MatchingScenario.SUCCESS_MATC
 public class ResponseServiceTest {
 
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "some-entity-id";
-    private static final String VERIFY_HUB_ENTITY_ID = "some-entity-id-for-hub";
 
     private ResponseService matchingResponseService;
     private ResponseService eidasNonMatchingResponseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
-    private EidasValidatorFactory mockEidasValidatorFactory = mock(EidasValidatorFactory.class);
+    private UnsignedAssertionsResponseHandler mockUnsignedAssertionsResponseHandler = mock(UnsignedAssertionsResponseHandler.class);
+    private AssertionTranslator mockAssertionTranslator = mock(ClassifyingAssertionTranslator.class);
 
     private MetadataResolver hubMetadataResolver;
 
@@ -123,7 +131,7 @@ public class ResponseServiceTest {
 
         hubMetadataResolver = mock(MetadataResolver.class);
 
-        ResponseFactory responseFactory = new ResponseFactory(keyPairs, VERIFY_HUB_ENTITY_ID);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -143,14 +151,13 @@ public class ResponseServiceTest {
             dateTimeComparator
         );
 
-        AssertionTranslator mockAssertionTranslator = mock(ClassifyingAssertionTranslator.class);
-        Optional<EidasValidatorFactory> eidasValidatorFactory = Optional.of(mockEidasValidatorFactory);
+        Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler = Optional.of(mockUnsignedAssertionsResponseHandler);
 
         eidasNonMatchingResponseService = responseFactory.createNonMatchingResponseService(
                 signatureTrustEngine,
                 mockAssertionTranslator,
                 dateTimeComparator,
-                eidasValidatorFactory
+                unsignedAssertionsResponseHandler
         );
     }
 
@@ -185,7 +192,7 @@ public class ResponseServiceTest {
     }
 
     @Test
-    public void matchingResponseServiceshouldHandleAccountCreationSaml() throws Exception {
+    public void matchingResponseServiceShouldHandleAccountCreationSaml() throws Exception {
         EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
         when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
 
@@ -203,6 +210,36 @@ public class ResponseServiceTest {
 
         assertThat(result.getScenario()).isEqualTo(ACCOUNT_CREATION);
         assertThat(result.getAttributes()).isNotNull();
+    }
+
+    @Test
+    public void nonMatchingResponseServiceShouldHandleUnsignedAssertions() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Response response = signResponse(createUnsignedAttributeResponseBuilder(), testRpSigningCredential);
+        ValidatedResponse validatedResponse = new ValidatedResponse(response);
+        List<Assertion> decryptedAssertion = Arrays.asList(mock(Assertion.class));
+        TranslatedNonMatchingResponseBody expectedResponse = mock(TranslatedNonMatchingResponseBody.class);
+
+        when(mockUnsignedAssertionsResponseHandler.getValidatedResponse(any(), eq(validatedResponse.getInResponseTo())))
+                .thenReturn(validatedResponse);
+        when(mockUnsignedAssertionsResponseHandler.decryptAssertion(eq(validatedResponse), any()))
+                .thenReturn(decryptedAssertion);
+        when(mockAssertionTranslator.translateSuccessResponse(eq(decryptedAssertion), eq(validatedResponse.getInResponseTo()), any(), any()))
+                .thenReturn(expectedResponse);
+
+        TranslatedNonMatchingResponseBody result = (TranslatedNonMatchingResponseBody) eidasNonMatchingResponseService.convertTranslatedResponseBody(
+                responseToBase64StringTransformer.apply(response),
+                response.getInResponseTo(),
+                LevelOfAssurance.LEVEL_2,
+                VERIFY_SERVICE_PROVIDER_ENTITY_ID
+        );
+
+        verify(mockUnsignedAssertionsResponseHandler).getValidatedResponse(any(), eq(response.getInResponseTo()));
+        verify(mockUnsignedAssertionsResponseHandler).decryptAssertion(eq(validatedResponse), any());
+
+        assertThat(result).isEqualTo(expectedResponse);
     }
 
     @Test
@@ -451,29 +488,6 @@ public class ResponseServiceTest {
         );
     }
 
-    @Test
-    public void shouldUseEidasValidatorFactoryIfResponseSignedByCountry() throws MarshallingException, SignatureException {
-        Credential testRpSigningCredential = new TestCredentialFactory(TEST_RP_PUBLIC_SIGNING_CERT, TEST_RP_PRIVATE_SIGNING_KEY).getSigningCredential();
-
-        Status successStatus = aStatus().
-                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
-                .build();
-        Response response = signResponse(createNoAttributeResponseBuilder(successStatus), testRpSigningCredential);
-
-        when(mockEidasValidatorFactory.getValidatedResponse(any())).thenReturn(new ValidatedResponse(response));
-
-        eidasNonMatchingResponseService.convertTranslatedResponseBody(
-                responseToBase64StringTransformer.apply(response),
-                response.getInResponseTo(),
-                LevelOfAssurance.LEVEL_2,
-                VERIFY_SERVICE_PROVIDER_ENTITY_ID
-        );
-
-        ArgumentCaptor<Response> responseArgumentCaptor = ArgumentCaptor.forClass(Response.class);
-        verify(mockEidasValidatorFactory).getValidatedResponse(responseArgumentCaptor.capture());
-        assertThat(response.getID()).isEqualTo(responseArgumentCaptor.getValue().getID());
-    }
-
     private EntityDescriptor createEntityDescriptorWithSigningCertificate(String signingCert) throws MarshallingException, SignatureException {
         return anEntityDescriptor()
             .addSpServiceDescriptor(anSpServiceDescriptor()
@@ -513,6 +527,26 @@ public class ResponseServiceTest {
                         .build())
                 .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
             );
+    }
+
+    private ResponseBuilder createUnsignedAttributeResponseBuilder() {
+        return aResponse()
+                .withStatus(
+                        aStatus().
+                                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
+                                .build())
+                .withNoDefaultAssertion()
+                .addEncryptedAssertion(aDefaultAssertion()
+                        .addAttributeStatement(
+                                anAttributeStatement()
+                                        .addAttribute(new SimpleStringAttributeBuilder()
+                                                .withName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME)
+                                                .withSimpleStringValue("eidasSaml")
+                                                .build())
+                                        .build())
+                        .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
+                );
+
     }
 
     private AssertionBuilder aDefaultAssertion() {

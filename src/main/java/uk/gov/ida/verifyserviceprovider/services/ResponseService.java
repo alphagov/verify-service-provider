@@ -1,13 +1,14 @@
 package uk.gov.ida.verifyserviceprovider.services;
 
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
+import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
-import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -25,8 +26,7 @@ public class ResponseService {
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
     private final ResponderCodeTranslator responderCodeTranslator;
-    private final String hubEntityId;
-    private final Optional<EidasValidatorFactory> eidasValidatorFactory;
+    private final Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler;
 
     public ResponseService(
             StringToOpenSamlObjectTransformer<Response> samlObjectTransformer,
@@ -35,8 +35,7 @@ public class ResponseService {
             SamlResponseSignatureValidator responseSignatureValidator,
             InstantValidator instantValidator,
             ResponderCodeTranslator responderCodeTranslator,
-            String hubEntityId,
-            Optional<EidasValidatorFactory> eidasValidatorFactory
+            Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler
     ) {
         this.samlObjectTransformer = samlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
@@ -44,8 +43,7 @@ public class ResponseService {
         this.responseSignatureValidator = responseSignatureValidator;
         this.instantValidator = instantValidator;
         this.responderCodeTranslator = responderCodeTranslator;
-        this.hubEntityId = hubEntityId;
-        this.eidasValidatorFactory = eidasValidatorFactory;
+        this.unsignedAssertionsResponseHandler = unsignedAssertionsResponseHandler;
     }
 
     public TranslatedResponseBody convertTranslatedResponseBody(
@@ -55,7 +53,7 @@ public class ResponseService {
         String entityId
     ) {
         Response response = samlObjectTransformer.apply(decodedSamlResponse);
-        ValidatedResponse validatedResponse = getValidatedResponse(response);
+        ValidatedResponse validatedResponse = responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
         if (!expectedInResponseTo.equals(validatedResponse.getInResponseTo())) {
             throw new SamlResponseValidationException(
@@ -72,16 +70,30 @@ public class ResponseService {
                 return responderCodeTranslator.translateResponderCode(statusCode);
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
+                if (assertionsContainEidasUnsignedAssertionsResponse(assertions)) {
+                    UnsignedAssertionsResponseHandler handler = unsignedAssertionsResponseHandler.get();
+
+                    ValidatedResponse validatedCountryResponse = handler.getValidatedResponse(assertions.get(0), expectedInResponseTo);
+                    assertions = handler.decryptAssertion(validatedCountryResponse, assertions.get(0));
+                }
                 return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
             default:
                 throw new SamlResponseValidationException(String.format("Unknown SAML status: %s", statusCode.getValue()));
         }
     }
 
-    private ValidatedResponse getValidatedResponse (Response response) {
-        String issuer = response.getIssuer().getValue();
-        return eidasValidatorFactory.isPresent() && !issuer.equals(hubEntityId) ?
-                eidasValidatorFactory.get().getValidatedResponse(response) :
-                responseSignatureValidator.validate(response, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    private boolean assertionsContainEidasUnsignedAssertionsResponse(List<Assertion> assertions) {
+        if (assertions == null || assertions.size() != 1) { return false; }
+
+        List<AttributeStatement> attributeStatements = assertions.get(0).getAttributeStatements();
+        if (attributeStatements.isEmpty() || attributeStatements.size() != 1) { return false; }
+
+        return attributeStatements.get(0).getAttributes()
+                .stream()
+                .anyMatch(
+                        attribute -> attribute.getName().equals(
+                                IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME
+                        )
+                );
     }
 }

@@ -12,7 +12,10 @@ import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.security.EidasValidatorFactory;
+import uk.gov.ida.saml.security.IdaKeyStore;
+import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
+import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
@@ -25,10 +28,13 @@ import uk.gov.ida.verifyserviceprovider.resources.VersionNumberResource;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.EidasUnsignedAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
+import uk.gov.ida.verifyserviceprovider.services.UnsignedAssertionsResponseHandler;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
+import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import javax.ws.rs.client.Client;
 import java.security.KeyException;
@@ -40,6 +46,8 @@ import java.util.Timer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory.createStringToResponseTransformer;
+import static uk.gov.ida.verifyserviceprovider.validators.EidasEncryptionAlgorithmValidator.anEidasEncryptionAlgorithmValidator;
 
 public class VerifyServiceProviderFactory {
 
@@ -52,6 +60,8 @@ public class VerifyServiceProviderFactory {
     private final MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle;
     private final ManifestReader manifestReader;
     private final Client client;
+    private final List<KeyPair> decryptionKeyPairs;
+    private final IdaKeyStore keyStore;
 
     public VerifyServiceProviderFactory(
             VerifyServiceProviderConfiguration configuration,
@@ -59,13 +69,12 @@ public class VerifyServiceProviderFactory {
             MetadataResolverBundle<VerifyServiceProviderConfiguration> msaMetadataBundle,
             Client client) throws KeyException {
         this.configuration = configuration;
-        this.responseFactory = new ResponseFactory(
-            getDecryptionKeyPairs(
+        this.decryptionKeyPairs = getDecryptionKeyPairs(
                 configuration.getSamlPrimaryEncryptionKey(),
                 configuration.getSamlSecondaryEncryptionKey()
-            ),
-            configuration.getVerifyHubMetadata().getExpectedEntityId()
         );
+        this.keyStore = new IdaKeyStore(null, decryptionKeyPairs);
+        this.responseFactory = new ResponseFactory(decryptionKeyPairs);
         this.dateTimeComparator = new DateTimeComparator(configuration.getClockSkew());
         this.entityIdService = new EntityIdService(configuration.getServiceEntityIds());
         this.verifyMetadataBundler = verifyMetadataBundler;
@@ -134,7 +143,15 @@ public class VerifyServiceProviderFactory {
         );
 
         EidasMetadataResolverRepository eidasMetadataResolverRepository = getEidasMetadataResolverRepository();
-        Optional<EidasValidatorFactory> eidasValidatorFactory = Optional.of(new EidasValidatorFactory(eidasMetadataResolverRepository));
+        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
+        UnsignedAssertionsResponseHandler unsignedAssertionsResponseHandler = new UnsignedAssertionsResponseHandler(
+                new EidasValidatorFactory(eidasMetadataResolverRepository),
+                createStringToResponseTransformer(),
+                new InstantValidator(dateTimeComparator),
+                new SecretKeyDecryptorFactory(idaKeyStoreCredentialRetriever),
+                anEidasEncryptionAlgorithmValidator()
+        );
+
 
         EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
                 dateTimeComparator,
@@ -143,14 +160,24 @@ public class VerifyServiceProviderFactory {
                 configuration.getHashingEntityId()
         );
 
-        AssertionTranslator assertionTranslator = new ClassifyingAssertionTranslator(verifyAssertionService, eidasAssertionService);
+        EidasUnsignedAssertionTranslator eidasUnsignedAssertionService = responseFactory.createEidasUnsignedAssertionService(
+                dateTimeComparator,
+                eidasMetadataResolverRepository,
+                configuration.getEuropeanIdentity().get(),
+                configuration.getHashingEntityId()
+        );
+
+        AssertionTranslator assertionTranslator = new ClassifyingAssertionTranslator(
+                verifyAssertionService,
+                eidasAssertionService,
+                eidasUnsignedAssertionService);
 
         return new TranslateSamlResponseResource(
                 responseFactory.createNonMatchingResponseService(
                         getHubSignatureTrustEngine(),
                         assertionTranslator,
                         dateTimeComparator,
-                        eidasValidatorFactory
+                        Optional.of(unsignedAssertionsResponseHandler)
                 ),
                 entityIdService);
     }
