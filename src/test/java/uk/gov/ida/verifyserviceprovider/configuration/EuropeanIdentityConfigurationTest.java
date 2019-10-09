@@ -100,7 +100,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getHubConnectorEntityId().toString()).isEqualTo(overriddenHubConnectorEntityId);
+        assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds().toString()).contains(overriddenHubConnectorEntityId);
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataTrustAnchorUri());
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataSourceUri());
     }
@@ -119,7 +119,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getHubConnectorEntityId()).isEqualTo(HubEnvironment.INTEGRATION.getEidasHubConnectorEntityId());
+        assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.INTEGRATION.getEidasDefaultAcceptableHubConnectorEntityIds());
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri().toString()).isEqualTo(overriddenTrustAnchorUri);
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataSourceUri());
     }
@@ -138,7 +138,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isNotEqualTo(integrationEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getHubConnectorEntityId()).isEqualTo(HubEnvironment.INTEGRATION.getEidasHubConnectorEntityId());
+        assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.INTEGRATION.getEidasDefaultAcceptableHubConnectorEntityIds());
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataTrustAnchorUri());
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataSourceUri());
     }
@@ -157,7 +157,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getHubConnectorEntityId()).isEqualTo(HubEnvironment.INTEGRATION.getEidasHubConnectorEntityId());
+        assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.INTEGRATION.getEidasDefaultAcceptableHubConnectorEntityIds());
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.INTEGRATION.getEidasMetadataTrustAnchorUri());
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overriddenMetadataSourceUri);
 
@@ -208,7 +208,7 @@ public class EuropeanIdentityConfigurationTest {
         assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
         assertThat(europeanConfigCert).isEqualTo(productionEntryCert);
 
-        assertThat(europeanIdentityConfiguration.getHubConnectorEntityId()).isEqualTo(HubEnvironment.PRODUCTION.getEidasHubConnectorEntityId());
+        assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.PRODUCTION.getEidasDefaultAcceptableHubConnectorEntityIds());
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.PRODUCTION.getEidasMetadataTrustAnchorUri());
         assertThat(europeanIdentityConfiguration.getMetadataSourceUri().toString()).isEqualTo(overriddenMetadataSourceUri);
     }

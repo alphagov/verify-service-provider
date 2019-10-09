@@ -31,7 +31,6 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
     private final EidasMetadataResolverRepository metadataResolverRepository;
     private final SignatureValidatorFactory signatureValidatorFactory;
-    private final String hubConnectorEntityId;
     private final List<String> acceptableHubConnectorEntityIds;
     private UserIdHashFactory userIdHashFactory;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
@@ -45,7 +44,6 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
             LevelOfAssuranceValidator levelOfAssuranceValidator,
             EidasMetadataResolverRepository metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
-            String hubConnectorEntityId,
             List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
@@ -54,7 +52,6 @@ public class EidasAssertionTranslator extends IdentityAssertionTranslator {
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
-        this.hubConnectorEntityId = hubConnectorEntityId;
         this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
         this.userIdHashFactory = userIdHashFactory;
     }

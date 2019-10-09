@@ -180,8 +180,7 @@ public class ResponseFactory {
                 new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
-                europeanIdentityConfiguration.getHubConnectorEntityId(),
-                europeanIdentityConfiguration.getAcceptableHubConnectorEntityIds(),
+                europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds(),
                 new UserIdHashFactory(hashingEntityId)
                 );
     }
