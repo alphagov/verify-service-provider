@@ -3,6 +3,8 @@ Release notes
 
 ### Next
 
+* Configuration option `hubConnectorEntityId` is now optional.
+
 ### 2.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/1.0.0...2.0.0)
 
