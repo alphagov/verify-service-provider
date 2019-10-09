@@ -57,6 +57,7 @@ msaMetadata:
 
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
+  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
   trustAnchorUri: ${TRUST_ANCHOR_URI}
   metadataSourceUri: ${METADATA_SOURCE_URI}
   trustStore:
