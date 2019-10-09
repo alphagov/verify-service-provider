@@ -52,9 +52,9 @@ public interface ConfigurationConstants {
     String[] INTEGRATION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
         "https://www.integration.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
         "https://connector-node-integration.london.verify.govsvc.uk/ConnectorMetadata",         // (GSP)
-        "https://integration.eidas.signin.service.gov.uk/ConnectorMetadata",                    // (potential new #1)
-        "https://connector.integration.eidas.signin.service.gov.uk/ConnectorMetadata",          // (potential new #2)
-        "https://connector-node.integration.eidas.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+        "https://eidas.integration.signin.service.gov.uk/ConnectorMetadata",                    // (potential new #1)
+        "https://connector.eidas.integration.signin.service.gov.uk/ConnectorMetadata",          // (potential new #2)
+        "https://connector-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
     };
 
     String COMPLIANCE_SSO = COMPLIANCE_HOST + SSO_PATH;
@@ -66,9 +66,9 @@ public interface ConfigurationConstants {
     String[] COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
         "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/connector",         // (AWS)
         "connector-node-compliance-tool-reference.london.verify.govsvc.uk/ConnectorMetadata",                   // (GSP)
-        "https://compliance-tool-reference.eidas.signin.service.gov.uk/ConnectorMetadata",                      // (potential new #1)
-        "https://connector.compliance-tool-reference.eidas.signin.service.gov.uk/ConnectorMetadata",            // (potential new #2)
-        "https://compliance-tool-reference-node.integration.eidas.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+        "https://eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",                      // (potential new #1)
+        "https://connector.eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",            // (potential new #2)
+        "https://compliance-tool-reference-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
     };
 
 

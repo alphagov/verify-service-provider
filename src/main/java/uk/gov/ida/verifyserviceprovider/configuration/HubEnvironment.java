@@ -73,7 +73,6 @@ public enum HubEnvironment {
 
     private URI eidasMetaDataSourceUri;
     private URI eidasMetadataTrustAnchorUri;
-    private String eidasHubConnectorEntityId;
     private List<String> eidasAcceptableHubConnectorEntityIds;
     private String metadataTrustStore;
     private String hubTrustStore;
@@ -95,14 +94,13 @@ public enum HubEnvironment {
         this.metadataUri = metadataUri;
         this.eidasMetaDataSourceUri = eidasMetadataSourceUri;
         this.eidasMetadataTrustAnchorUri = eidasMetadataTrustAnchorUri;
-        this.eidasHubConnectorEntityId = eidasHubConnectorEntityId;
         this.metadataTrustStore = metadataTrustStore;
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
 
         Set<String> entityIds = new HashSet<>();
-        Optional.ofNullable(eidasAcceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         Optional.ofNullable(eidasHubConnectorEntityId).ifPresent(entityIds::add);
+        Optional.ofNullable(eidasAcceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         this.eidasAcceptableHubConnectorEntityIds = new ArrayList<>(entityIds);
     }
 
@@ -122,11 +120,7 @@ public enum HubEnvironment {
         return this.eidasMetadataTrustAnchorUri;
     }
 
-    public String getEidasHubConnectorEntityId(){
-        return this.eidasHubConnectorEntityId;
-    }
-
-    public List<String> getEidasAcceptableHubConnectorEntityIds() {
+    public List<String> getEidasAllAcceptableHubConnectorEntityIds() {
         return this.eidasAcceptableHubConnectorEntityIds;
     }
 

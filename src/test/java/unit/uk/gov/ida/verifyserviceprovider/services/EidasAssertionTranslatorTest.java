@@ -97,7 +97,6 @@ public class EidasAssertionTranslatorTest {
             levelOfAssuranceValidator,
             metadataResolverRepository,
             signatureValidatorFactory,
-            HUB_CONNECTOR_ENTITY_ID,
             singletonList(HUB_CONNECTOR_ENTITY_ID),
             userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
