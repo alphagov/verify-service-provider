@@ -67,7 +67,7 @@ public class ApplicationConfigurationFeatureTests {
         assertThat(configuration.getSamlSecondaryEncryptionKey().getEncoded()).isEqualTo(decode(TEST_RP_PRIVATE_ENCRYPTION_KEY));
         assertThat(configuration.getClockSkew()).isEqualTo(Duration.standardSeconds(30));
         assertThat(configuration.getEuropeanIdentity().isPresent()).isTrue();
-        assertThat(configuration.getEuropeanIdentity().get().getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.COMPLIANCE_TOOL.getEidasAllAcceptableHubConnectorEntityIds());
+        assertThat(configuration.getEuropeanIdentity().get().getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.COMPLIANCE_TOOL.getEidasDefaultAcceptableHubConnectorEntityIds());
         assertThat(configuration.getEuropeanIdentity().get().getMetadataSourceUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataSourceUri());
         assertThat(configuration.getEuropeanIdentity().get().getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
         assertThat(configuration.getEuropeanIdentity().get().getTrustStore().getCertificate("idaca").toString())

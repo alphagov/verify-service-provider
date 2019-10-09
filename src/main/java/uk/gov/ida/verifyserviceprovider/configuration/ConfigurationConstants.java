@@ -27,13 +27,11 @@ public interface ConfigurationConstants {
     String METADATA_PATH = "/SAML2/metadata/federation";
     String TRUSTANCHOR_PATH = "/SAML2/metadata/trust-anchor";
     String METADATASOURCE_PATH = "/SAML2/metadata/aggregator";
-    String HUBCONNECTOR_ENTITY_ID_PATH = "/SAML2/metadata/connector";
 
     String PRODUCTION_SSO = PRODUCTION_HOST + SSO_PATH;
     String PRODUCTION_METADATA = PRODUCTION_HOST + METADATA_PATH;
     String PRODUCTION_TRUSTANCHOR_URI = PRODUCTION_HOST + TRUSTANCHOR_PATH;
     String PRODUCTION_METADATASOURCE_URI = PRODUCTION_HOST + METADATASOURCE_PATH;
-    String PRODUCTION_HUBCONNECTOR_ENTITY_ID = PRODUCTION_HOST + HUBCONNECTOR_ENTITY_ID_PATH;
 
     String[] PRODUCTION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
         "https://www.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
@@ -47,7 +45,6 @@ public interface ConfigurationConstants {
     String INTEGRATION_METADATA = INTEGRATION_HOST +  METADATA_PATH;
     String INTEGRATION_TRUSTANCHOR_URI = INTEGRATION_HOST + TRUSTANCHOR_PATH;
     String INTEGRATION_METADATASOURCE_URI = INTEGRATION_HOST + METADATASOURCE_PATH;
-    String INTEGRATION_HUBCONNECTOR_ENTITY_ID = INTEGRATION_HOST + HUBCONNECTOR_ENTITY_ID_PATH;
 
     String[] INTEGRATION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
         "https://www.integration.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
@@ -61,7 +58,6 @@ public interface ConfigurationConstants {
     String COMPLIANCE_METADATA = COMPLIANCE_HOST +  METADATA_PATH;
     String COMPLIANCE_TRUSTANCHOR_URI = COMPLIANCE_HOST +  TRUSTANCHOR_PATH;
     String COMPLIANCE_METADATASOURCE_URI = COMPLIANCE_HOST + METADATASOURCE_PATH;
-    String COMPLIANCE_HUBCONNECTOR_ENTITY_ID = COMPLIANCE_HOST + HUBCONNECTOR_ENTITY_ID_PATH;
 
     String[] COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
         "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/connector",         // (AWS)

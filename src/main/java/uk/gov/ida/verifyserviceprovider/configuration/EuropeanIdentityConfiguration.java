@@ -42,13 +42,9 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
     ){
         super(trustAnchorUri, minRefreshDelay, maxRefreshDelay, trustAnchorMaxRefreshDelay, trustAnchorMinRefreshDelay, client, jerseyClientName, trustStore, metadataSourceUri);
         this.enabled = enabled;
-        this.hubConnectorEntityId = hubConnectorEntityId;
         this.trustStoreConfiguration = trustStore;
-
-        Set<String> hubConnectorEntityIds = new HashSet<>();
-        Optional.ofNullable(hubConnectorEntityId).ifPresent(hubConnectorEntityIds::add);
-        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(hubConnectorEntityIds::addAll);
-        this.acceptableHubConnectorEntityIds = new ArrayList<>(hubConnectorEntityIds);
+        this.hubConnectorEntityId = hubConnectorEntityId;
+        this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
     }
 
     @JsonIgnore
@@ -61,7 +57,7 @@ public class EuropeanIdentityConfiguration extends EidasMetadataConfiguration {
     }
 
     public List<String> getAllAcceptableHubConnectorEntityIds() {
-        Set<String> entityIds = new HashSet<>(environment.getEidasAllAcceptableHubConnectorEntityIds());
+        Set<String> entityIds = new HashSet<>(environment.getEidasDefaultAcceptableHubConnectorEntityIds());
         Optional.ofNullable(hubConnectorEntityId).ifPresent(entityIds::add);
         Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         return new ArrayList<>(entityIds);
