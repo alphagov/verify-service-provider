@@ -10,14 +10,17 @@ public class ClassifyingAssertionTranslator implements AssertionTranslator {
 
     private final VerifyAssertionTranslator verifyAssertionTranslator;
     private final EidasAssertionTranslator eidasAssertionTranslator;
+    private final EidasUnsignedAssertionTranslator eidasUnsignedAssertionTranslator;
 
 
     public ClassifyingAssertionTranslator(
             VerifyAssertionTranslator verifyAssertionTranslator,
-            EidasAssertionTranslator eidasAssertionTranslator
+            EidasAssertionTranslator eidasAssertionTranslator,
+            EidasUnsignedAssertionTranslator eidasUnsignedAssertionTranslator
     ) {
         this.verifyAssertionTranslator = verifyAssertionTranslator;
         this.eidasAssertionTranslator = eidasAssertionTranslator;
+        this.eidasUnsignedAssertionTranslator = eidasUnsignedAssertionTranslator;
     }
 
 
@@ -29,9 +32,12 @@ public class ClassifyingAssertionTranslator implements AssertionTranslator {
     }
 
     private IdentityAssertionTranslator getAssertionService(List<Assertion> assertions) {
-        return isEidasIdentity(assertions) ? eidasAssertionTranslator : verifyAssertionTranslator;
+        return isEidasIdentity(assertions) ? getEidasAssertionService(assertions) : verifyAssertionTranslator;
     }
 
+    private IdentityAssertionTranslator getEidasAssertionService(List<Assertion> assertions) {
+        return assertions.get(0).getSignature() == null ? eidasUnsignedAssertionTranslator : eidasAssertionTranslator;
+    }
 
     private boolean isEidasIdentity(List<Assertion> assertions) {
         return assertions.stream().anyMatch(eidasAssertionTranslator::isCountryAssertion);
