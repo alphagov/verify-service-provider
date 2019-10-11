@@ -47,7 +47,7 @@ import java.util.Timer;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory.createStringToResponseTransformer;
-import static uk.gov.ida.verifyserviceprovider.validators.EidasEncryptionAlgorithmValidator.anEidasEncryptionAlgorithmValidator;
+import static uk.gov.ida.verifyserviceprovider.validators.EidasEncryptionAlgorithmValidatorHelper.anEidasEncryptionAlgorithmValidator;
 
 public class VerifyServiceProviderFactory {
 

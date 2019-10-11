@@ -51,7 +51,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
 public abstract class BaseEidasAssertionTranslatorTestBase {
 
-    BaseEidasAssertionTranslator assertionService;
+    protected BaseEidasAssertionTranslator assertionService;
     @Mock
     SubjectValidator subjectValidator;
     @Mock
@@ -73,7 +73,7 @@ public abstract class BaseEidasAssertionTranslatorTestBase {
     @Mock
     UserIdHashFactory userIdHashFactory;
 
-    abstract void shouldCallValidatorsCorrectly();
+    protected abstract void shouldCallValidatorsCorrectly();
 
     @Test
     public void shouldTranslateEidasAssertion() {
@@ -132,7 +132,7 @@ public abstract class BaseEidasAssertionTranslatorTestBase {
     }
 
 
-    static AssertionBuilder anAssertionWithAuthnStatement(String authnContext, String inResponseTo) {
+    protected static AssertionBuilder anAssertionWithAuthnStatement(String authnContext, String inResponseTo) {
         return anAssertion()
             .addAuthnStatement(
                 anAuthnStatement()

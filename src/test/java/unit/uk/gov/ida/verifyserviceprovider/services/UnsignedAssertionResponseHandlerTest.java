@@ -22,6 +22,7 @@ import uk.gov.ida.saml.core.extensions.eidas.impl.EncryptedAssertionKeysBuilder;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.EidasValidatorFactory;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
 import uk.gov.ida.saml.security.exception.SamlFailedToDecryptException;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
@@ -48,19 +49,22 @@ import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.aResponse;
 public class UnsignedAssertionResponseHandlerTest {
 
     @Mock
-    EidasValidatorFactory eidasValidatorFactory;
+    private EidasValidatorFactory eidasValidatorFactory;
 
     @Mock
-    StringToOpenSamlObjectTransformer<Response> stringToResponseTransformer;
+    private StringToOpenSamlObjectTransformer<Response> stringToResponseTransformer;
 
     @Mock
-    InstantValidator instantValidator;
+    private InstantValidator instantValidator;
 
     @Mock
-    SecretKeyDecryptorFactory secretKeyDecryptorFactory;
+    private SecretKeyDecryptorFactory secretKeyDecryptorFactory;
 
     @Mock
-    Decrypter decrypter;
+    private Decrypter decrypter;
+
+    @Mock
+    private SamlAssertionsSignatureValidator hubAssertionSignatureValidator;
 
     private UnsignedAssertionsResponseHandler handler;
     private final List<String> singleKeyList = Arrays.asList("aKey");

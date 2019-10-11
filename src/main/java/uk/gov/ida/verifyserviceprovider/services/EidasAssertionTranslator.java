@@ -41,11 +41,10 @@ public class EidasAssertionTranslator extends BaseEidasAssertionTranslator {
                 acceptableHubConnectorEntityIds,
                 userIdHashFactory
         );
-
     }
 
     @Override
-    void validateSignature(Assertion assertion, String issuerEntityId) {
+    protected void validateSignature(Assertion assertion, String issuerEntityId) {
         metadataResolverRepository.getSignatureTrustEngine(issuerEntityId)
                 .map(signatureValidatorFactory::getSignatureValidator)
                 .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + issuerEntityId))

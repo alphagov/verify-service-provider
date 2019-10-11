@@ -27,8 +27,8 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
     private final InstantValidator instantValidator;
     private final ConditionsValidator conditionsValidator;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
-    final EidasMetadataResolverRepository metadataResolverRepository;
-    final SignatureValidatorFactory signatureValidatorFactory;
+    protected final EidasMetadataResolverRepository metadataResolverRepository;
+    protected SignatureValidatorFactory signatureValidatorFactory;
     private final List<String> acceptableHubConnectorEntityIds;
     private UserIdHashFactory userIdHashFactory;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
@@ -54,7 +54,7 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
         this.userIdHashFactory = userIdHashFactory;
     }
 
-    abstract void validateSignature(Assertion assertion, String issuerEntityId);
+    protected abstract void validateSignature(Assertion assertion, String issuerEntityId);
 
     @Override
     public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
@@ -98,7 +98,7 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
         }
     }
 
-    Optional<AuthnContext> getAuthnContext(String uri) {
+    private Optional<AuthnContext> getAuthnContext(String uri) {
         AuthnContext authnContext = authnContextFactory.mapFromEidasToLoA(uri);
 
         return Optional.of(authnContext);

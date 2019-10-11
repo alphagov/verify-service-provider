@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.opensaml.xmlsec.encryption.support.EncryptionConstants;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 
-public class EidasEncryptionAlgorithmValidator {
+public class EidasEncryptionAlgorithmValidatorHelper {
     public static EncryptionAlgorithmValidator anEidasEncryptionAlgorithmValidator() {
         return new EncryptionAlgorithmValidator(
                 ImmutableSet.of(

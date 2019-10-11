@@ -38,7 +38,7 @@ public class EidasUnsignedAssertionTranslator extends BaseEidasAssertionTranslat
     }
 
     @Override
-    void validateSignature(Assertion assertion, String issuerEntityId) {
+    protected void validateSignature(Assertion assertion, String issuerEntityId) {
         // No need to validate the signature of an unsigned assertion.
     }
 }
