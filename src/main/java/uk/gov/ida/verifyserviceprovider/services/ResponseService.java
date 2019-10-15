@@ -73,7 +73,7 @@ public class ResponseService {
                 if (assertionsContainEidasUnsignedAssertionsResponse(assertions)) {
                     UnsignedAssertionsResponseHandler handler = unsignedAssertionsResponseHandler.get();
 
-                    ValidatedResponse validatedCountryResponse = handler.getValidatedResponse(assertions.get(0), expectedInResponseTo);
+                    ValidatedResponse validatedCountryResponse = handler.getValidatedResponse(assertions, expectedInResponseTo);
                     assertions = handler.decryptAssertion(validatedCountryResponse, assertions.get(0));
                 }
                 return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);

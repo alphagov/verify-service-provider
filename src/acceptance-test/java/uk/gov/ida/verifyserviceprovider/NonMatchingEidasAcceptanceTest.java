@@ -131,19 +131,18 @@ public class NonMatchingEidasAcceptanceTest {
         org.opensaml.saml.saml2.core.Response countryResponse = anEidasResponseIssuedByACountryWithUnsignedAssertions("requestId", appWithEidasEnabled.getCountryEntityId()).build();
         org.opensaml.saml.saml2.core.Response hubResponse = aHubResponseContainingEidasUnsignedAssertions(
                 "requestId",
-                appWithEidasEnabled.getCountryEntityId(),
                 xmlToB64Transformer.apply(countryResponse),
                 getReEncryptedKeys(countryResponse)
         ).build();
 
-        Response appResonse = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
+        Response appResponse = appWithEidasEnabled.client().target(format("http://localhost:%s/translate-response", appWithEidasEnabled.getLocalPort())).request().post(
                 Entity.json(new TranslateSamlResponseBody(xmlToB64Transformer.apply(hubResponse), "requestId", LEVEL_2, null))
         );
 
-        String body = appResonse.readEntity(String.class);
+        String body = appResponse.readEntity(String.class);
         JSONObject json = new JSONObject(body);
 
-        assertThat(appResonse.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(appResponse.getStatus()).isEqualTo(HttpStatus.SC_OK);
         assertThat(json.getString("pid")).isEqualTo("428eb6096580250e9edbac60566529c2e8f9dbfe9ea88999b8996f6dbc602160");
     }
 

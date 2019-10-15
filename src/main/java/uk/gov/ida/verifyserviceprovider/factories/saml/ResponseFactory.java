@@ -144,15 +144,14 @@ public class ResponseFactory {
         );
     }
 
-    public VerifyAssertionTranslator createVerifyIdpAssertionService(ExplicitKeySignatureTrustEngine signatureTrustEngine,
-                                                                     SignatureValidatorFactory signatureValidatorFactory,
+    public VerifyAssertionTranslator createVerifyIdpAssertionService(SamlAssertionsSignatureValidator hubSignatureValidator,
                                                                      DateTimeComparator dateTimeComparator,
                                                                      String hashingEntityId) {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
         return new VerifyAssertionTranslator(
-                signatureValidatorFactory.getSignatureValidator(signatureTrustEngine),
+                hubSignatureValidator,
                 new SubjectValidator(timeRestrictionValidator),
                 new AssertionAttributeStatementValidator(),
                 new VerifyMatchingDatasetUnmarshaller(new AddressFactory()),

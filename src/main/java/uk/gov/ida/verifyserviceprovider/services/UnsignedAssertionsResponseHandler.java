@@ -3,6 +3,7 @@ package uk.gov.ida.verifyserviceprovider.services;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.saml.core.IdaConstants;
@@ -12,8 +13,10 @@ import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.EidasValidatorFactory;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
 import uk.gov.ida.saml.security.exception.SamlFailedToDecryptException;
+import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
@@ -35,28 +38,32 @@ public class UnsignedAssertionsResponseHandler {
     private final InstantValidator instantValidator;
     private final SecretKeyDecryptorFactory secretKeyDecryptorFactory;
     private final EncryptionAlgorithmValidator encryptionAlgorithmValidator;
+    private final SamlAssertionsSignatureValidator hubAssertionsSignatureValidator;
 
     public UnsignedAssertionsResponseHandler (
             EidasValidatorFactory eidasValidatorFactory,
             StringToOpenSamlObjectTransformer<Response> stringToResponseTransformer,
             InstantValidator instantValidator,
             SecretKeyDecryptorFactory secretKeyDecryptorFactory,
-            EncryptionAlgorithmValidator encryptionAlgorithmValidator
+            EncryptionAlgorithmValidator encryptionAlgorithmValidator,
+            SamlAssertionsSignatureValidator hubAssertionsSignatureValidator
     ) {
         this.eidasValidatorFactory = eidasValidatorFactory;
         this.stringToResponseTransformer = stringToResponseTransformer;
         this.instantValidator = instantValidator;
         this.secretKeyDecryptorFactory = secretKeyDecryptorFactory;
         this.encryptionAlgorithmValidator = encryptionAlgorithmValidator;
+        this.hubAssertionsSignatureValidator = hubAssertionsSignatureValidator;
     }
 
     public ValidatedResponse getValidatedResponse(
-            Assertion hubResponseAssertion,
+            List<Assertion> hubResponseAssertion,
             String expectedInResponseTo
     ) {
+        ValidatedAssertions validatedHubAssertion = hubAssertionsSignatureValidator.validate(hubResponseAssertion, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
         ValidatedResponse validatedResponse = eidasValidatorFactory.getValidatedResponse(
                 stringToResponseTransformer.apply(
-                        getCountryResponseStringFromAssertion(hubResponseAssertion)
+                        getCountryResponseStringFromAssertion(validatedHubAssertion.getAssertions().get(0))
                 )
         );
 

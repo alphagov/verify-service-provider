@@ -232,7 +232,6 @@ public class AssertionHelper {
 
     public static ResponseBuilder aHubResponseContainingEidasUnsignedAssertions(
             String requestId,
-            String assertionIssuerId,
             String countrySamlResponseString,
             List<String> encryptedKeys
     ) {
@@ -243,8 +242,8 @@ public class AssertionHelper {
                 .addEncryptedAssertion(
                         anEidasEncryptedAssertion(
                                 requestId,
-                                assertionIssuerId,
-                                anEidasSignature(),
+                                HUB_ENTITY_ID,
+                                aHubSignature(),
                                 anAttributeStatementContainingAnEidasUnsignedResponse(
                                         countrySamlResponseString,
                                         encryptedKeys
@@ -299,6 +298,16 @@ public class AssertionHelper {
                         new TestCredentialFactory(
                                 STUB_IDP_PUBLIC_PRIMARY_CERT,
                                 STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                        ).getSigningCredential()
+                ).build();
+    }
+
+    public static Signature aHubSignature() {
+        return aSignature()
+                .withSigningCredential(
+                        new TestCredentialFactory(
+                                HUB_TEST_PUBLIC_SIGNING_CERT,
+                                HUB_TEST_PRIVATE_SIGNING_KEY
                         ).getSigningCredential()
                 ).build();
     }

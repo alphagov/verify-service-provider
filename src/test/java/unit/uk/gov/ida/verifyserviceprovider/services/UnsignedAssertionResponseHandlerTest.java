@@ -12,6 +12,7 @@ import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
+import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.xmlsec.encryption.support.EncryptionConstants;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -25,6 +26,7 @@ import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
 import uk.gov.ida.saml.security.exception.SamlFailedToDecryptException;
+import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.verifyserviceprovider.services.UnsignedAssertionsResponseHandler;
@@ -82,30 +84,34 @@ public class UnsignedAssertionResponseHandlerTest {
                 stringToResponseTransformer,
                 instantValidator,
                 secretKeyDecryptorFactory,
-                getEncryptionAlgorithmValidator()
+                getEncryptionAlgorithmValidator(),
+                hubAssertionSignatureValidator
         );
         eidasResponse = createEidasResponse();
         validatedResponse = new ValidatedResponse(eidasResponse);
     }
 
     @Test
-    public void getValidatedResponseShouldValidateResponse() throws Exception {
-        Assertion eidasSamlAssertion = anEidasSamlAssertion(singleKeyList);
+    public void getValidatedResponseShouldValidateResponse() {
+        List<Assertion> eidasSamlAssertion = Arrays.asList(anEidasSamlAssertion(singleKeyList));
 
+        when(hubAssertionSignatureValidator.validate(eidasSamlAssertion, SPSSODescriptor.DEFAULT_ELEMENT_NAME)).thenReturn(new ValidatedAssertions(eidasSamlAssertion));
         when(stringToResponseTransformer.apply(samlString)).thenReturn(eidasResponse);
         when(eidasValidatorFactory.getValidatedResponse(eidasResponse)).thenReturn(validatedResponse);
 
         handler.getValidatedResponse(eidasSamlAssertion, inResponseTo);
 
+        verify(hubAssertionSignatureValidator).validate(eidasSamlAssertion, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
         verify(stringToResponseTransformer).apply(samlString);
         verify(eidasValidatorFactory).getValidatedResponse(eidasResponse);
         verify(instantValidator).validate(validatedResponse.getIssueInstant(), "Response IssueInstant");
     }
 
     @Test
-    public void getValidatedResponseShouldThrowIfInResponseToIsNotExpected() throws Exception {
-        Assertion eidasSamlAssertion = anEidasSamlAssertion(singleKeyList);
+    public void getValidatedResponseShouldThrowIfInResponseToIsNotExpected() {
+        List<Assertion> eidasSamlAssertion = Arrays.asList(anEidasSamlAssertion(singleKeyList));
 
+        when(hubAssertionSignatureValidator.validate(eidasSamlAssertion, SPSSODescriptor.DEFAULT_ELEMENT_NAME)).thenReturn(new ValidatedAssertions(eidasSamlAssertion));
         when(stringToResponseTransformer.apply(samlString)).thenReturn(eidasResponse);
         when(eidasValidatorFactory.getValidatedResponse(eidasResponse)).thenReturn(validatedResponse);
 
@@ -167,7 +173,8 @@ public class UnsignedAssertionResponseHandlerTest {
                         ImmutableSet.of(
                                 EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSAOAEP
                         )
-                )
+                ),
+                hubAssertionSignatureValidator
         );
         Assertion eidasSamlAssertion = anEidasSamlAssertion(singleKeyList);
 

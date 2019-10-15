@@ -15,6 +15,7 @@ import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
+import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
@@ -61,6 +62,7 @@ public class VerifyServiceProviderFactory {
     private final ManifestReader manifestReader;
     private final Client client;
     private final IdaKeyStore keyStore;
+    private final SamlAssertionsSignatureValidator hubSignatureValidator;
 
     public VerifyServiceProviderFactory(
             VerifyServiceProviderConfiguration configuration,
@@ -80,6 +82,7 @@ public class VerifyServiceProviderFactory {
         this.msaMetadataBundle = msaMetadataBundle;
         this.manifestReader = new ManifestReader();
         this.client = client;
+        this.hubSignatureValidator = new SignatureValidatorFactory().getSignatureValidator(getHubSignatureTrustEngine());
     }
 
     private List<KeyPair> getDecryptionKeyPairs(PrivateKey primary, PrivateKey secondary) throws KeyException {
@@ -135,8 +138,7 @@ public class VerifyServiceProviderFactory {
 
     private TranslateSamlResponseResource getEidasEnabledTranslateNonMatchingSamlResponseResource() {
         VerifyAssertionTranslator verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
-                getHubSignatureTrustEngine(),
-                new SignatureValidatorFactory(),
+                hubSignatureValidator,
                 dateTimeComparator,
                 configuration.getHashingEntityId()
         );
@@ -148,9 +150,9 @@ public class VerifyServiceProviderFactory {
                 createStringToResponseTransformer(),
                 new InstantValidator(dateTimeComparator),
                 new SecretKeyDecryptorFactory(idaKeyStoreCredentialRetriever),
-                anEidasEncryptionAlgorithmValidator()
+                anEidasEncryptionAlgorithmValidator(),
+                hubSignatureValidator
         );
-
 
         EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
                 dateTimeComparator,
@@ -183,8 +185,7 @@ public class VerifyServiceProviderFactory {
 
     private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
         VerifyAssertionTranslator assertionTranslator = responseFactory.createVerifyIdpAssertionService(
-                getHubSignatureTrustEngine(),
-                new SignatureValidatorFactory(),
+                hubSignatureValidator,
                 dateTimeComparator,
                 configuration.getHashingEntityId()
         );
