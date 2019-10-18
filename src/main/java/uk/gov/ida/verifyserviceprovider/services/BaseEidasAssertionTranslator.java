@@ -13,9 +13,9 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
-import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,20 +35,17 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
     public BaseEidasAssertionTranslator(
-            SubjectValidator subjectValidator,
+            EidasAssertionTranslatorValidatorContainer validatorContainer,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
-            InstantValidator instantValidator,
-            ConditionsValidator conditionsValidator,
-            LevelOfAssuranceValidator levelOfAssuranceValidator,
             EidasMetadataResolverRepository metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
             List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
-        super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
-        this.instantValidator = instantValidator;
-        this.conditionsValidator = conditionsValidator;
-        this.levelOfAssuranceValidator = levelOfAssuranceValidator;
+        super(validatorContainer.getSubjectValidator(), matchingDatasetUnmarshaller, mdsMapper);
+        this.instantValidator = validatorContainer.getInstantValidator();
+        this.conditionsValidator = validatorContainer.getConditionsValidator();
+        this.levelOfAssuranceValidator = validatorContainer.getLevelOfAssuranceValidator();
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
         this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;

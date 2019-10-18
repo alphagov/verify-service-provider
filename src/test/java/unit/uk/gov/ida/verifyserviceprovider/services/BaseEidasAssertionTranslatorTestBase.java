@@ -21,6 +21,7 @@ import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.BaseEidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -160,5 +161,14 @@ public abstract class BaseEidasAssertionTranslatorTestBase {
                             .build()
                     ).build()
             ).build();
+    }
+
+    protected EidasAssertionTranslatorValidatorContainer getEidasAssertionTranslatorValidatorContainer() {
+        return new EidasAssertionTranslatorValidatorContainer(
+                subjectValidator,
+                instantValidator,
+                conditionsValidator,
+                levelOfAssuranceValidator
+        );
     }
 }

@@ -60,7 +60,6 @@ import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.List;
-import java.util.Optional;
 
 import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
 import static java.util.Arrays.asList;

@@ -38,6 +38,7 @@ import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
@@ -46,7 +47,6 @@ import uk.gov.ida.verifyserviceprovider.validators.TimeRestrictionValidator;
 
 import java.security.KeyPair;
 import java.util.List;
-import java.util.Optional;
 
 public class ResponseFactory {
 
@@ -168,16 +168,10 @@ public class ResponseFactory {
             EuropeanIdentityConfiguration europeanIdentityConfiguration,
             String hashingEntityId
     ) {
-        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
-        AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
-
         return new EidasAssertionTranslator(
-                new SubjectValidator(timeRestrictionValidator),
+                getEidasAssertionValidatorContainer(dateTimeComparator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
-                new InstantValidator(dateTimeComparator),
-                new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
-                new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 new SignatureValidatorFactory(),
                 europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds(),
@@ -191,16 +185,10 @@ public class ResponseFactory {
             EuropeanIdentityConfiguration europeanIdentityConfiguration,
             String hashingEntityId
     ) {
-        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
-        AudienceRestrictionValidator audienceRestrictionValidator = new AudienceRestrictionValidator();
-
         return new EidasUnsignedAssertionTranslator(
-                new SubjectValidator(timeRestrictionValidator),
+                getEidasAssertionValidatorContainer(dateTimeComparator),
                 new EidasMatchingDatasetUnmarshaller(),
                 new MatchingDatasetToNonMatchingAttributesMapper(),
-                new InstantValidator(dateTimeComparator),
-                new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator),
-                new LevelOfAssuranceValidator(),
                 eidasMetadataResolverRepository,
                 europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds(),
                 new UserIdHashFactory(hashingEntityId)
@@ -213,5 +201,15 @@ public class ResponseFactory {
 
     private IdaKeyStore createEncryptionKeyStore() {
         return new IdaKeyStore(null, encryptionKeyPairs);
+    }
+
+    private EidasAssertionTranslatorValidatorContainer getEidasAssertionValidatorContainer(DateTimeComparator dateTimeComparator) {
+        TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
+        return new EidasAssertionTranslatorValidatorContainer(
+                new SubjectValidator(timeRestrictionValidator),
+                new InstantValidator(dateTimeComparator),
+                new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator()),
+                new LevelOfAssuranceValidator()
+        );
     }
 }

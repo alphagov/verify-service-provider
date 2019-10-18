@@ -8,10 +8,7 @@ import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
-import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
-import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
-import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
-import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
+import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 
 import java.util.List;
 
@@ -19,23 +16,17 @@ import static java.util.Collections.singletonList;
 
 public class EidasAssertionTranslator extends BaseEidasAssertionTranslator {
     public EidasAssertionTranslator(
-            SubjectValidator subjectValidator,
+            EidasAssertionTranslatorValidatorContainer validatorContainer,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
-            InstantValidator instantValidator,
-            ConditionsValidator conditionsValidator,
-            LevelOfAssuranceValidator levelOfAssuranceValidator,
             EidasMetadataResolverRepository metadataResolverRepository,
             SignatureValidatorFactory signatureValidatorFactory,
             List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
         super(
-                subjectValidator,
+                validatorContainer,
                 matchingDatasetUnmarshaller,
                 mdsMapper,
-                instantValidator,
-                conditionsValidator,
-                levelOfAssuranceValidator,
                 metadataResolverRepository,
                 signatureValidatorFactory,
                 acceptableHubConnectorEntityIds,

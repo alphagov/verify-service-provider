@@ -33,12 +33,9 @@ public class EidasUnsignedAssertionTranslatorTest extends BaseEidasAssertionTran
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
         assertionService = new EidasUnsignedAssertionTranslator(
-                subjectValidator,
+                getEidasAssertionTranslatorValidatorContainer(),
                 eidasMatchingDatasetUnmarshaller,
                 mdsMapper,
-                instantValidator,
-                conditionsValidator,
-                levelOfAssuranceValidator,
                 metadataResolverRepository,
                 singletonList(HUB_CONNECTOR_ENTITY_ID),
                 userIdHashFactory);
