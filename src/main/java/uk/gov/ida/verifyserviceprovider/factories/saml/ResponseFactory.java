@@ -123,7 +123,7 @@ public class ResponseFactory {
         );
     }
 
-    public MatchingAssertionTranslator createMsaAssertionService(
+    public MatchingAssertionTranslator createMsaAssertionTranslator(
             ExplicitKeySignatureTrustEngine signatureTrustEngine,
             SignatureValidatorFactory signatureValidatorFactory,
             DateTimeComparator dateTimeComparator
@@ -144,9 +144,9 @@ public class ResponseFactory {
         );
     }
 
-    public VerifyAssertionTranslator createVerifyIdpAssertionService(SamlAssertionsSignatureValidator hubSignatureValidator,
-                                                                     DateTimeComparator dateTimeComparator,
-                                                                     String hashingEntityId) {
+    public VerifyAssertionTranslator createVerifyIdpAssertionTranslator(SamlAssertionsSignatureValidator hubSignatureValidator,
+                                                                        DateTimeComparator dateTimeComparator,
+                                                                        String hashingEntityId) {
 
         TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
 
@@ -162,7 +162,7 @@ public class ResponseFactory {
             );
     }
 
-    public EidasAssertionTranslator createEidasAssertionService(
+    public EidasAssertionTranslator createEidasAssertionTranslator(
             DateTimeComparator dateTimeComparator,
             EidasMetadataResolverRepository eidasMetadataResolverRepository,
             EuropeanIdentityConfiguration europeanIdentityConfiguration,
@@ -185,7 +185,7 @@ public class ResponseFactory {
         );
     }
 
-    public EidasUnsignedAssertionTranslator createEidasUnsignedAssertionService(
+    public EidasUnsignedAssertionTranslator createEidasUnsignedAssertionTranslator(
             DateTimeComparator dateTimeComparator,
             EidasMetadataResolverRepository eidasMetadataResolverRepository,
             EuropeanIdentityConfiguration europeanIdentityConfiguration,

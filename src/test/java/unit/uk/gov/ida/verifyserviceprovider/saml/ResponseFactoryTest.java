@@ -28,7 +28,7 @@ public class ResponseFactoryTest {
     }
 
     @Test
-    public void createStringToResponseTransformerShouldNotAllowNotBase64EncodedSamlResponse() {
+    public void createStringToResponseTransformerMustContainBase64EncodedSamlResponse() {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: SAML is not base64 encoded in message body. start> not-encoded-string <end");
         stringToResponseTransformer.apply("not-encoded-string");

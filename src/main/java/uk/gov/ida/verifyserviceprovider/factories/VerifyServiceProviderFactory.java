@@ -130,14 +130,14 @@ public class VerifyServiceProviderFactory {
     private TranslateSamlResponseResource getTranslateMatchingSamlResponseResource() {
         ResponseService matchingResponseService = responseFactory.createMatchingResponseService(
                 getHubSignatureTrustEngine(),
-                responseFactory.createMsaAssertionService(getMsaSignatureTrustEngine(), new SignatureValidatorFactory(), dateTimeComparator),
+                responseFactory.createMsaAssertionTranslator(getMsaSignatureTrustEngine(), new SignatureValidatorFactory(), dateTimeComparator),
                 dateTimeComparator
         );
         return new TranslateSamlResponseResource(matchingResponseService, entityIdService);
     }
 
     private TranslateSamlResponseResource getEidasEnabledTranslateNonMatchingSamlResponseResource() {
-        VerifyAssertionTranslator verifyAssertionService = responseFactory.createVerifyIdpAssertionService(
+        VerifyAssertionTranslator verifyAssertionTranslator = responseFactory.createVerifyIdpAssertionTranslator(
                 hubSignatureValidator,
                 dateTimeComparator,
                 configuration.getHashingEntityId()
@@ -154,14 +154,14 @@ public class VerifyServiceProviderFactory {
                 hubSignatureValidator
         );
 
-        EidasAssertionTranslator eidasAssertionService = responseFactory.createEidasAssertionService(
+        EidasAssertionTranslator eidasAssertionTranslator = responseFactory.createEidasAssertionTranslator(
                 dateTimeComparator,
                 eidasMetadataResolverRepository,
                 configuration.getEuropeanIdentity().get(),
                 configuration.getHashingEntityId()
         );
 
-        EidasUnsignedAssertionTranslator eidasUnsignedAssertionService = responseFactory.createEidasUnsignedAssertionService(
+        EidasUnsignedAssertionTranslator eidasUnsignedAssertionTranslator = responseFactory.createEidasUnsignedAssertionTranslator(
                 dateTimeComparator,
                 eidasMetadataResolverRepository,
                 configuration.getEuropeanIdentity().get(),
@@ -169,9 +169,9 @@ public class VerifyServiceProviderFactory {
         );
 
         AssertionTranslator assertionTranslator = new ClassifyingAssertionTranslator(
-                verifyAssertionService,
-                eidasAssertionService,
-                eidasUnsignedAssertionService);
+                verifyAssertionTranslator,
+                eidasAssertionTranslator,
+                eidasUnsignedAssertionTranslator);
 
         return new TranslateSamlResponseResource(
                 responseFactory.createNonMatchingResponseService(
@@ -184,7 +184,7 @@ public class VerifyServiceProviderFactory {
     }
 
     private TranslateSamlResponseResource getTranslateNonMatchingSamlResponseResource() {
-        VerifyAssertionTranslator assertionTranslator = responseFactory.createVerifyIdpAssertionService(
+        VerifyAssertionTranslator assertionTranslator = responseFactory.createVerifyIdpAssertionTranslator(
                 hubSignatureValidator,
                 dateTimeComparator,
                 configuration.getHashingEntityId()
