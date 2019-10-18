@@ -178,7 +178,7 @@ public class VerifyServiceProviderFactory {
                         getHubSignatureTrustEngine(),
                         assertionTranslator,
                         dateTimeComparator,
-                        Optional.of(unsignedAssertionsResponseHandler)
+                        unsignedAssertionsResponseHandler
                 ),
                 entityIdService);
     }
@@ -195,7 +195,7 @@ public class VerifyServiceProviderFactory {
                         getHubSignatureTrustEngine(),
                         assertionTranslator,
                         dateTimeComparator,
-                        Optional.empty()
+                        null
                 ),
                 entityIdService);
     }

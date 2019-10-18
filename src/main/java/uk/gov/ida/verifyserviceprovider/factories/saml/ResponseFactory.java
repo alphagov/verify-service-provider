@@ -98,7 +98,7 @@ public class ResponseFactory {
             new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
             new InstantValidator(dateTimeComparator),
             new MatchingResponderCodeTranslator(),
-            Optional.empty()
+            null
         );
     }
 
@@ -106,7 +106,7 @@ public class ResponseFactory {
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionTranslator nonMatchingAssertionTranslator,
             DateTimeComparator dateTimeComparator,
-            Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler
+            UnsignedAssertionsResponseHandler unsignedAssertionsResponseHandler
     ) {
         AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);

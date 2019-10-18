@@ -41,6 +41,7 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.MissingUnsignedAssertionsHandlerException;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
@@ -64,6 +65,7 @@ import java.util.Optional;
 import static common.uk.gov.ida.verifyserviceprovider.utils.SamlResponseHelper.createVerifiedAttribute;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -103,6 +105,7 @@ public class ResponseServiceTest {
 
     private ResponseService matchingResponseService;
     private ResponseService eidasNonMatchingResponseService;
+    private ResponseService badlyConfiguredEidasNonMatchingResponseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
     private UnsignedAssertionsResponseHandler mockUnsignedAssertionsResponseHandler = mock(UnsignedAssertionsResponseHandler.class);
@@ -146,13 +149,18 @@ public class ResponseServiceTest {
             dateTimeComparator
         );
 
-        Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler = Optional.of(mockUnsignedAssertionsResponseHandler);
-
         eidasNonMatchingResponseService = responseFactory.createNonMatchingResponseService(
                 signatureTrustEngine,
                 mockAssertionTranslator,
                 dateTimeComparator,
-                unsignedAssertionsResponseHandler
+                mockUnsignedAssertionsResponseHandler
+        );
+
+        badlyConfiguredEidasNonMatchingResponseService = responseFactory.createNonMatchingResponseService(
+                signatureTrustEngine,
+                mockAssertionTranslator,
+                dateTimeComparator,
+                null
         );
     }
 
@@ -235,6 +243,23 @@ public class ResponseServiceTest {
         verify(mockUnsignedAssertionsResponseHandler).decryptAssertion(eq(validatedResponse), any());
 
         assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void nonMatchingResponseServiceShouldThrowIfConfiguredIncorrectlyForUnsignedAssertions() throws Exception {
+        EntityDescriptor entityDescriptor = createEntityDescriptorWithSigningCertificate(TEST_RP_PUBLIC_SIGNING_CERT);
+        when(hubMetadataResolver.resolve(any())).thenReturn(ImmutableList.of(entityDescriptor));
+
+        Response response = signResponse(createUnsignedAttributeResponseBuilder(), testRpSigningCredential);
+
+        assertThrows(MissingUnsignedAssertionsHandlerException.class, () -> {
+            badlyConfiguredEidasNonMatchingResponseService.convertTranslatedResponseBody(
+                    responseToBase64StringTransformer.apply(response),
+                    response.getInResponseTo(),
+                    LevelOfAssurance.LEVEL_2,
+                    VERIFY_SERVICE_PROVIDER_ENTITY_ID
+            );
+        });
     }
 
     @Test

@@ -13,10 +13,10 @@ import uk.gov.ida.saml.security.validators.ValidatedResponse;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
+import uk.gov.ida.verifyserviceprovider.exceptions.MissingUnsignedAssertionsHandlerException;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ResponseService {
 
@@ -26,7 +26,7 @@ public class ResponseService {
     private final SamlResponseSignatureValidator responseSignatureValidator;
     private final InstantValidator instantValidator;
     private final ResponderCodeTranslator responderCodeTranslator;
-    private final Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler;
+    private final UnsignedAssertionsResponseHandler unsignedAssertionsResponseHandler;
 
     public ResponseService(
             StringToOpenSamlObjectTransformer<Response> samlObjectTransformer,
@@ -35,7 +35,7 @@ public class ResponseService {
             SamlResponseSignatureValidator responseSignatureValidator,
             InstantValidator instantValidator,
             ResponderCodeTranslator responderCodeTranslator,
-            Optional<UnsignedAssertionsResponseHandler> unsignedAssertionsResponseHandler
+            UnsignedAssertionsResponseHandler unsignedAssertionsResponseHandler
     ) {
         this.samlObjectTransformer = samlObjectTransformer;
         this.assertionDecrypter = assertionDecrypter;
@@ -71,10 +71,10 @@ public class ResponseService {
             case StatusCode.SUCCESS:
                 List<Assertion> assertions = assertionDecrypter.decryptAssertions(validatedResponse);
                 if (assertionsContainEidasUnsignedAssertionsResponse(assertions)) {
-                    UnsignedAssertionsResponseHandler handler = unsignedAssertionsResponseHandler.get();
+                    if (unsignedAssertionsResponseHandler == null) { throw new MissingUnsignedAssertionsHandlerException(); }
 
-                    ValidatedResponse validatedCountryResponse = handler.getValidatedResponse(assertions, expectedInResponseTo);
-                    assertions = handler.decryptAssertion(validatedCountryResponse, assertions.get(0));
+                    ValidatedResponse validatedCountryResponse = unsignedAssertionsResponseHandler.getValidatedResponse(assertions, expectedInResponseTo);
+                    assertions = unsignedAssertionsResponseHandler.decryptAssertion(validatedCountryResponse, assertions.get(0));
                 }
                 return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
             default:
