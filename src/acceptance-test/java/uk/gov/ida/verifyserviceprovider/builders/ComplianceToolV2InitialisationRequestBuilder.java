@@ -1,17 +1,11 @@
 package uk.gov.ida.verifyserviceprovider.builders;
 
-import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAddress;
-import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingAttribute;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDataset;
 import uk.gov.ida.verifyserviceprovider.compliance.dto.MatchingDatasetBuilder;
 
 import javax.ws.rs.client.Entity;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.UUID;
 
-import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 

@@ -6,7 +6,7 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
+import uk.gov.ida.verifyserviceprovider.services.EidasUnsignedAssertionTranslator;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,18 +26,17 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance.LEVEL_2;
 
-public class EidasAssertionTranslatorTest extends BaseEidasAssertionTranslatorTestBase {
+public class EidasUnsignedAssertionTranslatorTest extends BaseEidasAssertionTranslatorTestBase {
 
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
         initMocks(this);
-        assertionService = new EidasAssertionTranslator(
+        assertionService = new EidasUnsignedAssertionTranslator(
                 getEidasAssertionTranslatorValidatorContainer(),
                 eidasMatchingDatasetUnmarshaller,
                 mdsMapper,
                 metadataResolverRepository,
-                signatureValidatorFactory,
                 singletonList(HUB_CONNECTOR_ENTITY_ID),
                 userIdHashFactory);
         doNothing().when(instantValidator).validate(any(), any());
@@ -62,6 +62,7 @@ public class EidasAssertionTranslatorTest extends BaseEidasAssertionTranslatorTe
         verify(subjectValidator, times(1)).validate(any(), any());
         verify(conditionsValidator, times(1)).validate(any(), any());
         verify(levelOfAssuranceValidator, times(1)).validate(any(), any());
-        verify(samlAssertionsSignatureValidator, times(1)).validate(any(), any());
+
+        verify(samlAssertionsSignatureValidator, never()).validate(any(), any());
     }
 }

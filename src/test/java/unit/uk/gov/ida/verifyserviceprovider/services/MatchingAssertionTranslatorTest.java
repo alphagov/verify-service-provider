@@ -63,8 +63,7 @@ public class MatchingAssertionTranslatorTest {
 
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private static final String VERIFY_SERVICE_PROVIDER_ENTITY_ID = "default-entity-id";
-    private static final String VERIFY_HUB_ENTITY_ID = "hub-entity-id";
-    private MatchingAssertionTranslator msaAssertionService;
+    private MatchingAssertionTranslator msaAssertionTranslator;
     private Credential testRpMsaSigningCredential = createMSSigningCredential();
 
     private Credential createMSSigningCredential() {
@@ -78,14 +77,14 @@ public class MatchingAssertionTranslatorTest {
         PrivateKey privateKey = new PrivateKeyStoreFactory().create(TestEntityIds.TEST_RP).getEncryptionPrivateKeys().get(0);
         KeyPair keyPair = new KeyPair(KeySupport.derivePublicKey(privateKey), privateKey);
         List<KeyPair> keyPairs = asList(keyPair, keyPair);
-        ResponseFactory responseFactory = new ResponseFactory(keyPairs, VERIFY_HUB_ENTITY_ID);
+        ResponseFactory responseFactory = new ResponseFactory(keyPairs);
 
         CollectionCredentialResolver resolver = new CollectionCredentialResolver(asList(testRpMsaSigningCredential));
         ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(resolver, DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
 
         DateTimeComparator dateTimeComparator = new DateTimeComparator(Duration.standardSeconds(5));
 
-        msaAssertionService = responseFactory.createMsaAssertionService(explicitKeySignatureTrustEngine, new SignatureValidatorFactory(), dateTimeComparator);
+        msaAssertionTranslator = responseFactory.createMsaAssertionTranslator(explicitKeySignatureTrustEngine, new SignatureValidatorFactory(), dateTimeComparator);
     }
 
     @Rule
@@ -98,7 +97,7 @@ public class MatchingAssertionTranslatorTest {
 
     @Test
     public void shouldTranslateValidAssertion() {
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionTranslator.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
@@ -111,7 +110,7 @@ public class MatchingAssertionTranslatorTest {
 
     @Test
     public void shouldAllowHigherLevelOfAssuranceThanRequested() throws Exception {
-        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionService.translateSuccessResponse(ImmutableList.of(
+        TranslatedMatchingResponseBody result = (TranslatedMatchingResponseBody) msaAssertionTranslator.translateSuccessResponse(ImmutableList.of(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).buildUnencrypted()
         ), IN_RESPONSE_TO, LEVEL_1, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
         assertThat(result).isEqualTo(new TranslatedMatchingResponseBody(
@@ -127,7 +126,7 @@ public class MatchingAssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        msaAssertionService.translateSuccessResponse(emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionTranslator.translateSuccessResponse(emptyList(), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -135,7 +134,7 @@ public class MatchingAssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        msaAssertionService.translateSuccessResponse(null, IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionTranslator.translateSuccessResponse(null, IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -143,7 +142,7 @@ public class MatchingAssertionTranslatorTest {
         expectedException.expect(SamlResponseValidationException.class);
         expectedException.expectMessage("Exactly one assertion is expected.");
 
-        msaAssertionService.translateSuccessResponse(
+        msaAssertionTranslator.translateSuccessResponse(
             ImmutableList.of(
                 anAssertion().buildUnencrypted(),
                 anAssertion().buildUnencrypted()
@@ -158,7 +157,7 @@ public class MatchingAssertionTranslatorTest {
         expectedException.expect(SamlTransformationErrorException.class);
         expectedException.expectMessage("SAML Validation Specification: Message signature is not signed");
 
-        msaAssertionService.translateSuccessResponse(Collections.singletonList(
+        msaAssertionTranslator.translateSuccessResponse(Collections.singletonList(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX).withoutSigning().buildUnencrypted()),
             IN_RESPONSE_TO,
             LEVEL_2,
@@ -172,7 +171,7 @@ public class MatchingAssertionTranslatorTest {
         expectedException.expectMessage("SAML Validation Specification: Signature was not valid.");
 
         Credential unknownSigningCredential = new TestCredentialFactory(TEST_PUBLIC_CERT, TEST_PRIVATE_KEY).getSigningCredential();
-        msaAssertionService.translateSuccessResponse(Collections.singletonList(
+        msaAssertionTranslator.translateSuccessResponse(Collections.singletonList(
             anAssertionWith("some-pid", LEVEL_2_AUTHN_CTX)
                 .withSignature(aSignature().withSigningCredential(unknownSigningCredential).build())
                 .buildUnencrypted()),
@@ -194,7 +193,7 @@ public class MatchingAssertionTranslatorTest {
             .addAuthnStatement(authnStatement
             ).buildUnencrypted();
 
-        msaAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionTranslator.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     @Test
@@ -212,7 +211,7 @@ public class MatchingAssertionTranslatorTest {
                 .build())
             .buildUnencrypted();
 
-        msaAssertionService.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
+        msaAssertionTranslator.translateSuccessResponse(ImmutableList.of(assertion), IN_RESPONSE_TO, LEVEL_2, VERIFY_SERVICE_PROVIDER_ENTITY_ID);
     }
 
     private AssertionBuilder aSignedAssertion() {
