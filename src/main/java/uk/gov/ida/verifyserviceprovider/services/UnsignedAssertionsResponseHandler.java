@@ -33,6 +33,7 @@ import static uk.gov.ida.saml.security.errors.SamlTransformationErrorFactory.una
 public class UnsignedAssertionsResponseHandler {
     private static final Logger LOG = LoggerFactory.getLogger(UnsignedAssertionsResponseHandler.class);
 
+    private final int ONLY_ONE_PRESENT = 0;
     private final EidasValidatorFactory eidasValidatorFactory;
     private final StringToOpenSamlObjectTransformer<Response> stringToResponseTransformer;
     private final InstantValidator instantValidator;
@@ -63,7 +64,7 @@ public class UnsignedAssertionsResponseHandler {
         ValidatedAssertions validatedHubAssertion = hubAssertionsSignatureValidator.validate(hubResponseAssertion, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
         ValidatedResponse validatedResponse = eidasValidatorFactory.getValidatedResponse(
                 stringToResponseTransformer.apply(
-                        getCountryResponseStringFromAssertion(validatedHubAssertion.getAssertions().get(0))
+                        getCountryResponseStringFromAssertion(validatedHubAssertion.getAssertions().get(ONLY_ONE_PRESENT))
                 )
         );
 
@@ -112,8 +113,8 @@ public class UnsignedAssertionsResponseHandler {
     }
 
     private String getCountryResponseStringFromAssertion(Assertion hubResponseAssertion) {
-        List<Attribute> attributes = hubResponseAssertion.getAttributeStatements().get(0).getAttributes();
-        CountrySamlResponse countrySamlResponse = (CountrySamlResponse) attributes.get(0).getAttributeValues().get(0);
+        List<Attribute> attributes = hubResponseAssertion.getAttributeStatements().get(ONLY_ONE_PRESENT).getAttributes();
+        CountrySamlResponse countrySamlResponse = (CountrySamlResponse) attributes.get(ONLY_ONE_PRESENT).getAttributeValues().get(ONLY_ONE_PRESENT);
         return countrySamlResponse.getValue();
     }
 

@@ -20,6 +20,7 @@ import java.util.List;
 
 public class ResponseService {
 
+    private final int ONLY_ONE_PRESENT = 0;
     private final StringToOpenSamlObjectTransformer<Response> samlObjectTransformer;
     private final AssertionDecrypter assertionDecrypter;
     private final AssertionTranslator assertionTranslator;
@@ -74,7 +75,7 @@ public class ResponseService {
                     if (unsignedAssertionsResponseHandler == null) { throw new MissingUnsignedAssertionsHandlerException(); }
 
                     ValidatedResponse validatedCountryResponse = unsignedAssertionsResponseHandler.getValidatedResponse(assertions, expectedInResponseTo);
-                    assertions = unsignedAssertionsResponseHandler.decryptAssertion(validatedCountryResponse, assertions.get(0));
+                    assertions = unsignedAssertionsResponseHandler.decryptAssertion(validatedCountryResponse, assertions.get(ONLY_ONE_PRESENT));
                 }
                 return assertionTranslator.translateSuccessResponse(assertions, expectedInResponseTo, expectedLevelOfAssurance, entityId);
             default:
@@ -85,10 +86,10 @@ public class ResponseService {
     private boolean assertionsContainEidasUnsignedAssertionsResponse(List<Assertion> assertions) {
         if (assertions == null || assertions.size() != 1) { return false; }
 
-        List<AttributeStatement> attributeStatements = assertions.get(0).getAttributeStatements();
+        List<AttributeStatement> attributeStatements = assertions.get(ONLY_ONE_PRESENT).getAttributeStatements();
         if (attributeStatements.isEmpty() || attributeStatements.size() != 1) { return false; }
 
-        return attributeStatements.get(0).getAttributes()
+        return attributeStatements.get(ONLY_ONE_PRESENT).getAttributes()
                 .stream()
                 .anyMatch(
                         attribute -> attribute.getName().equals(

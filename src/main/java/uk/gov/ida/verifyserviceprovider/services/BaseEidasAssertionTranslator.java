@@ -24,6 +24,7 @@ import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_
 
 public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTranslator {
 
+    private final int ONLY_ONE_PRESENT = 0;
     private final InstantValidator instantValidator;
     private final ConditionsValidator conditionsValidator;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
@@ -62,7 +63,7 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
             throw new SamlResponseValidationException("Exactly one country assertion is expected.");
         }
 
-        Assertion countryAssertion = assertions.get(0);
+        Assertion countryAssertion = assertions.get(ONLY_ONE_PRESENT);
 
         validateCountryAssertion(countryAssertion, expectedInResponseTo);
 
