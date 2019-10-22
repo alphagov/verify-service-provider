@@ -3,6 +3,9 @@ Release notes
 
 ### Next
 
+### 2.1.0
+[View Diff](https://github.com/alphagov/verify-service-provider/compare/2.0.0...2.1.0)
+
 #### Accept identities from more European countries
 The eIDAS specification does not require assertions to be signed, whereas the Verify specification does. This release adds the ability to for the VSP to accept these unsigned assertions in a secure manner.
 
