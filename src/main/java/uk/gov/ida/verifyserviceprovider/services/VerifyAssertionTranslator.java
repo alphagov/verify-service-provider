@@ -3,8 +3,6 @@ package uk.gov.ida.verifyserviceprovider.services;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-import uk.gov.ida.saml.core.domain.AuthnContext;
-import uk.gov.ida.saml.core.domain.NonMatchingAttributes;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
@@ -28,7 +26,6 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_ISSUERS;
 import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidationSpecification.MISMATCHED_PIDS;
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
 
 public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
@@ -36,7 +33,6 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
     private final AssertionAttributeStatementValidator attributeStatementValidator;
     private final AssertionClassifier assertionClassifierService;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
-    private UserIdHashFactory userIdHashFactory;
 
     public VerifyAssertionTranslator(
             SamlAssertionsSignatureValidator assertionsSignatureValidator,
@@ -47,33 +43,22 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
             UserIdHashFactory userIdHashFactory) {
-        super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
+        super(userIdHashFactory, subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.attributeStatementValidator = attributeStatementValidator;
         this.assertionClassifierService = assertionClassifierService;
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
-        this.userIdHashFactory = userIdHashFactory;
     }
 
     @Override
     public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
-        Assertion authnAssertion = getAuthnAssertion(assertions);
-        Assertion mdsAssertion = getMatchingDatasetAssertion(assertions);
-
-        LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(authnAssertion);
+        final Assertion authnAssertion = getAuthnAssertion(assertions);
+        final Assertion mdsAssertion = getMatchingDatasetAssertion(assertions);
+        final LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(authnAssertion);
 
         validate(authnAssertion, mdsAssertion, expectedInResponseTo, expectedLevelOfAssurance, levelOfAssurance);
 
-        String nameID = getNameIdFrom(mdsAssertion);
-        String issuerID = mdsAssertion.getIssuer().getValue();
-        String levelOfAssuranceUri = extractLevelOfAssuranceUriFrom(authnAssertion);
-        Optional<AuthnContext> authnContext = getAuthnContext(levelOfAssuranceUri);
-
-        String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
-
-        NonMatchingAttributes attributes = translateAttributes(mdsAssertion);
-
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
+        return translateAssertion(mdsAssertion, levelOfAssurance, getAuthnContext(extractLevelOfAssuranceUriFrom(authnAssertion)));
     }
 
     public void validate(Assertion authnAssertion, Assertion mdsAssertion, String requestId, LevelOfAssurance expectedLevelOfAssurance, LevelOfAssurance levelOfAssurance) {
@@ -92,9 +77,7 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
         }
     }
 
-    public void validateIdpAssertion(Assertion assertion,
-                                     String expectedInResponseTo,
-                                     QName role) {
+    public void validateIdpAssertion(Assertion assertion, String expectedInResponseTo, QName role) {
 
         if (assertion.getIssueInstant() == null) {
             throw new SamlResponseValidationException("Assertion IssueInstant is missing.");

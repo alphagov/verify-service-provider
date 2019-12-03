@@ -20,21 +20,20 @@ import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario.IDENTITY_VERIFIED;
-
 public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTranslator {
 
-    private final int ONLY_ONE_PRESENT = 0;
+    private final static int ONLY_ONE_PRESENT = 0;
+
     private final InstantValidator instantValidator;
     private final ConditionsValidator conditionsValidator;
     private final LevelOfAssuranceValidator levelOfAssuranceValidator;
-    protected final EidasMetadataResolverRepository metadataResolverRepository;
-    protected SignatureValidatorFactory signatureValidatorFactory;
     private final List<String> acceptableHubConnectorEntityIds;
-    private UserIdHashFactory userIdHashFactory;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
-    public BaseEidasAssertionTranslator(
+    final EidasMetadataResolverRepository metadataResolverRepository;
+    final SignatureValidatorFactory signatureValidatorFactory;
+
+    BaseEidasAssertionTranslator(
             EidasAssertionTranslatorValidatorContainer validatorContainer,
             MatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
@@ -42,14 +41,13 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
             SignatureValidatorFactory signatureValidatorFactory,
             List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
-        super(validatorContainer.getSubjectValidator(), matchingDatasetUnmarshaller, mdsMapper);
+        super(userIdHashFactory, validatorContainer.getSubjectValidator(), matchingDatasetUnmarshaller, mdsMapper);
         this.instantValidator = validatorContainer.getInstantValidator();
         this.conditionsValidator = validatorContainer.getConditionsValidator();
         this.levelOfAssuranceValidator = validatorContainer.getLevelOfAssuranceValidator();
         this.metadataResolverRepository = metadataResolverRepository;
         this.signatureValidatorFactory = signatureValidatorFactory;
         this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
-        this.userIdHashFactory = userIdHashFactory;
     }
 
     protected abstract void validateSignature(Assertion assertion, String issuerEntityId);
@@ -60,22 +58,13 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
             throw new SamlResponseValidationException("Exactly one country assertion is expected.");
         }
 
-        Assertion countryAssertion = assertions.get(ONLY_ONE_PRESENT);
-
+        final Assertion countryAssertion = assertions.get(ONLY_ONE_PRESENT);
         validateCountryAssertion(countryAssertion, expectedInResponseTo);
 
-        LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(countryAssertion);
+        final LevelOfAssurance levelOfAssurance = extractLevelOfAssuranceFrom(countryAssertion);
         levelOfAssuranceValidator.validate(levelOfAssurance, expectedLevelOfAssurance);
 
-        String nameID = getNameIdFrom(countryAssertion);
-        String issuerID = countryAssertion.getIssuer().getValue();
-        String levelOfAssuranceUri =  extractLevelOfAssuranceUriFrom(countryAssertion);
-        Optional<AuthnContext> authnContext = getAuthnContext(levelOfAssuranceUri);
-        String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
-
-        NonMatchingAttributes attributes = translateAttributes(countryAssertion);
-
-        return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
+        return translateAssertion(countryAssertion, levelOfAssurance, getAuthnContext(extractLevelOfAssuranceUriFrom(countryAssertion)));
     }
 
     private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
@@ -98,7 +87,6 @@ public abstract class BaseEidasAssertionTranslator extends IdentityAssertionTran
 
     private Optional<AuthnContext> getAuthnContext(String uri) {
         AuthnContext authnContext = authnContextFactory.mapFromEidasToLoA(uri);
-
         return Optional.of(authnContext);
     }
 

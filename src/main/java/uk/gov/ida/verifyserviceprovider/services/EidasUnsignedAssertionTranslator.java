@@ -17,7 +17,7 @@ public class EidasUnsignedAssertionTranslator extends BaseEidasAssertionTranslat
             EidasMetadataResolverRepository metadataResolverRepository,
             List<String> acceptableHubConnectorEntityIds,
             UserIdHashFactory userIdHashFactory) {
-            super(
+        super(
                 validatorContainer,
                 matchingDatasetUnmarshaller,
                 mdsMapper,
