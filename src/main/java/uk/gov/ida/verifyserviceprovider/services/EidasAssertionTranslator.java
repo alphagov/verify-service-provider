@@ -5,9 +5,9 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
+import uk.gov.ida.saml.hub.factories.UserIdHashFactory;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
-import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
 import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 
 import java.util.List;
