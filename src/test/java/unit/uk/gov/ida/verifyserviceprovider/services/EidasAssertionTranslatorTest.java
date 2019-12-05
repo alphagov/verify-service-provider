@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
+import uk.gov.ida.saml.core.domain.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
 
 import java.util.List;

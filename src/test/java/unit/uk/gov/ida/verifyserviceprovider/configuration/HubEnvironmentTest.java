@@ -3,7 +3,7 @@ package unit.uk.gov.ida.verifyserviceprovider.configuration;
 import org.junit.Test;
 import uk.gov.ida.verifyserviceprovider.configuration.HubEnvironment;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 public class HubEnvironmentTest {

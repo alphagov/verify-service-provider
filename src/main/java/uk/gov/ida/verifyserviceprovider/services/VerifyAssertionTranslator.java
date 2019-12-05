@@ -4,15 +4,15 @@ import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.saml.core.domain.AuthnContext;
+import uk.gov.ida.saml.core.domain.NonMatchingAttributes;
+import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
-import uk.gov.ida.verifyserviceprovider.dto.NonMatchingAttributes;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier.AssertionType;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
@@ -46,8 +46,7 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
             AssertionClassifier assertionClassifierService,
             MatchingDatasetToNonMatchingAttributesMapper mdsMapper,
             LevelOfAssuranceValidator levelOfAssuranceValidator,
-            UserIdHashFactory userIdHashFactory
-    ) {
+            UserIdHashFactory userIdHashFactory) {
         super(subjectValidator, matchingDatasetUnmarshaller, mdsMapper);
         this.assertionsSignatureValidator = assertionsSignatureValidator;
         this.attributeStatementValidator = attributeStatementValidator;
@@ -55,7 +54,6 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
         this.levelOfAssuranceValidator = levelOfAssuranceValidator;
         this.userIdHashFactory = userIdHashFactory;
     }
-
 
     @Override
     public TranslatedNonMatchingResponseBody translateSuccessResponse(List<Assertion> assertions, String expectedInResponseTo, LevelOfAssurance expectedLevelOfAssurance, String entityId) {
@@ -68,7 +66,7 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
         String nameID = getNameIdFrom(mdsAssertion);
         String issuerID = mdsAssertion.getIssuer().getValue();
-        String levelOfAssuranceUri =  extractLevelOfAssuranceUriFrom(authnAssertion);
+        String levelOfAssuranceUri = extractLevelOfAssuranceUriFrom(authnAssertion);
         Optional<AuthnContext> authnContext = getAuthnContext(levelOfAssuranceUri);
 
         String hashId = userIdHashFactory.hashId(issuerID, nameID, authnContext);
@@ -77,7 +75,6 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
 
         return new TranslatedNonMatchingResponseBody(IDENTITY_VERIFIED, hashId, levelOfAssurance, attributes);
     }
-
 
     public void validate(Assertion authnAssertion, Assertion mdsAssertion, String requestId, LevelOfAssurance expectedLevelOfAssurance, LevelOfAssurance levelOfAssurance) {
 
@@ -96,8 +93,8 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
     }
 
     public void validateIdpAssertion(Assertion assertion,
-                                      String expectedInResponseTo,
-                                      QName role) {
+                                     String expectedInResponseTo,
+                                     QName role) {
 
         if (assertion.getIssueInstant() == null) {
             throw new SamlResponseValidationException("Assertion IssueInstant is missing.");
@@ -123,7 +120,6 @@ public class VerifyAssertionTranslator extends IdentityAssertionTranslator {
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         attributeStatementValidator.validate(assertion);
     }
-
 
     private Assertion getAuthnAssertion(Collection<Assertion> assertions) {
         Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()

@@ -11,7 +11,7 @@ import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.verifyserviceprovider.dto.MatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.builders.StatusCodeBuilder.aStatusCode;
 
 public class MatchingResponderCodeTranslatorTest {
@@ -85,5 +85,4 @@ public class MatchingResponderCodeTranslatorTest {
             .build();
         msaAssertionService.translateResponderCode(statusCode);
     }
-
 }

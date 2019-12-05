@@ -154,7 +154,7 @@ public class NonMatchingAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
+        assertThat(attributes.keySet()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter);
@@ -224,7 +224,7 @@ public class NonMatchingAcceptanceTest {
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
+        assertThat(attributes.keySet()).containsExactlyInAnyOrder(COMMON_ATTRIBUTES);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String expectedFromDateString = standardFromDate.toLocalDate().atStartOfDay().format(formatter);
         String expectedToDateString = standardToDate.toLocalDate().atStartOfDay().format(formatter);
