@@ -17,6 +17,7 @@ import uk.gov.ida.verifyserviceprovider.exceptions.JerseyViolationExceptionMappe
 import uk.gov.ida.verifyserviceprovider.exceptions.JsonProcessingExceptionMapper;
 import uk.gov.ida.verifyserviceprovider.factories.VerifyServiceProviderFactory;
 import uk.gov.ida.verifyserviceprovider.listeners.VerifyServiceProviderServerListener;
+import uk.gov.ida.verifyserviceprovider.resources.OidcAuthenticationResource;
 import uk.gov.ida.verifyserviceprovider.utils.ConfigurationFileFinder;
 
 import javax.ws.rs.client.Client;
@@ -74,6 +75,7 @@ public class VerifyServiceProviderApplication extends Application<VerifyServiceP
         environment.jersey().register(factory.getVersionNumberResource());
         environment.jersey().register(factory.getGenerateAuthnRequestResource());
         environment.jersey().register(factory.getTranslateSamlResponseResource());
+        environment.jersey().register(new OidcAuthenticationResource());
         environment.lifecycle().addServerLifecycleListener(new VerifyServiceProviderServerListener(environment));
     }
 }
