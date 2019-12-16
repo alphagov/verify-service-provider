@@ -72,28 +72,27 @@ public class ComplianceToolModeAcceptanceTest {
         final ObjectMapper objectMapper = bootstrap.getObjectMapper();
         return new ComplianceToolMode(objectMapper, bootstrap.getValidatorFactory().getValidator(), application) {
 
-        @Override
-        public void run(Bootstrap<?> wildcardBootstrap, Namespace defaultNamespace) throws Exception {
-            Namespace namespace = applyCommandLineArguments(defaultNamespace,
-                    "--url", "http://localhost:8080",
-                    "-d", objectMapper.writeValueAsString(matchingDataset),
-                    "--host", "127.0.0.1",
-                    "-p", "0");
-            super.run(wildcardBootstrap, namespace);
-        }
+            @Override
+            public void run(Bootstrap<?> wildcardBootstrap, Namespace defaultNamespace) throws Exception {
+                Namespace namespace = applyCommandLineArguments(defaultNamespace,
+                        "--url", "http://localhost:8080",
+                        "-d", objectMapper.writeValueAsString(matchingDataset),
+                        "--host", "127.0.0.1",
+                        "-p", "0");
+                super.run(wildcardBootstrap, namespace);
+            }
 
-        private Namespace applyCommandLineArguments(Namespace defaultNamespace, String... arguments) throws ArgumentParserException {
-            final ArgumentParser p = ArgumentParsers.newArgumentParser("Usage:", false);
-            final Subparser subparser = p.addSubparsers().addParser(getName(), false);
-            configure(subparser);
-            HashMap<String, Object> attributes = new HashMap<>();
-            attributes.putAll(subparser.parseArgs(arguments).getAttrs());
-            attributes.putAll(defaultNamespace.getAttrs());
-            return new Namespace(attributes);
-        }
-    };
+            private Namespace applyCommandLineArguments(Namespace defaultNamespace, String... arguments) throws ArgumentParserException {
+                final ArgumentParser p = ArgumentParsers.newArgumentParser("Usage:", false);
+                final Subparser subparser = p.addSubparsers().addParser(getName(), false);
+                configure(subparser);
+                HashMap<String, Object> attributes = new HashMap<>();
+                attributes.putAll(subparser.parseArgs(arguments).getAttrs());
+                attributes.putAll(defaultNamespace.getAttrs());
+                return new Namespace(attributes);
+            }
+        };
     }
-
 
     private static MatchingDataset matchingDataset = createMatchingDataset("Bob", "Smith");
 
@@ -116,7 +115,7 @@ public class ComplianceToolModeAcceptanceTest {
             VerifyServiceProviderApplication.class,
             null,
             Optional.of("dw"),
-            (application)-> commandLineInitiator(application, matchingDataset)
+            (application) -> commandLineInitiator(application, matchingDataset)
     );
 
     private Client client;
@@ -137,7 +136,7 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     @Test
-    public void shouldGenerateARequestToALocalHubService() throws Exception {
+    public void shouldGenerateARequestToALocalHubService() {
         Response authnRequest = client
                 .target(appUri("generate-request"))
                 .request()
@@ -163,10 +162,9 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
+        assertThat(attributes.keySet()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
 
         checkMatchingDatasetMatches(attributes, matchingDataset);
-
     }
 
     @Test
@@ -188,7 +186,7 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     @Test
-    public void shouldLetYouRefreshTheMatchingDataset() throws Exception {
+    public void shouldLetYouRefreshTheMatchingDataset() {
         MatchingDataset newMatchingDataset = createMatchingDataset("Alice", "Surname");
 
         Response refreshDataset = client
@@ -224,14 +222,14 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
+        assertThat(attributes.keySet()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
 
         checkMatchingDatasetMatches(attributes, newMatchingDataset);
 
     }
 
     @Test
-    public void shouldLetYouUseEidasStyleAttributes() throws Exception {
+    public void shouldLetYouUseEidasStyleAttributes() {
         MatchingDataset matchingDataset = new MatchingDatasetBuilder().withEidasFirstName("FOO")
                 .withEidasMiddlename("BAR")
                 .withEidasSurname("BAZ")
@@ -273,7 +271,7 @@ public class ComplianceToolModeAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
 
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keys()).containsExactlyInAnyOrder(COMMON_FIELDS);
+        assertThat(attributes.keySet()).containsExactlyInAnyOrder(COMMON_FIELDS);
 
         checkMdsValueInArrayAttributeWithoutDates("firstNames", 0, matchingDataset.getFirstName().getValue(), matchingDataset.getFirstName().isVerified(), attributes);
         checkMdsValueInArrayAttributeWithoutDates("datesOfBirth", 0, matchingDataset.getDateOfBirth().getValue(), matchingDataset.getDateOfBirth().isVerified(), attributes);
@@ -309,7 +307,7 @@ public class ComplianceToolModeAcceptanceTest {
     }
 
     private void checkMatchingDatasetListAttribute(JSONObject attributes, String attributeName, int index, List<MatchingAttribute> attributeList) {
-        MatchingAttribute expectedAttribute = attributeList.get(index) ;
+        MatchingAttribute expectedAttribute = attributeList.get(index);
         checkMatchingDatasetListAttribute(attributes, attributeName, index, expectedAttribute);
     }
 
@@ -319,5 +317,4 @@ public class ComplianceToolModeAcceptanceTest {
         String toDate = expectedAttribute.getTo().toLocalDate().atStartOfDay().format(formatter);
         MdsValueChecker.checkMdsValueOfAttribute(attributeName, expectedAttribute.getValue(), expectedAttribute.isVerified(), fromDate, toDate, attributes);
     }
-
 }

@@ -3,6 +3,9 @@ package uk.gov.ida.verifyserviceprovider.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.ida.saml.core.domain.NonMatchingAttributes;
+
+import java.util.Objects;
 
 public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody {
 
@@ -57,9 +60,9 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
         TranslatedNonMatchingResponseBody that = (TranslatedNonMatchingResponseBody) o;
 
         if (scenario != that.scenario) return false;
-        if (pid != null ? !pid.equals(that.pid) : that.pid != null) return false;
+        if (!Objects.equals(pid, that.pid)) return false;
         if (levelOfAssurance != that.levelOfAssurance) return false;
-        return attributes != null ? attributes.equals(that.attributes) : that.attributes == null;
+        return Objects.equals(attributes, that.attributes);
     }
 
     @Override
@@ -80,5 +83,4 @@ public class TranslatedNonMatchingResponseBody implements TranslatedResponseBody
                 ", attributes=" + attributes +
                 '}';
     }
-
 }

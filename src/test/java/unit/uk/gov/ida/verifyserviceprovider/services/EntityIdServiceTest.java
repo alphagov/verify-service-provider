@@ -8,8 +8,8 @@ import uk.gov.ida.verifyserviceprovider.services.EntityIdService;
 
 import java.util.Arrays;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class EntityIdServiceTest {
     private final String entityId = "http://default.entity.id";

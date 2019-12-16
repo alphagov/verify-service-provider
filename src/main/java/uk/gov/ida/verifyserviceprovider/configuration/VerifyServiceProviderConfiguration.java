@@ -20,7 +20,8 @@ import java.util.Optional;
 
 public class VerifyServiceProviderConfiguration extends Configuration {
 
-    public static final String NOT_EMPTY_MESSAGE = "may not be empty";
+    private static final String NOT_EMPTY_MESSAGE = "may not be empty";
+
     private List<String> serviceEntityIds;
     private String hashingEntityId;
     private VerifyHubConfiguration verifyHubConfiguration;
@@ -31,18 +32,19 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private Duration clockSkew;
     private Optional<EuropeanIdentityConfiguration> europeanIdentity;
 
-    protected VerifyServiceProviderConfiguration() {}
+    protected VerifyServiceProviderConfiguration() {
+    }
+
     public VerifyServiceProviderConfiguration(
-        @JsonProperty("serviceEntityIds") @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid List<String> serviceEntityIds,
-        @JsonProperty("hashingEntityId") @Valid String hashingEntityId,
-        @JsonProperty("verifyHubConfiguration") @NotNull @Valid VerifyHubConfiguration verifyHubConfiguration,
-        @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
-        @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
-        @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-        @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
-        @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
-        @JsonProperty("europeanIdentity") @Valid @UnwrapValidatedValue Optional<EuropeanIdentityConfiguration> europeanIdentity
-    ) {
+            @JsonProperty("serviceEntityIds") @NotNull @Size(min = 1, message = NOT_EMPTY_MESSAGE) @Valid List<String> serviceEntityIds,
+            @JsonProperty("hashingEntityId") @Valid String hashingEntityId,
+            @JsonProperty("verifyHubConfiguration") @NotNull @Valid VerifyHubConfiguration verifyHubConfiguration,
+            @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
+            @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
+            @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
+            @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
+            @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
+            @JsonProperty("europeanIdentity") @Valid @UnwrapValidatedValue Optional<EuropeanIdentityConfiguration> europeanIdentity) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
         this.verifyHubConfiguration = verifyHubConfiguration;
@@ -60,12 +62,14 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     }
 
     public String getHashingEntityId() {
-        if(hashingEntityId != null) {
+        if (hashingEntityId != null) {
             return hashingEntityId;
         }
+
         if (getServiceEntityIds().size() == 1) {
             return getServiceEntityIds().get(0);
         }
+
         throw new NoHashingEntityIdIsProvidedError("No HashingEntityId is provided");
     }
 

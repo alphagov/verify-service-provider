@@ -15,12 +15,15 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
+import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.hub.factories.UserIdHashFactory;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
@@ -28,13 +31,11 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
-import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.SubjectValidator;
-import uk.gov.ida.saml.core.domain.AuthnContext;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -205,7 +206,7 @@ public class VerifyAssertionTranslatorTest {
         Assertion authnAssertion = anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted();
         Assertion mdsAssertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
 
-        verifyAssertionService.validate(authnAssertion, mdsAssertion,"requestId", LevelOfAssurance.LEVEL_1, LEVEL_2);
+        verifyAssertionService.validate(authnAssertion, mdsAssertion, "requestId", LevelOfAssurance.LEVEL_1, LEVEL_2);
 
         verify(subjectValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
@@ -231,7 +232,6 @@ public class VerifyAssertionTranslatorTest {
         exception.expectMessage("Expected a level of assurance.");
         verifyAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
     }
-
 
     @Test
     public void shouldThrowExceptionWithUnknownLevelOfAssurance() throws Exception {
@@ -261,11 +261,11 @@ public class VerifyAssertionTranslatorTest {
 
         TranslatedNonMatchingResponseBody responseBody = verifyAssertionService.translateSuccessResponse(ImmutableList.of(authnAssertion, mdsAssertion), "requestId", LEVEL_2, "default-entity-id");
 
-        verify(userIdHashFactory, times(1)).hashId(issuerId,nameId, Optional.of(AuthnContext.LEVEL_2));
+        verify(userIdHashFactory, times(1)).hashId(issuerId, nameId, Optional.of(AuthnContext.LEVEL_2));
         assertThat(responseBody.toString()).contains(expectedNonMatchingResponseBody.getPid());
     }
 
-    public static AssertionBuilder aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, String requestId) {
+    private static AssertionBuilder aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, String requestId) {
         return anAssertion()
                 .withId("mds-assertion")
                 .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
@@ -275,7 +275,7 @@ public class VerifyAssertionTranslatorTest {
                 .withConditions(aConditions().build());
     }
 
-    public static AssertionBuilder anAuthnStatementAssertion(String authnContext, String inResponseTo) {
+    private static AssertionBuilder anAuthnStatementAssertion(String authnContext, String inResponseTo) {
         return anAssertion()
                 .addAuthnStatement(
                         anAuthnStatement()
@@ -301,7 +301,7 @@ public class VerifyAssertionTranslatorTest {
                 .addAttributeStatement(anAttributeStatement().addAttribute(anIPAddress().build()).build());
     }
 
-    public static Subject anAssertionSubject(final String inResponseTo) {
+    private static Subject anAssertionSubject(final String inResponseTo) {
         return aSubject()
                 .withSubjectConfirmation(
                         aSubjectConfirmation()
@@ -314,18 +314,10 @@ public class VerifyAssertionTranslatorTest {
                 ).build();
     }
 
-    public static Signature anIdpSignature() {
+    private static Signature anIdpSignature() {
         return aSignature().withSigningCredential(
                 new TestCredentialFactory(STUB_IDP_PUBLIC_PRIMARY_CERT, STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY)
                         .getSigningCredential()).build();
 
     }
-
-    public static AssertionBuilder aMatchingDatasetAssertion(String requestId) {
-        return anAssertion()
-                .withId("mds-assertion")
-                .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
-                .addAttributeStatement(anAttributeStatement().build());
-    }
-
 }

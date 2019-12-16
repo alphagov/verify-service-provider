@@ -9,7 +9,9 @@ import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
+import uk.gov.ida.saml.hub.factories.UserIdHashFactory;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
@@ -17,8 +19,6 @@ import uk.gov.ida.verifyserviceprovider.dto.NonMatchingScenario;
 import uk.gov.ida.verifyserviceprovider.dto.TestTranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedNonMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.SignatureValidatorFactory;
-import uk.gov.ida.verifyserviceprovider.factories.saml.UserIdHashFactory;
-import uk.gov.ida.verifyserviceprovider.mappers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.verifyserviceprovider.services.BaseEidasAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
 import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
@@ -31,7 +31,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -163,7 +163,7 @@ public abstract class BaseEidasAssertionTranslatorTestBase {
             ).build();
     }
 
-    protected EidasAssertionTranslatorValidatorContainer getEidasAssertionTranslatorValidatorContainer() {
+    EidasAssertionTranslatorValidatorContainer getEidasAssertionTranslatorValidatorContainer() {
         return new EidasAssertionTranslatorValidatorContainer(
                 subjectValidator,
                 instantValidator,

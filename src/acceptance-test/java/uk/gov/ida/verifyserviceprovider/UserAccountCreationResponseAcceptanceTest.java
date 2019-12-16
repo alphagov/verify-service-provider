@@ -67,7 +67,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         assertThat(jsonResponse.getString("scenario")).isEqualTo(ACCOUNT_CREATION.name());
         assertThat(jsonResponse.getString("pid")).isEqualTo("some-expected-pid");
-        assertThat(jsonResponse.keys()).contains("attributes");
+        assertThat(jsonResponse.keySet()).contains("attributes");
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_2.name());
     }
 
@@ -87,7 +87,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         assertThat(jsonResponse.getString("scenario")).isEqualTo(ACCOUNT_CREATION.name());
         assertThat(jsonResponse.getString("pid")).isEqualTo("some-expected-pid");
-        assertThat(jsonResponse.keys()).contains("attributes");
+        assertThat(jsonResponse.keySet()).contains("attributes");
         assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
     }
 
@@ -99,7 +99,7 @@ public class UserAccountCreationResponseAcceptanceTest {
         JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
         JSONObject attributes = jsonResponse.getJSONObject("attributes");
 
-        assertThat(attributes.keys()).containsExactly("firstName", "dateOfBirth");
+        assertThat(attributes.keySet()).containsExactly("firstName", "dateOfBirth");
     }
 
     @Test

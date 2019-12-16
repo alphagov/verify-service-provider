@@ -49,7 +49,7 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
 
     @Override
     public URI getUri() {
-        return ofNullable(super.getUri()).orElse(environment.getMetadataUri());
+        return ofNullable(super.getUri()).orElseGet(() -> environment.getMetadataUri());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
         return ofNullable(trustStoreConfiguration)
                 .map(TrustStoreConfiguration::getTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(environment::getMetadataTrustStore);
+                .orElseGet(() -> environment.getMetadataTrustStore());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
         return of(ofNullable(hubTrustStoreConfiguration)
                 .map(TrustStoreConfiguration::getTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(environment::getHubTrustStore));
+                .orElseGet(() -> environment.getHubTrustStore()));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
         return of(ofNullable(idpTrustStoreConfiguration)
                 .map(TrustStoreConfiguration::getTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(environment::getIdpTrustStore));
+                .orElseGet(() -> environment.getIdpTrustStore()));
     }
 
     private static String generateExpectedEntityId(HubEnvironment hubEnvironment) {
