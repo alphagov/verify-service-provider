@@ -29,8 +29,8 @@ public class VerifyHubConfigurationFeatureTests {
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
         HubMetadataConfiguration metadataConfiguration = actualConfiguration.getHubMetadataConfiguration();
 
-        assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO");
-        assertThat(metadataConfiguration.getUri().toString()).isEqualTo("https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation");
+        assertThat(actualConfiguration.getHubSsoLocation().toString()).isEqualTo("https://compliance-tool-integration.cloudapps.digital/SAML2/SSO");
+        assertThat(metadataConfiguration.getUri().toString()).isEqualTo("https://compliance-tool-integration.cloudapps.digital/SAML2/metadata/federation");
         assertThat(metadataConfiguration.getExpectedEntityId()).isEqualTo("https://signin.service.gov.uk");
         assertThat(metadataConfiguration.getTrustStore().containsAlias("idaca")).isTrue();
         assertThat(metadataConfiguration.getJerseyClientConfiguration()).isNotNull();

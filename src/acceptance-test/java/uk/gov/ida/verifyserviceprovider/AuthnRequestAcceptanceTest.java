@@ -30,7 +30,7 @@ import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV1Initiali
 
 public class AuthnRequestAcceptanceTest {
 
-    private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-integration.cloudapps.digital";
     private static String SINGLE_ENTITY_ID = "http://default-entity-id";
     private static String HASHING_ENTITY_ID = "http://default-entity-id";
     private static String MULTI_ENTITY_ID_1 = "http://service-entity-id-one";

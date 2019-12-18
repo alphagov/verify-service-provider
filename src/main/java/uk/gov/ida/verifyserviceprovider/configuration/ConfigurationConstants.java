@@ -21,7 +21,7 @@ public interface ConfigurationConstants {
 
     String PRODUCTION_HOST ="https://www.signin.service.gov.uk";
     String INTEGRATION_HOST ="https://www.integration.signin.service.gov.uk";
-    String COMPLIANCE_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    String COMPLIANCE_HOST = "https://compliance-tool-integration.cloudapps.digital";
 
     String SSO_PATH = "/SAML2/SSO";
     String METADATA_PATH = "/SAML2/metadata/federation";
@@ -60,7 +60,7 @@ public interface ConfigurationConstants {
     String COMPLIANCE_METADATASOURCE_URI = COMPLIANCE_HOST + METADATASOURCE_PATH;
 
     String[] COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
-        "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/connector",         // (AWS)
+        "https://compliance-tool-integration.cloudapps.digital/SAML2/metadata/connector",                       // (AWS)
         "connector-node-compliance-tool-reference.london.verify.govsvc.uk/ConnectorMetadata",                   // (GSP)
         "https://eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",                      // (potential new #1)
         "https://connector.eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",            // (potential new #2)

@@ -24,7 +24,7 @@ nx13JhSPXZnB+t2rL+V6ppqwbCI/z3EO</ds:X509Certificate>
           </ds:X509Data>
         </ds:KeyInfo>
       </md:KeyDescriptor>
-      <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO"/>
+      <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://compliance-tool-integration.cloudapps.digital/SAML2/SSO"/>
     </md:IDPSSODescriptor>
   </md:EntityDescriptor>
 </md:EntitiesDescriptor>

@@ -20,7 +20,7 @@ import static uk.gov.ida.verifyserviceprovider.builders.ComplianceToolV2Initiali
 
 public class ComplianceToolService {
 
-    private static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static final String HOST = "https://compliance-tool-integration.cloudapps.digital";
     public static final String SSO_LOCATION = HOST + "/SAML2/SSO";
 
     public static final int BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID = 1;
