@@ -56,7 +56,7 @@ import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VE
 public class ComplianceToolModeAcceptanceTest {
 
     public static final String[] COMMON_FIELDS = {"firstNames", "middleNames", "surnames", "datesOfBirth", "addresses"};
-    private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static String COMPLIANCE_TOOL_HOST = "https://compliance-tool-integration.cloudapps.digital";
 
     private static final KeyStoreResource KEY_STORE_RESOURCE = aKeyStoreResource()
             .withCertificate("VERIFY-FEDERATION", aCertificate().withCertificate(METADATA_SIGNING_A_PUBLIC_CERT).build().getCertificate())

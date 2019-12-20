@@ -3,6 +3,10 @@ Release notes
 
 ### Next
 
+#### Updated Compliance Tool's URL address
+
+The Compliance Tool has started using the new URL address `https://compliance-tool-integration.cloudapps.digital` instead of the old URL address `https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk`. This is to ensure that Verify Service Provider can continue to access the Compliance Tool.
+
 ### 2.1.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/2.0.0...2.1.0)
 

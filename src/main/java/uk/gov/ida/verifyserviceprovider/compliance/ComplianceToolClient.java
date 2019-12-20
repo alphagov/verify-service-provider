@@ -13,7 +13,7 @@ import java.util.Base64;
 
 public class ComplianceToolClient {
 
-    private static final String HOST = "https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk";
+    private static final String HOST = "https://compliance-tool-integration.cloudapps.digital";
 
     private final Client client;
     private final String url;
