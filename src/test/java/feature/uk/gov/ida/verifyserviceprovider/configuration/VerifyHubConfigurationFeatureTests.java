@@ -91,10 +91,42 @@ public class VerifyHubConfigurationFeatureTests {
         String config = "{" +
             "\"environment\": \"PRODUCTION\"," +
             "\"metadata\": {" +
-            "\"trustStore\": {" +
+            "\"hubTrustStore\": {" +
             "\"path\": \"" + keyStore.getAbsolutePath() + "\"," +
             "\"password\": \"" + keyStore.getPassword() + "\"" +
             "}}}";
+
+        VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
+
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getHubTrustStore()).isPresent();
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getHubTrustStore().get().containsAlias("rootCA"));
+    }
+
+    @Test
+    public void shouldSetIdpMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
+        String config = "{" +
+                "\"environment\": \"PRODUCTION\"," +
+                "\"metadata\": {" +
+                "\"idpTrustStore\": {" +
+                "\"path\": \"" + keyStore.getAbsolutePath() + "\"," +
+                "\"password\": \"" + keyStore.getPassword() + "\"" +
+                "}}}";
+
+        VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
+
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getIdpTrustStore()).isPresent();
+        assertThat(actualConfiguration.getHubMetadataConfiguration().getIdpTrustStore().get().containsAlias("rootCA"));
+    }
+
+    @Test
+    public void shouldSetMetadataTrustStorePathToTheConfigValueIfOneHasBeenProvided() throws Exception {
+        String config = "{" +
+                "\"environment\": \"PRODUCTION\"," +
+                "\"metadata\": {" +
+                "\"trustStore\": {" +
+                "\"path\": \"" + keyStore.getAbsolutePath() + "\"," +
+                "\"password\": \"" + keyStore.getPassword() + "\"" +
+                "}}}";
 
         VerifyHubConfiguration actualConfiguration = OBJECT_MAPPER.readValue(config, VerifyHubConfiguration.class);
 

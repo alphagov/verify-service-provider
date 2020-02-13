@@ -24,7 +24,12 @@ public class VerifyHubConfiguration {
             @JsonProperty("metadata") HubMetadataConfiguration hubMetadataConfiguration
     ) {
         this.hubEnvironment = hubEnvironment;
-        this.hubSsoLocation = hubSsoLocation != null ? hubSsoLocation : hubEnvironment.getSsoLocation();
+
+        this.hubSsoLocation = ofNullable(hubSsoLocation).orElseGet(() ->
+                ofNullable(hubEnvironment)
+                        .map(HubEnvironment::getSsoLocation)
+                        .orElseThrow(() -> new IllegalArgumentException("Missing configuration value for ssoLocation. Either provide an override or set environment in the verifyHubConfiguration section")));
+
         this.hubMetadataConfiguration = ofNullable(hubMetadataConfiguration).orElse(createHubMetadataConfigurationWithDefaults());
         this.hubMetadataConfiguration.setEnvironment(hubEnvironment);
     }

@@ -12,6 +12,7 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -49,7 +50,8 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
 
     @Override
     public URI getUri() {
-        return ofNullable(super.getUri()).orElseGet(() -> environment.getMetadataUri());
+        return ofNullable(super.getUri()).orElseGet(() ->
+                getValueFromEnvironment(HubEnvironment::getMetadataUri, "metadata.uri"));
     }
 
     @Override
@@ -60,25 +62,25 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
     @Override
     public KeyStore getTrustStore() {
         return ofNullable(trustStoreConfiguration)
-                .map(TrustStoreConfiguration::getTrustStore)
+                .map(this::tryGetTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(() -> environment.getMetadataTrustStore());
+                .orElseGet(() -> getValueFromEnvironment(HubEnvironment::getMetadataTrustStore, "metadata.trustStore"));
     }
 
     @Override
     public Optional<KeyStore> getHubTrustStore() {
         return of(ofNullable(hubTrustStoreConfiguration)
-                .map(TrustStoreConfiguration::getTrustStore)
+                .map(this::tryGetTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(() -> environment.getHubTrustStore()));
+                .orElseGet(() -> getValueFromEnvironment(HubEnvironment::getHubTrustStore, "metadata.hubTrustStore")));
     }
 
     @Override
     public Optional<KeyStore> getIdpTrustStore() {
         return of(ofNullable(idpTrustStoreConfiguration)
-                .map(TrustStoreConfiguration::getTrustStore)
+                .map(this::tryGetTrustStore)
                 .map(this::validateTruststore)
-                .orElseGet(() -> environment.getIdpTrustStore()));
+                .orElseGet(() -> getValueFromEnvironment(HubEnvironment::getIdpTrustStore, "metadata.idpTrustStore")));
     }
 
     private static String generateExpectedEntityId(HubEnvironment hubEnvironment) {
@@ -107,5 +109,23 @@ public class HubMetadataConfiguration extends MetadataConfiguration {
             throw new EmptyTrustStoreException();
         }
         return trustStore;
+    }
+
+    private KeyStore tryGetTrustStore(TrustStoreConfiguration trustStoreConfiguration) {
+        try {
+            return trustStoreConfiguration.getTrustStore();
+        } catch (NullPointerException ignored) {
+            return null;
+        }
+    }
+
+    private <T> T getValueFromEnvironment(Function<HubEnvironment, T> supplier, String valueName) {
+        return ofNullable(this.environment)
+                .map(supplier)
+                .orElseThrow(() -> createConfigValueMissingException(valueName));
+    }
+
+    private RuntimeException createConfigValueMissingException(String valueName) {
+        return new IllegalArgumentException("Missing configuration value for " + valueName + ". Either provide an override or set environment in the verifyHubConfiguration section");
     }
 }
