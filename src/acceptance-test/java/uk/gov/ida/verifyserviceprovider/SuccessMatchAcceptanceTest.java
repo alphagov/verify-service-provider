@@ -180,7 +180,7 @@ public class SuccessMatchAcceptanceTest {
     public void shouldReturnAnErrorWhenNullRequestIdIsProvided() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
 
-        Map<String, String> translateResponseRequestData = new HashMap<>(); // not a lot of map implementations allow nulls
+        Map<String, String> translateResponseRequestData = new HashMap<>();
         translateResponseRequestData.put(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID));
         translateResponseRequestData.put("requestId", null);
@@ -202,7 +202,7 @@ public class SuccessMatchAcceptanceTest {
     public void shouldReturnAnErrorForTheNullRequestIdProvidedRegardlessOfIncorrectSaml() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
 
-        Map<String, String> translateResponseRequestData = new HashMap<>(); // not a lot of map implementations allow nulls
+        Map<String, String> translateResponseRequestData = new HashMap<>();
         translateResponseRequestData.put("samlResponse", "not a SAML response");
         translateResponseRequestData.put("requestId", null);
         translateResponseRequestData.put("levelOfAssurance", LEVEL_2.name());
@@ -275,7 +275,7 @@ public class SuccessMatchAcceptanceTest {
     public void shouldReturnAnErrorWhenAnEmptyRequestIdIsProvided() {
         RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
 
-        Map<String, String> translateResponseRequestData = new HashMap<>(); // not a lot of map implementations allow nulls
+        Map<String, String> translateResponseRequestData = new HashMap<>();
         translateResponseRequestData.put(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID));
         translateResponseRequestData.put("requestId", "");
@@ -300,7 +300,7 @@ public class SuccessMatchAcceptanceTest {
 
         String falseRequestId = "_" + UUID.randomUUID().toString();
 
-        Map<String, String> translateResponseRequestData = new HashMap<>(); // not a lot of map implementations allow nulls
+        Map<String, String> translateResponseRequestData = new HashMap<>();
         translateResponseRequestData.put(
             "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), BASIC_SUCCESSFUL_MATCH_WITH_LOA2_ID));
         translateResponseRequestData.put("requestId", falseRequestId);
