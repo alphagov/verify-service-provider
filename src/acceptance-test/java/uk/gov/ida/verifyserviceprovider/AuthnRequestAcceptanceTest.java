@@ -8,6 +8,7 @@ import keystore.KeyStoreResource;
 import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.platform.commons.util.StringUtils;
 import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfiguration;
 import uk.gov.ida.verifyserviceprovider.dto.RequestGenerationBody;
 import uk.gov.ida.verifyserviceprovider.dto.RequestResponseBody;
@@ -87,13 +88,14 @@ public class AuthnRequestAcceptanceTest {
 
         setupComplianceToolWithDefaultEntityId(client);
 
-        Response authnResponse = client
+        Response generateRequestResponse = client
                 .target(URI.create(String.format("http://localhost:%d/generate-request", singleTenantApplication.getLocalPort())))
                 .request()
                 .buildPost(Entity.json(null))
                 .invoke();
 
-        RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
+        RequestResponseBody authnSaml = generateRequestResponse.readEntity(RequestResponseBody.class);
+        assertThat(StringUtils.isNotBlank(authnSaml.getRequestId()));
 
         Response complianceToolResponse = client
                 .target(authnSaml.getSsoLocation())
@@ -120,6 +122,7 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
+        assertThat(StringUtils.isNotBlank(authnSaml.getRequestId()));
 
         Response complianceToolResponse = client
             .target(authnSaml.getSsoLocation())
@@ -145,6 +148,7 @@ public class AuthnRequestAcceptanceTest {
             .invoke();
 
         RequestResponseBody authnSaml = authnResponse.readEntity(RequestResponseBody.class);
+        assertThat(StringUtils.isNotBlank(authnSaml.getRequestId()));
 
         Response complianceToolResponse = client
             .target(authnSaml.getSsoLocation())
