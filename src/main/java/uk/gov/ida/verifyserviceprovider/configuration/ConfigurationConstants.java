@@ -34,11 +34,8 @@ public interface ConfigurationConstants {
     String PRODUCTION_METADATASOURCE_URI = PRODUCTION_HOST + METADATASOURCE_PATH;
 
     String[] PRODUCTION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
-        "https://www.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
-        "https://connector-node.london.verify.govsvc.uk/ConnectorMetadata",         // (GSP)
-        "https://eidas.signin.service.gov.uk/ConnectorMetadata",                    // (potential new #1)
-        "https://connector.eidas.signin.service.gov.uk/ConnectorMetadata",          // (potential new #2)
-        "https://connector-node.eidas.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+        "https://www.signin.service.gov.uk/SAML2/metadata/connector",
+        "https://connector-node.eidas.signin.service.gov.uk/ConnectorMetadata",
     };
 
     String INTEGRATION_SSO = INTEGRATION_HOST + SSO_PATH;
@@ -47,11 +44,8 @@ public interface ConfigurationConstants {
     String INTEGRATION_METADATASOURCE_URI = INTEGRATION_HOST + METADATASOURCE_PATH;
 
     String[] INTEGRATION_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
-        "https://www.integration.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
-        "https://connector-node-integration.london.verify.govsvc.uk/ConnectorMetadata",         // (GSP)
-        "https://eidas.integration.signin.service.gov.uk/ConnectorMetadata",                    // (potential new #1)
-        "https://connector.eidas.integration.signin.service.gov.uk/ConnectorMetadata",          // (potential new #2)
-        "https://connector-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+        "https://www.integration.signin.service.gov.uk/SAML2/metadata/connector",
+        "https://connector-node.integration.eidas.signin.service.gov.uk/ConnectorMetadata",
     };
 
     String COMPLIANCE_SSO = COMPLIANCE_HOST + SSO_PATH;
@@ -60,11 +54,8 @@ public interface ConfigurationConstants {
     String COMPLIANCE_METADATASOURCE_URI = COMPLIANCE_HOST + METADATASOURCE_PATH;
 
     String[] COMPLIANCE_ACCEPTABLE_HUBCONNECTOR_ENTITY_IDS = new String[] {
-        "https://compliance-tool-integration.cloudapps.digital/SAML2/metadata/connector",                       // (AWS)
-        "connector-node-compliance-tool-reference.london.verify.govsvc.uk/ConnectorMetadata",                   // (GSP)
-        "https://eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",                      // (potential new #1)
-        "https://connector.eidas.compliance-tool-reference.signin.service.gov.uk/ConnectorMetadata",            // (potential new #2)
-        "https://compliance-tool-reference-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
+        "https://compliance-tool-integration.cloudapps.digital/SAML2/metadata/connector",
+        "https://compliance-tool-reference-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",
     };
 
 
