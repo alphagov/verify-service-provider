@@ -51,6 +51,6 @@ samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED:-false}
   trustStore:
-    path: ida_metadata_truststore.ts
+    path: test_metadata_truststore.ts
     password: ${TRUSTSTORE_PASSWORD}
   jerseyClientName: trust-anchor-client

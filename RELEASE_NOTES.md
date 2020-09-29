@@ -3,6 +3,14 @@ Release notes
 
 ### Next
 
+#### Update truststores with new CAs
+
+The production truststores now contain the new G3 CAs. The test truststores include the new test G3 CAs as well as the long lived dev-pki CAs.
+
+#### Allow empty truststore configuration
+
+It's now possible to have an empty truststore section in the config template if the environment is provided. Previously the app would fail to initialise even if valid config was provided with environment set but empty truststore section.
+
 #### Updated Compliance Tool's URL address
 
 The Compliance Tool has started using the new URL address `https://compliance-tool-integration.cloudapps.digital` instead of the old URL address `https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk`. This is to ensure that Verify Service Provider can continue to access the Compliance Tool.

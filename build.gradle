@@ -34,7 +34,7 @@ project.ext {
     version_number = '2.1.0'
     openSamlVersion = '3.4.3'
     verifyCommonUtils = '2.0.0-374'
-    samlLibVersion = "$openSamlVersion-232"
+    samlLibVersion = "$openSamlVersion-246"
     dropwizardVersion = '1.3.17'
     jaxbapiVersion = '2.2.9'
 }
@@ -161,7 +161,7 @@ distributions {
                     'configuration/vsp-no-eidas.yml',
                     'configuration/vsp-eidas-without-matching.yml',
                     'verify-service-provider.yml',
-                    'src/main/resources/ida_metadata_truststore.ts'
+                    'src/main/resources/test_metadata_truststore.ts'
 
                 ]
             }

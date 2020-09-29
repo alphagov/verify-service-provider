@@ -20,8 +20,10 @@ import static uk.gov.ida.verifyserviceprovider.utils.DefaultObjectMapper.OBJECT_
 
 public class EuropeanIdentityConfigurationTest {
 
-    public static final String IDAMETADATA = "Idametadata";
-    public static final String IDACA = "Idaca";
+    public static final String IDATESTMETADATACA = "test-metadata-ca-g3";
+    public static final String IDATESTROOTCA = "test-root-ca-g3";
+    public static final String IDAPRODMETADATACAG3 = "prod-metadata-ca-g3";
+    public static final String IDAPRODROOTCAG3 = "prod-root-ca-g3";
     public static final String OVERRIDDENMETADATACA = "overriddenmetadataca";
     public static final String OVERRIDDENROOTCA = "overriddenrootca";
     private final String overriddenTrustAnchorUri = "http://overridden.trustanchoruri.example.com";
@@ -35,13 +37,11 @@ public class EuropeanIdentityConfigurationTest {
 
     private static KeyStoreResource overriddenKeyStoreResource;
 
-    public static final String IDAMETADATAG2 = "idametadatag2";
-
     @Before
     public void setUp() {
         overriddenKeyStoreResource = KeyStoreResourceBuilder.aKeyStoreResource()
-                .withCertificate(OVERRIDDENMETADATACA, CACertificates.TEST_METADATA_CA)
-                .withCertificate(OVERRIDDENROOTCA, CACertificates.TEST_ROOT_CA).build();
+                .withCertificate(OVERRIDDENMETADATACA, CACertificates.TEST_VERIFY_METADATA_CA)
+                .withCertificate(OVERRIDDENROOTCA, CACertificates.TEST_VERIFY_ROOT_CA).build();
 
         overriddenKeyStoreResource.create();
 
@@ -74,30 +74,28 @@ public class EuropeanIdentityConfigurationTest {
     @Test
     public void shouldUseTestTrustStoreWithIntegrationTrustAnchorGivenEidasIsEnabledWithHubEnvironmentSetToIntegration() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert = integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configEnabledOnly, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert = europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
     }
 
     @Test
     public void shouldUseIntegrationEnvironmentConfigExceptOverriddenHubConnectorEntityId() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert = integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithHubConnectorEntityIdOnly, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert = europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
         assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds().toString()).contains(overriddenHubConnectorEntityId);
@@ -108,15 +106,14 @@ public class EuropeanIdentityConfigurationTest {
     @Test
     public void shouldUseIntegrationEnvironmentConfigExceptOverriddenTrustAnchorUri() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert = integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithTrustAnchorUriOnly, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert = europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
         assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.INTEGRATION.getEidasDefaultAcceptableHubConnectorEntityIds());
@@ -127,7 +124,7 @@ public class EuropeanIdentityConfigurationTest {
     @Test
     public void shouldUseIntegrationEnvironmentConfigExceptOverriddenWithTrustStoreOnlyDefined() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithTrustStoreOnlyDefined, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
@@ -146,15 +143,14 @@ public class EuropeanIdentityConfigurationTest {
     @Test
     public void shouldUseIntegrationEnvironmentConfigExceptOverriddenWithMetadataSourceUriOnly() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.INTEGRATION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
 
         assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.INTEGRATION.getEidasDefaultAcceptableHubConnectorEntityIds());
@@ -167,45 +163,42 @@ public class EuropeanIdentityConfigurationTest {
     public void shouldUseTrustStoreWithProductionTrustAnchorGivenEidasIsEnabledWithHubEnvironmentSetToProduction() throws Exception {
 
         KeyStore productionKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(PRODUCTION_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  productionKeyStore.getCertificate(IDAMETADATAG2);
+        Certificate prodMetadataCert = productionKeyStore.getCertificate(IDAPRODMETADATACAG3);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configEnabledOnly, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.PRODUCTION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATAG2);
-        assertThat(productionKeyStore.containsAlias(IDAMETADATAG2)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATAG2)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
-        assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
+        Certificate europeanConfigCert = europeanIdentityConfiguration.getTrustStore().getCertificate(IDAPRODMETADATACAG3);
+        assertThat(productionKeyStore.containsAlias(IDAPRODMETADATACAG3)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAPRODROOTCAG3)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAPRODMETADATACAG3)).isTrue();
+        assertThat(europeanConfigCert).isEqualTo(prodMetadataCert);
     }
 
     @Test
     public void shouldUseTestTrustStoreWithComplianceTrustAnchorGivenEidasIsEnabledWithHubEnvironmentSetToCompliance() throws Exception {
         KeyStore integrationKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDAMETADATA);
+        Certificate integrationEntryCert =  integrationKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configEnabledOnly, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.COMPLIANCE_TOOL);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(integrationEntryCert);
     }
 
     @Test
     public void shouldUseProductionEnvironmentConfigExceptOverriddenWithMetadataSourceUriOnly() throws Exception {
         KeyStore productionKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(PRODUCTION_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate productionEntryCert =  productionKeyStore.getCertificate(IDAMETADATAG2);
+        Certificate productionEntryCert =  productionKeyStore.getCertificate(IDAPRODMETADATACAG3);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.PRODUCTION);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATAG2);
+        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAPRODMETADATACAG3);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATAG2)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAPRODROOTCAG3)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAPRODMETADATACAG3)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(productionEntryCert);
 
         assertThat(europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds()).containsAll(HubEnvironment.PRODUCTION.getEidasDefaultAcceptableHubConnectorEntityIds());
@@ -216,15 +209,14 @@ public class EuropeanIdentityConfigurationTest {
     @Test
     public void shouldUseComplianceEnvironmentConfigExceptOverriddenWithMetadataSourceUriOnly() throws Exception {
         KeyStore complianceKeyStore = new KeyStoreLoader().load(ResourceHelpers.resourceFilePath(TEST_METADATA_TRUSTSTORE),DEFAULT_TRUST_STORE_PASSWORD);
-        Certificate complianceEntryCert =  complianceKeyStore.getCertificate(IDAMETADATA);
+        Certificate complianceEntryCert =  complianceKeyStore.getCertificate(IDATESTMETADATACA);
 
         EuropeanIdentityConfiguration europeanIdentityConfiguration = OBJECT_MAPPER.readValue(configWithMetadataSourceUri, EuropeanIdentityConfiguration.class);
         europeanIdentityConfiguration.setEnvironment(HubEnvironment.COMPLIANCE_TOOL);
-        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDAMETADATA);
+        Certificate europeanConfigCert =  europeanIdentityConfiguration.getTrustStore().getCertificate(IDATESTMETADATACA);
 
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDACA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDAMETADATA)).isTrue();
-        assertThat(europeanIdentityConfiguration.getTrustStore().size()).isEqualTo(2);
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTROOTCA)).isTrue();
+        assertThat(europeanIdentityConfiguration.getTrustStore().containsAlias(IDATESTMETADATACA)).isTrue();
         assertThat(europeanConfigCert).isEqualTo(complianceEntryCert);
 
         assertThat(europeanIdentityConfiguration.getTrustAnchorUri()).isEqualTo(HubEnvironment.COMPLIANCE_TOOL.getEidasMetadataTrustAnchorUri());
