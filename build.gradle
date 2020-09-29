@@ -161,7 +161,7 @@ distributions {
                     'configuration/vsp-no-eidas.yml',
                     'configuration/vsp-eidas-without-matching.yml',
                     'verify-service-provider.yml',
-                    'src/main/resources/test_metadata_truststore.ts'
+                    'src/main/resources/test-metadata-truststore.ts'
 
                 ]
             }

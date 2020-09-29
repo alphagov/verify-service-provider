@@ -61,6 +61,6 @@ europeanIdentity:
   trustAnchorUri: ${TRUST_ANCHOR_URI}
   metadataSourceUri: ${METADATA_SOURCE_URI}
   trustStore:
-    path: ${TRUSTSTORE_PATH}/test_metadata_truststore.ts
+    path: ${TRUSTSTORE_PATH}/test-metadata-truststore.ts
     password: ${TRUSTSTORE_PASSWORD}
   jerseyClientName: trust-anchor-client
