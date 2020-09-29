@@ -31,7 +31,7 @@ repositories {
 }
 
 project.ext {
-    version_number = '2.1.0'
+    version_number = '2.2.0'
     openSamlVersion = '3.4.3'
     verifyCommonUtils = '2.0.0-374'
     samlLibVersion = "$openSamlVersion-246"

@@ -3,6 +3,9 @@ Release notes
 
 ### Next
 
+### 2.2.0
+[View Diff](https://github.com/alphagov/verify-service-provider/compare/2.1.0...2.2.0)
+
 #### Update truststores with new CAs
 
 The production truststores now contain the new G3 CAs. The test truststores include the new test G3 CAs as well as the long lived dev-pki CAs.
