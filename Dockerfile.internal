@@ -1,4 +1,4 @@
-FROM gradle:5.1-jdk8 as build
+FROM gradle:6.7.0-jdk11 as build
 ARG VERIFY_USE_PUBLIC_BINARIES=false
 WORKDIR /verify-service-provider
 USER root
@@ -13,7 +13,7 @@ RUN gradle installDist
 ENTRYPOINT ["gradle"]
 CMD ["tasks"]
 
-FROM openjdk:8-jre-slim
+FROM openjdk:11.0.9.1-jre
 
 WORKDIR /verify-service-provider
 
