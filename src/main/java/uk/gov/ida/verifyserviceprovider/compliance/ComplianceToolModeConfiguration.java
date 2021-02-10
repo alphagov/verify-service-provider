@@ -29,8 +29,7 @@ public class ComplianceToolModeConfiguration extends VerifyServiceProviderConfig
               encryptionKeysAndCert.getPrivate(),
               encryptionKeysAndCert.getPrivate(),
               Optional.empty(),
-              org.joda.time.Duration.standardMinutes(2),
-              Optional.empty());
+              org.joda.time.Duration.standardMinutes(2));
 
         this.serviceEntityId = serviceEntityId;
         this.signingKeysAndCert = signingKeysAndCert;

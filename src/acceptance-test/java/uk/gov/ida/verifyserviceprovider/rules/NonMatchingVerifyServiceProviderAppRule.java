@@ -17,7 +17,6 @@ import uk.gov.ida.verifyserviceprovider.configuration.VerifyServiceProviderConfi
 
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
-import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP;
 
 public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServiceProviderConfiguration> {
@@ -68,13 +67,7 @@ public class NonMatchingVerifyServiceProviderAppRule extends DropwizardAppRule<V
                 ConfigOverride.config("verifyHubConfiguration.metadata.hubTrustStore.password", hubTrustStore.getPassword()),
                 ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
                 ConfigOverride.config("verifyHubConfiguration.metadata.idpTrustStore.password", idpTrustStore.getPassword()),
-                ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-                ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
-                ConfigOverride.config("europeanIdentity.enabled", isEidasEnabled ? "true" : "false"),
-                ConfigOverride.config("europeanIdentity.trustAnchorUri", trustAnchorServer::getUri),
-                ConfigOverride.config("europeanIdentity.metadataSourceUri", metadataAggregatorServer::getUri),
-                ConfigOverride.config("europeanIdentity.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
-                ConfigOverride.config("europeanIdentity.trustStore.password", countryMetadataTrustStore.getPassword())
+                ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
         );
     }
 

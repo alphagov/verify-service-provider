@@ -54,13 +54,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", SINGLE_ENTITY_ID),
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-        ConfigOverride.config("europeanIdentity.enabled", "false"),
-        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-        ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-        ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
     );
 
     @Rule
@@ -73,13 +67,7 @@ public class AuthnRequestAcceptanceTest {
         ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
         ConfigOverride.config("serviceEntityIds", String.format("%s,%s", MULTI_ENTITY_ID_1, MULTI_ENTITY_ID_2)),
         ConfigOverride.config("hashingEntityId", HASHING_ENTITY_ID),
-        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-        ConfigOverride.config("europeanIdentity.enabled", "false"),
-        ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-        ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
-        ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-        ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+        ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY)
     );
 
     @Test
