@@ -19,7 +19,6 @@ import org.opensaml.security.credential.Credential;
 import org.opensaml.security.crypto.KeySupport;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
-import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.domain.SamlStatusCode;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
@@ -39,8 +38,6 @@ import uk.gov.ida.verifyserviceprovider.dto.LevelOfAssurance;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedMatchingResponseBody;
 import uk.gov.ida.verifyserviceprovider.dto.TranslatedResponseBody;
 import uk.gov.ida.verifyserviceprovider.factories.saml.ResponseFactory;
-import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
-import uk.gov.ida.verifyserviceprovider.services.ClassifyingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
@@ -97,7 +94,6 @@ public class ResponseServiceTest {
     private ResponseService matchingResponseService;
 
     private XmlObjectToBase64EncodedStringTransformer<XMLObject> responseToBase64StringTransformer = new XmlObjectToBase64EncodedStringTransformer<>();
-    private AssertionTranslator mockAssertionTranslator = mock(ClassifyingAssertionTranslator.class);
 
     private MetadataResolver hubMetadataResolver;
 
@@ -475,26 +471,6 @@ public class ResponseServiceTest {
                         .build())
                 .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
             );
-    }
-
-    private ResponseBuilder createUnsignedAttributeResponseBuilder() {
-        return aResponse()
-                .withStatus(
-                        aStatus().
-                                withStatusCode(aStatusCode().withValue(StatusCode.SUCCESS).build())
-                                .build())
-                .withNoDefaultAssertion()
-                .addEncryptedAssertion(aDefaultAssertion()
-                        .addAttributeStatement(
-                                anAttributeStatement()
-                                        .addAttribute(new SimpleStringAttributeBuilder()
-                                                .withName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME)
-                                                .withSimpleStringValue("eidasSaml")
-                                                .build())
-                                        .build())
-                        .buildWithEncrypterCredential(encryptionCredentialFactory.getEncryptingCredential())
-                );
-
     }
 
     private AssertionBuilder aDefaultAssertion() {
