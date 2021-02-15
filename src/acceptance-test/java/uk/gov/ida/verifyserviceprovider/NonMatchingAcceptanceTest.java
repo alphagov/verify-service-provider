@@ -253,6 +253,34 @@ public class NonMatchingAcceptanceTest {
     }
 
     @Test
+    public void shouldProcessIdpResponseCorrectlyWhenEuropeanIdentityConfigAbsent() {
+        Client client = application.client();
+        ComplianceToolService complianceTool = new ComplianceToolService(client);
+        GenerateRequestService generateRequestService = new GenerateRequestService(client);
+
+        complianceTool.initialiseWithDefaultsForV2();
+
+        RequestResponseBody requestResponseBody = generateRequestService.generateAuthnRequest(application.getLocalPort());
+        Map<String, String> translateResponseRequestData = ImmutableMap.of(
+                "samlResponse", complianceTool.createResponseFor(requestResponseBody.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID),
+                "requestId", requestResponseBody.getRequestId(),
+                "levelOfAssurance", LEVEL_1.name()
+        );
+
+        Response response = client
+                .target(String.format("http://localhost:%d/translate-response", application.getLocalPort()))
+                .request()
+                .buildPost(json(translateResponseRequestData))
+                .invoke();
+
+        assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+
+        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
+        assertThat(jsonResponse.getString("scenario")).isEqualTo(IDENTITY_VERIFIED.name());
+        assertThat(jsonResponse.getString("levelOfAssurance")).isEqualTo(LEVEL_1.name());
+    }
+
+    @Test
     public void shouldRespondWithSuccessWhenAuthnFailed() {
         complianceTool.initialiseWithDefaultsForV2();
 
