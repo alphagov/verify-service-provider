@@ -47,10 +47,3 @@ samlPrimaryEncryptionKey: ${SAML_PRIMARY_ENCRYPTION_KEY:-}
 # Secondary private key used to decrypt Assertions in the Response
 # This only needs to be set if during key rotations (for example if your primary encryption certificate is about to expire)
 samlSecondaryEncryptionKey: ${SAML_SECONDARY_ENCRYPTION_KEY:-}
-
-europeanIdentity:
-  enabled: ${EUROPEAN_IDENTITY_ENABLED:-false}
-  trustStore:
-    path: test-metadata-truststore.ts
-    password: ${TRUSTSTORE_PASSWORD}
-  jerseyClientName: trust-anchor-client

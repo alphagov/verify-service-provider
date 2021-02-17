@@ -1,10 +1,8 @@
 package uk.gov.ida.verifyserviceprovider.configuration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
-import io.dropwizard.validation.ValidationMethod;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.joda.time.Duration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
@@ -30,7 +28,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     private PrivateKey samlSecondaryEncryptionKey;
     private Optional<MsaMetadataConfiguration> msaMetadata;
     private Duration clockSkew;
-    private Optional<EuropeanIdentityConfiguration> europeanIdentity;
 
     protected VerifyServiceProviderConfiguration() {
     }
@@ -43,8 +40,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
             @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
             @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
             @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
-            @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew,
-            @JsonProperty("europeanIdentity") @Valid @UnwrapValidatedValue Optional<EuropeanIdentityConfiguration> europeanIdentity) {
+            @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
         this.verifyHubConfiguration = verifyHubConfiguration;
@@ -53,8 +49,6 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         this.samlSecondaryEncryptionKey = samlSecondaryEncryptionKey;
         this.msaMetadata = msaMetadata;
         this.clockSkew = clockSkew;
-        this.europeanIdentity = europeanIdentity;
-        this.europeanIdentity.ifPresent(eid -> eid.setEnvironment(verifyHubConfiguration.getHubEnvironment()));
     }
 
     public List<String> getServiceEntityIds() {
@@ -101,13 +95,4 @@ public class VerifyServiceProviderConfiguration extends Configuration {
         return clockSkew;
     }
 
-    public Optional<EuropeanIdentityConfiguration> getEuropeanIdentity() {
-        return europeanIdentity;
-    }
-
-    @ValidationMethod(message = "eIDAS and MSA support cannot be set together. The VSP's eIDAS support is only available when it operates without the MSA")
-    @JsonIgnore
-    public boolean isNotMsaAndEidas() {
-        return !(msaMetadata.isPresent() && europeanIdentity.isPresent());
-    }
 }

@@ -6,9 +6,6 @@ import uk.gov.ida.verifyserviceprovider.rules.VerifyServiceProviderAppRule;
 public class VerifyServiceProviderAppRuleBuilder {
 
     private MockMsaServer mockMsaServer;
-    private boolean isEidasEnabled;
-    private String secondaryEncryptionKey;
-    private String serviceEntityIdOverride;
 
     public static VerifyServiceProviderAppRuleBuilder aVerifyServiceProviderAppRule() {
         return new VerifyServiceProviderAppRuleBuilder();
@@ -23,8 +20,4 @@ public class VerifyServiceProviderAppRuleBuilder {
         return this;
     }
 
-    public VerifyServiceProviderAppRuleBuilder withEidasEnabledFlag(boolean isEidasEnabled) {
-        this.isEidasEnabled = isEidasEnabled;
-        return this;
-    }
 }

@@ -10,5 +10,3 @@ applications:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       CLOCK_SKEW: PT30s
       VERIFY_ENVIRONMENT: PRODUCTION
-      EUROPEAN_IDENTITY_ENABLED: true
-      TRUSTSTORE_PASSWORD: bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh

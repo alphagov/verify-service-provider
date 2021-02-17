@@ -2,8 +2,7 @@ Release notes
 =============
 
 ### Next
-* Fixes an issue with trust anchors for eIDAS metadata resolvers not being updated when they changed at source. The VSP
-  will now update them without requiring a restart.
+* Removed processing of assertions received from EU Member States. The configuration parameter `europeanIdentity`, if present, and child elements must be removed in order for the VSP to start.
 
 ### 2.2.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/2.1.0...2.2.0)

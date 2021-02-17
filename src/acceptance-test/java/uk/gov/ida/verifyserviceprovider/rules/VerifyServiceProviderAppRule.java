@@ -36,17 +36,11 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
             ConfigOverride.config("samlSigningKey", TEST_RP_PRIVATE_SIGNING_KEY),
             ConfigOverride.config("verifyHubConfiguration.environment", "COMPLIANCE_TOOL"),
             ConfigOverride.config("samlPrimaryEncryptionKey", TEST_RP_PRIVATE_ENCRYPTION_KEY),
-            ConfigOverride.config("samlSecondaryEncryptionKey", secondaryEncryptionKey),
-            ConfigOverride.config("europeanIdentity.enabled", "false"),
-            ConfigOverride.config("europeanIdentity.hubConnectorEntityId", "dummyEntity"),
-            ConfigOverride.config("europeanIdentity.trustAnchorUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.metadataSourceUri", "http://dummy.com"),
-            ConfigOverride.config("europeanIdentity.trustStore.path", KEY_STORE_RESOURCE.getAbsolutePath()),
-            ConfigOverride.config("europeanIdentity.trustStore.password", KEY_STORE_RESOURCE.getPassword())
+            ConfigOverride.config("samlSecondaryEncryptionKey", secondaryEncryptionKey)
         );
     }
 
-    public VerifyServiceProviderAppRule(boolean isEidasEnabled, MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
+    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
         super(
             VerifyServiceProviderApplication.class,
             ResourceHelpers.resourceFilePath("verify-service-provider-with-msa.yml"),
@@ -71,16 +65,8 @@ public class VerifyServiceProviderAppRule extends DropwizardAppRule<VerifyServic
     public VerifyServiceProviderAppRule() {
         this(TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
     }
-    public VerifyServiceProviderAppRule(boolean isEidasEnabled, MockMsaServer msaServer) {
-        this(isEidasEnabled, msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
-    }
-
-    public VerifyServiceProviderAppRule(MockMsaServer msaServer, String secondaryEncryptionKey, String serviceEntityIdOverride) {
-        this(false, msaServer, secondaryEncryptionKey, serviceEntityIdOverride);
-    }
-
     public VerifyServiceProviderAppRule(MockMsaServer msaServer) {
-        this(msaServer,TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
+        this(msaServer, TEST_RP_PRIVATE_ENCRYPTION_KEY, "http://verify-service-provider");
     }
 
     public VerifyServiceProviderAppRule(MockMsaServer msaServer, String serviceEntityIdOverride) {

@@ -50,7 +50,6 @@ import static keystore.builders.KeyStoreResourceBuilder.aKeyStoreResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.builders.CertificateBuilder.aCertificate;
-import static uk.gov.ida.verifyserviceprovider.Utils.MdsValueChecker.checkMdsValueInArrayAttributeWithoutDates;
 import static uk.gov.ida.verifyserviceprovider.services.ComplianceToolService.VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID;
 
 public class ComplianceToolModeAcceptanceTest {
@@ -225,59 +224,6 @@ public class ComplianceToolModeAcceptanceTest {
         assertThat(attributes.keySet()).containsExactlyInAnyOrder(Arrays.append(COMMON_FIELDS, "gender"));
 
         checkMatchingDatasetMatches(attributes, newMatchingDataset);
-
-    }
-
-    @Test
-    public void shouldLetYouUseEidasStyleAttributes() {
-        MatchingDataset matchingDataset = new MatchingDatasetBuilder().withEidasFirstName("FOO")
-                .withEidasMiddlename("BAR")
-                .withEidasSurname("BAZ")
-                .withoutAddress()
-                .withoutGender()
-                .withDateOfBirth("1970-01-01")
-                .build();
-
-        Response refreshDataset = client
-                .target(appUri("refresh-matching-dataset"))
-                .request()
-                .post(json(matchingDataset));
-
-        assertThat(refreshDataset.getStatus()).isEqualTo(200);
-
-        Response authnRequest = client
-                .target(appUri("generate-request"))
-                .request()
-                .post(json(new RequestGenerationBody(null)));
-
-        assertThat(authnRequest.getStatus()).isEqualTo(200);
-        RequestResponseBody authnSaml = authnRequest.readEntity(RequestResponseBody.class);
-
-        assertThat(authnSaml.getSsoLocation()).isEqualTo(URI.create(COMPLIANCE_TOOL_HOST + "/SAML2/SSO"));
-        String responseFor = complianceTool.createResponseFor(authnSaml.getSamlRequest(), VERIFIED_USER_ON_SERVICE_WITH_NON_MATCH_SETTING_ID);
-
-        Map<String, String> translateResponseRequestData = ImmutableMap.of(
-                "samlResponse", responseFor,
-                "requestId", authnSaml.getRequestId(),
-                "levelOfAssurance", LevelOfAssurance.LEVEL_1.name());
-
-        Response response = client
-                .target(appUri("translate-response"))
-                .request()
-                .post(json(translateResponseRequestData));
-
-        assertThat(response.getStatus()).isEqualTo(200);
-
-        JSONObject jsonResponse = new JSONObject(response.readEntity(String.class));
-
-        JSONObject attributes = jsonResponse.getJSONObject("attributes");
-        assertThat(attributes.keySet()).containsExactlyInAnyOrder(COMMON_FIELDS);
-
-        checkMdsValueInArrayAttributeWithoutDates("firstNames", 0, matchingDataset.getFirstName().getValue(), matchingDataset.getFirstName().isVerified(), attributes);
-        checkMdsValueInArrayAttributeWithoutDates("datesOfBirth", 0, matchingDataset.getDateOfBirth().getValue(), matchingDataset.getDateOfBirth().isVerified(), attributes);
-        checkMdsValueInArrayAttributeWithoutDates("surnames", 0, matchingDataset.getSurnames().get(0).getValue(), matchingDataset.getSurnames().get(0).isVerified(), attributes);
-        checkMdsValueInArrayAttributeWithoutDates("middleNames", 0, matchingDataset.getMiddleNames().getValue(), matchingDataset.getMiddleNames().isVerified(), attributes);
-        assertThat(attributes.getJSONArray("addresses")).isEmpty();
 
     }
 

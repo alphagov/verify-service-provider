@@ -9,7 +9,3 @@ applications:
     env:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       CLOCK_SKEW: PT30s
-      EUROPEAN_IDENTITY_ENABLED: false
-      HUB_SSO_LOCATION: "https://www.staging.signin.service.gov.uk/SAML2/SSO"
-      HUB_METADATA_URL: "https://www.staging.signin.service.gov.uk/SAML2/metadata/federation"
-      TRUSTSTORE_PASSWORD: bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh

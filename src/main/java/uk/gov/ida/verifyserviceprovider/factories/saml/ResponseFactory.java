@@ -4,7 +4,6 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.saml.core.domain.AddressFactory;
-import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.MatchingDatasetToNonMatchingAttributesMapper;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
@@ -15,7 +14,6 @@ import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
 import uk.gov.ida.saml.deserializers.validators.Base64StringDecoder;
 import uk.gov.ida.saml.deserializers.validators.NotNullSamlStringValidator;
 import uk.gov.ida.saml.hub.factories.UserIdHashFactory;
-import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.IdaKeyStore;
@@ -25,21 +23,16 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.signature.SamlResponseSignatureValidator;
-import uk.gov.ida.verifyserviceprovider.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.verifyserviceprovider.services.AssertionClassifier;
 import uk.gov.ida.verifyserviceprovider.services.AssertionTranslator;
-import uk.gov.ida.verifyserviceprovider.services.EidasAssertionTranslator;
-import uk.gov.ida.verifyserviceprovider.services.EidasUnsignedAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.IdentityResponderCodeTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.services.MatchingResponderCodeTranslator;
 import uk.gov.ida.verifyserviceprovider.services.ResponseService;
-import uk.gov.ida.verifyserviceprovider.services.UnsignedAssertionsResponseHandler;
 import uk.gov.ida.verifyserviceprovider.services.VerifyAssertionTranslator;
 import uk.gov.ida.verifyserviceprovider.utils.DateTimeComparator;
 import uk.gov.ida.verifyserviceprovider.validators.AssertionValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ConditionsValidator;
-import uk.gov.ida.verifyserviceprovider.validators.EidasAssertionTranslatorValidatorContainer;
 import uk.gov.ida.verifyserviceprovider.validators.InstantValidator;
 import uk.gov.ida.verifyserviceprovider.validators.LevelOfAssuranceValidator;
 import uk.gov.ida.verifyserviceprovider.validators.ResponseSizeValidator;
@@ -90,16 +83,14 @@ public class ResponseFactory {
                 matchingAssertionTranslator,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator),
-                new MatchingResponderCodeTranslator(),
-                null
+                new MatchingResponderCodeTranslator()
         );
     }
 
     public ResponseService createNonMatchingResponseService(
             ExplicitKeySignatureTrustEngine hubSignatureTrustEngine,
             AssertionTranslator nonMatchingAssertionTranslator,
-            DateTimeComparator dateTimeComparator,
-            UnsignedAssertionsResponseHandler unsignedAssertionsResponseHandler) {
+            DateTimeComparator dateTimeComparator) {
         final AssertionDecrypter assertionDecrypter = createAssertionDecrypter();
         final MetadataBackedSignatureValidator metadataBackedSignatureValidator = createMetadataBackedSignatureValidator(hubSignatureTrustEngine);
         final StringToOpenSamlObjectTransformer<Response> stringToResponseTransformer = createStringToResponseTransformer();
@@ -110,8 +101,7 @@ public class ResponseFactory {
                 nonMatchingAssertionTranslator,
                 new SamlResponseSignatureValidator(new SamlMessageSignatureValidator(metadataBackedSignatureValidator)),
                 new InstantValidator(dateTimeComparator),
-                new IdentityResponderCodeTranslator(),
-                unsignedAssertionsResponseHandler
+                new IdentityResponderCodeTranslator()
         );
     }
 
@@ -149,35 +139,6 @@ public class ResponseFactory {
                 new UserIdHashFactory(hashingEntityId));
     }
 
-    public EidasAssertionTranslator createEidasAssertionTranslator(
-            DateTimeComparator dateTimeComparator,
-            EidasMetadataResolverRepository eidasMetadataResolverRepository,
-            EuropeanIdentityConfiguration europeanIdentityConfiguration,
-            String hashingEntityId) {
-        return new EidasAssertionTranslator(
-                getEidasAssertionValidatorContainer(dateTimeComparator),
-                new EidasMatchingDatasetUnmarshaller(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                eidasMetadataResolverRepository,
-                new SignatureValidatorFactory(),
-                europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds(),
-                new UserIdHashFactory(hashingEntityId));
-    }
-
-    public EidasUnsignedAssertionTranslator createEidasUnsignedAssertionTranslator(
-            DateTimeComparator dateTimeComparator,
-            EidasMetadataResolverRepository eidasMetadataResolverRepository,
-            EuropeanIdentityConfiguration europeanIdentityConfiguration,
-            String hashingEntityId) {
-        return new EidasUnsignedAssertionTranslator(
-                getEidasAssertionValidatorContainer(dateTimeComparator),
-                new EidasMatchingDatasetUnmarshaller(),
-                new MatchingDatasetToNonMatchingAttributesMapper(),
-                eidasMetadataResolverRepository,
-                europeanIdentityConfiguration.getAllAcceptableHubConnectorEntityIds(),
-                new UserIdHashFactory(hashingEntityId));
-    }
-
     private AssertionDecrypter createAssertionDecrypter() {
         final List<Credential> decryptingCredentials = idaKeyStoreCredentialRetriever.getDecryptingCredentials();
         return new AssertionDecrypter(
@@ -193,12 +154,4 @@ public class ResponseFactory {
         return new IdaKeyStore(null, encryptionKeyPairs);
     }
 
-    private EidasAssertionTranslatorValidatorContainer getEidasAssertionValidatorContainer(DateTimeComparator dateTimeComparator) {
-        final TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(dateTimeComparator);
-        return new EidasAssertionTranslatorValidatorContainer(
-                new SubjectValidator(timeRestrictionValidator),
-                new InstantValidator(dateTimeComparator),
-                new ConditionsValidator(timeRestrictionValidator, new AudienceRestrictionValidator()),
-                new LevelOfAssuranceValidator());
-    }
 }

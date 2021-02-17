@@ -3,7 +3,6 @@ package uk.gov.ida.verifyserviceprovider.compliance.dto;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,10 +37,6 @@ public class MatchingDatasetBuilder {
 
     public MatchingDatasetBuilder withFirstName(String value, boolean verified, LocalDateTime fromDate, LocalDateTime toDate) {
         return withFirstName(new MatchingAttribute(value, verified, fromDate, toDate));
-    }
-
-    public MatchingDatasetBuilder withEidasFirstName(String value) {
-        return withFirstName(new MatchingAttribute(value));
     }
 
     public MatchingDatasetBuilder withMiddleNames(MatchingAttribute middleNames) {
@@ -116,15 +111,6 @@ public class MatchingDatasetBuilder {
 
     public MatchingDataset build() {
         return new MatchingDataset(firstName, middleNames, surnames, gender, dateOfBirth, addresses, levelOfAssurance, persistentId);
-    }
-
-    public MatchingDatasetBuilder withEidasSurname(String value) {
-        this.surnames = Collections.singletonList(new MatchingAttribute(value));
-        return this;
-    }
-
-    public MatchingDatasetBuilder withEidasMiddlename(String value) {
-        return withMiddleNames(new MatchingAttribute(value));
     }
 
     public MatchingDatasetBuilder withoutAddress() {
