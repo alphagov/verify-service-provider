@@ -158,6 +158,7 @@ distributions {
                 [
                     'configuration/vsp-with-matching.yml',
                     'configuration/vsp-with-matching-custom.yml',
+                    'configuration/vsp-without-matching.yml',
                     'verify-service-provider.yml',
                     'src/main/resources/test-metadata-truststore.ts'
 
