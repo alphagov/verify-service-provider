@@ -2,7 +2,7 @@ Release notes
 =============
 
 ### Next
-* Use saml-libs release that removes eIDAS code
+
 ### 3.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/2.2.0...3.0.0)
 * Removed processing of assertions received from EU Member States. The configuration parameter `europeanIdentity`, if present, and child elements must be removed in order for the VSP to start.
