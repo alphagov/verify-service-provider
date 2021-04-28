@@ -1,10 +1,5 @@
-plugins {
-    id 'com.github.ben-manes.versions' version '0.17.0'
-}
-
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'idea'
 
 if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
     apply plugin: 'jacoco'
@@ -20,10 +15,7 @@ if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/allowed-repos for production builds.\n\n')
-        maven { url 'https://dl.bintray.com/alphagov/maven' } // For dropwizard-logstash
-        maven { url 'https://dl.bintray.com/alphagov/maven-test' }
-        maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases' }
-        jcenter()
+        mavenCentral()
     }
     else {
         maven { url 'https://gds.jfrog.io/artifactory/allowed-repos' }
@@ -33,8 +25,8 @@ repositories {
 project.ext {
     version_number = '3.0.0'
     openSamlVersion = '3.4.3'
-    verifyCommonUtils = '2.0.0-374'
-    samlLibVersion = "$openSamlVersion-250"
+    verifyCommonUtils = '2.0.0-396'
+    samlLibVersion = "$openSamlVersion-255"
     dropwizardVersion = '1.3.17'
     jaxbapiVersion = '2.2.9'
 }
@@ -47,8 +39,8 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:common-utils:$verifyCommonUtils",
-        "uk.gov.ida:dropwizard-logstash:$dropwizardVersion-79",
-        "uk.gov.ida:rest-utils:2.0.0-370",
+        "uk.gov.ida:dropwizard-logstash:1.3.22-89",
+        "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
         "org.bouncycastle:bcprov-jdk15on:1.60",
         "org.bouncycastle:bcpkix-jdk15on:1.60",
@@ -60,7 +52,7 @@ dependencies {
         "org.junit.jupiter:junit-jupiter-api:5.5.2",
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
         'org.mockito:mockito-core:3.2.0',
-        "uk.gov.ida:common-test-utils:2.0.0-49",
+        "uk.gov.ida:common-test-utils:2.0.0-65",
         "org.jsoup:jsoup:1.11.1",
         "uk.gov.ida:saml-test:$samlLibVersion",
         "javax.activation:javax.activation-api:1.2.0",
@@ -110,6 +102,10 @@ sourceSets {
             srcDir 'src/test/resources'
         }
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 compileJava {
