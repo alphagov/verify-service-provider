@@ -8,13 +8,15 @@ case $1 in
         CONFIG_FILE=./local-running/local-config.yml
         if test -e local.env; then
             set -a
+            # shellcheck disable=SC1091
             source local.env
             set +a
         else
-            printf "$(tput setaf 1)No local environment found. Use verify-local-startup or openssl to generate a local.env file\n$(tput sgr0)"
+            printf "%sNo local environment found. Use verify-local-startup or openssl to generate a local.env file\n%s" "$(tput setaf  1)" "$(tput sgr0)"
         fi
         ;;
     'vsp-only')
+        # shellcheck disable=SC1091
         source ./local-running/local-vsp-only.env
         ;;
 esac
