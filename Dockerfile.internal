@@ -17,7 +17,7 @@ FROM openjdk:11.0.9.1-jre
 WORKDIR /verify-service-provider
 
 COPY verify-service-provider.yml verify-service-provider.yml
-COPY --from=build home/gradle/verify-service-provider/build/install/verify-service-provider .
+COPY --from=build /home/gradle/verify-service-provider/build/install/verify-service-provider .
 
 ENTRYPOINT ["sh", "-c"]
 CMD ["bin/verify-service-provider", "server", "verify-service-provider.yml"]
