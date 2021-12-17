@@ -31,6 +31,13 @@ project.ext {
     jaxbapiVersion = '2.2.9'
 }
 
+configurations.all {
+    resolutionStrategy {
+        force "ch.qos.logback:logback-classic:1.2.9"
+        force "ch.qos.logback:logback-access:1.2.9"
+    }
+}
+
 dependencies {
     implementation(
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
