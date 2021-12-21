@@ -4,8 +4,6 @@ dist: trusty
 env:
   global:
     - VERIFY_USE_PUBLIC_BINARIES=true
-    # GITHUB_PAT
-    - secure: "nCdMvwIX+lGcJEEyUoFkXz0eBQUXdlY2QqrL5aQA37L6TA78EWxzdawjYi/hIwqx9dfOXYSbZsWbHABfyghQyjKaoF6G+b+CSmq4CDYIpPZMtJNLjPraM7P/FfXu4ocgvKg/MIQoD/63c57ha1HFeoY3A2Zo08Ug2bSlF4/Sx3cnzJNoZNsk7RTUc7xIzfeHYZeVPfs6PxX4M450fwZeAtzq7ktNYfdbBnxMiUG55YTW/1Zkwhc82RKeCXDoq+ILQ+a4jEhgNql0Gzbw79zpvclDhNIxUUIml2UutIq8BOWbIf7Emo/3+tgR3K1GdCAvdFEqF8ussE87teLDZlBzuvwFtEW+Nas04m2WUdKttgvAL+WHTy3hyrw7mX8Z73kAOmmYA6CXp6mye+nIvbmluTRS2niKqJeE8qTENy1+GTHnMcwyMl5LSX0FtH9yAIN/X2L/QBCOuG0XANvuvv1nQsI+Tzbr0O2WHiE2QIUnnS8l5M9QTRHhDYflNRaXEjvoVm6yaqhBaVmiqR32OiDvS/ilYfeLsDN+AsnXRi5RIGYzzdMST1viLoyf+SxOn1ajHxjidOOU4nE6UifVVZoCBlBdn6Q2xMC69BfpBDyTO3U/PXO3lfzPUFIYjPg+JQvHfsUhqRK39DYJBl83YUlph6flAMLof6DB8E0wKYIjzVA="
     # CODACY_PROJECT_TOKEN
     - secure: "eIA7sQrjvTiAIIYVCXqB+PAOaoPy5Okm4Pi1SZ98uJsa2ZCFeSSyO6mostll8JDTmSfLwQRcIL1Wm/Pg7TbsqiMAal594CJylfuVG1LUO2r+MdPHDMn1z9Zzg9OcTZ7TRMD22W2KDBjRs8MYDISqoPUsT6ar85KimiyN/+wMkgkh29qMRzeGdmcXVMmBHyiSF5KrbjpeIsjlSu0/6XDTxTImTpatqNO3pm3fRpak0hAxvsZuhhQkEY/zf66+a/SGWXg+Ancdh75MwVZeDLvi1nnCi09A+fOPGWAwKZ+cBzeo7MsJJW/qWEa2FlydBTylMxNzgOk6VAiK6nOAXfNwHyV2e0FhM2Lm3Bc6WoWMtWz6Xa2ygIrzrmQHJzCfhUfFDMju4tOBEtp4pZK9dkQk+6denr8lbszxc3JzYYhW4vqZMjATmmhoi5/CxnqokbgUJ8fk9xrAAjsOC71iUhZxoPcJpSTLd0cQiQie+8zIZU4HRMufE2mHGrjFSKxCM+AQ35yMlK7Te45I9ObOnLGLBBTcyeRzA4gt+/lLYPSshMxm/e3uwaeXYhfbH9R16AwXLupHO81rc9lx5jq4vbTYbcYwg0K3/WopOmhcy/xwLTF3E9Wv/hUKGZcQcE4m6T16CksC6+4QgbwugygF/pYe2chWsNzKT/8eRxv++nYSyQw="
 
@@ -24,7 +22,7 @@ before_cache:
 
 before_install:
   - sudo apt-get install jq
-  - curl -u ida-codacy-bot:$GITHUB_PAT -LSs $(curl -u ida-codacy-bot:$GITHUB_PAT -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[] | select(.browser_download_url | contains("codacy-coverage-reporter-assembly"))'.browser_download_url) -o codacy-coverage-reporter-assembly.jar
+  - curl -LSs $(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[] | select(.browser_download_url | contains("codacy-coverage-reporter-assembly"))'.browser_download_url) -o codacy-coverage-reporter-assembly.jar
 
 cache:
   directories:
