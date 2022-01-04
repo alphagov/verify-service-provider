@@ -195,7 +195,7 @@ public class SuccessMatchAcceptanceTest {
         assertThat(response.getStatus()).isEqualTo(422);
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
         assertThat(errorMessage.getCode()).isEqualTo(422);
-        assertThat(errorMessage.getMessage()).isEqualTo("requestId may not be null");
+        assertThat(errorMessage.getMessage()).isEqualTo("requestId must not be null");
     }
 
     @Test
@@ -216,7 +216,7 @@ public class SuccessMatchAcceptanceTest {
         assertThat(response.getStatus()).isEqualTo(422);
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
         assertThat(errorMessage.getCode()).isEqualTo(422);
-        assertThat(errorMessage.getMessage()).isEqualTo("requestId may not be null");
+        assertThat(errorMessage.getMessage()).isEqualTo("requestId must not be null");
     }
 
     @Test

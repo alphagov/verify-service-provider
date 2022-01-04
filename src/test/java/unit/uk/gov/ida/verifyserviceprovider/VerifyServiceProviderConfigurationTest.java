@@ -134,7 +134,7 @@ public class VerifyServiceProviderConfigurationTest {
 
     @Test
     public void shouldNotAllowNullValues() throws Exception {
-        expectedException.expectMessage("server may not be null");
+        expectedException.expectMessage("server must not be null");
 
         factory.build(new StringConfigurationSourceProvider("server: "), "");
     }

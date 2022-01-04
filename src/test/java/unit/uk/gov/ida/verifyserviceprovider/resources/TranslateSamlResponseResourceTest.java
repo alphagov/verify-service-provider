@@ -140,7 +140,7 @@ public class TranslateSamlResponseResourceTest {
         ErrorMessage actualErrorMessage = response.readEntity(ErrorMessage.class);
         assertThat(actualErrorMessage.getCode()).isEqualTo(HttpStatus.SC_UNPROCESSABLE_ENTITY);
 
-        Set<String> expectedErrors = ImmutableSet.of("requestId may not be null", "samlResponse may not be null", "levelOfAssurance may not be null");
+        Set<String> expectedErrors = ImmutableSet.of("requestId must not be null", "samlResponse must not be null", "levelOfAssurance must not be null");
         Set<String> actualErrors = Arrays.stream(actualErrorMessage.getMessage().split(", ")).collect(Collectors.toSet());
         assertThat(actualErrors).isEqualTo(expectedErrors);
     }

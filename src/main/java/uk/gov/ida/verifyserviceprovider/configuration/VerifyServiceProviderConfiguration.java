@@ -3,11 +3,9 @@ package uk.gov.ida.verifyserviceprovider.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.dropwizard.Configuration;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.joda.time.Duration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.verifyserviceprovider.exceptions.NoHashingEntityIdIsProvidedError;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -39,7 +37,7 @@ public class VerifyServiceProviderConfiguration extends Configuration {
             @JsonProperty("samlSigningKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSigningKey,
             @JsonProperty("samlPrimaryEncryptionKey") @NotNull @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlPrimaryEncryptionKey,
             @JsonProperty("samlSecondaryEncryptionKey") @Valid @JsonDeserialize(using = PrivateKeyDeserializer.class) PrivateKey samlSecondaryEncryptionKey,
-            @JsonProperty("msaMetadata") @NotNull @UnwrapValidatedValue @Valid Optional<MsaMetadataConfiguration> msaMetadata,
+            @JsonProperty("msaMetadata") @NotNull Optional<@NotNull @Valid MsaMetadataConfiguration> msaMetadata,
             @JsonProperty("clockSkew") @NotNull @Valid Duration clockSkew) {
         this.serviceEntityIds = serviceEntityIds;
         this.hashingEntityId = hashingEntityId;
@@ -94,5 +92,4 @@ public class VerifyServiceProviderConfiguration extends Configuration {
     public Duration getClockSkew() {
         return clockSkew;
     }
-
 }

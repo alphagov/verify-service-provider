@@ -27,7 +27,7 @@ project.ext {
     openSamlVersion = '3.4.3'
     verifyCommonUtils = '2.0.0-396'
     samlLibVersion = "$openSamlVersion-255"
-    dropwizardVersion = '1.3.17'
+    dropwizardVersion = '2.0.28'
     jaxbapiVersion = '2.2.9'
 }
 
@@ -46,7 +46,7 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:common-utils:$verifyCommonUtils",
-        "uk.gov.ida:dropwizard-logstash:1.3.22-89",
+        "uk.gov.ida:dropwizard-logstash:2.0.21-90",
         "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
         "org.bouncycastle:bcprov-jdk15on:1.60",
@@ -59,7 +59,7 @@ dependencies {
         "org.junit.jupiter:junit-jupiter-api:5.5.2",
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
         'org.mockito:mockito-core:3.2.0',
-        "uk.gov.ida:common-test-utils:2.0.0-65",
+        "uk.gov.ida:common-test-utils:2.0.0-66",
         "org.jsoup:jsoup:1.11.1",
         "uk.gov.ida:saml-test:$samlLibVersion",
         "javax.activation:javax.activation-api:1.2.0",

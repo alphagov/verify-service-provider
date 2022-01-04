@@ -3,7 +3,9 @@ package unit.uk.gov.ida.verifyserviceprovider.resources;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.collect.ImmutableMap;
+import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.assertj.core.api.Assertions;
@@ -72,7 +74,9 @@ public class GenerateAuthnRequestResourceTest {
             .addProvider(JsonProcessingExceptionMapper.class)
             .addProvider(InvalidEntityIdExceptionMapper.class)
             .addResource(new GenerateAuthnRequestResource(authnRequestFactory, HUB_SSO_LOCATION, entityIdService))
+            .setMapper(Jackson.newObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true))
             .build();
+
 
     @Before
     public void mockAuthnRequestFactory() {
@@ -165,7 +169,7 @@ public class GenerateAuthnRequestResourceTest {
         assertThat(response.getStatus()).isEqualTo(422);
         assertThat(response.readEntity(ErrorMessage.class)).isEqualTo(new ErrorMessage(
                 422,
-                "Unrecognized token 'this': was expecting 'null', 'true', 'false' or NaN")
+                "Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')")
         );
     }
 
