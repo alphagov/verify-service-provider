@@ -108,7 +108,7 @@ public class MsaMetadataFeatureTest {
     }
 
     @Test
-    public void shouldFailHealthcheckWhenMsaMetadataUnavailable() {
+    public void shouldFailHealthcheckWhenMsaMetadataUnavailable() throws Exception {
         wireMockServer.stubFor(
             get(urlEqualTo("/matching-service/metadata"))
                 .willReturn(aResponse()
@@ -134,7 +134,7 @@ public class MsaMetadataFeatureTest {
     }
 
     @Test
-    public void shouldPassHealthcheckWhenMsaMetadataAvailable() {
+    public void shouldPassHealthcheckWhenMsaMetadataAvailable() throws Exception {
         wireMockServer.stubFor(
             get(urlEqualTo("/matching-service/metadata"))
                 .willReturn(aResponse()

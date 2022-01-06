@@ -35,7 +35,7 @@ public class RefreshDatasetResourceTest {
         assertThat(response.getStatus()).isEqualTo(422);
         ValidationErrorMessage errorMessage = response.readEntity(ValidationErrorMessage.class);
         assertThat(errorMessage.getErrors()).isNotEmpty();
-        assertThat(errorMessage.getErrors()).contains("firstName may not be null");
+        assertThat(errorMessage.getErrors()).contains("firstName must not be null");
     }
 
     @Test

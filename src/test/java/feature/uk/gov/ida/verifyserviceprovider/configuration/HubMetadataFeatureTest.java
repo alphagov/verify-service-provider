@@ -104,7 +104,7 @@ public class HubMetadataFeatureTest {
     }
 
     @Test
-    public void shouldFailHealthcheckWhenHubMetadataUnavailable() {
+    public void shouldFailHealthcheckWhenHubMetadataUnavailable() throws Exception {
         wireMockServer.stubFor(
             get(urlEqualTo("/SAML2/metadata"))
                 .willReturn(aResponse()
@@ -130,7 +130,7 @@ public class HubMetadataFeatureTest {
     }
 
     @Test
-    public void shouldFailHealthcheckWhenHubMetadataIsSignedWithMD5() {
+    public void shouldFailHealthcheckWhenHubMetadataIsSignedWithMD5() throws Exception {
         String id = UUID.randomUUID().toString();
         Signature signature = SignatureBuilder.aSignature()
             .withDigestAlgorithm(id, new DigestMD5())
@@ -166,7 +166,7 @@ public class HubMetadataFeatureTest {
     }
 
     @Test
-    public void shouldPassHealthcheckWhenHubMetadataAvailable() {
+    public void shouldPassHealthcheckWhenHubMetadataAvailable() throws Exception {
         wireMockServer.stubFor(
             get(urlEqualTo("/SAML2/metadata"))
                 .willReturn(

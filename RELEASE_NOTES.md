@@ -5,6 +5,7 @@ Release notes
 * Use saml-libs release that removes eIDAS code
 * Pull dependencies for public builds from Maven Central.
 * Update logback library to version 1.2.9
+* Upgrade to Dropwizard 2
 
 ### 3.0.0
 [View Diff](https://github.com/alphagov/verify-service-provider/compare/2.2.0...3.0.0)
