@@ -25,7 +25,7 @@ repositories {
 project.ext {
     version_number = '3.0.0'
     openSamlVersion = '3.4.3'
-    verifyCommonUtils = '2.0.0-396'
+    verifyCommonUtils = '2.0.0-397'
     samlLibVersion = "$openSamlVersion-255"
     dropwizardVersion = '2.0.28'
     jaxbapiVersion = '2.2.9'
