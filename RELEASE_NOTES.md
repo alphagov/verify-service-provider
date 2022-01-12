@@ -2,6 +2,9 @@ Release notes
 =============
 
 ### Next
+
+### 3.1.0
+[View Diff](https://github.com/alphagov/verify-service-provider/compare/3.0.0...3.1.0)
 * Use saml-libs release that removes eIDAS code
 * Pull dependencies for public builds from Maven Central.
 * Update logback library to version 1.2.9
