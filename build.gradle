@@ -46,7 +46,7 @@ dependencies {
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:common-utils:$verifyCommonUtils",
-        "uk.gov.ida:dropwizard-logstash:2.0.21-90",
+        "uk.gov.ida:dropwizard-logstash:2.1.2-92",
         "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
         "org.bouncycastle:bcprov-jdk15on:1.60",
