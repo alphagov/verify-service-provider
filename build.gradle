@@ -49,7 +49,7 @@ dependencies {
         "uk.gov.ida:dropwizard-logstash:2.0.21-90",
         "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
-        "org.bouncycastle:bcprov-jdk15on:1.60",
+        "org.bouncycastle:bcprov-jdk15on:1.70",
         "org.bouncycastle:bcpkix-jdk15on:1.60",
         "javax.activation:javax.activation-api:1.2.0",
     )
