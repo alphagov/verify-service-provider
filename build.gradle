@@ -50,7 +50,7 @@ dependencies {
         "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
         "org.bouncycastle:bcprov-jdk15on:1.60",
-        "org.bouncycastle:bcpkix-jdk15on:1.60",
+        "org.bouncycastle:bcpkix-jdk15on:1.70",
         "javax.activation:javax.activation-api:1.2.0",
     )
     implementation("commons-collections:commons-collections:3.2.2") { force = true }
