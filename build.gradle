@@ -42,7 +42,7 @@ dependencies {
     implementation(
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
         "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}",
-        "org.json:json:20171018",
+        "org.json:json:20220924",
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:common-utils:$verifyCommonUtils",
