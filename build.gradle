@@ -28,7 +28,7 @@ project.ext {
     verifyCommonUtils = '2.0.0-412'
     samlLibVersion = "$openSamlVersion-275"
     dropwizardVersion = '2.1.2'
-    jaxbapiVersion = '2.2.9'
+    jaxbapiVersion = '2.3.1'
 }
 
 configurations.all {
@@ -42,29 +42,29 @@ dependencies {
     implementation(
         "io.dropwizard:dropwizard-core:$dropwizardVersion",
         "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}",
-        "org.json:json:20171018",
+        "org.json:json:20220924",
         "org.opensaml:opensaml-core:$openSamlVersion",
         "org.opensaml:opensaml-saml-impl:$openSamlVersion",
         "uk.gov.ida:common-utils:$verifyCommonUtils",
-        "uk.gov.ida:dropwizard-logstash:2.0.21-90",
+        "uk.gov.ida:dropwizard-logstash:2.1.2-92",
         "uk.gov.ida:rest-utils:$verifyCommonUtils",
         "uk.gov.ida:saml-lib:$samlLibVersion",
-        "org.bouncycastle:bcprov-jdk15on:1.60",
-        "org.bouncycastle:bcpkix-jdk15on:1.60",
+        "org.bouncycastle:bcprov-jdk15on:1.70",
+        "org.bouncycastle:bcpkix-jdk15on:1.70",
         "javax.activation:javax.activation-api:1.2.0",
     )
     implementation("commons-collections:commons-collections:3.2.2") { force = true }
 
     testImplementation(
-        "org.junit.jupiter:junit-jupiter-api:5.5.2",
+        "org.junit.jupiter:junit-jupiter-api:5.9.1",
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:3.2.0',
-        "uk.gov.ida:common-test-utils:2.0.0-66",
+        'org.mockito:mockito-core:4.8.0',
+        "uk.gov.ida:common-test-utils:2.0.0-67",
         "org.jsoup:jsoup:1.15.3",
         "uk.gov.ida:saml-test:$samlLibVersion",
         "javax.activation:javax.activation-api:1.2.0",
     )
-    testImplementation('com.github.tomakehurst:wiremock:2.11.0'){ transitive = false }
+    testImplementation('com.github.tomakehurst:wiremock:2.16.0'){ transitive = false }
 }
 
 sourceSets {
