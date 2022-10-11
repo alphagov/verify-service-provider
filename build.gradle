@@ -58,7 +58,7 @@ dependencies {
     testImplementation(
         "org.junit.jupiter:junit-jupiter-api:5.5.2",
         "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        'org.mockito:mockito-core:3.2.0',
+        'org.mockito:mockito-core:4.8.0',
         "uk.gov.ida:common-test-utils:2.0.0-66",
         "org.jsoup:jsoup:1.15.3",
         "uk.gov.ida:saml-test:$samlLibVersion",
