@@ -64,7 +64,7 @@ dependencies {
         "uk.gov.ida:saml-test:$samlLibVersion",
         "javax.activation:javax.activation-api:1.2.0",
     )
-    testImplementation('com.github.tomakehurst:wiremock:2.16.0'){ transitive = false }
+    testImplementation('com.github.tomakehurst:wiremock:2.27.2'){ transitive = false }
 }
 
 sourceSets {
