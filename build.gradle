@@ -24,10 +24,10 @@ repositories {
 
 project.ext {
     version_number = '3.1.0'
-    openSamlVersion = '3.4.3'
-    verifyCommonUtils = '2.0.0-397'
-    samlLibVersion = "$openSamlVersion-255"
-    dropwizardVersion = '2.0.28'
+    openSamlVersion = '3.4.6'
+    verifyCommonUtils = '2.0.0-412'
+    samlLibVersion = "$openSamlVersion-273"
+    dropwizardVersion = '2.1.2'
     jaxbapiVersion = '2.2.9'
 }
 
