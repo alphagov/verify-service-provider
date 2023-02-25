@@ -27,7 +27,7 @@ project.ext {
     openSamlVersion = '3.4.6'
     verifyCommonUtils = '2.0.0-412'
     samlLibVersion = "$openSamlVersion-275"
-    dropwizardVersion = '2.1.2'
+    dropwizardVersion = '2.1.5'
     jaxbapiVersion = '2.3.1'
 }
 
