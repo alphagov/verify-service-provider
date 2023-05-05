@@ -24,7 +24,7 @@ repositories {
 
 project.ext {
     version_number = '3.1.0'
-    openSamlVersion = '3.4.6'
+    openSamlVersion = '4.0.1'
     verifyCommonUtils = '2.0.0-412'
     samlLibVersion = "$openSamlVersion-275"
     dropwizardVersion = '2.1.2'
