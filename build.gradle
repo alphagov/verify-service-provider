@@ -34,7 +34,7 @@ project.ext {
 configurations.all {
     resolutionStrategy {
         force "ch.qos.logback:logback-classic:1.2.9"
-        force "ch.qos.logback:logback-access:1.2.9"
+        force "ch.qos.logback:logback-access:1.4.14"
         force "org.apache.santuario:xmlsec:2.1.8"
     }
 }
